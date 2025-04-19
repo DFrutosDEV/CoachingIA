@@ -30,7 +30,7 @@ const clientsData = [
     status: "active",
     plan: "Profesional",
     focus: "Desarrollo personal",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/1",
   },
   {
     id: "2",
@@ -44,7 +44,7 @@ const clientsData = [
     status: "active",
     plan: "Profesional",
     focus: "Gestión del estrés",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/2",
   },
   {
     id: "3",
@@ -58,7 +58,7 @@ const clientsData = [
     status: "active",
     plan: "Básico",
     focus: "Productividad",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/3",
   },
   {
     id: "4",
@@ -72,7 +72,7 @@ const clientsData = [
     status: "active",
     plan: "Empresas",
     focus: "Liderazgo",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/4",
   },
   {
     id: "5",
@@ -86,7 +86,7 @@ const clientsData = [
     status: "pending",
     plan: "Básico",
     focus: "Comunicación",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/5",
   },
   {
     id: "6",
@@ -100,7 +100,7 @@ const clientsData = [
     status: "active",
     plan: "Profesional",
     focus: "Equilibrio vida-trabajo",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/6",
   },
   {
     id: "7",
@@ -114,13 +114,14 @@ const clientsData = [
     status: "inactive",
     plan: "Básico",
     focus: "Desarrollo profesional",
-    avatar: "https://via.placeholder.com/40",
+    avatar: "https://unavatar.io/7",
   },
 ]
 
 export function ClientsList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [currentPage, setCurrentPage] = useState(0)
   const [selectedClient, setSelectedClient] = useState<string | null>(null)
 
   // Filtrar clientes basado en la búsqueda y el filtro de estado
@@ -136,7 +137,7 @@ export function ClientsList() {
   })
 
   return (
-    <Card className="col-span-1">
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>Lista de Clientes</CardTitle>
         <CardDescription>Gestiona tus clientes y su información</CardDescription>
@@ -158,7 +159,7 @@ export function ClientsList() {
                 Filtrar
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800">
               <DropdownMenuLabel>Estado</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setStatusFilter("all")}>Todos</DropdownMenuItem>
@@ -169,7 +170,7 @@ export function ClientsList() {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 overflow-auto">
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -182,7 +183,7 @@ export function ClientsList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredClients.map((client) => (
+              {filteredClients.slice(currentPage * 5, (currentPage + 1) * 5).map((client) => (
                 <TableRow
                   key={client.id}
                   className={selectedClient === client.id ? "bg-muted/50" : ""}
@@ -249,6 +250,29 @@ export function ClientsList() {
               ))}
             </TableBody>
           </Table>
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Mostrando {currentPage * 5 + 1} a {Math.min((currentPage + 1) * 5, filteredClients.length)} de {filteredClients.length} clientes
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 0}
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={(currentPage + 1) * 5 >= filteredClients.length}
+            >
+              Siguiente
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { Button } from "@mui/material"
@@ -9,9 +9,9 @@ export default function CoachDashboard() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
       <DashboardSidebar userType="coach" />
-      <div className="flex flex-col">
+      <div className="flex flex-col h-screen">
         <DashboardHeader userType="coach" />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-auto">
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-4xl font-bold">Bienvenido, María</h1>
@@ -44,10 +44,12 @@ export default function CoachDashboard() {
                   <div className="text-2xl font-bold">24</div>
                   <p className="text-xs text-muted-foreground">+3 este mes</p>
                   <div className="mt-4">
-                    <Button variant="outlined" className="w-full">
-                      Ver clientes
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href="/dashboard/coach/clients">
+                      <Button variant="outlined" className="w-full">
+                        Ver clientes
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -86,13 +88,13 @@ export default function CoachDashboard() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="flex flex-col h-full">
                 <CardHeader>
                   <CardTitle>Sesiones de Hoy</CardTitle>
                   <CardDescription>Tus sesiones programadas para hoy.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="flex-1 overflow-y-auto scrollbar-thin">
+                  <div className="space-y-4 pr-2">
                     {[
                       { time: "10:00 - 11:00", client: "Ana Martínez", topic: "Desarrollo profesional" },
                       { time: "12:30 - 13:30", client: "Pedro Sánchez", topic: "Gestión del tiempo" },
@@ -120,12 +122,12 @@ export default function CoachDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="flex flex-col">
                 <CardHeader>
                   <CardTitle>Clientes Recientes</CardTitle>
                   <CardDescription>Tus clientes más recientes y su progreso.</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 overflow-y-auto" style={{ maxHeight: "320px" }}>
                   <div className="space-y-4">
                     {[
                       { name: "Carlos Rodríguez", sessions: 12, progress: 75 },
@@ -154,15 +156,15 @@ export default function CoachDashboard() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-6">
-                    <Link href="/dashboard/coach/clients">
-                      <Button className="w-full">
-                        Ver todos los clientes
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
                 </CardContent>
+                <CardFooter className="p-4">
+                  <Link href="/dashboard/coach/clients">
+                    <Button className="w-full">
+                      Ver todos los clientes
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </CardFooter>
               </Card>
             </div>
           </div>

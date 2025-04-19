@@ -20,7 +20,7 @@ const clientData = {
   status: "active",
   plan: "Profesional",
   focus: "Desarrollo personal",
-  avatar: "https://via.placeholder.com/150",
+  avatar: "https://unavatar.io/1",
   bio: "Profesional de marketing digital buscando mejorar habilidades de liderazgo y gestión del estrés en entornos de alta presión.",
   goals: [
     { id: "1", title: "Mejorar habilidades de comunicación", progress: 80 },
@@ -48,12 +48,12 @@ export function ClientDetail() {
   const [activeTab, setActiveTab] = useState("info")
 
   return (
-    <Card className="col-span-1">
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>Detalle del Cliente</CardTitle>
-        <CardDescription>Información detallada y acciones</CardDescription>
+        {/* <CardDescription>Información detallada y acciones</CardDescription> */}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex-1 overflow-auto">
         <div className="flex flex-col items-center space-y-3 text-center">
           <img src={clientData.avatar || "/placeholder.svg"} alt={clientData.name} className="h-24 w-24 rounded-full" />
           <div>
@@ -69,7 +69,7 @@ export function ClientDetail() {
           </Badge>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2 mt-4">
           <Button variant="outline" size="sm" className="gap-1">
             <Calendar className="h-4 w-4" />
             Programar
@@ -84,7 +84,7 @@ export function ClientDetail() {
           </Button>
         </div>
 
-        <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="info">Info</TabsTrigger>
             <TabsTrigger value="goals">Objetivos</TabsTrigger>
@@ -197,7 +197,7 @@ export function ClientDetail() {
           </TabsContent>
         </Tabs>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between pb-4">
         <Button variant="outline">Exportar Datos</Button>
         <Button>Editar Perfil</Button>
       </CardFooter>
