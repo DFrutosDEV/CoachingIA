@@ -8,7 +8,7 @@ import Link from "next/link"
 export default function AdminDashboard() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <DashboardSidebar userType="admin" />
+      <DashboardSidebar userType="admin" className="hidden md:block md:w-64" />
       <div className="flex flex-col">
         <DashboardHeader userType="admin" />
         <main className="flex-1 p-6">

@@ -8,7 +8,7 @@ import Link from "next/link"
 export default function CoachDashboard() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <DashboardSidebar userType="coach" />
+      <DashboardSidebar userType="coach" className="hidden md:block md:w-64" />
       <div className="flex flex-col h-screen">
         <DashboardHeader userType="coach" />
         <main className="flex-1 p-6 overflow-auto">

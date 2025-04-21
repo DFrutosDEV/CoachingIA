@@ -42,6 +42,13 @@ export const lightTheme = createTheme({
           fontWeight: 500,
           textTransform: 'none',
         },
+        contained: {
+          color: '#ffffff', // Color blanco para el texto de los botones contenidos
+          '&:hover': {
+            backgroundColor: 'hsl(222.2 47.4% 20%)', // Un tono más claro del color primario para el hover
+            color: '#ffffff', // Mantener el texto blanco en el hover
+          },
+        },
       },
     },
   },

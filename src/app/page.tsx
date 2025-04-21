@@ -186,7 +186,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-              <div className="flex flex-col justify-between rounded-lg border bg-card p-6">
+              <div className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-lg">
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold">Básico</h3>
                   <p className="text-4xl font-bold">
@@ -239,7 +239,7 @@ export default function Home() {
                 </div>
                 <Button variant="contained" className="mt-6">Comenzar</Button>
               </div>
-              <div className="flex flex-col justify-between rounded-lg border bg-card p-6">
+              <div className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-lg">
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold">Empresas</h3>
                   <p className="text-4xl font-bold">
@@ -345,7 +345,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="container flex flex-col items-center justify-between gap-4 border-t py-6 md:h-16 md:flex-row md:py-0">
+        <div className="container flex flex-col gap-4 py-10 border-t md:h-16 md:flex-row md:py-4 mx-auto">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} CoachingIA. Todos los derechos reservados.
           </p>

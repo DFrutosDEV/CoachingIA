@@ -5,11 +5,12 @@ import { Home, Users, Calendar, MessageSquare, FileText, Settings, BarChart, Log
 
 interface SidebarProps {
   userType: "client" | "coach" | "admin"
+  className?: string
 }
 
-export function DashboardSidebar({ userType }: SidebarProps) {
+export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
   return (
-    <div className="hidden border-r bg-muted/40 md:block md:w-64">
+    <div className={`border-r bg-muted/40 ${className}`}>
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 min-h-15">
           <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -39,12 +40,6 @@ export function DashboardSidebar({ userType }: SidebarProps) {
                     Sesiones
                   </Button>
                 </Link>
-                {/* <Link href={`/dashboard/${userType}/messages`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
-                    <MessageSquare className="h-4 w-4" />
-                    Mensajes
-                  </Button>
-                </Link> */}
                 <Link href={`/dashboard/${userType}/progress`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <BarChart className="h-4 w-4" />
@@ -68,12 +63,6 @@ export function DashboardSidebar({ userType }: SidebarProps) {
                     Sesiones
                   </Button>
                 </Link>
-                {/* <Link href={`/dashboard/${userType}/messages`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
-                    <MessageSquare className="h-4 w-4" />
-                    Mensajes
-                  </Button>
-                </Link> */}
                 <Link href={`/dashboard/${userType}/resources`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <FileText className="h-4 w-4" />
@@ -120,7 +109,7 @@ export function DashboardSidebar({ userType }: SidebarProps) {
             </Link>
           </div>
         </ScrollArea>
-        <div className="mt-auto p-4 border-t">
+        <div className="p-4">
           <Link href="/login">
             <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
               <LogOut className="h-4 w-4" />
