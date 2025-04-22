@@ -19,7 +19,7 @@ export function DashboardHeader({ userType }: HeaderProps) {
               <span className="sr-only">Toggle Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-white">
+          <SheetContent side="left" className="w-64 p-0">
             <SheetTitle className="sr-only">Menú de navegación</SheetTitle>
             <DashboardSidebar userType={userType} />
           </SheetContent>
