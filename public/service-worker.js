@@ -2,8 +2,8 @@ const CACHE_NAME = 'coaching-ia-v1';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/icon-192x192.png', //! MODIFICAR Icono de la aplicación 
-  '/icon-512x512.png', //! MODIFICAR Icono de la aplicación
+  '/next.svg', //! MODIFICAR Icono de la aplicación 
+  // '/next.svg', //! MODIFICAR Icono de la aplicación
 ];
 
 self.addEventListener('install', (event) => {
