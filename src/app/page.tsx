@@ -21,9 +21,6 @@ export default function Home() {
             <Link href="#testimonials" className="text-sm font-medium hover:underline underline-offset-4">
               Testimonios
             </Link>
-            <Link href="#pricing" className="text-sm font-medium hover:underline underline-offset-4">
-              Precios
-            </Link>
           </nav>
           <div className="flex gap-4">
             <Link href="/login">
@@ -173,109 +170,9 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section id="pricing" className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Planes simples y transparentes
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Elige el plan que mejor se adapte a tus necesidades.
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-              <div className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-lg">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold">Básico</h3>
-                  <p className="text-4xl font-bold">
-                    €49<span className="text-sm font-normal text-muted-foreground">/mes</span>
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>2 sesiones mensuales</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Acceso a recursos básicos</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Soporte por email</span>
-                    </li>
-                  </ul>
-                </div>
-                <Button variant="contained" className="mt-6">Comenzar</Button>
-              </div>
-              <div className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-lg">
-                <div className="space-y-4">
-                  <div className="inline-block rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground">
-                    Popular
-                  </div>
-                  <h3 className="text-2xl font-bold">Profesional</h3>
-                  <p className="text-4xl font-bold">
-                    €99<span className="text-sm font-normal text-muted-foreground">/mes</span>
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>4 sesiones mensuales</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Acceso a todos los recursos</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Soporte prioritario</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Seguimiento personalizado</span>
-                    </li>
-                  </ul>
-                </div>
-                <Button variant="contained" className="mt-6">Comenzar</Button>
-              </div>
-              <div className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-lg">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold">Empresas</h3>
-                  <p className="text-4xl font-bold">
-                    €199<span className="text-sm font-normal text-muted-foreground">/mes</span>
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>8 sesiones mensuales</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Acceso a todos los recursos</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Soporte 24/7</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Coaching para equipos</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      <span>Informes detallados</span>
-                    </li>
-                  </ul>
-                </div>
-                <Button variant="contained" className="mt-6">Contactar</Button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       <footer className="border-t">
-        <div className="container flex flex-col gap-4 py-10 md:flex-row md:gap-8 md:py-12 mx-auto">
+        <div className="flex flex-col gap-4 py-10 md:flex-row md:gap-8 md:p-12">
           <div className="flex-1 space-y-4">
             <div className="flex items-center gap-2 font-semibold">
               <span className="text-primary font-bold text-xl">CoachingIA</span>
@@ -289,11 +186,6 @@ export default function Home() {
                 <li>
                   <Link href="#" className="text-muted-foreground hover:text-foreground">
                     Características
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Precios
                   </Link>
                 </li>
                 <li>
@@ -345,7 +237,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="container flex flex-col gap-4 py-10 border-t md:h-16 md:flex-row md:py-4 mx-auto">
+        <div className="flex flex-col gap-4 py-10 border-t md:h-16 md:flex-row md:py-4">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} CoachingIA. Todos los derechos reservados.
           </p>
