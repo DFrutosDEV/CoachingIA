@@ -28,6 +28,8 @@ export default function LoginPage() {
         router.push("/dashboard/coach")
       } else if (email.includes("admin")) {
         router.push("/dashboard/admin")
+      } else if (email.includes("enterprise")) {
+        router.push("/dashboard/enterprise")
       } else {
         router.push("/dashboard/client")
       }
@@ -70,7 +72,7 @@ export default function LoginPage() {
                       required
                     />
                     <div className="text-xs text-muted-foreground">
-                      Prueba con: coach@ejemplo.com, client@ejemplo.com o admin@ejemplo.com
+                      Prueba con: coach@ejemplo.com, client@ejemplo.com o admin@ejemplo.com o enterprise@ejemplo.com
                     </div>
                   </div>
                   <div className="space-y-2">

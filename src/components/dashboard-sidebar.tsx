@@ -1,10 +1,10 @@
 import Link from "next/link"
 import { Button } from "@mui/material"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Home, Users, Calendar, MessageSquare, FileText, Settings, BarChart, LogOut, UserCircle } from "lucide-react"
+import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle } from "lucide-react"
 
 interface SidebarProps {
-  userType: "client" | "coach" | "admin"
+  userType: "client" | "coach" | "admin" | "enterprise"
   className?: string
 }
 
@@ -31,19 +31,25 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
                 <Link href={`/dashboard/${userType}/coaches`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <Users className="h-4 w-4" />
-                    Mis Coaches
+                    Mis Servicios
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/sessions`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <Calendar className="h-4 w-4" />
-                    Sesiones
+                    Próximas Sesiones
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/progress`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <BarChart className="h-4 w-4" />
-                    Mi Progreso
+                    En qué estoy trabajando
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/resources`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                    <FileText className="h-4 w-4" />
+                    Recursos
                   </Button>
                 </Link>
               </>
@@ -84,6 +90,41 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <UserCircle className="h-4 w-4" />
                     Coaches
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/enterprises`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                    <Building className="h-4 w-4" />
+                    Empresas
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/analytics`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                    <BarChart className="h-4 w-4" />
+                    Analíticas
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/reports`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                    <FileText className="h-4 w-4" />
+                    Reportes
+                  </Button>
+                </Link>
+              </>
+            )}
+
+            {userType === "enterprise" && (
+              <>
+                <Link href={`/dashboard/${userType}/users`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                    <Users className="h-4 w-4" />
+                    Mis Clientes
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/coaches`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                    <UserCircle className="h-4 w-4" />
+                    Mis Coaches
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/analytics`} passHref>

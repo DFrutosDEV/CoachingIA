@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Bell, FileText, UserPlus, Ticket, ArrowRight } from "lucide-react"
 
-export function ResourcesGrid() {
+export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" | "enterprise" }) {
   const [showNotificationDialog, setShowNotificationDialog] = useState(false)
   const [showNoteDialog, setShowNoteDialog] = useState(false)
   const [showClientDialog, setShowClientDialog] = useState(false)
@@ -27,7 +27,7 @@ export function ResourcesGrid() {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
       {/* Notificaciones */}
-      <Card className="flex flex-col">
+      {userType === "coach" && <Card className="flex flex-col">
         <CardHeader className="pb-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
             <Bell className="h-6 w-6 text-primary" />
@@ -88,10 +88,10 @@ export function ResourcesGrid() {
             </DialogContent>
           </Dialog>
         </CardFooter>
-      </Card>
+      </Card>}
 
       {/* Notas */}
-      <Card className="flex flex-col">
+      {userType === "coach" && <Card className="flex flex-col">
         <CardHeader className="pb-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
             <FileText className="h-6 w-6 text-primary" />
@@ -156,10 +156,10 @@ export function ResourcesGrid() {
             </DialogContent>
           </Dialog>
         </CardFooter>
-      </Card>
+      </Card>}
 
       {/* Agregar Cliente */}
-      <Card className="flex flex-col">
+      {userType === "coach" && <Card className="flex flex-col">
         <CardHeader className="pb-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
             <UserPlus className="h-6 w-6 text-primary" />
@@ -242,10 +242,10 @@ export function ResourcesGrid() {
             </DialogContent>
           </Dialog>
         </CardFooter>
-      </Card>
+      </Card>}
 
       {/* Generar Ticket */}
-      <Card className="flex flex-col">
+      {userType === "coach" && <Card className="flex flex-col">
         <CardHeader className="pb-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
             <Ticket className="h-6 w-6 text-primary" />
@@ -333,7 +333,69 @@ export function ResourcesGrid() {
             </DialogContent>
           </Dialog>
         </CardFooter>
+      </Card>}
+
+      {/* Visualiza PDA */}
+      {userType === "client" && <Card className="flex flex-col">
+        <CardHeader className="pb-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+            <Ticket className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="mt-4">Visualiza tu PDA</CardTitle>
+          <CardDescription>
+            Accede a tu PDA (Personal Development Analysis).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <span>Visualiza tu PDA</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <span>Descarga tu PDA</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <span>Comparte tu PDA</span>
+            </li>
+          </ul>
+        </CardContent>
+        <CardFooter></CardFooter>
       </Card>
+      }
+
+      {/* Visualiza tu formulario de configuración */}
+      {userType === "client" && <Card className="flex flex-col">
+        <CardHeader className="pb-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+            <Ticket className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="mt-4">Visualiza tu formulario de configuración</CardTitle>
+          <CardDescription>
+            Accede a tu formulario de configuración.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <span>Visualiza tu formulario de configuración</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <span>Descarga tu formulario de configuración</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <span>Comparte tu formulario de configuración</span>
+            </li>
+          </ul>
+        </CardContent>
+        <CardFooter></CardFooter>
+      </Card>
+      }
     </div>
   )
 }

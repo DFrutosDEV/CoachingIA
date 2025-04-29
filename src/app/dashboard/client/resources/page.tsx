@@ -12,10 +12,10 @@ export default function ResourcesPage() {
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-bold">Recursos</h1>
-              <p className="text-muted-foreground">Herramientas y recursos para gestionar tu práctica de coaching.</p>
+              <p className="text-muted-foreground">Herramientas y recursos para gestionar tu experiencia de cliente.</p>
             </div>
 
-            <ResourcesGrid userType="coach"/>
+            <ResourcesGrid userType="client"/>
           </div>
         </main>
       </div>

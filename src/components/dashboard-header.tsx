@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { DashboardSidebar } from "./dashboard-sidebar"
 
 interface HeaderProps {
-  userType: "client" | "coach" | "admin"
+  userType: "client" | "coach" | "admin" | "enterprise"
 }
 
 export function DashboardHeader({ userType }: HeaderProps) {
