@@ -1,0 +1,4 @@
+- A LA HORA DE IMPLEMENTAR EL MIDDLEWARE, PUEDO OBTENER CON context.request.headers.get("Accept-Language")
+  esto es interesante para obtener el idioma que prefiere el usuario y poder setearle en una primera instancia el lenguaje
+
+  - para el middleware se puede usar "clerk" (ANALIZAR) midu.link/clerk

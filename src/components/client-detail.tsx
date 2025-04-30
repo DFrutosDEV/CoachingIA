@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Calendar, Clock, Mail, MessageSquare, Phone, FileText, User, CalendarIcon, BarChart } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 // Datos de ejemplo para el cliente seleccionado
 const clientData = {
@@ -51,18 +52,17 @@ export function ClientDetail() {
     <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>Detalle del Cliente</CardTitle>
-        {/* <CardDescription>Información detallada y acciones</CardDescription> */}
       </CardHeader>
       <CardContent className="flex-1 overflow-auto">
         <div className="flex flex-col items-center space-y-3 text-center">
-          <img src={clientData.avatar || "/placeholder.svg"} alt={clientData.name} className="h-24 w-24 rounded-full" />
+          <Image src={clientData.avatar || "/placeholder.svg"} alt={clientData.name} width={86} height={86} className="rounded-full" />
           <div>
             <h3 className="text-xl font-bold">{clientData.name}</h3>
             <p className="text-sm text-muted-foreground">{clientData.focus}</p>
           </div>
           <Badge
             variant={
-              clientData.status === "active" ? "default" : clientData.status === "pending" ? "outline" : "secondary"
+              clientData.status === "active" ? "active" : clientData.status === "pending" ? "pending" : "inactive"
             }
           >
             {clientData.status === "active" ? "Activo" : clientData.status === "pending" ? "Pendiente" : "Inactivo"}
@@ -79,16 +79,16 @@ export function ClientDetail() {
             Mensaje
           </Button>
           <Button variant="outline" size="sm" className="gap-1">
-            <Phone className="h-4 w-4" />
-            Llamar
+            <FileText className="h-4 w-4" />
+            Ver PDA
           </Button>
         </div>
 
         <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="info">Info</TabsTrigger>
-            <TabsTrigger value="goals">Objetivos</TabsTrigger>
-            <TabsTrigger value="notes">Notas</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 border-solid border-2 border-border rounded-md bg-card p-1 h-auto">
+            <TabsTrigger value="info" className="data-[state=active]:bg-accent">Info</TabsTrigger>
+            <TabsTrigger value="goals" className="data-[state=active]:bg-accent">Objetivos</TabsTrigger>
+            <TabsTrigger value="notes" className="data-[state=active]:bg-accent">Notas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="info" className="space-y-4">

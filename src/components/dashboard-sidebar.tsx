@@ -63,7 +63,7 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
                     Mis Clientes
                   </Button>
                 </Link>
-                <Link href={`/dashboard/${userType}/sessions`} passHref>
+                <Link href={`/dashboard/${userType}/calendar`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
                     <Calendar className="h-4 w-4" />
                     Sesiones

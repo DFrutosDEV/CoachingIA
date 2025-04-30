@@ -15,6 +15,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, MoreVertical, Calendar, MessageSquare, FileText, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 // Datos de ejemplo para los clientes
 const clientsData = [
@@ -159,7 +160,7 @@ export function ClientsList() {
                 Filtrar
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800">
+            <DropdownMenuContent className="bg-accent" align="end">
               <DropdownMenuLabel>Estado</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setStatusFilter("all")}>Todos</DropdownMenuItem>
@@ -191,10 +192,12 @@ export function ClientsList() {
                 >
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={client.avatar || "/placeholder.svg"}
                         alt={client.name}
-                        className="h-8 w-8 rounded-full"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
                       />
                       <div>
                         <div className="font-medium">{client.name}</div>
@@ -205,7 +208,7 @@ export function ClientsList() {
                   <TableCell>
                     <Badge
                       variant={
-                        client.status === "active" ? "default" : client.status === "pending" ? "outline" : "secondary"
+                        client.status === "active" ? "active" : client.status === "pending" ? "pending" : "inactive"
                       }
                     >
                       {client.status === "active" ? "Activo" : client.status === "pending" ? "Pendiente" : "Inactivo"}
