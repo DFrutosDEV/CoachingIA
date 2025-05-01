@@ -4,7 +4,7 @@ import { SettingsForm } from "@/components/settings-options";
 
 interface SettingsPageProps {
   params: {
-    userType: "client" | "coach" | "admin" | "enterprise";
+    userType: string;
   };
 }
 
