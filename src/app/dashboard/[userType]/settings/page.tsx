@@ -8,8 +8,8 @@ interface SettingsPageProps {
   };
 }
 
-export default async function SettingsPage({ params }: SettingsPageProps) {
-  const { userType } = await params;
+export default function SettingsPage({ params }: SettingsPageProps) {
+  const { userType } = params;
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
