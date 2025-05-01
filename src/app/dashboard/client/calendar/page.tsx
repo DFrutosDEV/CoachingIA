@@ -6,10 +6,10 @@ export default function ClientsPage() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden md:block">
-        <DashboardSidebar userType="coach" className="h-full" />
+        <DashboardSidebar userType="client" className="h-full" />
       </div>
       <div className="flex flex-col h-screen">
-        <DashboardHeader userType="coach" />
+        <DashboardHeader userType="client" />
         <main className="flex-1 overflow-hidden">
           <div className="grid grid-cols-1 gap-6 h-full">
             <SessionsPage />

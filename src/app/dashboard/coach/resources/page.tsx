@@ -5,7 +5,9 @@ import { ResourcesGrid } from "@/components/resources-grid"
 export default function ResourcesPage() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <DashboardSidebar userType="coach" />
+      <div className="hidden md:block">
+        <DashboardSidebar userType="coach" className="h-full" />
+      </div>
       <div className="flex flex-col">
         <DashboardHeader userType="coach" />
         <main className="flex-1 p-6">

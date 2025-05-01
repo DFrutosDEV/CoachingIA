@@ -17,116 +17,44 @@ import { Search, MoreVertical, Calendar, MessageSquare, FileText, Filter } from 
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 
-// Datos de ejemplo para los clientes
-const clientsData = [
-  {
-    id: "1",
-    name: "Carlos Rodríguez",
-    email: "carlos.rodriguez@ejemplo.com",
-    phone: "+34 612 345 678",
-    startDate: "15/01/2023",
-    sessions: 12,
-    nextSession: "Hoy, 15:00",
-    progress: 75,
-    status: "active",
-    plan: "Profesional",
-    focus: "Desarrollo personal",
-    avatar: "https://unavatar.io/1",
-  },
-  {
-    id: "2",
-    name: "Laura Gómez",
-    email: "laura.gomez@ejemplo.com",
-    phone: "+34 623 456 789",
-    startDate: "03/03/2023",
-    sessions: 8,
-    nextSession: "Mañana, 10:30",
-    progress: 60,
-    status: "active",
-    plan: "Profesional",
-    focus: "Gestión del estrés",
-    avatar: "https://unavatar.io/2",
-  },
-  {
-    id: "3",
-    name: "Miguel Torres",
-    email: "miguel.torres@ejemplo.com",
-    phone: "+34 634 567 890",
-    startDate: "22/04/2023",
-    sessions: 5,
-    nextSession: "Viernes, 16:00",
-    progress: 40,
-    status: "active",
-    plan: "Básico",
-    focus: "Productividad",
-    avatar: "https://unavatar.io/3",
-  },
-  {
-    id: "4",
-    name: "Ana Martínez",
-    email: "ana.martinez@ejemplo.com",
-    phone: "+34 645 678 901",
-    startDate: "10/05/2023",
-    sessions: 3,
-    nextSession: "Lunes, 11:00",
-    progress: 25,
-    status: "active",
-    plan: "Empresas",
-    focus: "Liderazgo",
-    avatar: "https://unavatar.io/4",
-  },
-  {
-    id: "5",
-    name: "Pedro Sánchez",
-    email: "pedro.sanchez@ejemplo.com",
-    phone: "+34 656 789 012",
-    startDate: "05/06/2023",
-    sessions: 2,
-    nextSession: "Martes, 17:30",
-    progress: 15,
-    status: "pending",
-    plan: "Básico",
-    focus: "Comunicación",
-    avatar: "https://unavatar.io/5",
-  },
-  {
-    id: "6",
-    name: "Elena Castro",
-    email: "elena.castro@ejemplo.com",
-    phone: "+34 667 890 123",
-    startDate: "20/02/2023",
-    sessions: 9,
-    nextSession: "Jueves, 09:00",
-    progress: 65,
-    status: "active",
-    plan: "Profesional",
-    focus: "Equilibrio vida-trabajo",
-    avatar: "https://unavatar.io/6",
-  },
-  {
-    id: "7",
-    name: "Javier Moreno",
-    email: "javier.moreno@ejemplo.com",
-    phone: "+34 678 901 234",
-    startDate: "12/03/2023",
-    sessions: 7,
-    nextSession: "Miércoles, 18:00",
-    progress: 50,
-    status: "inactive",
-    plan: "Básico",
-    focus: "Desarrollo profesional",
-    avatar: "https://unavatar.io/7",
-  },
-]
+// Definir tipos (importar si están en archivo compartido)
+interface Goal {
+  id: string;
+  title: string;
+  progress: number;
+}
 
-export function ClientsList() {
+interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  startDate: string;
+  sessions: number;
+  nextSession: string;
+  progress: number;
+  status: "active" | "pending" | "inactive";
+  focus: string;
+  avatar: string;
+  bio: string;
+  goals: Goal[];
+  upcomingSessions: { id: string; date: string; topic: string }[];
+  notes: { id: string; date: string; content: string }[];
+}
+
+// Definir props para ClientsList
+interface ClientsListProps {
+  clients: Client[];
+  onClientSelect: (clientId: string) => void;
+}
+
+export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // Recibir props
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(0)
-  const [selectedClient, setSelectedClient] = useState<string | null>(null)
 
-  // Filtrar clientes basado en la búsqueda y el filtro de estado
-  const filteredClients = clientsData.filter((client) => {
+  // Filtrar clientes basado en la búsqueda y el filtro de estado, usando la prop 'clients'
+  const filteredClients = clients.filter((client) => {
     const matchesSearch =
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,6 +64,11 @@ export function ClientsList() {
 
     return matchesSearch && matchesStatus
   })
+
+  // Resetear página si el filtro cambia y la página actual queda vacía
+  if (currentPage * 5 >= filteredClients.length && currentPage > 0) {
+    setCurrentPage(0);
+  }
 
   return (
     <Card className="h-full flex flex-col">
@@ -150,7 +83,10 @@ export function ClientsList() {
               placeholder="Buscar por nombre, email o enfoque..."
               className="pl-8"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(0); // Reset page on search
+              }}
             />
           </div>
           <DropdownMenu>
@@ -163,10 +99,10 @@ export function ClientsList() {
             <DropdownMenuContent className="bg-accent" align="end">
               <DropdownMenuLabel>Estado</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setStatusFilter("all")}>Todos</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("active")}>Activos</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("pending")}>Pendientes</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>Inactivos</DropdownMenuItem>
+              <DropdownMenuItem className="bg-accent-hover" onClick={() => { setStatusFilter("all"); setCurrentPage(0); }}>Todos</DropdownMenuItem>
+              <DropdownMenuItem className="bg-accent-hover" onClick={() => { setStatusFilter("active"); setCurrentPage(0); }}>Activos</DropdownMenuItem>
+              <DropdownMenuItem className="bg-accent-hover" onClick={() => { setStatusFilter("pending"); setCurrentPage(0); }}>Pendientes</DropdownMenuItem>
+              <DropdownMenuItem className="bg-accent-hover" onClick={() => { setStatusFilter("inactive"); setCurrentPage(0); }}>Inactivos</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -184,11 +120,12 @@ export function ClientsList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredClients.slice(currentPage * 5, (currentPage + 1) * 5).map((client) => (
+              {filteredClients.length > 0 ? (
+                 filteredClients.slice(currentPage * 5, (currentPage + 1) * 5).map((client) => (
                 <TableRow
                   key={client.id}
-                  className={selectedClient === client.id ? "bg-muted/50" : ""}
-                  onClick={() => setSelectedClient(client.id)}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => onClientSelect(client.id)}
                 >
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -226,57 +163,65 @@ export function ClientsList() {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="text" size="icon" onClick={(e) => e.stopPropagation()}>
                           <MoreVertical className="h-4 w-4" />
                           <span className="sr-only">Abrir menú</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                      <DropdownMenuContent className="bg-accent" align="end">
+                        <DropdownMenuLabel>Acciones Rápidas</DropdownMenuLabel>
+                        <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Programar", client.id); }}>
                           <Calendar className="mr-2 h-4 w-4" />
                           <span>Programar sesión</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Mensaje", client.id); }}>
                           <MessageSquare className="mr-2 h-4 w-4" />
                           <span>Enviar mensaje</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("PDA", client.id); }}>
                           <FileText className="mr-2 h-4 w-4" />
-                          <span>Ver notas</span>
+                          <span>Ver PDA</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    No se encontraron clientes.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Mostrando {currentPage * 5 + 1} a {Math.min((currentPage + 1) * 5, filteredClients.length)} de {filteredClients.length} clientes
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 0}
-            >
-              Anterior
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={(currentPage + 1) * 5 >= filteredClients.length}
-            >
-              Siguiente
-            </Button>
+        {filteredClients.length > 5 && (
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Mostrando {currentPage * 5 + 1} a {Math.min((currentPage + 1) * 5, filteredClients.length)} de {filteredClients.length} clientes
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 0}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={(currentPage + 1) * 5 >= filteredClients.length}
+              >
+                Siguiente
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -8,7 +8,9 @@ import Link from "next/link"
 export default function CoachDashboard() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <DashboardSidebar userType="coach" className="hidden md:block md:w-64" />
+      <div className="hidden md:block">
+        <DashboardSidebar userType="coach" className="h-full" />
+      </div>
       <div className="flex flex-col h-screen">
         <DashboardHeader userType="coach" />
         <main className="flex-1 p-6 overflow-auto">
@@ -62,14 +64,16 @@ export default function CoachDashboard() {
                   <div className="text-2xl font-bold">12</div>
                   <p className="text-xs text-muted-foreground">Para esta semana</p>
                   <div className="mt-4">
-                    <Button variant="outlined" className="w-full">
-                      Ver calendario
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href="/dashboard/coach/calendar">
+                      <Button variant="outlined" className="w-full">
+                        Ver calendario
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              {/* <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Mensajes</CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -84,7 +88,7 @@ export default function CoachDashboard() {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">

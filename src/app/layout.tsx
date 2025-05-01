@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from '../components/theme-provider'
 import { MUIProvider } from '../components/mui-provider'
 import { ClientLayout } from '../components/ClientLayout'
+import { Toaster } from 'sonner'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -57,6 +58,7 @@ export default function RootLayout({
           <MUIProvider>
             <ClientLayout>
               {children}
+              <Toaster position="bottom-right" richColors />
             </ClientLayout>
           </MUIProvider>
         </ThemeProvider>

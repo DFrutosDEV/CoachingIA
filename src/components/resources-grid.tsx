@@ -79,7 +79,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
                   <Textarea id="message" placeholder="Escribe tu mensaje aquí..." />
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="flex justify-end gap-2">
                 <Button variant="outlined" onClick={() => setShowNotificationDialog(false)}>
                   Cancelar
                 </Button>
@@ -147,7 +147,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
                   <Textarea id="note-content" placeholder="Escribe tu nota aquí..." className="min-h-[120px]" />
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="flex justify-end gap-2">
                 <Button variant="outlined" onClick={() => setShowNoteDialog(false)}>
                   Cancelar
                 </Button>
@@ -217,23 +217,11 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
                   <Input id="phone" placeholder="+34 600 000 000" />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="plan">Plan</Label>
-                  <select
-                    id="plan"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="">Seleccionar plan</option>
-                    <option value="basic">Básico</option>
-                    <option value="professional">Profesional</option>
-                    <option value="enterprise">Empresas</option>
-                  </select>
-                </div>
-                <div className="grid gap-2">
                   <Label htmlFor="focus">Enfoque principal</Label>
                   <Input id="focus" placeholder="Ej: Desarrollo personal, Liderazgo..." />
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="flex justify-end gap-2">
                 <Button variant="outlined" onClick={() => setShowClientDialog(false)}>
                   Cancelar
                 </Button>
@@ -324,7 +312,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
                   </select>
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="flex justify-end gap-2">
                 <Button variant="outlined" onClick={() => setShowTicketDialog(false)}>
                   Cancelar
                 </Button>

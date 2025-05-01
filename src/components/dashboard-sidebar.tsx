@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Button } from "@mui/material"
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle } from "lucide-react"
 
@@ -20,7 +20,7 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
         <ScrollArea className="flex-1 px-2">
           <div className="flex flex-col gap-1 py-2">
             <Link href={`/dashboard/${userType}`} passHref>
-              <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+              <Button variant="text" className="w-full justify-start gap-2">
                 <Home className="h-4 w-4" />
                 Inicio
               </Button>
@@ -28,26 +28,26 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
 
             {userType === "client" && (
               <>
-                <Link href={`/dashboard/${userType}/coaches`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                <Link href={`/dashboard/${userType}/services`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
                     Mis Servicios
                   </Button>
                 </Link>
-                <Link href={`/dashboard/${userType}/sessions`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                <Link href={`/dashboard/${userType}/calendar`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Calendar className="h-4 w-4" />
                     Próximas Sesiones
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/progress`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
                     En qué estoy trabajando
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/resources`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
                     Recursos
                   </Button>
@@ -58,19 +58,19 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
             {userType === "coach" && (
               <>
                 <Link href={`/dashboard/${userType}/clients`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
                     Mis Clientes
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/calendar`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Calendar className="h-4 w-4" />
                     Sesiones
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/resources`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
                     Recursos
                   </Button>
@@ -81,31 +81,31 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
             {userType === "admin" && (
               <>
                 <Link href={`/dashboard/${userType}/users`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
                     Usuarios
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/coaches`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <UserCircle className="h-4 w-4" />
                     Coaches
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/enterprises`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Building className="h-4 w-4" />
                     Empresas
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/analytics`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
                     Analíticas
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/reports`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
                     Reportes
                   </Button>
@@ -116,25 +116,25 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
             {userType === "enterprise" && (
               <>
                 <Link href={`/dashboard/${userType}/users`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
                     Mis Clientes
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/coaches`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <UserCircle className="h-4 w-4" />
                     Mis Coaches
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/analytics`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
                     Analíticas
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/reports`} passHref>
-                  <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+                  <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
                     Reportes
                   </Button>
@@ -143,16 +143,16 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
             )}
 
             <Link href={`/dashboard/${userType}/settings`} passHref>
-              <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+              <Button variant="text" className="w-full justify-start gap-2">
                 <Settings className="h-4 w-4" />
                 Configuración
               </Button>
             </Link>
           </div>
         </ScrollArea>
-        <div className="p-4">
+        <div className="p-2 pt-8">
           <Link href="/login">
-            <Button variant="text" className="w-full justify-start gap-2" sx={{ justifyContent: "flex-start" }}>
+            <Button variant="text" className="w-full justify-start gap-2">
               <LogOut className="h-4 w-4" />
               Cerrar Sesión
             </Button>

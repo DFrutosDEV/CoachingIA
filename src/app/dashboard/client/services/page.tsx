@@ -1,8 +1,8 @@
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { ResourcesGrid } from "@/components/resources-grid"
+import { ServicesGrid } from "@/components/services-grid"
 
-export default function ResourcesPage() {
+export default function ServicesPage() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden md:block">
@@ -13,11 +13,10 @@ export default function ResourcesPage() {
         <main className="flex-1 p-6">
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="text-3xl font-bold">Recursos</h1>
-              <p className="text-muted-foreground">Herramientas y recursos para gestionar tu experiencia de cliente.</p>
+              <h1 className="text-3xl font-bold">Servicios</h1>
+              <p className="text-muted-foreground">Aca encontraras los servicios que tienes contratados.</p>
             </div>
-
-            <ResourcesGrid userType="client"/>
+            <ServicesGrid />
           </div>
         </main>
       </div>

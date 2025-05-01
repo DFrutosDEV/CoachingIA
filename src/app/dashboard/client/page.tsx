@@ -8,7 +8,9 @@ import Link from "next/link"
 export default function ClientDashboard() {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <DashboardSidebar userType="client" className="hidden md:block md:w-64" />
+      <div className="hidden md:block">
+        <DashboardSidebar userType="client" className="h-full" />
+      </div>
       <div className="flex flex-col">
         <DashboardHeader userType="client" />
         <main className="flex-1 p-6">
