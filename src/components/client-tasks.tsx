@@ -93,8 +93,8 @@ const ClientTasks: React.FC = () => {
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-semibold" style={{ color: theme.palette.text.primary }}>15 Marzo 2024</h3>
                 <span className="text-xs px-2 py-1 rounded-full" style={{
-                  backgroundColor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText
+                  backgroundColor: theme.palette.info.main,
+                  color: theme.palette.info.contrastText
                 }}>Importante</span>
               </div>
               <p className="text-sm mb-2" style={{ color: theme.palette.text.secondary }}>
