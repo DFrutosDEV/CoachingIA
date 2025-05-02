@@ -212,13 +212,13 @@ export default function ClientsPage() {
   const selectedClient = clients.find(client => client.id === selectedClientId) || null;
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <div className="hidden md:block">
+    <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="coach" className="h-full" />
       </div>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col overflow-hidden">
         <DashboardHeader userType="coach" />
-        <main className="flex-1 p-6 overflow-hidden">
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col h-full">
             <div className="mb-4">
               <h1 className="text-3xl font-bold">Mis Clientes</h1>

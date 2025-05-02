@@ -4,14 +4,17 @@ import SessionsPage from "@/components/ui/calendar"
 
 export default function ClientsPage() {
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <div className="hidden md:block">
+    <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="coach" className="h-full" />
       </div>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col overflow-hidden">
         <DashboardHeader userType="coach" />
-        <main className="flex-1 overflow-hidden">
-          <div className="grid grid-cols-1 gap-6 h-full">
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
+          <div className="grid grid-cols-1 h-full">
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-bold">Calendario</h1>
+            </div>
             <SessionsPage />
           </div>
         </main>

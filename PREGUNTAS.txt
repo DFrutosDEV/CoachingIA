@@ -1,1 +1,7 @@
  1 - Los Coachs pueden editar datos clientes? Cuales?
+ 
+ 2 - "Mis servicios" => donde verás los servicios activos y activables. => Como se tiene que ver la pantalla? 
+ Visualiza a todos los coachs activos y el cliente desde ahi puede contratarlos? o apreta un boton 
+ para buscar un nuevo servicio a contratar?
+
+ 3 - 

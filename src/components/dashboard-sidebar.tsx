@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle, File } from "lucide-react"
+import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle, File, BookOpenCheck } from "lucide-react"
 
 interface SidebarProps {
   userType: "client" | "coach" | "admin" | "enterprise"
@@ -44,6 +44,12 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
                   <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
                     En qué estoy trabajando
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/tasks`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2">
+                    <BookOpenCheck className="h-4 w-4" />
+                    Tareas a realizar
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/resources`} passHref>

@@ -160,7 +160,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
       </Card>}
 
       {/* Agregar Cliente */}
-      {(userType === "coach" || userType === "enterprise") && <Card className="flex flex-col">
+      {(userType === "coach" || userType === "enterprise" || userType === "admin") && <Card className="flex flex-col">
         <CardHeader className="pb-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
             <UserPlus className="h-6 w-6 text-primary" />
@@ -221,6 +221,15 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
                   <Label htmlFor="focus">Enfoque principal</Label>
                   <Input id="focus" placeholder="Ej: Desarrollo personal, Liderazgo..." />
                 </div>
+
+                {
+                  (userType === "admin" || userType === "enterprise") && (
+                    <div className="grid gap-2">
+                      <Label htmlFor="coach">Coach asignado</Label>
+                      <Input id="coach" placeholder="Seleccionar coach" />
+                    </div>
+                  )
+                }
               </div>
               <DialogFooter className="flex justify-end gap-2">
                 <Button variant="outlined" onClick={() => setShowClientDialog(false)}>

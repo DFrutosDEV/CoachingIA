@@ -126,8 +126,7 @@ export default function SessionsPage() {
   }
 
   return (
-    <div className="p-4 md:p-8">
-      <h1 className="text-2xl font-semibold mb-4">Calendario de Sesiones</h1>
+    <div className="p-2">
       <div style={{ height: "calc(100vh - 150px)" }}>
         {/* Ajusta la altura según necesites */}
         <Calendar

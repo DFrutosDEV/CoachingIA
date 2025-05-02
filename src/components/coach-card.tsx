@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@mui/material";
 
 interface CoachCardProps {
   firstName: string;
@@ -37,6 +38,7 @@ export function CoachCard({
       <Badge variant="outline">{service}</Badge>
       <p className="text-sm">{email}</p>
       <p className="text-sm">{phoneNumber}</p>
+      <Button variant="outlined">Enviar Mensaje</Button>
     </div>
   );
 }
