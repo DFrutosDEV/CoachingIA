@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle } from "lucide-react"
+import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle, File } from "lucide-react"
 
 interface SidebarProps {
   userType: "client" | "coach" | "admin" | "enterprise"
@@ -80,10 +80,10 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
 
             {userType === "admin" && (
               <>
-                <Link href={`/dashboard/${userType}/users`} passHref>
+                <Link href={`/dashboard/${userType}/clients`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
-                    Usuarios
+                    Clientes
                   </Button>
                 </Link>
                 <Link href={`/dashboard/${userType}/coaches`} passHref>
@@ -106,8 +106,14 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
                 </Link>
                 <Link href={`/dashboard/${userType}/reports`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2">
-                    <FileText className="h-4 w-4" />
+                    <File className="h-4 w-4" />
                     Reportes
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/resources`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2">
+                    <FileText className="h-4 w-4" />
+                    Recursos
                   </Button>
                 </Link>
               </>
@@ -115,7 +121,7 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
 
             {userType === "enterprise" && (
               <>
-                <Link href={`/dashboard/${userType}/users`} passHref>
+                <Link href={`/dashboard/${userType}/clients`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
                     Mis Clientes
@@ -135,8 +141,14 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
                 </Link>
                 <Link href={`/dashboard/${userType}/reports`} passHref>
                   <Button variant="text" className="w-full justify-start gap-2">
-                    <FileText className="h-4 w-4" />
+                    <File className="h-4 w-4" />
                     Reportes
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/${userType}/resources`} passHref>
+                  <Button variant="text" className="w-full justify-start gap-2">
+                    <FileText className="h-4 w-4" />
+                    Recursos
                   </Button>
                 </Link>
               </>

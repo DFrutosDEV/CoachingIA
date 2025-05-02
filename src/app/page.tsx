@@ -3,7 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@mui/material"
 import imgHome1 from "../img/imgHome1.png"
-import { ArrowRight, CheckCircle, Users, Calendar, BarChart } from "lucide-react"
+import { ArrowRight, Users, Calendar, BarChart } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export default function Home() {
@@ -132,7 +132,7 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4 rounded-lg border p-6">
                 <div className="flex items-center gap-4">
                   <Image
-                    src="https://unavatar.io/github/37t?fallback=https://source.boringavatars.com/marble/120/1337_user?colors=264653r,2a9d8f,e9c46a,f4a261,e76f51"
+                    src="https://ui-avatars.com/api/?background=random&name=María García"
                     alt="Avatar"
                     className="rounded-full"
                     height={50}
@@ -151,7 +151,7 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4 rounded-lg border p-6">
                 <div className="flex items-center gap-4">
                   <Image
-                    src="https://unavatar.io/github/37t?fallback=https://avatar.vercel.sh/37t?size=400"
+                    src="https://ui-avatars.com/api/?background=random&name=Carlos Rodríguez"
                     alt="Avatar"
                     className="rounded-full"
                     height={50}

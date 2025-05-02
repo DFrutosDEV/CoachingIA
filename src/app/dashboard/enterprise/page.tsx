@@ -7,13 +7,13 @@ import Link from "next/link"
 
 export default function EnterpriseDashboard() {
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <div className="hidden md:block">
+    <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="enterprise" className="h-full" />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col overflow-hidden">
         <DashboardHeader userType="enterprise" />
-        <main className="flex-1 p-6">
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-bold">Panel de Empresa</h1>
@@ -25,17 +25,19 @@ export default function EnterpriseDashboard() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Usuarios</CardTitle>
+                  <CardTitle className="text-sm font-medium">Total Clientes</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">1,248</div>
                   <p className="text-xs text-muted-foreground">+86 este mes</p>
                   <div className="mt-4">
-                    <Button size="sm" variant="outline" className="w-full">
-                      Ver usuarios
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href="/dashboard/enterprise/clients">
+                      <Button size="sm" variant="outline" className="w-full">
+                        Ver clientes
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -48,10 +50,12 @@ export default function EnterpriseDashboard() {
                   <div className="text-2xl font-bold">64</div>
                   <p className="text-xs text-muted-foreground">+12 este mes</p>
                   <div className="mt-4">
-                    <Button size="sm" variant="outline" className="w-full">
-                      Ver coaches
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href="/dashboard/enterprise/resources">
+                      <Button size="sm" variant="outline" className="w-full">
+                        Ver coaches
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -64,10 +68,12 @@ export default function EnterpriseDashboard() {
                   <div className="text-2xl font-bold">3,879</div>
                   <p className="text-xs text-muted-foreground">+458 este mes</p>
                   <div className="mt-4">
-                    <Button size="sm" variant="outline" className="w-full">
-                      Ver analíticas
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href="/dashboard/enterprise/analytics">
+                      <Button size="sm" variant="outline" className="w-full">
+                        Ver analíticas
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -80,10 +86,12 @@ export default function EnterpriseDashboard() {
                   <div className="text-2xl font-bold">12</div>
                   <p className="text-xs text-muted-foreground">Pendientes de revisión</p>
                   <div className="mt-4">
-                    <Button size="sm" variant="outline" className="w-full">
-                      Ver reportes
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href="/dashboard/enterprise/resources">
+                      <Button size="sm" variant="outline" className="w-full">
+                        Ver reportes
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -122,9 +130,11 @@ export default function EnterpriseDashboard() {
                             <span className="text-xs text-muted-foreground">{user.date}</span>
                           </div>
                         </div>
-                        <Button size="sm" variant="outline">
-                          Ver perfil
-                        </Button>
+                        <Link href="/dashboard/enterprise/clients">
+                          <Button size="sm" variant="outline">
+                            Ver perfil
+                          </Button>
+                        </Link>
                       </div>
                     ))}
                   </div>
@@ -172,7 +182,7 @@ export default function EnterpriseDashboard() {
                     ))}
                   </div>
                   <div className="mt-6">
-                    <Link href="/dashboard/admin/analytics">
+                    <Link href="/dashboard/enterprise/analytics">
                       <Button className="w-full">
                         Ver informe completo
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -182,52 +192,6 @@ export default function EnterpriseDashboard() {
                 </CardContent>
               </Card>
             </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Actividad Reciente</CardTitle>
-                <CardDescription>Últimas acciones realizadas en la plataforma.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      action: "Nuevo coach registrado",
-                      details: "Roberto Fernández se ha registrado como coach",
-                      time: "Hace 2 horas",
-                    },
-                    {
-                      action: "Sesión cancelada",
-                      details: "La sesión entre María González y Carlos Rodríguez ha sido cancelada",
-                      time: "Hace 5 horas",
-                    },
-                    {
-                      action: "Reporte de problema",
-                      details: "Laura Gómez ha reportado un problema con la plataforma de videoconferencia",
-                      time: "Hace 8 horas",
-                    },
-                    {
-                      action: "Actualización de perfil",
-                      details: "Juan Pérez ha actualizado su perfil y especialidades",
-                      time: "Hace 12 horas",
-                    },
-                    {
-                      action: "Nuevo plan contratado",
-                      details: "Ana Martínez ha contratado el plan Profesional",
-                      time: "Hace 1 día",
-                    },
-                  ].map((activity, index) => (
-                    <div key={index} className="flex items-start justify-between border-b pb-4 last:border-0 last:pb-0">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">{activity.action}</p>
-                        <p className="text-xs text-muted-foreground">{activity.details}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </main>
       </div>

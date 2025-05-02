@@ -10,7 +10,7 @@ const exampleCoaches = [
     email: "juan.perez@example.com",
     phoneNumber: "+1234567890",
     service: "Entrenamiento Personalizado",
-    profilePictureUrl: "/placeholder-user.jpg" // Cambiar por URL real o dejar undefined
+    profilePictureUrl: "https://ui-avatars.com/api/?background=random&name=Juan Pérez" // Cambiar por URL real o dejar undefined
   },
   {
     firstName: "Ana",
@@ -26,7 +26,7 @@ const exampleCoaches = [
     email: "carlos.r@example.com",
     phoneNumber: "+1122334455",
     service: "Coaching Mental",
-    profilePictureUrl: "/placeholder-user.jpg"
+    profilePictureUrl: "https://ui-avatars.com/api/?background=random&name=Carlos Rodríguez"
   },
 ];
 

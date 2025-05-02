@@ -99,6 +99,33 @@
   }
 }
 
+@keyframes circle-out-bottom-right {
+  from {
+    clip-path: circle(125%);
+  }
+  to {
+    clip-path: circle(0% at bottom right);
+  }
+}
+
+.circle-out {
+  animation: 2.5s cubic-bezier(.25, 1, .30, 1) circle-out-bottom-right both;
+}
+
+
+@keyframes circle-out-center {
+  from {
+    clip-path: circle(0%);
+  }
+  to {
+    clip-path: circle(125%);
+  }
+}
+
+.circle-out-center {
+  animation: 2.5s cubic-bezier(.25, 1, .30, 1) circle-out-center both;
+}
+
 @layer utilities {
   .bg-primary {
     background-color: hsl(var(--primary));

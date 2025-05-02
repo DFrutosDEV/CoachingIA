@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { ClientsList } from "../../../../components/clients-list"
 import { ClientDetail } from "../../../../components/client-detail"
+import { Users } from "lucide-react"
 
 interface Goal {
   id: string;
@@ -31,40 +32,6 @@ interface Client {
 }
 
 const initialClientsData: Client[] = [
-  {
-    id: "1",
-    name: "Carlos Rodríguez",
-    email: "carlos.rodriguez@ejemplo.com",
-    phone: "+34 612 345 678",
-    startDate: "15/01/2023",
-    sessions: 12,
-    nextSession: "Hoy, 15:00",
-    progress: 75,
-    status: "active",
-    focus: "Desarrollo personal",
-    avatar: "https://ui-avatars.com/api/?background=random&name=Carlos Rodríguez",
-    bio: "Profesional de marketing digital buscando mejorar habilidades de liderazgo y gestión del estrés en entornos de alta presión.",
-    goals: [
-      { id: "1", title: "Mejorar habilidades de comunicación", progress: 80 },
-      { id: "2", title: "Reducir niveles de estrés", progress: 65 },
-      { id: "3", title: "Establecer rutina matutina", progress: 90 },
-      { id: "4", title: "Mejorar productividad laboral", progress: 40 },
-    ],
-    upcomingSessions: [
-      { id: "1", date: "Hoy, 15:00", topic: "Desarrollo personal" },
-      { id: "2", date: "Viernes, 16:00", topic: "Seguimiento semanal" },
-      { id: "3", date: "Lunes, 10:30", topic: "Gestión del estrés" },
-    ],
-    notes: [
-      { id: "1", date: "10/06/2023", content: "Avance significativo en técnicas de respiración y mindfulness." },
-      { id: "2", date: "03/06/2023", content: "Dificultades con la gestión del tiempo. Establecer nuevas estrategias." },
-      {
-        id: "3",
-        date: "27/05/2023",
-        content: "Mejora en la comunicación con su equipo. Continuar practicando asertividad.",
-      },
-    ],
-  },
    {
     id: "2",
     name: "Laura Gómez",
@@ -104,46 +71,6 @@ const initialClientsData: Client[] = [
     ],
     upcomingSessions: [{ id: "1", date: "Viernes, 16:00", topic: "Productividad" }],
     notes: [{ id: "1", date: "05/06/2023", content: "Revisión de herramientas de gestión de tareas." }],
-  },
-  {
-    id: "4",
-    name: "Ana Martínez",
-    email: "ana.martinez@ejemplo.com",
-    phone: "+34 645 678 901",
-    startDate: "10/05/2023",
-    sessions: 3,
-    nextSession: "Lunes, 11:00",
-    progress: 25,
-    status: "active",
-    focus: "Liderazgo",
-    avatar: "https://ui-avatars.com/api/?background=random&name=Ana Martínez",
-    bio: "Gerente de equipo buscando desarrollar un estilo de liderazgo más inspirador.",
-    goals: [
-      { id: "1", title: "Mejorar feedback constructivo", progress: 30 },
-      { id: "2", title: "Fomentar la colaboración en el equipo", progress: 20 },
-    ],
-    upcomingSessions: [{ id: "1", date: "Lunes, 11:00", topic: "Liderazgo" }],
-    notes: [{ id: "1", date: "12/06/2023", content: "Primeros pasos en la identificación de estilos de comunicación del equipo." }],
-  },
-  {
-    id: "5",
-    name: "Pedro Sánchez",
-    email: "pedro.sanchez@ejemplo.com",
-    phone: "+34 656 789 012",
-    startDate: "05/06/2023",
-    sessions: 2,
-    nextSession: "Martes, 17:30",
-    progress: 15,
-    status: "pending",
-    focus: "Comunicación",
-    avatar: "https://ui-avatars.com/api/?background=random&name=Pedro Sánchez",
-    bio: "Estudiante universitario preparándose para presentaciones importantes.",
-    goals: [
-      { id: "1", title: "Reducir miedo escénico", progress: 10 },
-      { id: "2", title: "Estructurar presentaciones de forma clara", progress: 20 },
-    ],
-    upcomingSessions: [{ id: "1", date: "Martes, 17:30", topic: "Comunicación" }],
-    notes: [{ id: "1", date: "06/06/2023", content: "Introducción a técnicas de lenguaje corporal." }],
   },
     {
     id: "6",
@@ -187,7 +114,7 @@ const initialClientsData: Client[] = [
   },
 ];
 
-export default function ClientsPage() {
+export default function EnterpriseClientsPage() {
   const [clients, setClients] = useState<Client[]>(initialClientsData);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -212,22 +139,21 @@ export default function ClientsPage() {
   const selectedClient = clients.find(client => client.id === selectedClientId) || null;
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <div className="hidden md:block">
-        <DashboardSidebar userType="coach" className="h-full" />
+    <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
+        <DashboardSidebar userType="enterprise" className="h-full" />
       </div>
-      <div className="flex flex-col h-screen">
-        <DashboardHeader userType="coach" />
-        <main className="flex-1 p-6 overflow-hidden">
-          <div className="flex flex-col h-full">
-            <div className="mb-4">
-              <h1 className="text-3xl font-bold">Mis Clientes</h1>
-              <p className="text-muted-foreground">Gestiona tus clientes y su progreso en el programa de coaching.</p>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <ClientsList clients={clients} onClientSelect={handleClientSelect} />
-            </div>
+      <div className="flex flex-col overflow-hidden">
+        <DashboardHeader userType="enterprise" />
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
+          <div className="flex items-center gap-4">
+            <Users className="h-6 w-6" />
+            <h1 className="text-lg font-semibold md:text-2xl">Clientes</h1>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Gestiona y supervisa a los clientes registrados en la plataforma.
+          </p>
+          <ClientsList clients={clients} onClientSelect={handleClientSelect} />
         </main>
       </div>
       <ClientDetail

@@ -3,12 +3,21 @@
 import { useTheme } from 'next-themes'
 import { Button } from '@mui/material'
 import { Moon, Sun } from 'lucide-react'
+import { useEffect } from 'react'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
 
+  // useEffect(() => {
+  //   document.getElementById('miBoton')?.addEventListener('click', () => {
+  //     const btn = document.getElementById('miBoton');
+  //     btn?.classList.add('circle-out');
+  //   });
+  // }, []);
+
   return (
     <Button
+      id="miBoton"
       variant="contained"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       style={{

@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { ClientsList } from "../../../../components/clients-list"
 import { ClientDetail } from "../../../../components/client-detail"
+import { Users } from "lucide-react"
 
 interface Goal {
   id: string;
@@ -187,7 +188,7 @@ const initialClientsData: Client[] = [
   },
 ];
 
-export default function ClientsPage() {
+export default function AdminClientsPage() {
   const [clients, setClients] = useState<Client[]>(initialClientsData);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -212,22 +213,21 @@ export default function ClientsPage() {
   const selectedClient = clients.find(client => client.id === selectedClientId) || null;
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
-      <div className="hidden md:block">
-        <DashboardSidebar userType="coach" className="h-full" />
+    <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
+        <DashboardSidebar userType="admin" className="h-full" />
       </div>
-      <div className="flex flex-col h-screen">
-        <DashboardHeader userType="coach" />
-        <main className="flex-1 p-6 overflow-hidden">
-          <div className="flex flex-col h-full">
-            <div className="mb-4">
-              <h1 className="text-3xl font-bold">Mis Clientes</h1>
-              <p className="text-muted-foreground">Gestiona tus clientes y su progreso en el programa de coaching.</p>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <ClientsList clients={clients} onClientSelect={handleClientSelect} />
-            </div>
+      <div className="flex flex-col overflow-hidden">
+        <DashboardHeader userType="admin" />
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
+          <div className="flex items-center gap-4">
+            <Users className="h-6 w-6" />
+            <h1 className="text-lg font-semibold md:text-2xl">Clientes</h1>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Gestiona y supervisa a los clientes registrados en la plataforma.
+          </p>
+          <ClientsList clients={clients} onClientSelect={handleClientSelect} />
         </main>
       </div>
       <ClientDetail

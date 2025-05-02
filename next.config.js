@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'unavatar.io',
+        hostname: 'ui-avatars.com',
         port: '',
         pathname: '/**',
       },
