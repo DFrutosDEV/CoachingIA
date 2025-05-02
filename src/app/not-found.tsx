@@ -13,7 +13,7 @@ export default function NotFound() {
           </p>
         </div>
         <div className="flex justify-center">
-          <Link href="/dashboard/coach">
+          <Link href="/">
             <Button variant="text" size="large" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Volver al inicio

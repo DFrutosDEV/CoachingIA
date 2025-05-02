@@ -2,19 +2,15 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { SettingsForm } from "@/components/settings-options";
 
-// Definimos el tipo del objeto que la promesa resolverá
 type ParamsObject = {
   userType: "client" | "coach" | "admin" | "enterprise";
 };
 
-// Definimos que params es una promesa que resuelve a ParamsObject
 interface SettingsPageProps {
   params: Promise<ParamsObject>; 
 }
 
-// El componente vuelve a ser async
 export default async function SettingsPage({ params: paramsPromise }: SettingsPageProps) {
-  // Usamos await para obtener el objeto params de la promesa
   const params = await paramsPromise; 
   const { userType } = params;
 
