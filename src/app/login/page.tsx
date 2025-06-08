@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation"
 import { Button } from "@mui/material"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,22 +19,53 @@ export default function LoginPage() {
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsLoading(true)
-    // Simulación de login
-    const formData = new FormData(event.currentTarget)
-    const email = formData.get("email") as string
-    setTimeout(() => {
-      setIsLoading(false)
-      // Redirección basada en el tipo de usuario (simulado)
-      if (email.includes("coach")) {
-        router.push("/dashboard/coach")
-      } else if (email.includes("admin")) {
-        router.push("/dashboard/admin")
-      } else if (email.includes("enterprise")) {
-        router.push("/dashboard/enterprise")
+    
+    try {
+      const formData = new FormData(event.currentTarget)
+      const email = formData.get("email") as string
+      const contrasena = formData.get("password") as string
+
+      const response = await fetch('/api/loggin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          contrasena
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Login exitoso - mostrar toast de éxito
+        toast.success("¡Bienvenido! Iniciando sesión...")
+        
+        // Guardar datos del usuario en localStorage
+        localStorage.setItem('usuario', JSON.stringify(data.usuario))
+        
+        // Redirección basada en el tipo de usuario (basado en email por ahora)
+        setTimeout(() => {
+          if (email.includes("coach")) {
+            router.push("/dashboard/coach")
+          } else if (email.includes("admin")) {
+            router.push("/dashboard/admin")
+          } else if (email.includes("enterprise")) {
+            router.push("/dashboard/enterprise")
+          } else {
+            router.push("/dashboard/client")
+          }
+        }, 1000)
       } else {
-        router.push("/dashboard/client")
+        toast.error(data.message || "Error al iniciar sesión")
       }
-    }, 1500)
+    } catch (error) {
+      console.error('Error en login:', error)
+      toast.error("Error de conexión. Por favor intenta de nuevo.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -71,9 +103,6 @@ export default function LoginPage() {
                       autoCorrect="off"
                       required
                     />
-                    <div className="text-xs text-muted-foreground">
-                      Prueba con: coach@ejemplo.com, client@ejemplo.com o admin@ejemplo.com o enterprise@ejemplo.com
-                    </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
