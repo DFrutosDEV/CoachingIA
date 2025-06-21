@@ -6,6 +6,13 @@ export interface IUser extends Document {
   password: string;
   roles: ObjectId[];
   email: string;
+  phone: string;
+  biography: string;
+  profilePicture: string;
+  indexDashboardClient: number[];
+  indexDashboardCoach: number[];
+  indexDashboardEnterprise: number[];
+  indexDashboardAdmin: number[];
   age?: number;
   creationDate: Date;
   active: boolean;
@@ -47,6 +54,21 @@ const UserSchema: Schema = new Schema({
     trim: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
+  phone: {
+    type: String,
+    required: [true, 'The phone is required'],
+    trim: true,
+    maxlength: [15, 'The phone cannot exceed 15 characters']
+  },
+  biography: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'The biography cannot exceed 500 characters']
+  },
+  profilePicture: {
+    type: String,
+    trim: true,
+  },
   age: {
     type: Number,
     min: [0, 'The age cannot be negative'],
@@ -75,7 +97,23 @@ const UserSchema: Schema = new Schema({
   enterprises: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  indexDashboardClient: {
+    type: [Number],
+    default: []
+  },
+  indexDashboardCoach: {
+    type: [Number],
+    default: []
+  },
+  indexDashboardEnterprise: {
+    type: [Number],
+    default: []
+  },
+  indexDashboardAdmin: {
+    type: [Number],
+    default: []
+  }
 }, {
   timestamps: true // Agrega createdAt y updatedAt automáticamente
 });

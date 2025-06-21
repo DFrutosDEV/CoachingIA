@@ -1,15 +1,87 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { Button } from "@/components/ui/button"
-import { Calendar, Clock, BarChart3, ArrowRight } from "lucide-react"
-import Link from "next/link"
 import { useAuthStore } from "@/lib/stores/auth-store"
+import { useEffect, useRef } from "react"
+import { createSwapy } from "swapy"
+import {
+  NextSessionCard,
+  CompletedSessionsCard,
+  GoalsCard,
+  UpcomingSessionsCard,
+  ProgressCard
+} from "@/components/ui/dashboard-cards-client"
 
 export default function ClientDashboard() {
   const { user } = useAuthStore()
+  
+  // Referencias para los contenedores
+  const smallCardsRef = useRef<HTMLDivElement>(null)
+  const largeCardsRef = useRef<HTMLDivElement>(null)
+  const swapySmallRef = useRef<any>(null)
+  const swapyLargeRef = useRef<any>(null)
+
+  useEffect(() => {
+    // Configurar swapy después de que el DOM esté listo
+    const timer = setTimeout(() => {
+      // Configurar swapy para las cards pequeñas
+      if (smallCardsRef.current && !swapySmallRef.current) {
+        try {
+          swapySmallRef.current = createSwapy(smallCardsRef.current, {
+            animation: 'dynamic'
+          })
+          
+          swapySmallRef.current.onSwap((event: any) => {
+            console.log('Small cards swapped:', event.newSlotItemMap.asObject)
+            // Guardar en localStorage
+            localStorage.setItem('smallCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
+          })
+        } catch (error) {
+          console.warn('Error inicializando swapy para cards pequeñas:', error)
+        }
+      }
+
+      // Configurar swapy para las cards grandes
+      if (largeCardsRef.current && !swapyLargeRef.current) {
+        try {
+          swapyLargeRef.current = createSwapy(largeCardsRef.current, {
+            animation: 'dynamic'
+          })
+          
+          swapyLargeRef.current.onSwap((event: any) => {
+            console.log('Large cards swapped:', event.newSlotItemMap.asObject)
+            // Guardar en localStorage
+            localStorage.setItem('largeCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
+          })
+        } catch (error) {
+          console.warn('Error inicializando swapy para cards grandes:', error)
+        }
+      }
+    }, 500) // Aumentar el delay
+
+    return () => {
+      clearTimeout(timer)
+      // Limpiar swapy al desmontar
+      if (swapySmallRef.current) {
+        try {
+          swapySmallRef.current.destroy?.()
+        } catch (error) {
+          console.warn('Error destruyendo swapy pequeño:', error)
+        }
+        swapySmallRef.current = null
+      }
+      if (swapyLargeRef.current) {
+        try {
+          swapyLargeRef.current.destroy?.()
+        } catch (error) {
+          console.warn('Error destruyendo swapy grande:', error)
+        }
+        swapyLargeRef.current = null
+      }
+    }
+  }, []) // Solo se ejecuta una vez
+
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -20,138 +92,31 @@ export default function ClientDashboard() {
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="text-3xl font-bold">Bienvenido, {user?.name}</h1>
+              <h1 className="text-3xl font-bold">Bienvenido, {user?.name} {user?.lastName}</h1>
               <p className="text-muted-foreground">Aquí tienes un resumen de tu progreso y próximas sesiones.</p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Próxima Sesión</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">Hoy, 15:00</div>
-                  <p className="text-xs text-muted-foreground">Con María González</p>
-                  <div className="mt-4">
-                    <Button size="sm" className="w-full">
-                      <Clock className="mr-2 h-4 w-4" />
-                      Unirse a la sesión
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Sesiones Completadas</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">12</div>
-                  <p className="text-xs text-muted-foreground">+3 este mes</p>
-                  <div className="mt-4">
-                    <div className="h-2 w-full rounded-full bg-muted">
-                      <div className="h-full w-3/4 rounded-full bg-primary"></div>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">75% de tu plan mensual</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Objetivos</CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83" />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">3/5</div>
-                  <p className="text-xs text-muted-foreground">Objetivos completados</p>
-                  <div className="mt-4">
-                    <Button size="sm" variant="outline" className="w-full">
-                      Ver objetivos
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Zona de drag and drop para cards pequeñas (3 cards arriba - 33.33% cada una) */}
+            <div ref={smallCardsRef} className="small-cards-container grid gap-6 md:grid-cols-3">
+              <div data-swapy-slot="1" className="w-full">
+                <NextSessionCard />
+              </div>
+              <div data-swapy-slot="2" className="w-full">
+                <CompletedSessionsCard />
+              </div>
+              <div data-swapy-slot="3" className="w-full">
+                <GoalsCard />
+              </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Próximas Sesiones</CardTitle>
-                  <CardDescription>Tus sesiones programadas para los próximos días.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { date: "Hoy, 15:00", coach: "María González", topic: "Desarrollo personal" },
-                      { date: "Mañana, 10:30", coach: "Juan Pérez", topic: "Gestión del estrés" },
-                      { date: "Viernes, 16:00", coach: "María González", topic: "Seguimiento semanal" },
-                    ].map((session, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-                      >
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">{session.date}</p>
-                          <p className="text-sm text-muted-foreground">Con {session.coach}</p>
-                          <p className="text-xs text-muted-foreground">{session.topic}</p>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          Detalles
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Tu Progreso</CardTitle>
-                  <CardDescription>Seguimiento de tus objetivos y metas.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { goal: "Mejorar habilidades de comunicación", progress: 80 },
-                      { goal: "Reducir niveles de estrés", progress: 65 },
-                      { goal: "Establecer rutina matutina", progress: 90 },
-                      { goal: "Mejorar productividad laboral", progress: 40 },
-                      { goal: "Desarrollar habilidades de liderazgo", progress: 25 },
-                    ].map((goal, index) => (
-                      <div key={index} className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium">{goal.goal}</p>
-                          <p className="text-sm font-medium">{goal.progress}%</p>
-                        </div>
-                        <div className="h-2 w-full rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${goal.progress}%` }}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-6">
-                    <Link href="/dashboard/client/progress">
-                      <Button className="w-full">
-                        Ver informe completo
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
+            <div ref={largeCardsRef} className="large-cards-container grid gap-6 md:grid-cols-2">
+              <div data-swapy-slot="4" className="w-full">
+                <UpcomingSessionsCard />
+              </div>
+              <div data-swapy-slot="5" className="w-full">
+                <ProgressCard />
+              </div>
             </div>
           </div>
         </main>

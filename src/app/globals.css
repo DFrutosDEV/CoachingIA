@@ -201,3 +201,22 @@
 .scrollbar-thin::-webkit-scrollbar-button {
   display: none;
 }
+
+/* Estilos para Swapy drag and drop */
+[data-swapy-highlighted] {
+  border: 2px solid #3b82f6;
+  transition: all 0.2s;
+}
+
+[data-swapy-item] {
+  cursor: grab;
+  transition: transform 0.2s;
+}
+
+[data-swapy-item]:active {
+  cursor: grabbing;
+}
+
+[data-swapy-item]:hover {
+  transform: scale(1.02);
+}
