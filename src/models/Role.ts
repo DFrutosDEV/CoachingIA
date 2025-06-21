@@ -1,25 +1,25 @@
-import mongoose, { Document, Schema, ObjectId } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IRole extends Document {
-  nombre: string;
-  codigo: string;
-  activo: boolean;
+  name: string;
+  code: string;
+  active: boolean;
 }
 
 const RoleSchema: Schema = new Schema({
-  nombre: {
+  name: {
     type: String,
     required: [true, 'The name is required'],
     trim: true,
     maxlength: [50, 'The name cannot exceed 50 characters']
   },
-  codigo: {
+  code: {
     type: String,
     required: [true, 'The code is required'],
     trim: true,
     maxlength: [50, 'The code cannot exceed 50 characters']
   },
-  activo: {
+  active: {
     type: Boolean,
     default: true
   }
@@ -27,6 +27,6 @@ const RoleSchema: Schema = new Schema({
   timestamps: true
 });
 
-RoleSchema.index({ nombre: 1 });
+RoleSchema.index({ name: 1 });
 
 export default mongoose.models.Role || mongoose.model<IRole>('Role', RoleSchema); 

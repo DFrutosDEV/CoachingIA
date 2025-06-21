@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from '../components/theme-provider'
 import { MUIProvider } from '../components/mui-provider'
 import { ClientLayout } from '../components/ClientLayout'
+import { NotificationsProvider } from '../components/notifications-provider'
 import { Toaster } from 'sonner'
 
 const inter = Inter({
@@ -56,10 +57,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <MUIProvider>
-            <ClientLayout>
-              {children}
-              <Toaster position="bottom-right" richColors />
-            </ClientLayout>
+            <NotificationsProvider>
+              <ClientLayout>
+                {children}
+                <Toaster position="bottom-right" richColors />
+              </ClientLayout>
+            </NotificationsProvider>
           </MUIProvider>
         </ThemeProvider>
       </body>

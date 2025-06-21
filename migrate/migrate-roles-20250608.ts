@@ -13,10 +13,10 @@ const colors = {
 };
 
 const rolesToCreate = [
-  { nombre: 'Admin', codigo: '1', activo: true },
-  { nombre: 'Coach', codigo: '2', activo: true },
-  { nombre: 'Coachee', codigo: '3', activo: true },
-  { nombre: 'Enterprise', codigo: '4', activo: true }
+  { name: 'Admin', code: '1', active: true },
+  { name: 'Coach', code: '2', active: true },
+  { name: 'Client', code: '3', active: true },
+  { name: 'Enterprise', code: '4', active: true }
 ];
 
 export const migrateName = 'migrate-roles-20250608';
@@ -27,15 +27,15 @@ export async function up(): Promise<void> {
   try {
     for (const roleData of rolesToCreate) {
       // Verificar si el rol ya existe
-      const existingRole = await (Role as any).findOne({ codigo: roleData.codigo });
+      const existingRole = await (Role as any).findOne({ code: roleData.code });
       
       if (existingRole) {
-        console.log(`${colors.yellow}   ⚠️  Rol "${roleData.nombre}" (código: ${roleData.codigo}) ya existe${colors.reset}`);
+        console.log(`${colors.yellow}   ⚠️  Rol "${roleData.name}" (código: ${roleData.code}) ya existe${colors.reset}`);
       } else {
         // Crear el nuevo rol
         const newRole = new (Role as any)(roleData);
         await newRole.save();
-        console.log(`${colors.green}   ✅ Rol "${roleData.nombre}" (código: ${roleData.codigo}) creado exitosamente${colors.reset}`);
+        console.log(`${colors.green}   ✅ Rol "${roleData.name}" (código: ${roleData.code}) creado exitosamente${colors.reset}`);
       }
     }
     
@@ -52,8 +52,8 @@ export async function down(): Promise<void> {
   try {
     // Eliminar todos los roles creados en esta migración
     for (const roleData of rolesToCreate) {
-      await (Role as any).deleteOne({ codigo: roleData.codigo });
-      console.log(`${colors.yellow}   🗑️  Rol "${roleData.nombre}" (código: ${roleData.codigo}) eliminado${colors.reset}`);
+      await (Role as any).deleteOne({ code: roleData.code });
+      console.log(`${colors.yellow}   🗑️  Rol "${roleData.name}" (código: ${roleData.code}) eliminado${colors.reset}`);
     }
     
     console.log(`${colors.yellow}✅ Migración ${migrateName} revertida exitosamente${colors.reset}\n`);

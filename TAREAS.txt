@@ -4,3 +4,5 @@
 - para el middleware se puede usar "clerk" (ANALIZAR) midu.link/clerk
 
 - Mover funcionalidad para crear clientes o coach a sus respectivas paginas
+
+- DISEÑO DE PERFILES (ESTILO NETFLIX)

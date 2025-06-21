@@ -9,6 +9,10 @@ export interface IUser extends Document {
   age?: number;
   creationDate: Date;
   active: boolean;
+  isDeleted: boolean;
+  clients: ObjectId[];
+  coaches: ObjectId[];
+  enterprises: ObjectId[];
 }
 
 const UserSchema: Schema = new Schema({
@@ -55,7 +59,23 @@ const UserSchema: Schema = new Schema({
   active: {
     type: Boolean,
     default: true
-  }
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  clients: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  coaches: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  enterprises: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, {
   timestamps: true // Agrega createdAt y updatedAt automáticamente
 });

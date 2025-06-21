@@ -4,4 +4,4 @@
  Visualiza a todos los coachs activos y el cliente desde ahi puede contratarlos? o apreta un boton 
  para buscar un nuevo servicio a contratar?
 
- 3 - 
+ 3 - Como se relaciona Objetivos con el Progreso?

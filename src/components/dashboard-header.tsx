@@ -25,17 +25,7 @@ export function DashboardHeader({ userType }: HeaderProps) {
           </SheetContent>
         </Sheet>
       </div>
-      <div className="w-full flex-1">
-        <form className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <input
-            type="search"
-            placeholder="Buscar..."
-            className="w-full rounded-lg border border-input bg-background pl-8 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-2/5 lg:w-1/3"
-          />
-        </form>
-      </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ml-auto">
         <Button variant="text">
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notificaciones</span>

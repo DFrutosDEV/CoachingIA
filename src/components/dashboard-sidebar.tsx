@@ -1,7 +1,11 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle, File, BookOpenCheck } from "lucide-react"
+import { useAuthService } from "@/lib/services/auth-service"
 
 interface SidebarProps {
   userType: "client" | "coach" | "admin" | "enterprise"
@@ -9,6 +13,14 @@ interface SidebarProps {
 }
 
 export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
+  const router = useRouter()
+  const { logout } = useAuthService()
+
+  const handleLogout = () => {
+    logout()
+    router.push('/login')
+  }
+
   return (
     <div className={`border-r bg-muted/40 ${className}`}>
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -169,12 +181,14 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
           </div>
         </ScrollArea>
         <div className="p-2 pt-8">
-          <Link href="/login">
-            <Button variant="text" className="w-full justify-start gap-2">
-              <LogOut className="h-4 w-4" />
-              Cerrar Sesión
-            </Button>
-          </Link>
+          <Button 
+            variant="text" 
+            className="w-full justify-start gap-2"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
+            Cerrar Sesión
+          </Button>
         </div>
       </div>
     </div>
