@@ -17,6 +17,7 @@ export interface IUser extends Document {
   creationDate: Date;
   active: boolean;
   isDeleted: boolean;
+  firstLogin: boolean;
   clients: ObjectId[];
   coaches: ObjectId[];
   enterprises: ObjectId[];
@@ -85,6 +86,10 @@ const UserSchema: Schema = new Schema({
   isDeleted: {
     type: Boolean,
     default: false
+  },
+  firstLogin: {
+    type: Boolean,
+    default: true
   },
   clients: [{
     type: Schema.Types.ObjectId,

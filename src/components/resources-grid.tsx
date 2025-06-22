@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Bell, FileText, UserPlus, Ticket, ArrowRight } from "lucide-react"
+import { useAuthStore } from "@/lib/stores/auth-store"
+import { useNotifications } from "@/lib/hooks/use-stores"
 
 export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" | "enterprise" }) {
   const [showNotificationDialog, setShowNotificationDialog] = useState(false)
@@ -24,6 +26,99 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
   const [showCoachDialog, setShowCoachDialog] = useState(false)
   const [showTicketDialog, setShowTicketDialog] = useState(false)
   const [ticketPriority, setTicketPriority] = useState("medium")
+  
+  // Obtener usuario autenticado del estado global
+  const { user } = useAuthStore()
+  const { showSuccess, showError } = useNotifications()
+  
+  // Estados para el formulario de cliente
+  const [clientForm, setClientForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    focus: '',
+    startDate: '',
+    startTime: '',
+    coachId: ''
+  })
+  
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleClientFormChange = (field: string, value: string) => {
+    setClientForm(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleCreateClient = async () => {
+    if (!clientForm.firstName || !clientForm.lastName || !clientForm.email || !clientForm.focus || !clientForm.startDate || !clientForm.startTime) {
+      showError('Por favor completa todos los campos requeridos')
+      return
+    }
+
+    //! UNA VEZ QUE SE HAGA EL MIDDLEWARE DE AUTH, SE DEBE REMOVER ESTA VALIDACIÓN
+    if (!user?._id) {
+      showError('No se pudo identificar al usuario autenticado')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Determinar el coachId basado en el tipo de usuario
+      let coachIdToUse = user._id // Por defecto el usuario actual
+      
+      // Si es admin o enterprise y se especificó un coach, usar ese
+      if ((userType === "admin" || userType === "enterprise") && clientForm.coachId) {
+        coachIdToUse = clientForm.coachId
+      }
+
+      const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: clientForm.firstName,
+          lastName: clientForm.lastName,
+          email: clientForm.email,
+          phone: clientForm.phone,
+          focus: clientForm.focus,
+          startDate: clientForm.startDate,
+          startTime: clientForm.startTime,
+          coachId: coachIdToUse,
+          createdBy: user._id // Usuario que está creando el cliente
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        showSuccess('Cliente creado exitosamente con objetivo y reunión programada')
+        setShowClientDialog(false)
+        // Resetear formulario
+        setClientForm({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          focus: '',
+          startDate: '',
+          startTime: '',
+          coachId: ''
+        })
+      } else {
+        showError(`Error: ${result.error}`)
+      }
+    } catch (error) {
+      console.error('Error creando cliente:', error)
+      showError('Error interno del servidor')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="grid gap-6 sm:grid-cols-2">
@@ -202,40 +297,105 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="first-name">Nombre</Label>
-                    <Input id="first-name" placeholder="Nombre" />
+                    <Input 
+                      id="first-name" 
+                      placeholder="Nombre"
+                      value={clientForm.firstName}
+                      onChange={(e) => handleClientFormChange('firstName', e.target.value)}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="last-name">Apellidos</Label>
-                    <Input id="last-name" placeholder="Apellidos" />
+                    <Input 
+                      id="last-name" 
+                      placeholder="Apellidos"
+                      value={clientForm.lastName}
+                      onChange={(e) => handleClientFormChange('lastName', e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="email@ejemplo.com" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="email@ejemplo.com"
+                    value={clientForm.email}
+                    onChange={(e) => handleClientFormChange('email', e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="phone">Teléfono</Label>
-                  <Input id="phone" placeholder="+34 600 000 000" />
+                  <Input 
+                    id="phone" 
+                    placeholder="+34 600 000 000"
+                    value={clientForm.phone}
+                    onChange={(e) => handleClientFormChange('phone', e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="focus">Enfoque principal</Label>
-                  <Input id="focus" placeholder="Ej: Desarrollo personal, Liderazgo..." />
+                  <Input 
+                    id="focus" 
+                    placeholder="Ej: Desarrollo personal, Liderazgo..."
+                    value={clientForm.focus}
+                    onChange={(e) => handleClientFormChange('focus', e.target.value)}
+                  />
                 </div>
-
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="start-date">Fecha Inicio</Label>
+                    <Input 
+                      id="start-date" 
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={clientForm.startDate}
+                      onChange={(e) => handleClientFormChange('startDate', e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="start-time">Hora Inicio</Label>
+                    <Input 
+                      id="start-time" 
+                      type="time"
+                      min="08:00"
+                      max="18:00"
+                      value={clientForm.startTime}
+                      onChange={(e) => handleClientFormChange('startTime', e.target.value)}
+                    />
+                  </div>
+                </div>
                 {
                   (userType === "admin" || userType === "enterprise") && (
                     <div className="grid gap-2">
                       <Label htmlFor="coach">Coach asignado</Label>
-                      <Input id="coach" placeholder="Seleccionar coach" />
+                      <Input 
+                        id="coach" 
+                        placeholder="ID del coach (opcional - se asignará automáticamente si se deja vacío)"
+                        value={clientForm.coachId}
+                        onChange={(e) => handleClientFormChange('coachId', e.target.value)}
+                      />
+                      <small className="text-sm text-muted-foreground">
+                        Deja vacío para auto-asignar al usuario actual
+                      </small>
                     </div>
                   )
                 }
               </div>
               <DialogFooter className="flex justify-end gap-2">
-                <Button variant="outlined" onClick={() => setShowClientDialog(false)}>
+                <Button 
+                  variant="outlined" 
+                  onClick={() => setShowClientDialog(false)}
+                  disabled={isSubmitting}
+                >
                   Cancelar
                 </Button>
-                <Button onClick={() => setShowClientDialog(false)}>Crear Cliente</Button>
+                <Button 
+                  onClick={handleCreateClient}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Creando...' : 'Crear Cliente'}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
