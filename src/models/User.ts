@@ -4,23 +4,13 @@ export interface IUser extends Document {
   name: string;
   lastName: string;
   password: string;
-  roles: ObjectId[];
   email: string;
   phone: string;
-  biography: string;
-  profilePicture: string;
-  indexDashboardClient: number[];
-  indexDashboardCoach: number[];
-  indexDashboardEnterprise: number[];
-  indexDashboardAdmin: number[];
   age?: number;
-  creationDate: Date;
   active: boolean;
-  isDeleted: boolean;
   firstLogin: boolean;
-  clients: ObjectId[];
-  coaches: ObjectId[];
-  enterprises: ObjectId[];
+  isDeleted: boolean;
+  creationDate: Date;
 }
 
 const UserSchema: Schema = new Schema({
@@ -57,9 +47,8 @@ const UserSchema: Schema = new Schema({
   },
   phone: {
     type: String,
-    required: [true, 'The phone is required'],
     trim: true,
-    maxlength: [15, 'The phone cannot exceed 15 characters']
+    maxlength: [20, 'The phone cannot exceed 20 characters']
   },
   biography: {
     type: String,

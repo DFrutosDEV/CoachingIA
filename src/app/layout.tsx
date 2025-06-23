@@ -5,7 +5,9 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from '../components/theme-provider'
 import { MUIProvider } from '../components/mui-provider'
 import { ClientLayout } from '../components/ClientLayout'
-import { NotificationsProvider } from '../components/notifications-provider'
+import { ReduxProvider } from '../components/redux-provider'
+import { ThemeSync } from '../components/theme-sync'
+import { DebugRedux } from '../components/debug-redux'
 import { Toaster } from 'sonner'
 
 const inter = Inter({
@@ -50,21 +52,23 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/next.svg" />
       </head>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <MUIProvider>
-            <NotificationsProvider>
-              <ClientLayout>
-                {children}
-                <Toaster position="bottom-right" richColors />
-              </ClientLayout>
-            </NotificationsProvider>
-          </MUIProvider>
-        </ThemeProvider>
+        <ReduxProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <MUIProvider>
+              <ThemeSync />
+                <ClientLayout>
+                  {children}
+                  <Toaster position="bottom-right" richColors />
+                  {process.env.NODE_ENV === 'development' && <DebugRedux />}  
+                </ClientLayout>
+            </MUIProvider>
+          </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   )

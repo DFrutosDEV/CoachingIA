@@ -2,20 +2,54 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
-// GET /api/users - Obtener todos los usuarios
-export async function GET() {
+// GET /api/users - Obtener usuarios (con búsqueda opcional)
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
     
-    const usuarios = await User.find({ activo: true })
-      .select('-__v')
-      .sort({ fechaCreacion: -1 });
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search');
+    const limit = parseInt(searchParams.get('limit') || '10');
     
+    let query: any = { active: true, isDeleted: { $ne: true } };
+    
+    // Si hay parámetro de búsqueda, buscar por nombre, apellido o email
+    if (search && search.length >= 3) {
+      const searchRegex = new RegExp(search, 'i'); // Búsqueda case-insensitive
+      query.$or = [
+        { name: searchRegex },
+        { lastName: searchRegex },
+        { email: searchRegex }
+      ];
+    }
+    
+    const usuarios = await User.find(query)
+      .select('_id name lastName email')
+      .populate('roles', 'name')
+      .limit(limit)
+      .sort({ name: 1, lastName: 1 });
+    
+    // Si hay búsqueda, devolver formato para select
+    if (search) {
+      const formattedUsers = usuarios.map(user => ({
+        label: `${user.name} ${user.lastName}`,
+        value: user._id.toString()
+      }));
+      
+      return NextResponse.json({
+        success: true,
+        users: formattedUsers,
+        total: formattedUsers.length
+      });
+    }
+    
+    // Si no hay búsqueda, devolver formato completo
     return NextResponse.json({
       success: true,
       data: usuarios,
       total: usuarios.length
     });
+    
   } catch (error) {
     console.error('Error obteniendo usuarios:', error);
     return NextResponse.json(

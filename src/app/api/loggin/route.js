@@ -1,85 +1,8 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-
-// Definir el esquema de Role
-const RoleSchema = new mongoose.Schema({
-  nombre: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: [50, 'The name cannot exceed 50 characters']
-  },
-  codigo: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: [50, 'The code cannot exceed 50 characters']
-  },
-  activo: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
-
-RoleSchema.index({ nombre: 1 });
-
-const Role = mongoose.models.Role || mongoose.model('Role', RoleSchema);
-
-// Definir el esquema de User
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: [50, 'The name cannot exceed 50 characters']
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: [50, 'The last name cannot exceed 50 characters']
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: [50, 'The password cannot exceed 50 characters']
-  },
-  roles: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Role',
-    required: true
-  }],
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  age: {
-    type: Number,
-    min: [0, 'The age cannot be negative'],
-    max: [120, 'The age cannot be greater than 120']
-  },
-  creationDate: {
-    type: Date,
-    default: Date.now
-  },
-  active: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
-
-UserSchema.index({ name: 1 });
-
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
+import User from '@/models/User';
+import Role from '@/models/Role';
+import Profile from '@/models/Profile';
 
 // Conectar a MongoDB
 async function connectMongoDB() {
@@ -125,7 +48,7 @@ export async function POST(request) {
     }).populate('roles');
     
     console.log('👤 Usuario encontrado:', user ? 'SÍ' : 'NO');
-    
+
     if (!user) {
       return NextResponse.json(
         { 
@@ -135,6 +58,8 @@ export async function POST(request) {
         { status: 401 }
       );
     }
+
+    const profile = await Profile.findOne({ user: user._id });
     
     // Login exitoso - retornar datos del usuario (sin contraseña)
     const userResponse = {
@@ -142,10 +67,9 @@ export async function POST(request) {
       name: user.name,
       lastName: user.lastName,
       email: user.email,
-      roles: user.roles,
+      roles: [profile.role],
       age: user.age,
       creationDate: user.creationDate,
-      active: user.active
     };
     
     console.log('✅ Login exitoso para:', email);

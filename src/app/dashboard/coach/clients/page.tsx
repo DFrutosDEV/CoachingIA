@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSelector } from 'react-redux'
+import { RootState } from '@/lib/redux/store'
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { ClientsList } from "../../../../components/clients-list"
 import { ClientDetail } from "../../../../components/client-detail"
+import { toast } from "sonner"
 
 interface Goal {
   id: string;
@@ -188,9 +191,57 @@ const initialClientsData: Client[] = [
 ];
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>(initialClientsData);
+  const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Obtener el usuario actual desde Redux
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  // Función para obtener los clientes del coach
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Verificar si el usuario está autenticado y es un coach
+      if (!isAuthenticated || !user?._id) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      if (!user.roles.includes('coach')) {
+        throw new Error('El usuario no tiene permisos de coach');
+      }
+      
+      const response = await fetch(`/api/coach?coachId=${user._id}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al obtener los clientes');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setClients(data.clients);
+      } else {
+        throw new Error(data.error || 'Error desconocido');
+      }
+    } catch (err) {
+      console.error('Error al cargar clientes:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      toast.error('Ocurrio un error al cargar los clientes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchClients();
+    }
+  }, [isAuthenticated, user]);
 
   const handleClientSelect = (clientId: string) => {
     setSelectedClientId(clientId);
@@ -225,7 +276,16 @@ export default function ClientsPage() {
               <p className="text-muted-foreground">Gestiona tus clientes y su progreso en el programa de coaching.</p>
             </div>
             <div className="flex-1 overflow-hidden">
-              <ClientsList clients={clients} onClientSelect={handleClientSelect} />
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Cargando clientes...</p>
+                  </div>
+                </div>
+              ) : (
+                <ClientsList clients={clients} onClientSelect={handleClientSelect} />
+              )}
             </div>
           </div>
         </main>

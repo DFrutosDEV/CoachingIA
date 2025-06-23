@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Typography } from "@mui/material";
 import { useTheme } from 'next-themes'
 import { useState, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks'
+import { setTheme as setReduxTheme } from '@/lib/redux/slices/sessionSlice'
 
 interface SettingsFormProps {
   userType: "client" | "coach" | "admin" | "enterprise";
@@ -10,20 +12,30 @@ interface SettingsFormProps {
 
 export function SettingsForm({ userType }: SettingsFormProps) {
   const { theme, setTheme } = useTheme()
+  const dispatch = useAppDispatch()
+  const reduxTheme = useAppSelector(state => state.session.theme)
   const [selectedTheme, setSelectedTheme] = useState<string>('system');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (theme) {
-      setSelectedTheme(theme);
+    // Priorizar el tema de Redux si existe, sino usar next-themes
+    const currentTheme = reduxTheme || theme || 'system'
+    setSelectedTheme(currentTheme);
+    
+    // Sincronizar next-themes con Redux si hay diferencia
+    if (reduxTheme && reduxTheme !== theme) {
+      setTheme(reduxTheme);
     }
-  }, [theme]);
+  }, [theme, reduxTheme, setTheme]);
 
   const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newTheme = event.target.value;
+    const newTheme = event.target.value as 'light' | 'dark' | 'system';
     setSelectedTheme(newTheme);
+    
+    // Actualizar ambos: next-themes y Redux
     setTheme(newTheme);
+    dispatch(setReduxTheme(newTheme));
   };
   
   if (!mounted) {

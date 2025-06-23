@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Bell, FileText, UserPlus, Ticket, ArrowRight } from "lucide-react"
-import { useAuthStore } from "@/lib/stores/auth-store"
-import { useNotifications } from "@/lib/hooks/use-stores"
+import { useAppSelector } from "@/lib/redux/hooks"
+import { toast } from "sonner"
 
 export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" | "enterprise" }) {
   const [showNotificationDialog, setShowNotificationDialog] = useState(false)
@@ -27,10 +27,81 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
   const [showTicketDialog, setShowTicketDialog] = useState(false)
   const [ticketPriority, setTicketPriority] = useState("medium")
   
-  // Obtener usuario autenticado del estado global
-  const { user } = useAuthStore()
-  const { showSuccess, showError } = useNotifications()
+  // Estados para el autocompletado de notificaciones
+  const [recipientSearch, setRecipientSearch] = useState("")
+  const [selectedRecipient, setSelectedRecipient] = useState<{id: string, name: string} | null>(null)
+  const [showRecipientSuggestions, setShowRecipientSuggestions] = useState(false)
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
   
+  // Obtener usuario autenticado y datos del estado global
+  const user = useAppSelector(state => state.auth.user)
+  const clients = useAppSelector(state => state.auth.clients)
+  
+  // Función para buscar usuarios en el endpoint
+  const searchUsers = async (query: string) => {
+    if (query.length < 3) {
+      setSearchResults([])
+      setShowRecipientSuggestions(false)
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const response = await fetch(`/api/coach/search?search=${encodeURIComponent(query)}&limit=10`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success) {
+          setSearchResults(result.users || [])
+          setShowRecipientSuggestions(true)
+        } else {
+          setSearchResults([])
+          setShowRecipientSuggestions(false)
+        }
+      }
+    } catch (error) {
+      console.error('Error al buscar usuarios:', error)
+      setSearchResults([])
+      setShowRecipientSuggestions(false)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  // Debounce para la búsqueda
+  const debounceSearch = (() => {
+    let timeoutId: NodeJS.Timeout
+    return (query: string) => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => searchUsers(query), 300)
+    }
+  })()
+
+  const handleRecipientInputChange = (value: string) => {
+    setRecipientSearch(value)
+    setSelectedRecipient(null)
+    
+    if (value.length >= 3) {
+      debounceSearch(value)
+    } else {
+      setShowRecipientSuggestions(false)
+      setSearchResults([])
+    }
+  }
+
+  const handleRecipientSelect = (user: any) => {
+    setSelectedRecipient({ id: user._id, name: `${user.name} ${user.lastName}` })
+    setRecipientSearch(`${user.name} ${user.lastName}`)
+    setShowRecipientSuggestions(false)
+    setSearchResults([])
+  }
+
   // Estados para el formulario de cliente
   const [clientForm, setClientForm] = useState({
     firstName: '',
@@ -54,13 +125,13 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
 
   const handleCreateClient = async () => {
     if (!clientForm.firstName || !clientForm.lastName || !clientForm.email || !clientForm.focus || !clientForm.startDate || !clientForm.startTime) {
-      showError('Por favor completa todos los campos requeridos')
+      toast.error('Por favor completa todos los campos requeridos')
       return
     }
 
     //! UNA VEZ QUE SE HAGA EL MIDDLEWARE DE AUTH, SE DEBE REMOVER ESTA VALIDACIÓN
     if (!user?._id) {
-      showError('No se pudo identificar al usuario autenticado')
+      toast.error('No se pudo identificar al usuario autenticado')
       return
     }
 
@@ -75,7 +146,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
         coachIdToUse = clientForm.coachId
       }
 
-      const response = await fetch('/api/clients', {
+      const response = await fetch('/api/client', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +167,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
       const result = await response.json()
 
       if (result.success) {
-        showSuccess('Cliente creado exitosamente con objetivo y reunión programada')
+        toast.success('Cliente creado exitosamente con objetivo y reunión programada')
         setShowClientDialog(false)
         // Resetear formulario
         setClientForm({
@@ -110,13 +181,267 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
           coachId: ''
         })
       } else {
-        showError(`Error: ${result.error}`)
+        toast.error(`Error: ${result.error}`)
       }
     } catch (error) {
       console.error('Error creando cliente:', error)
-      showError('Error interno del servidor')
+      toast.error('Error interno del servidor')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  // Estados para el formulario de notificación
+  const [notificationForm, setNotificationForm] = useState({
+    title: '',
+    message: ''
+  })
+  
+  const [isSendingNotification, setIsSendingNotification] = useState(false)
+
+  const handleNotificationFormChange = (field: string, value: string) => {
+    setNotificationForm(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleSendNotification = async () => {
+    if (!selectedRecipient) {
+      toast.error('Por favor selecciona un destinatario')
+      return
+    }
+
+    if (!notificationForm.title || !notificationForm.message) {
+      toast.error('Por favor completa el título y mensaje')
+      return
+    }
+
+    if (!user?._id) {
+      toast.error('No se pudo identificar al usuario autenticado')
+      return
+    }
+
+    setIsSendingNotification(true)
+
+    try {
+      const response = await fetch('/api/notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipients: [selectedRecipient.id], // Array con el ID del destinatario
+          title: notificationForm.title,
+          message: notificationForm.message,
+          userId: user._id
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success(result.message)
+        setShowNotificationDialog(false)
+        // Resetear formulario
+        setNotificationForm({ title: '', message: '' })
+        setRecipientSearch("")
+        setSelectedRecipient(null)
+        setShowRecipientSuggestions(false)
+        setSearchResults([])
+      } else {
+        toast.error(`Error: ${result.error}`)
+      }
+    } catch (error) {
+      console.error('Error enviando notificación:', error)
+      toast.error('Error interno del servidor')
+    } finally {
+      setIsSendingNotification(false)
+    }
+  }
+
+  // Estados para el formulario de notas
+  const [noteForm, setNoteForm] = useState({
+    destinatario: '',
+    sesion: '',
+    titulo: '',
+    contenido: ''
+  })
+  
+  // Estados para autocompletado de notas
+  const [noteRecipientSearch, setNoteRecipientSearch] = useState("")
+  const [selectedNoteRecipient, setSelectedNoteRecipient] = useState<{id: string, name: string} | null>(null)
+  const [showNoteRecipientSuggestions, setShowNoteRecipientSuggestions] = useState(false)
+  const [noteSearchResults, setNoteSearchResults] = useState<any[]>([])
+  const [isSearchingNoteRecipients, setIsSearchingNoteRecipients] = useState(false)
+  
+  // Estados para sesiones
+  const [availableSessions, setAvailableSessions] = useState<any[]>([])
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false)
+  const [isSendingNote, setIsSendingNote] = useState(false)
+
+  const handleNoteFormChange = (field: string, value: string) => {
+    setNoteForm(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  // Función para buscar usuarios para las notas
+  const searchNoteUsers = async (query: string) => {
+    if (query.length < 3) {
+      setNoteSearchResults([])
+      setShowNoteRecipientSuggestions(false)
+      return
+    }
+
+    setIsSearchingNoteRecipients(true)
+    try {
+      const response = await fetch(`/api/coach/search?search=${encodeURIComponent(query)}&limit=10`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success) {
+          setNoteSearchResults(result.users || [])
+          setShowNoteRecipientSuggestions(true)
+        } else {
+          setNoteSearchResults([])
+          setShowNoteRecipientSuggestions(false)
+        }
+      }
+    } catch (error) {
+      console.error('Error al buscar usuarios para notas:', error)
+      setNoteSearchResults([])
+      setShowNoteRecipientSuggestions(false)
+    } finally {
+      setIsSearchingNoteRecipients(false)
+    }
+  }
+
+  // Debounce para la búsqueda de usuarios de notas
+  const debounceNoteSearch = (() => {
+    let timeoutId: NodeJS.Timeout
+    return (query: string) => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => searchNoteUsers(query), 300)
+    }
+  })()
+
+  const handleNoteRecipientInputChange = (value: string) => {
+    setNoteRecipientSearch(value)
+    setSelectedNoteRecipient(null)
+    
+    if (value.length >= 3) {
+      debounceNoteSearch(value)
+    } else {
+      setShowNoteRecipientSuggestions(false)
+      setNoteSearchResults([])
+    }
+  }
+
+  const handleNoteRecipientSelect = (user: any) => {
+    setSelectedNoteRecipient({ id: user._id, name: `${user.name} ${user.lastName}` })
+    setNoteRecipientSearch(`${user.name} ${user.lastName}`)
+    setShowNoteRecipientSuggestions(false)
+    setNoteSearchResults([])
+    
+    // Cargar sesiones del usuario seleccionado
+    loadUserSessions(user._id)
+  }
+
+  // Función para cargar sesiones de un usuario
+  const loadUserSessions = async (userId: string) => {
+    setIsLoadingSessions(true)
+    try {
+      // Aquí asumo que tienes un endpoint para obtener sesiones por usuario
+      // Ajusta la URL según tu endpoint real
+      const response = await fetch(`/api/meet?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success) {
+          setAvailableSessions(result.sessions || [])
+        } else {
+          setAvailableSessions([])
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar sesiones:', error)
+      setAvailableSessions([])
+    } finally {
+      setIsLoadingSessions(false)
+    }
+  }
+
+  const handleCreateNote = async () => {
+    if (!selectedNoteRecipient) {
+      toast.error('Por favor selecciona un destinatario')
+      return
+    }
+
+    if (!noteForm.sesion || !noteForm.titulo || !noteForm.contenido) {
+      toast.error('Por favor completa todos los campos requeridos')
+      return
+    }
+
+    if (!user?._id) {
+      toast.error('No se pudo identificar al usuario autenticado')
+      return
+    }
+
+    setIsSendingNote(true)
+
+    try {
+      const response = await fetch('/api/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          destinatario: selectedNoteRecipient.id,
+          sesion: noteForm.sesion,
+          titulo: noteForm.titulo,
+          contenido: noteForm.contenido,
+          clienteId: selectedNoteRecipient.id, // Asumiendo que el destinatario es el cliente
+          coachId: user._id
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success('Nota creada exitosamente')
+        setShowNoteDialog(false)
+        // Resetear formulario
+        setNoteForm({
+          destinatario: '',
+          sesion: '',
+          titulo: '',
+          contenido: ''
+        })
+        setNoteRecipientSearch("")
+        setSelectedNoteRecipient(null)
+        setShowNoteRecipientSuggestions(false)
+        setNoteSearchResults([])
+        setAvailableSessions([])
+      } else {
+        toast.error(`Error: ${result.error}`)
+      }
+    } catch (error) {
+      console.error('Error creando nota:', error)
+      toast.error('Error interno del servidor')
+    } finally {
+      setIsSendingNote(false)
     }
   }
 
@@ -159,27 +484,83 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Crear Notificación</DialogTitle>
-                <DialogDescription>Envía una notificación a un cliente o grupo de clientes.</DialogDescription>
+                <DialogDescription>Envía una notificación a {userType === "coach" ? "un cliente" : "uno o varios usuarios"}.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="recipient">Destinatario</Label>
-                  <Input id="recipient" placeholder="Seleccionar cliente o grupo" />
+                <div className="grid gap-2 relative">
+                  <Label htmlFor="recipient">Destinatario{userType === "coach" ? "" : "s"}</Label>
+                  <Input 
+                    id="recipient" 
+                    placeholder="Escribe 3 letras para empezar a buscar..."
+                    value={recipientSearch}
+                    onChange={(e) => handleRecipientInputChange(e.target.value)}
+                    onFocus={() => recipientSearch.length >= 3 && setShowRecipientSuggestions(true)}
+                  />
+                  {isSearching && (
+                    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                      <div className="text-sm text-muted-foreground">Buscando usuarios...</div>
+                    </div>
+                  )}
+                  {showRecipientSuggestions && searchResults.length > 0 && !isSearching && (
+                    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                      {searchResults.map((searchUser) => (
+                        <div
+                          key={searchUser._id}
+                          className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
+                          onClick={() => handleRecipientSelect(searchUser)}
+                        >
+                          <div className="font-medium text-foreground">{searchUser.name} {searchUser.lastName}</div>
+                          <div className="text-sm text-muted-foreground">{searchUser.email}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {recipientSearch.length >= 3 && searchResults.length === 0 && showRecipientSuggestions && !isSearching && (
+                    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                      <div className="text-sm text-muted-foreground">No se encontraron usuarios</div>
+                    </div>
+                  )}
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="title">Título</Label>
-                  <Input id="title" placeholder="Título de la notificación" />
+                  <Input 
+                    id="title" 
+                    placeholder="Título de la notificación"
+                    value={notificationForm.title}
+                    onChange={(e) => handleNotificationFormChange('title', e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="message">Mensaje</Label>
-                  <Textarea id="message" placeholder="Escribe tu mensaje aquí..." />
+                  <Textarea 
+                    id="message" 
+                    placeholder="Escribe tu mensaje aquí..."
+                    value={notificationForm.message}
+                    onChange={(e) => handleNotificationFormChange('message', e.target.value)}
+                  />
                 </div>
               </div>
               <DialogFooter className="flex justify-end gap-2">
-                <Button variant="outlined" onClick={() => setShowNotificationDialog(false)}>
+                <Button 
+                  variant="outlined" 
+                  onClick={() => {
+                    setShowNotificationDialog(false)
+                    setNotificationForm({ title: '', message: '' })
+                    setRecipientSearch("")
+                    setSelectedRecipient(null)
+                    setShowRecipientSuggestions(false)
+                    setSearchResults([])
+                  }}
+                  disabled={isSendingNotification}
+                >
                   Cancelar
                 </Button>
-                <Button onClick={() => setShowNotificationDialog(false)}>Enviar Notificación</Button>
+                <Button 
+                  onClick={handleSendNotification}
+                  disabled={isSendingNotification}
+                >
+                  {isSendingNotification ? 'Enviando...' : 'Enviar Notificación'}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -223,31 +604,112 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Crear Nota</DialogTitle>
-                <DialogDescription>Añade una nueva nota para un cliente o sesión específica.</DialogDescription>
+                <DialogDescription>Añade una nueva nota para un cliente y sesión específica.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="client">Cliente</Label>
-                  <Input id="client" placeholder="Seleccionar cliente" />
+                <div className="grid gap-2 relative">
+                  <Label htmlFor="note-recipient">Destinatario *</Label>
+                  <Input 
+                    id="note-recipient" 
+                    placeholder="Escribe 3 letras para empezar a buscar..."
+                    value={noteRecipientSearch}
+                    onChange={(e) => handleNoteRecipientInputChange(e.target.value)}
+                    onFocus={() => noteRecipientSearch.length >= 3 && setShowNoteRecipientSuggestions(true)}
+                  />
+                  {isSearchingNoteRecipients && (
+                    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                      <div className="text-sm text-muted-foreground">Buscando usuarios...</div>
+                    </div>
+                  )}
+                  {showNoteRecipientSuggestions && noteSearchResults.length > 0 && !isSearchingNoteRecipients && (
+                    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                      {noteSearchResults.map((searchUser) => (
+                        <div
+                          key={searchUser._id}
+                          className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
+                          onClick={() => handleNoteRecipientSelect(searchUser)}
+                        >
+                          <div className="font-medium text-foreground">{searchUser.name} {searchUser.lastName}</div>
+                          <div className="text-sm text-muted-foreground">{searchUser.email}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {noteRecipientSearch.length >= 3 && noteSearchResults.length === 0 && showNoteRecipientSuggestions && !isSearchingNoteRecipients && (
+                    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                      <div className="text-sm text-muted-foreground">No se encontraron usuarios</div>
+                    </div>
+                  )}
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="session">Sesión</Label>
-                  <Input id="session" placeholder="Seleccionar sesión (opcional)" />
+                  <Label htmlFor="note-session">Sesión *</Label>
+                  {isLoadingSessions ? (
+                    <div className="text-sm text-muted-foreground">Cargando sesiones...</div>
+                  ) : (
+                    <select
+                      id="note-session"
+                      value={noteForm.sesion}
+                      onChange={(e) => handleNoteFormChange('sesion', e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={!selectedNoteRecipient || availableSessions.length === 0}
+                    >
+                      <option value="">
+                        {!selectedNoteRecipient 
+                          ? "Primero selecciona un destinatario" 
+                          : availableSessions.length === 0 
+                            ? "No hay sesiones disponibles" 
+                            : "Seleccionar sesión"}
+                      </option>
+                      {availableSessions.map((session) => (
+                        <option key={session._id} value={session._id}>
+                          {new Date(session.date).toLocaleDateString()} - {session.time}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="note-title">Título</Label>
-                  <Input id="note-title" placeholder="Título de la nota" />
+                  <Label htmlFor="note-title">Título *</Label>
+                  <Input 
+                    id="note-title" 
+                    placeholder="Título de la nota"
+                    value={noteForm.titulo}
+                    onChange={(e) => handleNoteFormChange('titulo', e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="note-content">Contenido</Label>
-                  <Textarea id="note-content" placeholder="Escribe tu nota aquí..." className="min-h-[120px]" />
+                  <Label htmlFor="note-content">Contenido *</Label>
+                  <Textarea 
+                    id="note-content" 
+                    placeholder="Escribe tu nota aquí..." 
+                    className="min-h-[120px]"
+                    value={noteForm.contenido}
+                    onChange={(e) => handleNoteFormChange('contenido', e.target.value)}
+                  />
                 </div>
               </div>
               <DialogFooter className="flex justify-end gap-2">
-                <Button variant="outlined" onClick={() => setShowNoteDialog(false)}>
+                <Button 
+                  variant="outlined" 
+                  onClick={() => {
+                    setShowNoteDialog(false)
+                    setNoteForm({ destinatario: '', sesion: '', titulo: '', contenido: '' })
+                    setNoteRecipientSearch("")
+                    setSelectedNoteRecipient(null)
+                    setShowNoteRecipientSuggestions(false)
+                    setNoteSearchResults([])
+                    setAvailableSessions([])
+                  }}
+                  disabled={isSendingNote}
+                >
                   Cancelar
                 </Button>
-                <Button onClick={() => setShowNoteDialog(false)}>Guardar Nota</Button>
+                <Button 
+                  onClick={handleCreateNote}
+                  disabled={isSendingNote}
+                >
+                  {isSendingNote ? 'Guardando...' : 'Guardar Nota'}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

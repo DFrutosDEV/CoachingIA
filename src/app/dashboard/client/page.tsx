@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { useAuthStore } from "@/lib/stores/auth-store"
+import { useAppSelector } from "@/lib/redux/hooks"
 import { useEffect, useRef } from "react"
 import { createSwapy } from "swapy"
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dashboard-cards-client"
 
 export default function ClientDashboard() {
-  const { user } = useAuthStore()
+  const user = useAppSelector(state => state.auth.user)
   
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null)

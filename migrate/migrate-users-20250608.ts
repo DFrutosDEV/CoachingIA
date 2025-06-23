@@ -20,7 +20,7 @@ const usersToMigrate = [
     lastName: 'Prueba',
     email: 'admin@coach.com',
     password: 'admin123',
-    roles: ['Admin'], // Array de nombres de roles
+    roles: ['Admin'],
     age: 30,
     active: true
   },

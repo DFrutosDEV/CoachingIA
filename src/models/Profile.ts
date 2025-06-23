@@ -5,6 +5,10 @@ export interface IProfile extends Document {
   role: ObjectId;
   profilePicture: string;
   bio: string;  
+  indexDashboard: number[];
+  clients: ObjectId[];
+  coaches: ObjectId[];
+  enterprises: ObjectId[];
   isDeleted: boolean;
 }
 
@@ -28,6 +32,20 @@ const ProfileSchema: Schema = new Schema({
     trim: true,
     maxlength: [500, 'The bio cannot exceed 500 characters'],
     default: ''
+  },
+  indexDashboard: {
+    type: [Number],
+    default: []
+  },
+  clients: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Profile',
+    default: []
+  },
+  enterprises: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Profile',
+    default: []
   },
   isDeleted: {
     type: Boolean,
