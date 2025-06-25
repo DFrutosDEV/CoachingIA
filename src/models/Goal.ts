@@ -1,22 +1,22 @@
 import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 
 export interface IGoal extends Document {
-  objectives: ObjectId[];
+  objectiveId: ObjectId;
   description: string;
   createdBy: ObjectId;
   clientId: ObjectId;
   isCompleted: boolean;
-  feedback: ObjectId;
+  feedbackId: ObjectId;
   isDeleted: boolean;
 }
 
 const GoalSchema: Schema = new Schema({
-  objectives: {
-    type: [Schema.Types.ObjectId],
+  objectiveId: {
+    type: Schema.Types.ObjectId,
     ref: 'Objective',
-    required: [true, 'The objectives are required'],
+    required: [true, 'The objectiveId is required'],
     trim: true,
-    maxlength: [50, 'The objectives cannot exceed 50 characters']
+    maxlength: [50, 'The objectiveId cannot exceed 50 characters']
   },
   description: {
     type: String,
@@ -38,7 +38,7 @@ const GoalSchema: Schema = new Schema({
     type: Boolean,
     default: false
   },
-  feedback: {
+  feedbackId: {
     type: Schema.Types.ObjectId,
     ref: 'Feedback',
     required: [true, 'The feedback is required']
@@ -51,10 +51,10 @@ const GoalSchema: Schema = new Schema({
   timestamps: true
 });
 
-GoalSchema.index({ objectives: 1 });
+GoalSchema.index({ objectiveId: 1 });
 GoalSchema.index({ createdBy: 1 });
 GoalSchema.index({ clientId: 1 });
 GoalSchema.index({ isCompleted: 1 });
-GoalSchema.index({ feedback: 1 });
+GoalSchema.index({ feedbackId: 1 });
 
 export default mongoose.models.Goal || mongoose.model<IGoal>('Goal', GoalSchema); 

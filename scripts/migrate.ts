@@ -177,9 +177,12 @@ async function runSpecificMigrations(): Promise<{ executed: string[], errors: st
     // Leer todos los archivos en la carpeta de migraciones
     let migrationFiles: string[];
     try {
-      migrationFiles = readdirSync(migratePath).filter((file: string) => 
-        (file.endsWith('.ts') || file.endsWith('.js')) && file.startsWith('migrate-')
-      );
+      migrationFiles = readdirSync(migratePath).filter((file: string) => {
+        // Buscar archivos que terminen en .ts o .js Y que empiecen con un número seguido de guión
+        const isValidExtension = file.endsWith('.ts') || file.endsWith('.js');
+        const hasOrderPrefix = /^\d+-/.test(file); // Patrón: número-cualquier_cosa
+        return isValidExtension && hasOrderPrefix;
+      });
     } catch (error) {
       console.log(`${colors.yellow}⚠️  Carpeta de migraciones no encontrada: ${migratePath}${colors.reset}`);
       return { executed, errors };
@@ -187,17 +190,30 @@ async function runSpecificMigrations(): Promise<{ executed: string[], errors: st
     
     if (migrationFiles.length === 0) {
       console.log(`${colors.yellow}⚠️  No se encontraron archivos de migración en ${migratePath}${colors.reset}`);
+      console.log(`${colors.blue}💡 Tip: Los archivos deben seguir el patrón: [orden]-[nombre].ts${colors.reset}`);
+      console.log(`${colors.blue}   Ejemplo: 1-migrate-roles-20250623.ts${colors.reset}`);
       return { executed, errors };
     }
     
-    console.log(`${colors.blue}📁 Migraciones encontradas: ${migrationFiles.length}${colors.reset}`);
-    migrationFiles.forEach((file: string) => {
-      console.log(`   - ${file}`);
+    // Ordenar archivos por el número de orden al inicio del nombre
+    migrationFiles.sort((a: string, b: string) => {
+      const orderA = parseInt(a.split('-')[0], 10);
+      const orderB = parseInt(b.split('-')[0], 10);
+      
+      // Si tienen el mismo número de orden, ordenar por nombre completo
+      if (orderA === orderB) {
+        return a.localeCompare(b);
+      }
+      
+      return orderA - orderB;
+    });
+    
+    console.log(`${colors.blue}📁 Migraciones encontradas (en orden de ejecución): ${migrationFiles.length}${colors.reset}`);
+    migrationFiles.forEach((file: string, index: number) => {
+      const orderNumber = file.split('-')[0];
+      console.log(`   ${index + 1}. [Orden ${orderNumber}] ${file}`);
     });
     console.log('');
-    
-    // Ordenar archivos por fecha (formato YYYYMMDD en el nombre)
-    migrationFiles.sort();
     
     // Ejecutar cada migración
     for (const file of migrationFiles) {

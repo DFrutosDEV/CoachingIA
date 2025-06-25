@@ -20,8 +20,9 @@ Revierte la última migración ejecutada.
 │   ├── Role.ts
 │   └── Logs.ts
 ├── migrate/              # Scripts de migración específicos
-│   ├── migrate-roles-20250608.ts
-│   └── migrate-users-20250608.ts
+│   ├── 1-migrate-roles-20250623.ts
+│   ├── 1-migrate-users-20250623.ts
+│   └── 2-migrate-profile-20250623.ts
 ├── scripts/
 │   ├── migrate.ts        # Script principal de migración
 │   └── rollback.ts       # Script de rollback
@@ -31,6 +32,7 @@ Revierte la última migración ejecutada.
 ## Cómo Funciona
 
 ### 1. Migración de Modelos
+- El orden lo marca el primer numero del nombre del archivo
 - Lee todos los archivos `.ts` y `.js` en `src/models/`
 - Crea las colecciones correspondientes si no existen
 - Sincroniza los índices definidos en los esquemas

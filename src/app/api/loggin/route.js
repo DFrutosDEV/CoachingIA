@@ -45,7 +45,7 @@ export async function POST(request) {
       email: email.toLowerCase(),
       password: contrasena,
       active: true
-    }).populate('roles');
+    });
     
     console.log('👤 Usuario encontrado:', user ? 'SÍ' : 'NO');
 
@@ -59,9 +59,9 @@ export async function POST(request) {
       );
     }
 
-    const profile = await Profile.findOne({ user: user._id });
+    const profile = await Profile.findOne({ user: user._id }).populate('role');
     
-    // Login exitoso - retornar datos del usuario (sin contraseña)
+    // Login exitoso - retornar datos del usuario
     const userResponse = {
       _id: user._id,
       name: user.name,

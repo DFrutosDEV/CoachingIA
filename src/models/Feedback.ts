@@ -1,20 +1,13 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IFeedback extends Document {
-  userId: string;
   coachId: string;
   clientId: string;
-  enterpriseId: string;
+  objectiveId: string;
   feedback: string;
 }
 
 const FeedbackSchema: Schema = new Schema({
-  userId: {
-    type: String,
-    required: [true, 'The userId is required'],
-    trim: true,
-    maxlength: [50, 'The userId cannot exceed 50 characters']
-  },
   coachId: {
     type: String,
     required: [true, 'The coachId is required'],
@@ -33,6 +26,12 @@ const FeedbackSchema: Schema = new Schema({
     trim: true,
     maxlength: [50, 'The enterpriseId cannot exceed 50 characters']
   },
+  objectiveId: {
+    type: String,
+    required: [true, 'The objectiveId is required'],
+    trim: true,
+    maxlength: [50, 'The objectiveId cannot exceed 50 characters']
+  },
   feedback: {
     type: String,
     required: [true, 'The feedback is required'],
@@ -43,6 +42,8 @@ const FeedbackSchema: Schema = new Schema({
   timestamps: true
 });
 
-FeedbackSchema.index({ userId: 1 });
+FeedbackSchema.index({ coachId: 1 });
+FeedbackSchema.index({ clientId: 1 });
+FeedbackSchema.index({ objectiveId: 1 });
 
 export default mongoose.models.Feedback || mongoose.model<IFeedback>('Feedback', FeedbackSchema); 

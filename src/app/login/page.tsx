@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { useAuthService } from "@/lib/services/auth-service"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -33,8 +34,8 @@ export default function LoginPage() {
     event.preventDefault()
     
     const result = await login(email, password)
-    console.log("result", result)
     if (result.success) {
+      toast.success("Iniciando sesión...")
       // Manejar localStorage según el estado de "Recuérdame"
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email)
@@ -43,13 +44,18 @@ export default function LoginPage() {
       }
 
       const user = result.user
-      console.log("user", user)
       if (user) {
         setTimeout(() => {
           // Determinar la ruta basada en el primer rol o el rol principal
-          const primaryRole = user.roles[0].toLowerCase() || 'client'
+          const primaryRole = user.roles[0] || 'client'
           router.push(`/dashboard/${primaryRole}`)
         }, 1000)
+      }
+    } else {
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        toast.error("Error al iniciar sesión")
       }
     }
   }

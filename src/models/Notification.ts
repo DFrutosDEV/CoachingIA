@@ -4,7 +4,8 @@ export interface INotification extends Document {
   title: string;
   description: string;
   createdBy: ObjectId;
-  to: ObjectId;
+  coachId: ObjectId;
+  clientId: ObjectId;
   read: boolean;
 }
 
@@ -26,7 +27,12 @@ const NotificationSchema: Schema = new Schema({
     ref: 'User',
     required: true
   },
-  to: {
+  coachId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  clientId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -40,7 +46,7 @@ const NotificationSchema: Schema = new Schema({
 });
 
 NotificationSchema.index({ title: 1 });
-NotificationSchema.index({ to: 1 });
+NotificationSchema.index({ clientId: 1 });
 NotificationSchema.index({ read: 1 });
 
 export default mongoose.models.Notification || mongoose.model<INotification>('Notification', NotificationSchema); 

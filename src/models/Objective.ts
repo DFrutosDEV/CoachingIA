@@ -2,9 +2,9 @@ import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 
 export interface IObjective extends Document {
   title: string;
-  description: string;
   createdBy: ObjectId;
   clientId: ObjectId;
+  coachId: ObjectId;
   isCompleted: boolean;  
 }
 
@@ -15,12 +15,6 @@ const ObjectiveSchema: Schema = new Schema({
     trim: true,
     maxlength: [50, 'The title cannot exceed 50 characters']
   },
-  description: {
-    type: String,
-    required: [true, 'The description is required'],
-    trim: true,
-    maxlength: [500, 'The description cannot exceed 500 characters']
-  },
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -30,6 +24,11 @@ const ObjectiveSchema: Schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'The clientId is required']
+  },
+  coachId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'The coachId is required']
   },
   isCompleted: {
     type: Boolean,

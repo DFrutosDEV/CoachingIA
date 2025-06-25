@@ -2,11 +2,62 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@mui/material"
-import { Calendar, Clock, Users, ArrowRight, MessageSquare } from "lucide-react"
+import { Calendar, Clock, Users, ArrowRight, MessageSquare, Video } from "lucide-react"
 import Link from "next/link"
 
+// Interfaces para los datos
+interface NextSessionData {
+  date: string;
+  link: string;
+  time: string;
+  client: string;
+  topic: string;
+}
+
+interface TodaySession {
+  time: string;
+  client: string;
+  topic: string;
+}
+
+interface RecentClient {
+  id: string;
+  name: string;
+  sessions: number;
+  progress: number;
+}
+
 // Card 1: Próxima Sesión
-export function NextSessionCard() {
+export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
+  if (!data) {
+    return (
+      <Card data-swapy-item="next-session">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium">Próxima Sesión</CardTitle>
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">Sin sesiones programadas</div>
+          <p className="text-xs text-muted-foreground">No hay sesiones próximas</p>
+          <div className="mt-4">
+            <Button variant="outlined" className="w-full" disabled>
+              <Clock className="mr-2 h-4 w-4" />
+              Sin sesiones
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const sessionDate = new Date(data.date)
+  const isToday = sessionDate.toDateString() === new Date().toDateString()
+  const displayDate = isToday ? 'Hoy' : sessionDate.toLocaleDateString('es-ES', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long' 
+  })
+
   return (
     <Card data-swapy-item="next-session">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -14,10 +65,11 @@ export function NextSessionCard() {
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">Hoy, 15:00</div>
-        <p className="text-xs text-muted-foreground">Con Carlos Rodríguez</p>
+        <div className="text-2xl font-bold">{displayDate}, {data.time}</div>
+        <p className="text-xs text-muted-foreground">Con {data.client}</p>
+        <p className="text-xs text-muted-foreground mt-1">{data.topic}</p>
         <div className="mt-4">
-          <Button variant="outlined" className="w-full">
+          <Button variant="outlined" className="w-full" onClick={() => window.open(data.link, '_blank')}>
             <Clock className="mr-2 h-4 w-4" />
             Iniciar sesión
           </Button>
@@ -28,7 +80,7 @@ export function NextSessionCard() {
 }
 
 // Card 2: Clientes Activos
-export function ActiveClientsCard() {
+export function ActiveClientsCard({ count }: { count: number }) {
   return (
     <Card data-swapy-item="active-clients">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -36,8 +88,8 @@ export function ActiveClientsCard() {
         <Users className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">24</div>
-        <p className="text-xs text-muted-foreground">+3 este mes</p>
+        <div className="text-2xl font-bold">{count}</div>
+        <p className="text-xs text-muted-foreground">Clientes asignados</p>
         <div className="mt-4">
           <Link href="/dashboard/coach/clients">
             <Button variant="outlined" className="w-full">
@@ -52,7 +104,7 @@ export function ActiveClientsCard() {
 }
 
 // Card 3: Sesiones Programadas
-export function ScheduledSessionsCard() {
+export function ScheduledSessionsCard({ count }: { count: number }) {
   return (
     <Card data-swapy-item="scheduled-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -60,7 +112,7 @@ export function ScheduledSessionsCard() {
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">12</div>
+        <div className="text-2xl font-bold">{count}</div>
         <p className="text-xs text-muted-foreground">Para esta semana</p>
         <div className="mt-4">
           <Link href="/dashboard/coach/calendar">
@@ -76,7 +128,24 @@ export function ScheduledSessionsCard() {
 }
 
 // Card 4: Sesiones de Hoy
-export function TodaySessionsCard() {
+export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
+  if (sessions.length === 0) {
+    return (
+      <Card data-swapy-item="today-sessions" className="flex flex-col h-full">
+        <CardHeader>
+          <CardTitle>Sesiones de Hoy</CardTitle>
+          <CardDescription>No tienes sesiones programadas para hoy.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-muted-foreground">
+            <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>Sin sesiones programadas</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card data-swapy-item="today-sessions" className="flex flex-col h-full">
       <CardHeader>
@@ -85,12 +154,7 @@ export function TodaySessionsCard() {
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto scrollbar-thin">
         <div className="space-y-4 pr-2">
-          {[
-            { time: "10:00 - 11:00", client: "Ana Martínez", topic: "Desarrollo profesional" },
-            { time: "12:30 - 13:30", client: "Pedro Sánchez", topic: "Gestión del tiempo" },
-            { time: "15:00 - 16:00", client: "Carlos Rodríguez", topic: "Desarrollo personal" },
-            { time: "17:30 - 18:30", client: "Laura Gómez", topic: "Liderazgo" },
-          ].map((session, index) => (
+          {sessions.map((session, index) => (
             <div
               key={index}
               className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
@@ -101,10 +165,13 @@ export function TodaySessionsCard() {
                 <p className="text-xs text-muted-foreground">{session.topic}</p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outlined">
+                <Button variant="outlined" size="small">
                   Notas
                 </Button>
-                <Button variant="outlined">Iniciar</Button>
+                <Button variant="outlined" size="small">
+                  <Video className="mr-1 h-3 w-3" />
+                  Jitsi
+                </Button>
               </div>
             </div>
           ))}
@@ -115,7 +182,24 @@ export function TodaySessionsCard() {
 }
 
 // Card 5: Clientes Recientes
-export function RecentClientsCard() {
+export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
+  if (clients.length === 0) {
+    return (
+      <Card data-swapy-item="recent-clients" className="flex flex-col">
+        <CardHeader>
+          <CardTitle>Clientes Recientes</CardTitle>
+          <CardDescription>No tienes clientes asignados.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>Sin clientes asignados</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card data-swapy-item="recent-clients" className="flex flex-col">
       <CardHeader>
@@ -124,15 +208,9 @@ export function RecentClientsCard() {
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto" style={{ maxHeight: "320px" }}>
         <div className="space-y-4">
-          {[
-            { name: "Carlos Rodríguez", sessions: 12, progress: 75 },
-            { name: "Laura Gómez", sessions: 8, progress: 60 },
-            { name: "Miguel Torres", sessions: 5, progress: 40 },
-            { name: "Ana Martínez", sessions: 3, progress: 25 },
-            { name: "Pedro Sánchez", sessions: 2, progress: 15 },
-          ].map((client, index) => (
+          {clients.map((client, index) => (
             <div
-              key={index}
+              key={client.id}
               className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
             >
               <div className="space-y-1">
@@ -145,7 +223,7 @@ export function RecentClientsCard() {
                   ></div>
                 </div>
               </div>
-              <Button variant="outlined">
+              <Button variant="outlined" size="small">
                 Perfil
               </Button>
             </div>

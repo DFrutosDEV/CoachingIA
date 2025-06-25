@@ -5,7 +5,9 @@ export interface IMeet extends Document {
   time: string;
   link: string;
   createdBy: ObjectId;
-  participants: ObjectId[];
+  clientId: ObjectId;
+  coachId: ObjectId;
+  objectiveId: ObjectId;
   isCancelled: boolean;
 }
 
@@ -30,11 +32,21 @@ const MeetSchema: Schema = new Schema({
     ref: 'User',
     required: true
   },
-  participants: [{
+  clientId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  }],
+    required: [true, 'The clientId is required']
+  },
+  coachId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'The coachId is required']
+  },
+  objectiveId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Objective',
+    required: [true, 'The objectiveId is required']
+  },
   isCancelled: {
     type: Boolean,
     default: false
@@ -46,7 +58,9 @@ const MeetSchema: Schema = new Schema({
 MeetSchema.index({ date: 1 });
 MeetSchema.index({ time: 1 });
 MeetSchema.index({ createdBy: 1 });
-MeetSchema.index({ participants: 1 });
+MeetSchema.index({ clientId: 1 });
+MeetSchema.index({ coachId: 1 });
 MeetSchema.index({ isCancelled: 1 });
+MeetSchema.index({ objectiveId: 1 });
 
 export default mongoose.models.Meet || mongoose.model<IMeet>('Meet', MeetSchema); 

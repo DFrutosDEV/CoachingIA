@@ -7,8 +7,7 @@ export interface IProfile extends Document {
   bio: string;  
   indexDashboard: number[];
   clients: ObjectId[];
-  coaches: ObjectId[];
-  enterprises: ObjectId[];
+  enterprise: ObjectId;
   isDeleted: boolean;
 }
 
@@ -42,10 +41,10 @@ const ProfileSchema: Schema = new Schema({
     ref: 'Profile',
     default: []
   },
-  enterprises: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Profile',
-    default: []
+  enterprise: {
+    type: Schema.Types.ObjectId,
+    ref: 'Enterprise',
+    default: null
   },
   isDeleted: {
     type: Boolean,

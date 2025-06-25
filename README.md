@@ -1,4 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Coach Platform
+
+Plataforma de coaching con videollamadas integradas usando Jitsi Meet.
+
+## Características
+
+- **Videollamadas**: Integración con Jitsi Meet (gratuito y seguro)
+- **Gestión de clientes**: Dashboard completo para coaches
+- **Sesiones**: Programación y gestión de sesiones
+- **Notas**: Sistema de notas y seguimiento
+- **Dashboard**: Interfaz intuitiva para diferentes tipos de usuarios
+
+## Videollamadas con Jitsi Meet
+
+Este proyecto utiliza **Jitsi Meet** como plataforma de videollamadas por las siguientes ventajas:
+
+- ✅ **Completamente gratuito** - Sin límites de tiempo o participantes
+- ✅ **Encriptación E2E** - Máxima seguridad y privacidad
+- ✅ **Sin registro** - Los usuarios no necesitan crear cuentas
+- ✅ **Código abierto** - Transparente y auditado
+- ✅ **Fácil de usar** - Funciona en cualquier navegador
+
+### Migración de Google Meet a Jitsi
+
+Recientemente migramos de Google Meet a Jitsi Meet. Ver [JITSI_MIGRATION.md](./JITSI_MIGRATION.md) para más detalles.
 
 ## Getting Started
 

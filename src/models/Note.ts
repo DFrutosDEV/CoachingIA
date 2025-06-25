@@ -3,9 +3,8 @@ import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 export interface INote extends Document {
   title: string;
   content: string;
-  destinatario: ObjectId;
-  sesion: ObjectId;
-  clienteId: ObjectId;
+  clientId: ObjectId;
+  sessionId: ObjectId;
   coachId: ObjectId;
   createdBy: ObjectId;
   isDeleted: boolean;
@@ -24,20 +23,15 @@ const NoteSchema: Schema = new Schema({
     trim: true,
     maxlength: [2000, 'El contenido no puede exceder 2000 caracteres']
   },
-  destinatario: {
+  clientId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'El destinatario es requerido']
   },
-  sesion: {
+  sessionId: {
     type: Schema.Types.ObjectId,
     ref: 'Meet',
     required: [true, 'La sesión es requerida']
-  },
-  clienteId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'El cliente es requerido']
   },
   coachId: {
     type: Schema.Types.ObjectId,
@@ -58,9 +52,8 @@ const NoteSchema: Schema = new Schema({
 });
 
 NoteSchema.index({ title: 1 });
-NoteSchema.index({ destinatario: 1 });
-NoteSchema.index({ sesion: 1 });
-NoteSchema.index({ clienteId: 1 });
+NoteSchema.index({ clientId: 1 });
+NoteSchema.index({ sessionId: 1 });
 NoteSchema.index({ coachId: 1 });
 NoteSchema.index({ createdBy: 1 });
 

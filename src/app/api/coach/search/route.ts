@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import Profile from '@/models/Profile';
 
 // GET /api/coach/search - Buscar usuarios por nombre, apellido o email
 export async function GET(request: NextRequest) {
@@ -9,8 +10,7 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    
+    const coachId = searchParams.get('coachId');
     let query: any = { active: true, isDeleted: { $ne: true } };
     
     // Si hay parámetro de búsqueda, buscar por nombre, apellido o email
@@ -22,12 +22,17 @@ export async function GET(request: NextRequest) {
         { email: searchRegex }
       ];
     }
+
+    const coach = await Profile.findOne({ _id: coachId, isDeleted: { $ne: true } })
+      .select('clients')
+      .populate('clients', '_id name lastName email');
     
-    const users = await User.find(query)
-      .select('_id name lastName email')
-      .populate('roles', 'name')
-      .limit(limit)
-      .sort({ name: 1, lastName: 1 });
+    const users = coach?.clients.map((client: any) => ({
+      _id: client._id,
+      name: client.name,
+      lastName: client.lastName,
+      email: client.email
+    }));
     
     return NextResponse.json({
       success: true,

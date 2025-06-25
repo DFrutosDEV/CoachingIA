@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Role from '@/models/Role';
-import Objective from '@/models/Objective';
-import Meet from '@/models/Meet';
 
-// POST /api/clients - Crear un nuevo cliente
+// POST /api/client - Crear un nuevo cliente
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -16,19 +14,16 @@ export async function POST(request: NextRequest) {
       lastName, 
       email, 
       phone, 
-      focus, 
-      startDate, 
-      startTime, 
       coachId,
       createdBy // ID del usuario que está creando el cliente (coach, admin o enterprise)
     } = body;
     
     // Validaciones básicas
-    if (!firstName || !lastName || !email || !phone || !focus || !startDate || !startTime || !createdBy) {
+    if (!firstName || !lastName || !email || !createdBy) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Todos los campos son requeridos' 
+          error: 'Los campos firstName, lastName, email y createdBy son requeridos' 
         },
         { status: 400 }
       );
@@ -81,7 +76,7 @@ export async function POST(request: NextRequest) {
       name: firstName,
       lastName: lastName,
       email: email.toLowerCase(),
-      phone: phone,
+      phone: phone || '',
       password: tempPassword, // En un caso real, esto debería ser hasheado
       roles: [clientRole._id],
       biography: '',
@@ -102,39 +97,19 @@ export async function POST(request: NextRequest) {
       { new: true }
     );
     
-    // Crear el objetivo inicial
-    const nuevoObjetivo = new Objective({
-      title: 'Objetivo inicial',
-      description: focus,
-      createdBy: assignedCoachId,
-      clientId: clienteGuardado._id,
-      isCompleted: false
-    });
-    
-    const objetivoGuardado = await nuevoObjetivo.save();
-    
-    // Crear la primera reunión
-    const fechaHora = new Date(`${startDate}T${startTime}`);
-    
-    const nuevaReunion = new Meet({
-      date: fechaHora,
-      time: startTime,
-      link: `https://meet.example.com/room/${Math.random().toString(36).substring(2, 15)}`, // Link temporal
-      createdBy: assignedCoachId,
-      participants: [assignedCoachId, clienteGuardado._id],
-      isCancelled: false
-    });
-    
-    const reunionGuardada = await nuevaReunion.save();
-    
     return NextResponse.json({
       success: true,
       data: {
-        client: clienteGuardado,
-        objective: objetivoGuardado,
-        meeting: reunionGuardada
+        client: {
+          name: clienteGuardado.name,
+          lastName: clienteGuardado.lastName,
+          email: clienteGuardado.email,
+          phone: clienteGuardado.phone,
+          active: clienteGuardado.active,
+          createdAt: clienteGuardado.createdAt
+        }
       },
-      message: 'Cliente creado exitosamente con objetivo y reunión inicial'
+      message: 'Cliente creado exitosamente'
     }, { status: 201 });
     
   } catch (error: any) {
