@@ -38,12 +38,12 @@ const TicketSchema: Schema = new Schema({
   },
   assignedTo: [{
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: false
   }],
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: false
   },
   creationDate: {

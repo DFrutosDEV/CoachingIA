@@ -6,6 +6,7 @@ export interface IObjective extends Document {
   clientId: ObjectId;
   coachId: ObjectId;
   isCompleted: boolean;  
+  active: boolean;
 }
 
 const ObjectiveSchema: Schema = new Schema({
@@ -17,20 +18,24 @@ const ObjectiveSchema: Schema = new Schema({
   },
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The createdBy is required']
   },
   clientId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The clientId is required']
   },
   coachId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The coachId is required']
   },
   isCompleted: {
+    type: Boolean,
+    default: false
+  },
+  active: {
     type: Boolean,
     default: false
   }
@@ -42,5 +47,6 @@ ObjectiveSchema.index({ title: 1 });
 ObjectiveSchema.index({ createdBy: 1 });
 ObjectiveSchema.index({ clientId: 1 });
 ObjectiveSchema.index({ isCompleted: 1 });
+ObjectiveSchema.index({ active: 1 });
 
 export default mongoose.models.Objective || mongoose.model<IObjective>('Objective', ObjectiveSchema); 

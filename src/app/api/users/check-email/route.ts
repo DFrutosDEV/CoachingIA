@@ -37,9 +37,16 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    const role = await Role.findOne({
+      code: '3',
+      active: true,
+      isDeleted: { $ne: true }
+    });
+
     // Buscar el perfil del usuario que sea de tipo cliente
     const perfil = await Profile.findOne({
       user: usuario._id,
+      role: role._id,
       isDeleted: { $ne: true }
     }).populate({
       path: 'role',
@@ -56,6 +63,7 @@ export async function GET(request: NextRequest) {
         exists: true,
         user: {
           _id: usuario._id,
+          clientId: perfil._id,
           name: usuario.name,
           lastName: usuario.lastName,
           email: usuario.email,

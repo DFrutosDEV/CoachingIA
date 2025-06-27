@@ -24,6 +24,13 @@ interface Goal {
   progress: number;
 }
 
+interface NextSession {
+  date: Date;
+  time: string;
+  link: string;
+  objectiveId: string;
+}
+
 interface Client {
   id: string;
   name: string;
@@ -31,7 +38,7 @@ interface Client {
   phone: string;
   startDate: string;
   sessions: number;
-  nextSession: string;
+  nextSession: NextSession | {};
   progress: number;
   status: "active" | "pending" | "inactive";
   focus: string;
@@ -40,6 +47,7 @@ interface Client {
   goals: Goal[];
   upcomingSessions: { id: string; date: string; topic: string }[];
   notes: { id: string; date: string; content: string }[];
+  activeObjectiveId: string | null;
 }
 
 // Definir props para ClientsList
@@ -151,7 +159,12 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
                       {client.status === "active" ? "Activo" : client.status === "pending" ? "Pendiente" : "Inactivo"}
                     </Badge>
                   </TableCell>
-                  <TableCell>{client.nextSession}</TableCell>
+                  <TableCell>
+                    {Object.keys(client.nextSession).length > 0 
+                      ? `${new Date((client.nextSession as NextSession).date).toLocaleDateString('es-ES')} - ${(client.nextSession as NextSession).time}`
+                      : 'Por programar'
+                    }
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-16 rounded-full bg-muted">

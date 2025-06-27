@@ -23,8 +23,9 @@ interface NewObjectiveCardProps {
   userType: "coach" | "admin"
 }
 
-interface ExistingUser {
+interface ExistingClient {
   _id: string
+  clientId: string
   name: string
   lastName: string
   email: string
@@ -35,7 +36,7 @@ interface ExistingUser {
 export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
   const [showClientDialog, setShowClientDialog] = useState(false)
   const [showExistingUserDialog, setShowExistingUserDialog] = useState(false)
-  const [existingUser, setExistingUser] = useState<ExistingUser | null>(null)
+  const [existingClient, setExistingClient] = useState<ExistingClient | null>(null)
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
   
   // Estados para el formulario de cliente
@@ -73,25 +74,43 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       const result = await response.json()
 
       if (result.success && result.exists) {
-        setExistingUser(result.user)
+        setExistingClient(result.user)
         setShowExistingUserDialog(true)
         // No habilitar campos si existe el usuario
         setFieldsEnabled(false)
       } else if (!result.success && result.exists) {
         // Email existe pero no es cliente
         toast.error(result.message)
-        setExistingUser(null)
+        setExistingClient(null)
         setFieldsEnabled(false)
       } else {
         // Email no existe, habilitar campos para crear nuevo cliente
         setFieldsEnabled(true)
-        setExistingUser(null)
+        setExistingClient(null)
       }
     } catch (error) {
       console.error('Error verificando email:', error)
       toast.error('Error al verificar el email')
     } finally {
       setIsCheckingEmail(false)
+    }
+  }
+
+  // Función para verificar si el cliente tiene un objetivo activo
+  const checkActiveObjective = async (clientId: string) => {
+    try {
+      const response = await fetch(`/api/objective/check-active?clientId=${clientId}`)
+      const result = await response.json()
+
+      if (result.success && result.hasActiveObjective) {
+        toast.error('Este cliente ya tiene un objetivo activo. Debe completar el objetivo actual antes de crear uno nuevo.')
+        return false
+      }
+      return true
+    } catch (error) {
+      console.error('Error verificando objetivo activo:', error)
+      toast.error('Error al verificar el objetivo activo')
+      return false
     }
   }
 
@@ -102,7 +121,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
     // Si el email está vacío, deshabilitar campos
     if (!value) {
       setFieldsEnabled(false)
-      setExistingUser(null)
+      setExistingClient(null)
       return
     }
 
@@ -116,13 +135,13 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
   // Función para confirmar usuario existente
   const handleConfirmExistingUser = () => {
-    if (existingUser) {
+    if (existingClient) {
       setClientForm(prev => ({
         ...prev,
-        firstName: existingUser.name,
-        lastName: existingUser.lastName,
-        email: existingUser.email,
-        phone: existingUser.phone || '',
+        firstName: existingClient.name,
+        lastName: existingClient.lastName,
+        email: existingClient.email,
+        phone: existingClient.phone || '',
         focus: '',
         startDate: '',
         startTime: '',
@@ -138,7 +157,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
   // Función para rechazar usuario existente
   const handleRejectExistingUser = () => {
     setShowExistingUserDialog(false)
-    setExistingUser(null)
+    setExistingClient(null)
     setFieldsEnabled(false)
     // Limpiar solo el email para que pueda ingresar uno nuevo
     handleClientFormChange('email', '')
@@ -157,11 +176,19 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       return
     }
 
+    // Si es un usuario existente, verificar que no tenga un objetivo activo
+    if (existingClient?.clientId) {
+      const canCreateObjective = await checkActiveObjective(existingClient.clientId)
+      if (!canCreateObjective) {
+        return
+      }
+    }
+
     setIsSubmitting(true)
 
     try {
-      // Determinar el coachId basado en el tipo de usuario
-      let coachIdToUse = user._id // Por defecto el usuario actual
+      // Determinar el id del Rol del usuario autenticado
+      let coachIdToUse = user.roleId.toString()
       
       // Si es admin o enterprise y se especificó un coach, usar ese
       if ((userType === "admin") && clientForm.coachId) {
@@ -183,7 +210,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
           startDate: clientForm.startDate,
           startTime: clientForm.startTime,
           coachId: coachIdToUse,
-          userId: existingUser?._id // Si existe un usuario, se usa su ID
+          clientId: existingClient?.clientId // Si existe un usuario, se usa su ID
         }),
       })
 
@@ -204,7 +231,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
           coachId: ''
         })
         setFieldsEnabled(false)
-        setExistingUser(null)
+        setExistingClient(null)
       } else {
         toast.error(`Error: ${result.error}`)
       }
@@ -274,7 +301,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                     Verificando email...
                   </small>
                 )}
-                {existingUser && (
+                {existingClient && (
                   <small className="text-sm text-green-600 font-medium">
                     ✓ Cliente existente
                   </small>
@@ -388,7 +415,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                 onClick={() => {
                   setShowClientDialog(false)
                   setFieldsEnabled(false)
-                  setExistingUser(null)
+                  setExistingClient(null)
                   setClientForm({
                     firstName: '',
                     lastName: '',
@@ -406,7 +433,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
               </Button>
               <Button 
                 onClick={handleCreateClient}
-                disabled={isSubmitting || (!fieldsEnabled && !existingUser)}
+                disabled={isSubmitting || (!fieldsEnabled && !existingClient)}
               >
                 {isSubmitting ? 'Creando...' : 'Crear Objetivo'}
               </Button>
@@ -420,28 +447,28 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
             <DialogHeader>
               <DialogTitle>Usuario encontrado</DialogTitle>
               <DialogDescription>
-                Ya existe un usuario con el email <strong>{existingUser?.email}</strong>:
+                Ya existe un usuario con el email <strong>{existingClient?.email}</strong>:
               </DialogDescription>
             </DialogHeader>
             <div className="my-4 p-4 bg-muted rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <User className="h-4 w-4" />
-                <span><strong>{existingUser?.name} {existingUser?.lastName}</strong></span>
+                <span><strong>{existingClient?.name} {existingClient?.lastName}</strong></span>
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <Mail className="h-4 w-4" />
-                <span>{existingUser?.email}</span>
+                <span>{existingClient?.email}</span>
               </div>
-              {existingUser?.phone && (
+              {existingClient?.phone && (
                 <div className="flex items-center gap-2 mb-2">
                   <Phone className="h-4 w-4" />
-                  <span>{existingUser.phone}</span>
+                  <span>{existingClient.phone}</span>
                 </div>
               )}
-              {existingUser?.age && (
+              {existingClient?.age && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span>{existingUser.age} años</span>
+                  <span>{existingClient.age} años</span>
                 </div>
               )}
             </div>

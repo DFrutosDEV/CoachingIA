@@ -14,6 +14,7 @@ interface Role {
 
 interface ApiUser {
   _id: string
+  roleId: string
   name: string
   lastName: string
   email: string
@@ -54,6 +55,7 @@ const mapRolesToStore = (roles: Role[]): ('admin' | 'client' | 'coach' | 'enterp
 const mapApiUserToStore = (apiUser: ApiUser) => {
   return {
     _id: apiUser._id,
+    roleId: apiUser.roleId,
     email: apiUser.email,
     name: apiUser.name,
     lastName: apiUser.lastName,

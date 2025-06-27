@@ -29,17 +29,17 @@ const MeetSchema: Schema = new Schema({
   },
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: true
   },
   clientId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The clientId is required']
   },
   coachId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The coachId is required']
   },
   objectiveId: {

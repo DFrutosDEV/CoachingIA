@@ -5,6 +5,7 @@ export interface IGoal extends Document {
   description: string;
   createdBy: ObjectId;
   clientId: ObjectId;
+  day: string;
   isCompleted: boolean;
   feedbackId: ObjectId;
   isDeleted: boolean;
@@ -26,13 +27,17 @@ const GoalSchema: Schema = new Schema({
   },
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The createdBy is required']
   },
   clientId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'The clientId is required']
+  },
+  day: {
+    type: String,
+    required: [true, 'The day is required']
   },
   isCompleted: {
     type: Boolean,
@@ -41,7 +46,7 @@ const GoalSchema: Schema = new Schema({
   feedbackId: {
     type: Schema.Types.ObjectId,
     ref: 'Feedback',
-    required: [true, 'The feedback is required']
+    required: false
   },
   isDeleted: {
     type: Boolean,
@@ -54,6 +59,7 @@ const GoalSchema: Schema = new Schema({
 GoalSchema.index({ objectiveId: 1 });
 GoalSchema.index({ createdBy: 1 });
 GoalSchema.index({ clientId: 1 });
+GoalSchema.index({ day: 1 });
 GoalSchema.index({ isCompleted: 1 });
 GoalSchema.index({ feedbackId: 1 });
 

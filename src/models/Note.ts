@@ -25,7 +25,7 @@ const NoteSchema: Schema = new Schema({
   },
   clientId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'El destinatario es requerido']
   },
   sessionId: {
@@ -35,12 +35,12 @@ const NoteSchema: Schema = new Schema({
   },
   coachId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: [true, 'El coach es requerido']
   },
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Profile',
     required: true
   },
   isDeleted: {

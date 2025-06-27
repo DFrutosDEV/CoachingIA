@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
+import Objective from '@/models/Objective';
+import Meet from '@/models/Meet';
 
 // GET /api/coach - Obtener clientes de un coach
 export async function GET(request: NextRequest) {
@@ -18,10 +20,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('Buscando coach con ID:', coachId);
+    // Verificar que el coach existe y obtener su perfil
+    const coach = await User.findById(coachId);
+    if (!coach) {
+      return NextResponse.json(
+        { error: 'Coach no encontrado' },
+        { status: 404 }
+      );
+    }
 
-    // Buscar el coach y poblar sus clientes
-    const coach = await Profile.findOne({user: coachId})
+    // Obtener el perfil del coach
+    const coachProfile = await Profile.findOne({ user: coachId, isDeleted: false });
+    if (!coachProfile) {
+      return NextResponse.json(
+        { error: 'Perfil del coach no encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Obtener clientes del coach con sus datos de usuario
+    const coachProfileWithClients = await Profile.findById(coachProfile._id)
       .populate({
         path: 'clients',
         match: { isDeleted: false },
@@ -31,22 +49,8 @@ export async function GET(request: NextRequest) {
         }
       });
 
-    if (!coach) {
-      return NextResponse.json(
-        { error: 'Coach no encontrado' },
-        { status: 404 }
-      );
-    }
-
-    console.log('Coach encontrado:', {
-      id: coach._id,
-      userId: coach.user,
-      clientsCount: coach.clients?.length || 0,
-      clients: coach.clients
-    });
-
     // Verificar si hay clientes
-    if (!coach.clients || coach.clients.length === 0) {
+    if (!coachProfileWithClients.clients || coachProfileWithClients.clients.length === 0) {
       return NextResponse.json({
         success: true,
         clients: [],
@@ -55,30 +59,70 @@ export async function GET(request: NextRequest) {
     }
 
     // Transformar los datos para que coincidan con la estructura esperada en el frontend
-    const clients = coach.clients.map((clientProfile: any) => {
+    const clients = await Promise.all(coachProfileWithClients.clients.map(async (clientProfile: any) => {
       const clientUser = clientProfile.user;
+      
+      // Buscar el objetivo activo del cliente
+      const activeObjective = await Objective.findOne({ 
+        clientId: clientProfile._id, 
+        active: true,
+        isDeleted: false 
+      });
+
+      // Buscar sesiones completadas (meets que ya pasaron y no están canceladas)
+      const completedSessions = await Meet.countDocuments({
+        clientId: clientProfile._id, 
+        coachId: coachProfile._id, 
+        date: { $lt: new Date() }, // Sesiones que ya pasaron
+        isCancelled: false
+      });
+
+      // Buscar la próxima sesión (meet más cercana a hoy que no esté cancelada)
+      const nextSession = await Meet.findOne({
+        clientId: clientProfile._id, 
+        coachId: coachProfile._id, 
+        date: { $gte: new Date() }, // Sesiones futuras o de hoy
+        isCancelled: false
+      }).sort({ date: 1, time: 1 }); // Ordenar por fecha y hora ascendente
+
+      // Buscar la última sesión (meet más reciente que ya pasó y no está cancelada)
+      const lastSession = await Meet.findOne({
+        clientId: clientProfile._id, 
+        coachId: coachProfile._id, 
+        date: { $lt: new Date() }, // Sesiones que ya pasaron
+        isCancelled: false
+      }).sort({ date: -1, time: -1 }); // Ordenar por fecha y hora descendente
+
       return {
         id: clientUser._id.toString(),
         name: `${clientUser.name} ${clientUser.lastName}`,
         email: clientUser.email,
         phone: clientUser.phone || 'No especificado',
         startDate: new Date(clientUser.createdAt).toLocaleDateString('es-ES'),
-        //TODO: Calcular la cantidad de "Meet" que tiene asociadas al cliente en estado "fullfilled"
-        sessions: Math.floor(Math.random() * 15) + 1, // Temporal - deberías tener un modelo Session
-        //TODO: Calcular la fecha de la próxima sesión obteniendo la Meet mayor y mas cercana a hoy
-        nextSession: 'Por programar', // Temporal - deberías tener un modelo Session
+        sessions: completedSessions,
+        nextSession: nextSession ? {
+          date: nextSession.date,
+          time: nextSession.time,
+          link: nextSession.link,
+          objectiveId: nextSession.objectiveId.toString()
+        } : {},
+        lastSession: lastSession ? {
+          date: lastSession.date,
+          time: lastSession.time,
+          link: lastSession.link,
+          objectiveId: lastSession.objectiveId.toString()
+        } : {},
         progress: Math.floor(Math.random() * 100), // Temporal - deberías calcular el progreso real
         status: clientUser.active ? 'active' : 'inactive',
-        focus: 'Desarrollo personal', // Temporal - deberías tener esto en el modelo
+        focus: activeObjective?.title || 'Sin objetivo',
         avatar: clientProfile.profilePicture || `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(clientUser.name + ' ' + clientUser.lastName)}`,
-        bio: clientProfile.bio || 'Sin información biográfica disponible',
+        bio: clientProfile.bio || 'Sin información',
         goals: [], // Temporal - deberías tener un modelo Goal
         upcomingSessions: [], // Temporal - deberías tener un modelo Session
-        notes: [] // Temporal - deberías tener un modelo Note
+        notes: [], // Temporal - deberías tener un modelo Note
+        activeObjectiveId: activeObjective?._id?.toString() || null
       };
-    });
-
-    console.log('Clientes transformados:', clients.length);
+    }));
 
     return NextResponse.json({
       success: true,
@@ -120,8 +164,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar los perfiles correspondientes
-    const coachProfile = await Profile.findOne({ user: coachId });
-    const clientProfile = await Profile.findOne({ user: clientId });
+    const coachProfile = await Profile.findOne({ user: coachId, isDeleted: false });
+    const clientProfile = await Profile.findOne({ user: clientId, isDeleted: false });
 
     if (!coachProfile || !clientProfile) {
       return NextResponse.json(

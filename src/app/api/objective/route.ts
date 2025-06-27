@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       startDate,
       startTime,
       coachId,
-      userId, // Si se envía, es un usuario existente
+      clientId, // Si se envía, es un usuario existente
     } = body
 
     // Validaciones básicas
@@ -41,10 +41,9 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    let clientId: string
-
-    // Si no se envía userId, crear nuevo usuario
-    if (!userId) {
+    let clientIdToUse: string
+    // Si no se envía clientId, crear nuevo usuario
+    if (!clientId) {
       if (!firstName || !lastName || !email) {
         return NextResponse.json({
           success: false,
@@ -74,7 +73,6 @@ export async function POST(request: NextRequest) {
       })
 
       const savedUser = await newUser.save()
-      clientId = savedUser._id.toString()
 
       // Crear perfil para el nuevo usuario
       const newProfile = new Profile({
@@ -85,31 +83,22 @@ export async function POST(request: NextRequest) {
 
       await newProfile.save()
 
+      clientIdToUse = newProfile._id.toString()
     } else {
-      // Usar el userId existente
-      clientId = userId
+      clientIdToUse = clientId
     }
 
     // Verificar que el coach existe
-    const coach = await User.findById(coachId)
-    if (!coach) {
+    const coachProfile = await Profile.findOne({ _id: coachId })
+    if (!coachProfile) {
       return NextResponse.json({
         success: false,
         error: 'Coach no encontrado'
       }, { status: 404 })
     }
 
-    // Obtener el perfil del coach
-    const coachProfile = await Profile.findOne({ user: coachId })
-    if (!coachProfile) {
-      return NextResponse.json({
-        success: false,
-        error: 'Perfil del coach no encontrado'
-      }, { status: 404 })
-    }
-
     // Obtener el perfil del cliente
-    const clientProfile = await Profile.findOne({ user: clientId })
+    const clientProfile = await Profile.findOne({ _id: clientIdToUse })
     if (!clientProfile) {
       return NextResponse.json({
         success: false,
@@ -128,13 +117,20 @@ export async function POST(request: NextRequest) {
       await coachProfile.save()
     }
 
+    // Desactivar cualquier objetivo activo previo del cliente
+    await Objective.updateMany(
+      { clientId: clientIdToUse, active: true },
+      { active: false }
+    )
+
     // Crear el objetivo
     const newObjective = new Objective({
       title: focus,
       createdBy: coachId,
-      clientId,
+      clientId: clientIdToUse,
       coachId,
-      isCompleted: false
+      isCompleted: false,
+      active: true
     })
 
     const savedObjective = await newObjective.save()
@@ -145,7 +141,7 @@ export async function POST(request: NextRequest) {
     const meetDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes))
 
     // Crear el link de Jitsi Meet
-    const meetLink = generateJitsiLink(startDate, startTime, clientId, coachId)
+    const meetLink = generateJitsiLink(startDate, startTime, clientIdToUse, coachId)
 
     // Crear la reunión
     const newMeet = new Meet({
@@ -153,7 +149,7 @@ export async function POST(request: NextRequest) {
       time: startTime,
       link: meetLink,
       createdBy: coachId,
-      clientId,
+      clientId: clientIdToUse,
       coachId,
       objectiveId: savedObjective._id,
       isCancelled: false
@@ -167,8 +163,8 @@ export async function POST(request: NextRequest) {
       data: {
         objective: savedObjective,
         meet: savedMeet,
-        clientId,
-        isNewUser: !userId
+        clientId: clientIdToUse,
+        isNewUser: !clientId
       }
     }, { status: 201 })
 

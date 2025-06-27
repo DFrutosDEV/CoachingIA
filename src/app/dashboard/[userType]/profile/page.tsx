@@ -8,14 +8,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { User, Mail, Calendar, Shield, Edit, Save, Camera } from "lucide-react"
-import { useAuthStore } from "@/lib/stores/auth-store"
+import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks"
+import { updateUser } from "@/lib/redux/slices/authSlice"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 
 export default function ProfilePage() {
   const params = useParams()
   const userType = params.userType as "client" | "coach" | "admin" | "enterprise"
-  const { user, updateUser } = useAuthStore()
+  const user = useAppSelector(state => state.auth.user)
+  const dispatch = useAppDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -49,7 +51,7 @@ export default function ProfilePage() {
 
   const handleSave = () => {
     if (user) {
-      updateUser({
+      dispatch(updateUser({
         name: formData.name,
         lastName: formData.lastName,
         email: formData.email,
@@ -58,7 +60,7 @@ export default function ProfilePage() {
           phone: formData.phone,
           address: formData.address
         }
-      })
+      }))
     }
     setIsEditing(false)
   }

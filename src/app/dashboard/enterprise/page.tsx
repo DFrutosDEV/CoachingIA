@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createSwapy } from "swapy"
 import {
   TotalClientsCard,
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dashboard-cards-enterprise"
 
 export default function EnterpriseDashboard() {
+  const [isReady, setIsReady] = useState(false)
+  
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null)
   const largeCardsRef = useRef<HTMLDivElement>(null)
@@ -21,6 +23,18 @@ export default function EnterpriseDashboard() {
   const swapyLargeRef = useRef<any>(null)
 
   useEffect(() => {
+    // Marcar como listo después de que el componente se monte
+    const timer = setTimeout(() => {
+      setIsReady(true)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    // Solo inicializar swapy cuando esté listo
+    if (!isReady) return
+
     // Configurar swapy después de que el DOM esté listo
     const timer = setTimeout(() => {
       // Configurar swapy para las cards pequeñas
@@ -54,7 +68,7 @@ export default function EnterpriseDashboard() {
           console.warn('Error inicializando swapy para cards grandes:', error)
         }
       }
-    }, 500)
+    }, 100)
 
     return () => {
       clearTimeout(timer)
@@ -76,7 +90,7 @@ export default function EnterpriseDashboard() {
         swapyLargeRef.current = null
       }
     }
-  }, [])
+  }, [isReady])
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">

@@ -4,7 +4,6 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { useEffect, useRef, useState } from "react"
-import { createSwapy } from "swapy"
 import {
   NextSessionCard,
   ActiveClientsCard,
@@ -47,8 +46,6 @@ export default function CoachDashboard() {
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null)
   const largeCardsRef = useRef<HTMLDivElement>(null)
-  const swapySmallRef = useRef<any>(null)
-  const swapyLargeRef = useRef<any>(null)
 
   // Función para obtener los datos básicos
   const fetchBasicData = async () => {
@@ -82,64 +79,6 @@ export default function CoachDashboard() {
       fetchBasicData()
     }
   }, [user?._id])
-
-  useEffect(() => {
-    // Configurar swapy después de que el DOM esté listo
-    const timer = setTimeout(() => {
-      // Configurar swapy para las cards pequeñas
-      if (smallCardsRef.current && !swapySmallRef.current) {
-        try {
-          swapySmallRef.current = createSwapy(smallCardsRef.current, {
-            animation: 'dynamic'
-          })
-          
-          swapySmallRef.current.onSwap((event: any) => {
-            console.log('Coach small cards swapped:', event.newSlotItemMap.asObject)
-            localStorage.setItem('coachSmallCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
-          })
-        } catch (error) {
-          console.warn('Error inicializando swapy para cards pequeñas:', error)
-        }
-      }
-
-      // Configurar swapy para las cards grandes
-      if (largeCardsRef.current && !swapyLargeRef.current) {
-        try {
-          swapyLargeRef.current = createSwapy(largeCardsRef.current, {
-            animation: 'dynamic'
-          })
-          
-          swapyLargeRef.current.onSwap((event: any) => {
-            console.log('Coach large cards swapped:', event.newSlotItemMap.asObject)
-            localStorage.setItem('coachLargeCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
-          })
-        } catch (error) {
-          console.warn('Error inicializando swapy para cards grandes:', error)
-        }
-      }
-    }, 500)
-
-    return () => {
-      clearTimeout(timer)
-      // Limpiar swapy al desmontar
-      if (swapySmallRef.current) {
-        try {
-          swapySmallRef.current.destroy?.()
-        } catch (error) {
-          console.warn('Error destruyendo swapy pequeño:', error)
-        }
-        swapySmallRef.current = null
-      }
-      if (swapyLargeRef.current) {
-        try {
-          swapyLargeRef.current.destroy?.()
-        } catch (error) {
-          console.warn('Error destruyendo swapy grande:', error)
-        }
-        swapyLargeRef.current = null
-      }
-    }
-  }, [])
 
   if (loading) {
     return (

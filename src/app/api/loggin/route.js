@@ -64,6 +64,7 @@ export async function POST(request) {
     // Login exitoso - retornar datos del usuario
     const userResponse = {
       _id: user._id,
+      roleId: profile._id,
       name: user.name,
       lastName: user.lastName,
       email: user.email,
