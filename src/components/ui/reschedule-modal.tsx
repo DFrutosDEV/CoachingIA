@@ -98,6 +98,7 @@ export default function RescheduleModal({
         headers: {
           ...AuthService.getAuthHeaders(),
           'Content-Type': 'application/json',
+          'x-timezone': Intl.DateTimeFormat().resolvedOptions().timeZone // Enviar zona horaria en header
         },
         body: JSON.stringify({
           date: newDate,

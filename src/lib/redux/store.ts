@@ -9,7 +9,7 @@ import uiSlice from './slices/uiSlice'
 const authPersistConfig = {
   key: 'auth',
   storage,
-  whitelist: ['token', 'user', 'isAuthenticated'], // Persistir token y usuario
+  whitelist: ['token', 'user', 'isAuthenticated', 'enterprises'], // Persistir token y usuario
 }
 
 // Configuración de persistencia para session (datos no sensibles)

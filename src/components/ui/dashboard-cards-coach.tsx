@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@mui/material"
 import { Calendar, Clock, Users, ArrowRight, MessageSquare, Video } from "lucide-react"
 import Link from "next/link"
+import { formatDate } from "@/utils/validatesInputs"
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -52,7 +53,7 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
 
   const sessionDate = new Date(data.date)
   const isToday = sessionDate.toDateString() === new Date().toDateString()
-  const displayDate = isToday ? 'Hoy' : sessionDate.toLocaleDateString('es-ES', { 
+  const displayDate = isToday ? 'Hoy' : formatDate(sessionDate, {
     weekday: 'long', 
     day: 'numeric', 
     month: 'long' 
@@ -71,7 +72,7 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
         <div className="mt-4">
           <Button variant="outlined" className="w-full" onClick={() => window.open(data.link, '_blank')}>
             <Clock className="mr-2 h-4 w-4" />
-            Iniciar sesión
+            Iniciar videollamada
           </Button>
         </div>
       </CardContent>

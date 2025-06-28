@@ -20,7 +20,7 @@ import { RootState } from "@/lib/redux/store"
 import { toast } from "sonner"
 
 interface NewObjectiveCardProps {
-  userType: "coach" | "admin"
+  userType: "coach" | "admin" | "enterprise"
 }
 
 interface ExistingClient {
@@ -186,20 +186,18 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
     setIsSubmitting(true)
 
-    try {
-      // Determinar el id del Rol del usuario autenticado
-      let coachIdToUse = user.roleId.toString()
-      
+    try {  
       // Si es admin o enterprise y se especificó un coach, usar ese
-      if ((userType === "admin") && clientForm.coachId) {
+      let coachIdToUse = user?.profile?._id
+      if ((userType === "admin" || userType === "enterprise") && clientForm.coachId) {
         coachIdToUse = clientForm.coachId
       }
 
-      //! CAMBIO DE RUTA 
       const response = await fetch('/api/objective', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-timezone': Intl.DateTimeFormat().resolvedOptions().timeZone // Enviar zona horaria en header
         },
         body: JSON.stringify({
           firstName: clientForm.firstName,

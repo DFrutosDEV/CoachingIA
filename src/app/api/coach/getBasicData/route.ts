@@ -4,6 +4,7 @@ import User from '@/models/User';
 import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
+import { formatTime } from '@/utils/validatesInputs';
 
 // GET /api/coach/getBasicData - Obtener datos básicos del dashboard del coach
 export async function GET(request: NextRequest) {
@@ -55,8 +56,20 @@ export async function GET(request: NextRequest) {
       isCancelled: false,
       date: { $gte: new Date() }
     })
-    .populate('clientId', 'user') // Populate el profile del cliente
-    .populate('objectiveId', 'title')
+    .populate({
+      path: 'clientId',
+      model: Profile,
+      populate: {
+        path: 'user',
+        model: User,
+        select: 'name lastName email phone active isDeleted createdAt'
+      }
+    })
+    .populate({
+      path: 'objectiveId',
+      model: Objective,
+      select: 'title'
+    })
     .sort({ date: 1, time: 1 })
     .limit(1);
 
@@ -136,7 +149,7 @@ export async function GET(request: NextRequest) {
 
     // Transformar las sesiones de hoy al formato esperado
     const formattedTodaySessions = todaySessions.map(session => ({
-      time: `${session.time} - ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`,
+      time: `${session.time} - ${formatTime(new Date(session.date), { hour: '2-digit', minute: '2-digit' })}`,
       client: `${session.clientId.user.name} ${session.clientId.user.lastName}`,
       topic: session.objectiveId?.title || 'Sin objetivo definido'
     }));

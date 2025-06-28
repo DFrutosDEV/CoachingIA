@@ -2,13 +2,14 @@ import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 
 export interface IEnterprise extends Document {
   name: string;
-  description: string;
   logo: string;
   address: string;
   phone: string;
   email: string;
   website: string;
   socialMedia: string[];
+  coaches: string[];
+  employees: string[];
   active: boolean;
   isDeleted: boolean;
 }
@@ -19,12 +20,6 @@ const EnterpriseSchema: Schema = new Schema({
     required: true,
     trim: true,
     maxlength: [100, 'The name cannot exceed 100 characters'],
-  },
-  description: {
-    type: String,
-    trim: true,
-    maxlength: [500, 'The description cannot exceed 500 characters'],
-    default: ''
   },
   logo: {
     type: String,
@@ -58,6 +53,14 @@ const EnterpriseSchema: Schema = new Schema({
     type: [String],
     default: []
   },
+  coaches: {
+    type: [String],
+    default: []
+  },
+  employees: {
+    type: [String],
+    default: []
+  },
   active: {
     type: Boolean,
     default: true
@@ -72,5 +75,7 @@ const EnterpriseSchema: Schema = new Schema({
 
 EnterpriseSchema.index({ name: 1 });
 EnterpriseSchema.index({ isDeleted: 1 });
+EnterpriseSchema.index({ coaches: 1 });
+EnterpriseSchema.index({ employees: 1 });
 
 export default mongoose.models.Enterprise || mongoose.model<IEnterprise>('Enterprise', EnterpriseSchema); 

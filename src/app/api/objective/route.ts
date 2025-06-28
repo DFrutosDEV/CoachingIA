@@ -5,7 +5,8 @@ import Profile from '@/models/Profile'
 import Objective from '@/models/Objective'
 import Meet from '@/models/Meet'
 import Role from '@/models/Role'
-import { generateJitsiLink } from '@/lib/utils'
+import { generateJitsiLink } from '@/utils/generateJitsiLinks'
+import { fromZonedTime } from 'date-fns-tz'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +24,9 @@ export async function POST(request: NextRequest) {
       coachId,
       clientId, // Si se envía, es un usuario existente
     } = body
+
+    // Obtener la zona horaria del header Accept-Language o usar una por defecto
+    const timezone = request.headers.get('x-timezone') || 'America/Buenos_Aires' // Fallback
 
     // Validaciones básicas
     if (!focus || !startDate || !startTime || !coachId) {
@@ -136,17 +140,16 @@ export async function POST(request: NextRequest) {
     const savedObjective = await newObjective.save()
 
     // Crear la fecha combinando startDate y startTime
-    const [year, month, day] = startDate.split('-')
-    const [hours, minutes] = startTime.split(':')
-    const meetDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes))
+    const dateString = `${startDate}T${startTime}:00`
+    // Convertir la fecha/hora local y zona horaria a UTC
+    const utcMeetDate = fromZonedTime(dateString, timezone)
 
     // Crear el link de Jitsi Meet
-    const meetLink = generateJitsiLink(startDate, startTime, clientIdToUse, coachId)
+    const meetLink = generateJitsiLink(utcMeetDate, clientIdToUse, coachId)
 
     // Crear la reunión
     const newMeet = new Meet({
-      date: meetDate,
-      time: startTime,
+      date: utcMeetDate,
       link: meetLink,
       createdBy: coachId,
       clientId: clientIdToUse,

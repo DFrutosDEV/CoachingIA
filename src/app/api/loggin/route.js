@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import User from '@/models/User';
 import Role from '@/models/Role';
 import Profile from '@/models/Profile';
+import Enterprise from '@/models/Enterprise';
 
 // Conectar a MongoDB
 async function connectMongoDB() {
@@ -59,18 +60,31 @@ export async function POST(request) {
       );
     }
 
-    const profile = await Profile.findOne({ user: user._id }).populate('role');
+    // Devuelve el perfil del usuario con el rol activo y la empresa asociada activa y no eliminada
+    const profile = await Profile.findOne({ user: user._id })
+    .populate({
+      path: 'role',
+      select: 'name code',
+      match: { active: true }
+    })
+    .populate({
+      path: 'enterprise',
+      model: Enterprise,
+      select: 'name logo address phone email website socialMedia',
+      match: { active: true, isDeleted: false }
+    });
     
     // Login exitoso - retornar datos del usuario
     const userResponse = {
       _id: user._id,
-      roleId: profile._id,
+      role: profile.role,
+      profile: profile,
+      enterprise: profile?.enterprise || null,
       name: user.name,
       lastName: user.lastName,
       email: user.email,
-      roles: [profile.role],
+      roles: [profile.role.name.toLowerCase()],
       age: user.age,
-      creationDate: user.creationDate,
     };
     
     console.log('✅ Login exitoso para:', email);

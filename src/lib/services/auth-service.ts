@@ -3,25 +3,41 @@ import { login, logout, setLoading, setError } from '../redux/slices/authSlice'
 import { setSession, clearSession } from '../redux/slices/sessionSlice'
 import { addNotification } from '../redux/slices/uiSlice'
 import { useAppSelector } from '../redux/hooks'
-
 // Tipos para la respuesta de la API
 interface Role {
   _id: string
   name: string
   code: string
-  active: boolean
+}
+
+interface Profile {
+  _id: string
+  profilePicture: string
+  bio: string
+  indexDashboard: number[]
+}
+
+interface Enterprise {
+  _id: string
+  name: string
+  logo: string
+  address: string
+  phone: string
+  email: string
+  website: string
+  socialMedia: string[]
 }
 
 interface ApiUser {
   _id: string
-  roleId: string
+  role: Role
+  profile: Profile
+  enterprise: Enterprise | null
   name: string
   lastName: string
   email: string
-  roles: Role[]
+  roles: string[]
   age?: number
-  creationDate: string
-  active: boolean
 }
 
 interface LoginResponse {
@@ -31,38 +47,18 @@ interface LoginResponse {
   error?: string
 }
 
-// Función para mapear roles de la API al formato del store
-const mapRolesToStore = (roles: Role[]): ('admin' | 'client' | 'coach' | 'enterprise')[] => {
-  return roles.map(role => {
-    switch (role.name.toLowerCase()) {
-      case 'admin':
-        return 'admin'
-      case 'client':
-      case 'cliente':
-        return 'client'
-      case 'coach':
-        return 'coach'
-      case 'enterprise':
-      case 'empresa':
-        return 'enterprise'
-      default:
-        return 'client' // Por defecto
-    }
-  })
-}
-
 // Función para mapear usuario de la API al formato del store
 const mapApiUserToStore = (apiUser: ApiUser) => {
   return {
     _id: apiUser._id,
-    roleId: apiUser.roleId,
+    role: apiUser.role || apiUser.roles[0],
     email: apiUser.email,
     name: apiUser.name,
     lastName: apiUser.lastName,
-    roles: mapRolesToStore(apiUser.roles),
+    roles: apiUser.roles,
     age: apiUser.age,
-    creationDate: apiUser.creationDate,
-    active: apiUser.active
+    profile: apiUser.profile,
+    enterprise: apiUser.enterprise,
   }
 }
 
@@ -121,7 +117,6 @@ export class AuthService {
 
       // Mapear usuario de la API al formato del store
       const user = mapApiUserToStore(data.user)
-      
       // Generar un token simple (en producción usar JWT)
       const token = btoa(`${user.email}:${Date.now()}`)
       
@@ -129,7 +124,7 @@ export class AuthService {
       dispatch(login({ user, token }))
       
       // Actualizar sesión (solo información no sensible)
-      const primaryRole = user.roles[0] || 'client'
+      const primaryRole = user.role.name.toLowerCase()
       dispatch(setSession({ isLoggedIn: true, userType: primaryRole }))
       
       // Mostrar notificación de éxito
@@ -183,13 +178,13 @@ export class AuthService {
   }
 
   // Función para verificar si el usuario tiene un rol específico
-  static hasRole(role: 'admin' | 'client' | 'coach' | 'enterprise'): boolean {
+  static hasRole(role: string): boolean {
     const state = store.getState()
     return state.auth.user?.roles?.includes(role) || false
   }
 
   // Función para obtener todos los roles del usuario
-  static getUserRoles(): ('admin' | 'client' | 'coach' | 'enterprise')[] {
+  static getUserRoles(): string[] {
     const state = store.getState()
     return state.auth.user?.roles || []
   }
@@ -207,7 +202,7 @@ export const useAuthService = () => {
     AuthService.logout()
   }
 
-  const hasRole = (role: 'admin' | 'client' | 'coach' | 'enterprise') => {
+  const hasRole = (role: string) => {
     return AuthService.hasRole(role)
   }
 

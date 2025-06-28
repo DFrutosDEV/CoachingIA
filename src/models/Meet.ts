@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema, ObjectId } from 'mongoose';
+import { getBrowserLocale } from '../utils/validatesInputs';
 
 export interface IMeet extends Document {
-  date: Date;
-  time: string;
+  date: Date; 
   link: string;
   createdBy: ObjectId;
   clientId: ObjectId;
@@ -16,11 +16,20 @@ const MeetSchema: Schema = new Schema({
     type: Date,
     required: [true, 'The date is required'],
     trim: true,
-  },
-  time: {
-    type: String,
-    required: [true, 'The time is required'],
-    trim: true,
+    set: function(date: any) {
+      // Verificar si date es un objeto Date válido
+      if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+        // Si no es válido, intentar convertirlo a Date
+        const convertedDate = new Date(date);
+        if (isNaN(convertedDate.getTime())) {
+          throw new Error('Invalid date value');
+        }
+        return convertedDate;
+      }
+      // Si ya es un Date válido, devolverlo tal como está
+      // La conversión a UTC ya se hace en el endpoint
+      return date;
+    }
   },
   link: {
     type: String,
@@ -55,8 +64,27 @@ const MeetSchema: Schema = new Schema({
   timestamps: true
 });
 
+MeetSchema.methods.getLocalDate = function(timezone: string = 'America/Mexico_City'): Date {
+  const utcDate = new Date(this.date);
+  const localDate = new Date(utcDate.toLocaleString('en-US', { timeZone: timezone }));
+  return localDate;
+};
+
+MeetSchema.methods.getLocalTime = function(timezone: string = 'America/Mexico_City'): string {
+  const localDate = this.getLocalDate(timezone);
+  return localDate.toLocaleTimeString(getBrowserLocale(), { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  });
+};
+
+MeetSchema.methods.getLocalDateString = function(timezone: string = 'America/Mexico_City'): string {
+  const localDate = this.getLocalDate(timezone);
+  return localDate.toISOString().split('T')[0];
+};
+
 MeetSchema.index({ date: 1 });
-MeetSchema.index({ time: 1 });
 MeetSchema.index({ createdBy: 1 });
 MeetSchema.index({ clientId: 1 });
 MeetSchema.index({ coachId: 1 });

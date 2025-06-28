@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Meet from '@/models/Meet';
-import { generateJitsiLink } from '@/lib/utils';
+import { generateJitsiLink } from '@/utils/generateJitsiLinks';
 
 // POST /api/meets - Crear múltiples meets para un cliente
 export async function POST(request: NextRequest) {
@@ -19,16 +19,17 @@ export async function POST(request: NextRequest) {
 
     // Crear los meets en la base de datos
     const meetsToCreate = meets.map((meet: any) => {
-      const link = generateJitsiLink(
-        meet.date.toISOString().split('T')[0], 
-        meet.time, 
-        clientId, 
-        coachId
-      );
+      // Combinar fecha y hora en un solo objeto Date
+      const meetDate = new Date(meet.date);
+      if (meet.time) {
+        const [hours, minutes] = meet.time.split(':');
+        meetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      }
+
+      const link = generateJitsiLink(meetDate, clientId, coachId);
 
       return {
-        date: meet.date,
-        time: meet.time,
+        date: meetDate,
         link,
         createdBy: coachId,
         clientId,
@@ -63,6 +64,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('clientId');
     const coachId = searchParams.get('coachId');
+    const timezone = searchParams.get('timezone') || 'America/Mexico_City';
     
     if (!clientId) {
       return NextResponse.json(
@@ -82,11 +84,22 @@ export async function GET(request: NextRequest) {
 
     const meets = await Meet.find(query)
       .populate('objectiveId', 'title description')
-      .sort({ date: 1, time: 1 });
+      .sort({ date: 1 });
+
+    // Transformar las fechas a la zona horaria del cliente
+    const meetsWithLocalTime = meets.map(meet => {
+      const meetObj = meet.toObject();
+      return {
+        ...meetObj,
+        localDate: meet.getLocalDateString(timezone),
+        localTime: meet.getLocalTime(timezone),
+        time: meet.getLocalTime(timezone) // Mantener compatibilidad con el frontend
+      };
+    });
 
     return NextResponse.json({
       success: true,
-      meets
+      meets: meetsWithLocalTime
     });
 
   } catch (error) {

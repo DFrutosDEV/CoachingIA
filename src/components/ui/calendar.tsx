@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { CalendarService } from "@/lib/services/calendar-service"
 import RescheduleModal from "./reschedule-modal"
+import { useAppSelector } from "@/lib/redux/hooks"
 
 // Extiende dayjs con el plugin y configura el locale
 dayjs.extend(localizedFormat)
@@ -74,7 +75,7 @@ export default function SessionsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showRescheduleModal, setShowRescheduleModal] = useState(false)
-
+  const user = useAppSelector(state => state.auth.user)
   // Función para cargar las sesiones desde el API
   const loadSessions = async () => {
     try {
@@ -288,13 +289,16 @@ export default function SessionsPage() {
                 <Button variant="outline" onClick={handleCloseModal}>
                   Cerrar
                 </Button>
-                <Button 
-                  variant="secondary" 
-                  onClick={handleReschedule}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Reprogramar
-                </Button>
+
+                {user?.role.name === 'coach' && (
+                  <Button 
+                    variant="secondary" 
+                    onClick={handleReschedule}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Reprogramar
+                  </Button>
+                )}
               </DialogFooter>
             </>
           )}

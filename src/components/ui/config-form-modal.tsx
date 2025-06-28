@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Pencil, Trash2, Plus, Calendar, Clock } from "lucide-react"
 import { toast } from "sonner"
+import { formatTime } from "@/utils/validatesInputs"
 
 interface Goal {
   id: string;
@@ -24,7 +25,6 @@ interface Goal {
 
 interface Meet {
   date: Date;
-  time: string;
 }
 
 interface ConfigFormModalProps {
@@ -177,14 +177,15 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
 
     const meets: Meet[] = [];
     const startDate = new Date(meetDate);
+    const [hours, minutes] = meetTime.split(':');
     
     for (let i = 0; i < meetCount; i++) {
       const meetDate = new Date(startDate);
       meetDate.setDate(startDate.getDate() + (i * 7)); // 1 semana de diferencia
+      meetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       
       meets.push({
-        date: meetDate,
-        time: meetTime
+        date: meetDate
       });
     }
 
@@ -285,8 +286,8 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
           )}
 
           {step === 2 && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
+            <div className="flex flex-col h-full">
+              <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Objetivos Generados ({generatedGoals.length})</h3>
                 <Button onClick={handleGoalAdd} size="sm" className="gap-1">
                   <Plus className="h-4 w-4" />
@@ -294,25 +295,26 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
                 </Button>
               </div>
 
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2">
                 {generatedGoals.map((goal) => (
-                  <Card key={goal.id}>
+                  <Card key={goal.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
                           <input
                             type="text"
                             value={goal.title}
                             onChange={(e) => handleGoalEdit(goal.id, e.target.value)}
-                            className="w-full bg-transparent border-none outline-none text-sm"
+                            className="w-full bg-transparent border-none outline-none text-sm font-medium"
+                            placeholder="Escribe el objetivo aquí..."
                           />
-                          <Badge variant="outline" className="mt-1">{goal.day}</Badge>
+                          <Badge variant="outline" className="mt-2 text-xs">{goal.day}</Badge>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleGoalDelete(goal.id)}
-                          className="text-destructive"
+                          className="text-destructive hover:text-destructive flex-shrink-0"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -322,11 +324,11 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
                 ))}
               </div>
 
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={() => setStep(1)}>
+              <div className="flex justify-between pt-6 gap-4 border-t mt-6">
+                <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
                   Atrás
                 </Button>
-                <Button onClick={handleSaveGoals} disabled={loading}>
+                <Button onClick={handleSaveGoals} disabled={loading} className="flex-1">
                   {loading ? "Guardando..." : "Siguiente"}
                 </Button>
               </div>
@@ -334,71 +336,64 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
           )}
 
           {step === 3 && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="meet-date">Fecha de inicio</Label>
-                  <Input
-                    id="meet-date"
-                    type="date"
-                    value={meetDate}
-                    onChange={(e) => setMeetDate(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="meet-time">Hora</Label>
-                  <Input
-                    id="meet-time"
-                    type="time"
-                    value={meetTime}
-                    onChange={(e) => setMeetTime(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="meet-count">Cantidad de sesiones</Label>
-                  <Input
-                    id="meet-count"
-                    type="number"
-                    min="1"
-                    max="12"
-                    value={meetCount}
-                    onChange={(e) => setMeetCount(parseInt(e.target.value))}
-                  />
-                </div>
-              </div>
-
-              <Button onClick={generateMeets} className="w-full">
-                Generar Reuniones
-              </Button>
-
-              {meets.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="text-lg font-semibold">Reuniones Programadas</h3>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {meets.map((meet, index) => (
-                      <Card key={index}>
-                        <CardContent className="p-3">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">
-                              {new Date(meet.date).toLocaleDateString('es-ES')}
-                            </span>
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{meet.time}</span>
-                            <Badge variant="outline">Sesión {index + 1}</Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+            <div className="flex flex-col h-full">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="meet-date">Fecha de inicio</Label>
+                    <Input
+                      id="meet-date"
+                      type="date"
+                      value={meetDate}
+                      onChange={(e) => setMeetDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="meet-time">Hora</Label>
+                    <Input
+                      id="meet-time"
+                      type="time"
+                      value={meetTime}
+                      onChange={(e) => setMeetTime(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="meet-count">Cantidad de sesiones</Label>
+                    <Input
+                      id="meet-count"
+                      type="number"
+                      min="1"
+                      max="12"
+                      value={meetCount}
+                      onChange={(e) => setMeetCount(parseInt(e.target.value))}
+                    />
                   </div>
                 </div>
-              )}
 
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={() => setStep(2)}>
+                <Button onClick={generateMeets} className="w-full">
+                  Generar Reuniones
+                </Button>
+
+                {meets.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold">Reuniones Programadas</h3>
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {meets.map((meet, index) => (
+                        <div key={index} className="flex justify-between items-center p-3 bg-muted rounded-lg border">
+                          <span className="text-sm font-medium">{meet.date.toLocaleDateString()}</span>
+                          <span className="text-sm text-muted-foreground">{formatTime(meet.date, { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between pt-6 gap-4 border-t mt-6">
+                <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
                   Atrás
                 </Button>
-                <Button onClick={handleSaveMeets} disabled={loading || meets.length === 0}>
+                <Button onClick={handleSaveMeets} disabled={loading || meets.length === 0} className="flex-1">
                   {loading ? "Guardando..." : "Finalizar"}
                 </Button>
               </div>

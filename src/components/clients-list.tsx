@@ -16,37 +16,54 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, MoreVertical, Calendar, MessageSquare, FileText, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
+import { formatDate, formatTime } from "@/utils/validatesInputs"
 
 // Definir tipos (importar si están en archivo compartido)
 interface Goal {
-  id: string;
-  title: string;
-  progress: number;
+  _id: string;
+  description: string;
+  isCompleted: boolean;
+  day: string;
 }
 
-interface NextSession {
+interface UpcomingSession {
+  _id: string;
   date: Date;
-  time: string;
   link: string;
   objectiveId: string;
 }
 
+interface NextSession {
+  _id: string;
+  date: Date;
+  link: string;
+  objectiveId: string;
+}
+
+interface Note {
+  _id: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+}
+
 interface Client {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   phone: string;
   startDate: string;
   sessions: number;
   nextSession: NextSession | {};
+  lastSession: NextSession | {};
   progress: number;
   status: "active" | "pending" | "inactive";
   focus: string;
   avatar: string;
   bio: string;
   goals: Goal[];
-  upcomingSessions: { id: string; date: string; topic: string }[];
-  notes: { id: string; date: string; content: string }[];
+  upcomingSessions: UpcomingSession[];
+  notes: Note[];
   activeObjectiveId: string | null;
 }
 
@@ -129,77 +146,77 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
             </TableHeader>
             <TableBody>
               {filteredClients.length > 0 ? (
-                 filteredClients.slice(currentPage * 5, (currentPage + 1) * 5).map((client) => (
-                <TableRow
-                  key={client.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => onClientSelect(client.id)}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={client.avatar || "/placeholder.svg"}
-                        alt={client.name}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <div className="font-medium">{client.name}</div>
-                        <div className="text-xs text-muted-foreground">{client.focus}</div>
+                filteredClients.slice(currentPage * 5, (currentPage + 1) * 5).map((client) => (
+                  <TableRow
+                    key={client._id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onClientSelect(client._id)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={client.avatar || "/placeholder.svg"}
+                          alt={client.name}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                        <div>
+                          <div className="font-medium">{client.name}</div>
+                          <div className="text-xs text-muted-foreground">{client.focus}</div>
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        client.status === "active" ? "active" : client.status === "pending" ? "pending" : "inactive"
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          client.status === "active" ? "active" : client.status === "pending" ? "pending" : "inactive"
+                        }
+                      >
+                        {client.status === "active" ? "Activo" : client.status === "pending" ? "Pendiente" : "Inactivo"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {Object.keys(client.nextSession).length > 0 
+                        ? `${formatDate(new Date((client.nextSession as NextSession).date))} - ${formatTime(new Date((client.nextSession as NextSession).date), { hour: '2-digit', minute: '2-digit' })}`
+                        : 'Por programar'
                       }
-                    >
-                      {client.status === "active" ? "Activo" : client.status === "pending" ? "Pendiente" : "Inactivo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {Object.keys(client.nextSession).length > 0 
-                      ? `${new Date((client.nextSession as NextSession).date).toLocaleDateString('es-ES')} - ${(client.nextSession as NextSession).time}`
-                      : 'Por programar'
-                    }
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-16 rounded-full bg-muted">
-                        <div className="h-full rounded-full bg-primary" style={{ width: `${client.progress}%` }}></div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-16 rounded-full bg-muted">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${client.progress}%` }}></div>
+                        </div>
+                        <span className="text-xs">{client.progress}%</span>
                       </div>
-                      <span className="text-xs">{client.progress}%</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="text" size="icon" onClick={(e) => e.stopPropagation()}>
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Abrir menú</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-accent" align="end">
-                        <DropdownMenuLabel>Acciones Rápidas</DropdownMenuLabel>
-                        <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Programar", client.id); }}>
-                          <Calendar className="mr-2 h-4 w-4" />
-                          <span>Programar sesión</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Mensaje", client.id); }}>
-                          <MessageSquare className="mr-2 h-4 w-4" />
-                          <span>Enviar mensaje</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("PDA", client.id); }}>
-                          <FileText className="mr-2 h-4 w-4" />
-                          <span>Ver PDA</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="text" size="icon" onClick={(e) => e.stopPropagation()}>
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Abrir menú</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-accent" align="end">
+                          <DropdownMenuLabel>Acciones Rápidas</DropdownMenuLabel>
+                          <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Programar", client._id); }}>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            <span>Programar sesión</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Mensaje", client._id); }}>
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            <span>Enviar mensaje</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("PDA", client._id); }}>
+                            <FileText className="mr-2 h-4 w-4" />
+                            <span>Ver PDA</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center">

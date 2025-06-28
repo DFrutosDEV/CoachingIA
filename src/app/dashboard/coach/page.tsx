@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { useEffect, useRef, useState } from "react"
+import { createSwapy } from "swapy"
 import {
   NextSessionCard,
   ActiveClientsCard,
@@ -12,6 +13,8 @@ import {
   RecentClientsCard
 } from "@/components/ui/dashboard-cards-coach"
 import { HttpClient } from "@/lib/utils/http-client"
+import { Button } from "@/components/ui/button"
+import { Move, X } from "lucide-react"
 
 // Interfaces para los datos
 interface CoachBasicData {
@@ -42,10 +45,14 @@ export default function CoachDashboard() {
   const [basicData, setBasicData] = useState<CoachBasicData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isReady, setIsReady] = useState(false)
+  const [dragEnabled, setDragEnabled] = useState(false)
   
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null)
   const largeCardsRef = useRef<HTMLDivElement>(null)
+  const swapySmallRef = useRef<any>(null)
+  const swapyLargeRef = useRef<any>(null)
 
   // Función para obtener los datos básicos
   const fetchBasicData = async () => {
@@ -79,6 +86,81 @@ export default function CoachDashboard() {
       fetchBasicData()
     }
   }, [user?._id])
+
+  useEffect(() => {
+    // Marcar como listo después de que el componente se monte
+    const timer = setTimeout(() => {
+      setIsReady(true)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Función para alternar el estado del drag-and-drop
+  const toggleDragMode = () => {
+    setDragEnabled(!dragEnabled)
+  }
+
+  useEffect(() => {
+    // Solo inicializar swapy cuando esté listo y el drag esté habilitado
+    if (!isReady || !dragEnabled) return
+
+    // Configurar swapy después de que el DOM esté listo
+    const timer = setTimeout(() => {
+      // Configurar swapy para las cards pequeñas
+      if (smallCardsRef.current && !swapySmallRef.current) {
+        try {
+          swapySmallRef.current = createSwapy(smallCardsRef.current, {
+            animation: 'dynamic'
+          })
+          
+          swapySmallRef.current.onSwap((event: any) => {
+            console.log('Coach small cards swapped:', event.newSlotItemMap.asObject)
+            localStorage.setItem('coachSmallCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
+          })
+        } catch (error) {
+          console.warn('Error inicializando swapy para cards pequeñas:', error)
+        }
+      }
+
+      // Configurar swapy para las cards grandes
+      if (largeCardsRef.current && !swapyLargeRef.current) {
+        try {
+          swapyLargeRef.current = createSwapy(largeCardsRef.current, {
+            animation: 'dynamic'
+          })
+          
+          swapyLargeRef.current.onSwap((event: any) => {
+            console.log('Coach large cards swapped:', event.newSlotItemMap.asObject)
+            localStorage.setItem('coachLargeCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
+          })
+        } catch (error) {
+          console.warn('Error inicializando swapy para cards grandes:', error)
+        }
+      }
+    }, 100)
+
+    return () => {
+      clearTimeout(timer)
+      // Limpiar swapy al desmontar
+      if (swapySmallRef.current) {
+        try {
+          swapySmallRef.current.destroy?.()
+        } catch (error) {
+          console.warn('Error destruyendo swapy pequeño:', error)
+        }
+        swapySmallRef.current = null
+      }
+      if (swapyLargeRef.current) {
+        try {
+          swapyLargeRef.current.destroy?.()
+        } catch (error) {
+          console.warn('Error destruyendo swapy grande:', error)
+        }
+        swapyLargeRef.current = null
+      }
+    }
+  }, [isReady, dragEnabled])
 
   if (loading) {
     return (
@@ -137,12 +219,44 @@ export default function CoachDashboard() {
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="text-4xl font-bold">Bienvenido, {user?.name} {user?.lastName}</h1>
-              <p className="text-muted-foreground pt-2">Aquí tienes un resumen de tus sesiones y clientes.</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl font-bold">Bienvenido, {user?.name} {user?.lastName}</h1>
+                  <p className="text-muted-foreground pt-2">Aquí tienes un resumen de tus sesiones y clientes.</p>
+                </div>
+                <Button
+                  onClick={toggleDragMode}
+                  variant={dragEnabled ? "secondary" : "outline"}
+                  size="sm"
+                  className={`flex items-center gap-2 ${dragEnabled ? 'bg-red-500 hover:bg-red-600 text-white' : ''}`}
+                >
+                  {dragEnabled ? (
+                    <>
+                      <X className="h-4 w-4" />
+                      Desactivar Drag
+                    </>
+                  ) : (
+                    <>
+                      <Move className="h-4 w-4" />
+                      Activar Drag
+                    </>
+                  )}
+                </Button>
+              </div>
+              {dragEnabled && (
+                <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    ✨ Modo de reorganización activado - Puedes arrastrar las cards para reorganizarlas
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Zona de drag and drop para cards pequeñas (3 cards arriba - 33.33% cada una) */}
-            <div ref={smallCardsRef} className="small-cards-container grid gap-6 md:grid-cols-3">
+            <div 
+              ref={smallCardsRef} 
+              className="small-cards-container grid gap-6 md:grid-cols-3"
+            >
               <div data-swapy-slot="1" className="w-full">
                 <NextSessionCard data={basicData?.nextSession} />
               </div>
@@ -155,7 +269,10 @@ export default function CoachDashboard() {
             </div>
 
             {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
-            <div ref={largeCardsRef} className="large-cards-container grid gap-6 md:grid-cols-2">
+            <div 
+              ref={largeCardsRef} 
+              className="large-cards-container grid gap-6 md:grid-cols-2"
+            >
               <div data-swapy-slot="4" className="w-full">
                 <TodaySessionsCard sessions={basicData?.todaySessions || []} />
               </div>

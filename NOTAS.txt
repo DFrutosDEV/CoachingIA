@@ -1,0 +1,19 @@
+--------- PARA ESTE ERROR 
+
+ MissingSchemaError: Schema hasn't been registered for model "User".
+
+Pasarle directamente el modelo en vez de un string 'User'
+  populate: {
+          path: 'user',
+          model: User,
+        }
+
+
+--------- PARA ESTE ERROR
+
+Error: ENOENT: no such file or directory, open 'C:\Users\danie\OneDrive\Documentos\Nueva carpeta\coach\.next\server\app-paths-manifest.json'
+
+Remove-Item -Recurse -Force .next (en terminal para borrar cache y reinstalar dependencias)
+
+
+--------- 

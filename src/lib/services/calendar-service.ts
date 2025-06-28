@@ -39,10 +39,14 @@ export class CalendarService {
                       userRoles.includes('coach') ? 'coach' : 
                       userRoles.includes('client') ? 'client' : 'client'
 
+      // Obtener la zona horaria del navegador
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
       // Construir la URL con parámetros
       const searchParams = new URLSearchParams({
         userId: currentUser._id,
-        userType: userType
+        userType: userType,
+        timezone: timezone // Enviar zona horaria al backend
       })
 
       if (params?.startDate) {
@@ -101,6 +105,11 @@ export class CalendarService {
         throw new Error('Usuario no autenticado')
       }
 
+      // Combinar fecha y hora
+      const sessionDate = new Date(sessionData.date);
+      const [hours, minutes] = sessionData.time.split(':');
+      sessionDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
       const response = await fetch('/api/meets', {
         method: 'POST',
         headers: AuthService.getAuthHeaders(),
@@ -109,8 +118,7 @@ export class CalendarService {
           coachId: currentUser._id, // Asumiendo que el coach actual crea la sesión
           objectiveId: sessionData.objectiveId,
           meets: [{
-            date: sessionData.date,
-            time: sessionData.time
+            date: sessionDate
           }]
         })
       })

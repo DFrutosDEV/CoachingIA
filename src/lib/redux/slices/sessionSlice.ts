@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 interface SessionState {
   // Solo información no sensible para mejorar UX
   isLoggedIn: boolean
-  userType: 'admin' | 'client' | 'coach' | 'enterprise' | null
+  userType: string | null
   theme: 'light' | 'dark' | 'system'
   language: 'es' | 'en'
   lastLoginDate: string | null

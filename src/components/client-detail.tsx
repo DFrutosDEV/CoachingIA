@@ -15,11 +15,20 @@ import Image from "next/image"
 import { GoalsModal } from "./ui/goals-modal"
 import { ConfigFormModal } from "./ui/config-form-modal"
 import { useAppSelector } from "@/lib/redux/hooks"
+import { formatDate } from "@/utils/validatesInputs"
 
 interface Goal {
-  id: string;
-  title: string;
-  progress: number;
+  _id: string;
+  description: string;
+  isCompleted: boolean;
+  day: string;
+}
+
+interface UpcomingSession {
+  _id: string;
+  date: Date;
+  link: string;
+  objectiveId: string;
 }
 
 interface NextSession {
@@ -29,8 +38,15 @@ interface NextSession {
   objectiveId: string;
 }
 
+interface Note {
+  _id: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+}
+
 interface Client {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   phone: string;
@@ -44,8 +60,8 @@ interface Client {
   avatar: string;
   bio: string;
   goals: Goal[];
-  upcomingSessions: { id: string; date: string; topic: string }[];
-  notes: { id: string; date: string; content: string }[];
+  upcomingSessions: UpcomingSession[];
+  notes: Note[];
   activeObjectiveId: string | null;
 }
 
@@ -65,7 +81,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
 
   const handleGoalsUpdate = (updatedGoals: Goal[]) => {
     if (client) {
-      onUpdateClient(client.id, updatedGoals)
+      onUpdateClient(client._id, updatedGoals)
     }
     setIsGoalsModalOpen(false)
   }
@@ -169,7 +185,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                     <div className="flex justify-between">
                       <div className="font-medium">
                         {Object.keys(client.lastSession).length > 0 
-                          ? `${new Date((client.lastSession as NextSession).date).toLocaleDateString('es-ES')} - ${(client.lastSession as NextSession).time}`
+                          ? `${formatDate(new Date((client.lastSession as NextSession).date))} - ${(client.lastSession as NextSession).time}`
                           : "No se encontro una sesión"
                         }
                       </div>
@@ -197,22 +213,25 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
               <TabsContent value="goals" className="space-y-4 mt-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium">Objetivos y Progreso</h4>
+                    <h4 className="text-sm font-medium">Metas y Progreso</h4>
+                    { client.focus && (
+                      <Badge variant="outline" className="text-xs bg-primary text-primary-foreground">{client.focus}</Badge>
+                    )}
                     <Button variant="outline" size="sm" className="gap-1" onClick={() => setIsGoalsModalOpen(true)}>
                       <Pencil className="h-4 w-4" />
-                      Editar
+                      Editar Metas
                     </Button>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-3 mt-4 overflow-y-auto max-h-[350px] pr-2">
                     {client.goals?.length > 0 ? (
                        client.goals.map((goal) => (
-                        <div key={goal.id} className="space-y-1">
+                        <div key={goal._id} className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium">{goal.title}</p>
-                            <span className="text-xs">{goal.progress}%</span>
+                            <p className="text-sm font-medium">{goal.description}</p>
+                            <span className="text-xs">{goal.isCompleted ? "Completado" : "Pendiente"}</span>
                           </div>
                           <div className="h-2 w-full rounded-full bg-muted">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${goal.progress}%` }}></div>
+                            <div className="h-full rounded-full bg-primary" style={{ width: `${goal.isCompleted ? 100 : 0}%` }}></div>
                           </div>
                         </div>
                        ))
@@ -234,8 +253,8 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                 <div className="space-y-3">
                   {client.notes?.length > 0 ? (
                       client.notes.map((note) => (
-                        <div key={note.id} className="rounded-lg border p-3">
-                          <div className="mb-1 text-xs text-muted-foreground">{note.date}</div>
+                        <div key={note._id} className="rounded-lg border p-3">
+                          <div className="mb-1 text-xs text-muted-foreground">{formatDate(new Date(note.createdAt))}</div>
                           <p className="text-sm">{note.content}</p>
                         </div>
                       ))
@@ -259,7 +278,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
       <ConfigFormModal
         isOpen={isConfigModalOpen}
         onClose={() => setIsConfigModalOpen(false)}
-        clientId={client.id}
+        clientId={client._id}
         coachId={user?._id || ''}
         objectiveId={client.activeObjectiveId}
       />

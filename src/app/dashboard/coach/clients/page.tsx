@@ -9,20 +9,36 @@ import { toast } from "sonner"
 import { useAppSelector } from "@/lib/redux/hooks"
 
 interface Goal {
-  id: string;
-  title: string;
-  progress: number;
+  _id: string;
+  description: string;
+  isCompleted: boolean;
+  day: string;
+}
+
+interface UpcomingSession {
+  _id: string;
+  date: Date;
+  link: string;
+  objectiveId: string;
+  isCancelled: boolean;
 }
 
 interface NextSession {
+  _id: string;
   date: Date;
-  time: string;
   link: string;
   objectiveId: string;
 }
 
+interface Note {
+  _id: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+}
+
 interface Client {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   phone: string;
@@ -36,8 +52,8 @@ interface Client {
   avatar: string;
   bio: string;
   goals: Goal[];
-  upcomingSessions: { id: string; date: string; topic: string }[];
-  notes: { id: string; date: string; content: string }[];
+  upcomingSessions: UpcomingSession[];
+  notes: Note[];
   activeObjectiveId: string | null;
 }
 
@@ -65,7 +81,7 @@ export default function ClientsPage() {
         throw new Error('El usuario no tiene permisos de coach');
       }
       
-      const response = await fetch(`/api/coach?coachId=${user._id}`);
+      const response = await fetch(`/api/coach/clients?coachId=${user._id}`);
       
       if (!response.ok) {
         throw new Error('Error al obtener los clientes');
@@ -105,12 +121,12 @@ export default function ClientsPage() {
    const handleUpdateClient = (clientId: string, updatedGoals: Goal[]) => {
     setClients(prevClients =>
       prevClients.map(client =>
-        client.id === clientId ? { ...client, goals: updatedGoals } : client
+        client._id === clientId ? { ...client, goals: updatedGoals } : client
       )
     );
   };
 
-  const selectedClient = clients.find(client => client.id === selectedClientId) || null;
+  const selectedClient = clients.find(client => client._id === selectedClientId) || null;
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
