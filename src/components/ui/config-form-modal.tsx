@@ -101,10 +101,10 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
 
   const generateGoals = async () => {
     setLoading(true);
-    
+
     // Simular procesamiento de IA
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     // Generar 30 objetivos de ejemplo basados en las respuestas
     const goals: Goal[] = FIXED_GOALS.map((goal, index) => ({
       id: `goal-${index}`,
@@ -118,8 +118,8 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
   };
 
   const handleGoalEdit = (id: string, newTitle: string) => {
-    setGeneratedGoals(prev => 
-      prev.map(goal => 
+    setGeneratedGoals(prev =>
+      prev.map(goal =>
         goal.id === id ? { ...goal, title: newTitle } : goal
       )
     );
@@ -141,7 +141,7 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
   const handleSaveGoals = async () => {
     try {
       setLoading(true);
-      
+
       const response = await fetch('/api/goals', {
         method: 'POST',
         headers: {
@@ -178,12 +178,12 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
     const meets: Meet[] = [];
     const startDate = new Date(meetDate);
     const [hours, minutes] = meetTime.split(':');
-    
+
     for (let i = 0; i < meetCount; i++) {
       const meetDate = new Date(startDate);
       meetDate.setDate(startDate.getDate() + (i * 7)); // 1 semana de diferencia
       meetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      
+
       meets.push({
         date: meetDate
       });
@@ -195,7 +195,7 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
   const handleSaveMeets = async () => {
     try {
       setLoading(true);
-      
+
       const response = await fetch('/api/meets', {
         method: 'POST',
         headers: {
@@ -249,7 +249,7 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
                   Responde estas 10 preguntas para que podamos generar objetivos personalizados para tu cliente.
                 </p>
               </div>
-              
+
               {CONFIG_QUESTIONS.map((question, index) => (
                 <div key={index} className="space-y-2">
                   <Label htmlFor={`question-${index}`} className="text-sm font-medium">
@@ -267,8 +267,8 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
               ))}
 
               <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={generateGoals} 
+                <Button
+                  onClick={generateGoals}
                   disabled={!isFormComplete || loading}
                   className="w-full"
                 >
@@ -295,7 +295,7 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
                 </Button>
               </div>
 
-              <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 gap-5 flex flex-col">
                 {generatedGoals.map((goal) => (
                   <Card key={goal.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                     <CardContent className="p-4">

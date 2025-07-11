@@ -56,14 +56,14 @@ export async function GET(
           createdAt: objective.createdAt
         },
         goals: goals.map(goal => ({
-          id: goal._id.toString(),
+          _id: goal._id.toString(),
           description: goal.description,
           isCompleted: goal.isCompleted,
           day: goal.day,
           createdAt: goal.createdAt
         })),
         notes: notes.map(note => ({
-          id: note._id.toString(),
+          _id: note._id.toString(),
           content: note.content,
           createdBy: `${note.createdBy?.name} ${note.createdBy?.lastName}`,
           createdAt: note.createdAt

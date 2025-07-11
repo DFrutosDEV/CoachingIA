@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
         const progress = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
 
         return {
-          id: objective._id.toString(),
+          _id: objective._id.toString(),
           title: objective.title,
           progress: Math.round(progress),
           totalGoals,

@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
       }).sort({ date: -1 }).select('date link objectiveId'); // Ordenar por fecha y hora descendente
 
       return {
-        id: clientUser._id.toString(),
+        _id: clientUser._id.toString(),
         name: `${clientUser.name} ${clientUser.lastName}`,
         email: clientUser.email,
         phone: clientUser.phone || 'No especificado',
