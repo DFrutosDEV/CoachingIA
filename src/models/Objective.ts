@@ -7,6 +7,10 @@ export interface IObjective extends Document {
   coachId: ObjectId;
   isCompleted: boolean;  
   active: boolean;
+  configFile: {
+    question: string;
+    answer: string;
+  }[];
 }
 
 const ObjectiveSchema: Schema = new Schema({
@@ -38,6 +42,13 @@ const ObjectiveSchema: Schema = new Schema({
   active: {
     type: Boolean,
     default: false
+  },
+  configFile: {
+    type: [{
+      question: String,
+      answer: String
+    }],
+    default: []
   }
 }, {
   timestamps: true

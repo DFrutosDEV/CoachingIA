@@ -7,6 +7,7 @@ import Meet from "@/models/Meet";
 import { formatDate } from "@/utils/validatesInputs";
 import Goal from "@/models/Goal";
 import Note from "@/models/Note";
+import { ClientResponse } from "@/types";
 
 // GET /api/coach/clients - Obtener clientes de un coach
 export async function GET(request: NextRequest) {
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
         date: { $gte: new Date() }, // Sesiones futuras o de hoy
         isCancelled: false
 
-      }).sort({ date: 1 }).select('date link objectiveId'); // Ordenar por fecha y hora ascendente
+      }).sort({ date: 1 }).select('date link objectiveId').populate('objectiveId'); // Ordenar por fecha y hora ascendente
 
       // Buscar la última sesión (meet más reciente que ya pasó y no está cancelada)
       const lastSession = await Meet.findOne({
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
         coachId: coachProfile._id, 
         date: { $lt: new Date() }, // Sesiones que ya pasaron
         isCancelled: false
-      }).sort({ date: -1 }).select('date link objectiveId'); // Ordenar por fecha y hora descendente
+      }).sort({ date: -1 }).select('date link objectiveId').populate('objectiveId'); // Ordenar por fecha y hora descendente
 
       return {
         _id: clientUser._id.toString(),
@@ -133,13 +134,13 @@ export async function GET(request: NextRequest) {
           date: nextSession.date,
           time: nextSession.time,
           link: nextSession.link,
-          objectiveId: nextSession.objectiveId.toString()
+          objective: nextSession.objectiveId
         } : {},
         lastSession: lastSession ? {
           date: lastSession.date,
           time: lastSession.time,
           link: lastSession.link,
-          objectiveId: lastSession.objectiveId.toString()
+          objective: lastSession.objectiveId
         } : {},
         progress: goals.length > 0 ? (goals.filter((goal: any) => goal.isCompleted).length / goals.length) * 100 : 0,
         status: clientUser.active ? 'active' : 'inactive',
@@ -150,7 +151,7 @@ export async function GET(request: NextRequest) {
         upcomingSessions: upcomingSessions,
         notes: notes,
         activeObjectiveId: activeObjective?._id?.toString() || null
-      };
+      } as ClientResponse;
     }));
 
     return NextResponse.json({

@@ -11,32 +11,55 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const coachId = searchParams.get('coachId');
-    let query: any = { active: true, isDeleted: { $ne: true } };
     
-    // Si hay parámetro de búsqueda, buscar por nombre, apellido o email
-    if (search && search.length >= 3) {
-      const searchRegex = new RegExp(search, 'i'); // Búsqueda case-insensitive
-      query.$or = [
-        { name: searchRegex },
-        { lastName: searchRegex },
-        { email: searchRegex }
-      ];
+    // Validar que se proporcione el coachId
+    if (!coachId) {
+      return NextResponse.json(
+        { error: 'Se requiere coachId' },
+        { status: 400 }
+      );
     }
 
+    // Buscar el perfil del coach
     const coach = await Profile.findOne({ _id: coachId, isDeleted: { $ne: true } })
       .select('clients')
-      .populate('clients', '_id name lastName email');
+      .populate({
+        path: 'clients',
+        select: '_id user',
+        populate: {
+          path: 'user',
+          select: '_id name lastName email',
+          match: search && search.length >= 3 ? {
+            $or: [
+              { name: { $regex: search, $options: 'i' } },
+              { lastName: { $regex: search, $options: 'i' } },
+              { email: { $regex: search, $options: 'i' } }
+            ]
+          } : {}
+        }
+      });
     
-    const users = coach?.clients.map((client: any) => ({
-      _id: client._id,
-      name: client.name,
-      lastName: client.lastName,
-      email: client.email
-    }));
+    if (!coach) {
+      return NextResponse.json(
+        { success: false, error: 'Coach no encontrado' },
+        { status: 400 }
+      );
+    }
+    
+    // Filtrar clientes que tengan datos de usuario y que coincidan con la búsqueda
+    const users = coach.clients
+      .filter((client: any) => client.user) // Solo clientes que tengan datos de usuario
+      .map((client: any) => ({
+        _id: client.user._id,
+        name: client.user.name,
+        lastName: client.user.lastName,
+        email: client.user.email
+      }));
     
     return NextResponse.json({
       success: true,
-      users
+      users,
+      total: users.length
     });
   } catch (error) {
     console.error('Error al buscar usuarios:', error);

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "ts-node --project tsconfig.migrate.json -r dotenv/config scripts/migrate.ts",
-    "migrate:rollback": "ts-node --project tsconfig.migrate.json -r dotenv/config scripts/rollback.ts"
+    "migrate:rollback": "ts-node --project tsconfig.migrate.json -r dotenv/config scripts/rollback.ts",
+    "check:ollama": "node scripts/check-ollama.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

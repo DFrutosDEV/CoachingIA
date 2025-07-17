@@ -9,73 +9,22 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Clock, Mail, MessageSquare, Phone, FileText, ClipboardMinus, CalendarIcon, BarChart, Pencil } from "lucide-react"
+import { Calendar, Clock, Mail, MessageSquare, Phone, FileText, ClipboardMinus, CalendarIcon, BarChart, Pencil, Sparkles } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import { GoalsModal } from "./ui/goals-modal"
 import { ConfigFormModal } from "./ui/config-form-modal"
+import { AIGoalsGenerator } from "./ui/ai-goals-generator"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { formatDate } from "@/utils/validatesInputs"
 
-interface Goal {
-  _id: string;
-  description: string;
-  isCompleted: boolean;
-  day: string;
-}
-
-interface UpcomingSession {
-  _id: string;
-  date: Date;
-  link: string;
-  objectiveId: string;
-}
-
-interface NextSession {
-  date: Date;
-  time: string;
-  link: string;
-  objectiveId: string;
-}
-
-interface Note {
-  _id: string;
-  content: string;
-  createdBy: string;
-  createdAt: string;
-}
-
-interface Client {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  startDate: string;
-  sessions: number;
-  nextSession: NextSession | {};
-  lastSession: NextSession | {};
-  progress: number;
-  status: "active" | "pending" | "inactive";
-  focus: string;
-  avatar: string;
-  bio: string;
-  goals: Goal[];
-  upcomingSessions: UpcomingSession[];
-  notes: Note[];
-  activeObjectiveId: string | null;
-}
-
-interface ClientDetailProps {
-  client: Client | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onUpdateClient: (clientId: string, updatedGoals: Goal[]) => void;
-}
+import { Goal, NextSession, ClientDetailProps, Objective } from "@/types"
 
 export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: ClientDetailProps) {
   const [activeTab, setActiveTab] = useState("info")
   const [isGoalsModalOpen, setIsGoalsModalOpen] = useState(false)
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false)
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false)
 
   const user = useAppSelector(state => state.auth.user)
 
@@ -92,6 +41,20 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
       return;
     }
     setIsConfigModalOpen(true)
+  }
+
+  const handleAIGeneratorOpen = () => {
+    if (!client?.activeObjectiveId) {
+      // Mostrar mensaje de que el cliente no tiene un objetivo activo
+      return;
+    }
+    setIsAIGeneratorOpen(true)
+  }
+
+  const handleAIGoalsGenerated = (generatedGoals: Goal[]) => {
+    if (client) {
+      onUpdateClient(client._id, generatedGoals)
+    }
   }
 
   if (!isOpen && activeTab !== "info") {
@@ -185,7 +148,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                     <div className="flex justify-between">
                       <div className="font-medium">
                         {Object.keys(client.lastSession).length > 0 
-                          ? `${formatDate(new Date((client.lastSession as NextSession).date))} - ${(client.lastSession as NextSession).time}`
+                          ? `${formatDate(new Date((client.lastSession as NextSession).date))} - ${(client.lastSession as NextSession).objective.title}`
                           : "No se encontro una sesión"
                         }
                       </div>
@@ -217,10 +180,23 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                     { client.focus && (
                       <Badge variant="outline" className="text-xs bg-primary text-primary-foreground">{client.focus}</Badge>
                     )}
-                    <Button variant="outline" size="sm" className="gap-1" onClick={() => setIsGoalsModalOpen(true)}>
-                      <Pencil className="h-4 w-4" />
-                      Editar Metas
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="gap-1" onClick={() => setIsGoalsModalOpen(true)}>
+                        <Pencil className="h-4 w-4" />
+                        Editar Metas
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-1" 
+                        onClick={handleAIGeneratorOpen}
+                        disabled={!client.activeObjectiveId}
+                        title={!client.activeObjectiveId ? "El cliente no tiene un objetivo activo" : "Generar objetivos con IA"}
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        IA
+                      </Button>
+                    </div>
                   </div>
                   <div className="space-y-3 mt-4 overflow-y-auto max-h-[350px] pr-2">
                     {client.goals?.length > 0 ? (
@@ -281,6 +257,13 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
         clientId={client._id}
         coachId={user?._id || ''}
         objectiveId={client.activeObjectiveId}
+      />
+
+      <AIGoalsGenerator
+        isOpen={isAIGeneratorOpen}
+        onClose={() => setIsAIGeneratorOpen(false)}
+        objective={{ title: client.activeObjectiveId || '', totalGoals: 0, completedGoals: 0, hasGoals: false, isCompleted: false, active: true, createdAt: '', updatedAt: '', coach: '' }}
+        onGoalsGenerated={handleAIGoalsGenerated}
       />
     </>
   )

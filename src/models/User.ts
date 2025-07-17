@@ -1,11 +1,10 @@
-import mongoose, { Document, Schema, ObjectId } from 'mongoose';
+import mongoose, { Document, Schema} from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
   lastName: string;
   password: string;
   email: string;
-  phone: string;
   age?: number;
   active: boolean;
   firstLogin: boolean;
@@ -38,11 +37,6 @@ const UserSchema: Schema = new Schema({
     lowercase: true,
     trim: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  phone: {
-    type: String,
-    trim: true,
-    maxlength: [20, 'The phone cannot exceed 20 characters']
   },
   age: {
     type: Number,

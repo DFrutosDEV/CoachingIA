@@ -4,7 +4,8 @@ export interface IProfile extends Document {
   user: ObjectId;
   role: ObjectId;
   profilePicture: string;
-  bio: string;  
+  bio: string;
+  phone: string;
   indexDashboard: number[];
   clients: ObjectId[];
   enterprise: ObjectId;
@@ -30,6 +31,11 @@ const ProfileSchema: Schema = new Schema({
     type: String,
     trim: true,
     maxlength: [500, 'The bio cannot exceed 500 characters'],
+    default: ''
+  },
+  phone: {
+    type: String,
+    trim: true,
     default: ''
   },
   indexDashboard: {

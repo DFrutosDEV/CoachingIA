@@ -55,7 +55,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
 
     setIsSearching(true)
     try {
-      const response = await fetch(`/api/coach/search?search=${encodeURIComponent(query)}&coachId=${user?._id}`, {
+      const response = await fetch(`/api/coach/search?search=${encodeURIComponent(query)}&coachId=${user?.profile?._id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

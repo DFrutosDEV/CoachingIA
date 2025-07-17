@@ -18,58 +18,11 @@ import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import { formatDate, formatTime } from "@/utils/validatesInputs"
 
-// Definir tipos (importar si están en archivo compartido)
-interface Goal {
-  _id: string;
-  description: string;
-  isCompleted: boolean;
-  day: string;
-}
-
-interface UpcomingSession {
-  _id: string;
-  date: Date;
-  link: string;
-  objectiveId: string;
-}
-
-interface NextSession {
-  _id: string;
-  date: Date;
-  link: string;
-  objectiveId: string;
-}
-
-interface Note {
-  _id: string;
-  content: string;
-  createdBy: string;
-  createdAt: string;
-}
-
-interface Client {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  startDate: string;
-  sessions: number;
-  nextSession: NextSession | {};
-  lastSession: NextSession | {};
-  progress: number;
-  status: "active" | "pending" | "inactive";
-  focus: string;
-  avatar: string;
-  bio: string;
-  goals: Goal[];
-  upcomingSessions: UpcomingSession[];
-  notes: Note[];
-  activeObjectiveId: string | null;
-}
+import { ClientResponse, NextSession } from "@/types"
 
 // Definir props para ClientsList
 interface ClientsListProps {
-  clients: Client[];
+  clients: ClientResponse[];
   onClientSelect: (clientId: string) => void;
 }
 
