@@ -7,58 +7,10 @@ import { ClientsList } from "../../../../components/clients-list"
 import { ClientDetail } from "../../../../components/client-detail"
 import { toast } from "sonner"
 import { useAppSelector } from "@/lib/redux/hooks"
-
-interface Goal {
-  _id: string;
-  description: string;
-  isCompleted: boolean;
-  day: string;
-}
-
-interface UpcomingSession {
-  _id: string;
-  date: Date;
-  link: string;
-  objectiveId: string;
-  isCancelled: boolean;
-}
-
-interface NextSession {
-  _id: string;
-  date: Date;
-  link: string;
-  objectiveId: string;
-}
-
-interface Note {
-  _id: string;
-  content: string;
-  createdBy: string;
-  createdAt: string;
-}
-
-interface Client {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  startDate: string;
-  sessions: number;
-  nextSession: NextSession | {};
-  lastSession: NextSession | {};
-  progress: number;
-  status: "active" | "pending" | "inactive";
-  focus: string;
-  avatar: string;
-  bio: string;
-  goals: Goal[];
-  upcomingSessions: UpcomingSession[];
-  notes: Note[];
-  activeObjectiveId: string | null;
-}
+import { ClientResponse, Goal } from "@/types"
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientResponse[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -35,18 +35,11 @@ interface ConfigFormModalProps {
   objectiveId: string | null;
 }
 
-const CONFIG_QUESTIONS = [
-  "¿Cuál es tu objetivo principal en este programa de coaching?",
-  "¿En qué área de tu vida te gustaría enfocarte más?",
-  "¿Cuántas horas a la semana puedes dedicar a trabajar en tus objetivos?",
-  "¿Prefieres trabajar en objetivos a corto plazo (1-3 meses) o largo plazo (6-12 meses)?",
-  "¿Qué tipo de apoyo necesitas más del coach?",
-  "¿Tienes alguna experiencia previa con coaching o desarrollo personal?",
-  "¿Cuál es tu nivel de motivación actual (1-10)?",
-  "¿Qué obstáculos crees que pueden impedirte alcanzar tus objetivos?",
-  "¿Prefieres sesiones más estructuradas o flexibles?",
-  "¿Hay algún tema específico que te gustaría abordar en las sesiones?"
-];
+interface ConfigQuestion {
+  _id: string;
+  title: string;
+  isObligatory: boolean;
+}
 
 const FIXED_GOALS = [
   "Establecer una rutina matutina de 30 minutos",
@@ -85,13 +78,37 @@ const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sá
 
 export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveId }: ConfigFormModalProps) {
   const [step, setStep] = useState(1);
-  const [answers, setAnswers] = useState<string[]>(new Array(10).fill(''));
+  const [configQuestions, setConfigQuestions] = useState<ConfigQuestion[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [generatedGoals, setGeneratedGoals] = useState<Goal[]>([]);
   const [meets, setMeets] = useState<Meet[]>([]);
   const [meetDate, setMeetDate] = useState('');
   const [meetTime, setMeetTime] = useState('');
   const [meetCount, setMeetCount] = useState(4);
+
+  // Cargar preguntas de configuración al abrir el modal
+  const loadConfigQuestions = async () => {
+    try {
+      const response = await fetch('/api/config-forms');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setConfigQuestions(data.data);
+          setAnswers(new Array(data.data.length).fill(''));
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar preguntas de configuración:', error);
+    }
+  };
+
+  // Cargar preguntas cuando se abre el modal
+  React.useEffect(() => {
+    if (isOpen) {
+      loadConfigQuestions();
+    }
+  }, [isOpen]);
 
   const handleAnswerChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -216,7 +233,7 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
       toast.success('Reuniones programadas correctamente');
       onClose();
       setStep(1);
-      setAnswers(new Array(10).fill(''));
+      setAnswers(new Array(configQuestions.length).fill(''));
       setGeneratedGoals([]);
       setMeets([]);
     } catch (error) {
@@ -227,7 +244,10 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
     }
   };
 
-  const isFormComplete = answers.every(answer => answer.trim() !== '');
+  const isFormComplete = configQuestions.length > 0 && answers.every((answer, index) => {
+    const question = configQuestions[index];
+    return question && (!question.isObligatory || answer.trim() !== '');
+  });
   const isObjectiveActive = objectiveId !== null;
 
   return (
@@ -250,18 +270,19 @@ export function ConfigFormModal({ isOpen, onClose, clientId, coachId, objectiveI
                 </p>
               </div>
 
-              {CONFIG_QUESTIONS.map((question, index) => (
-                <div key={index} className="space-y-2">
+              {configQuestions.map((question, index) => (
+                <div key={question._id} className="space-y-2">
                   <Label htmlFor={`question-${index}`} className="text-sm font-medium">
                     Pregunta {index + 1}
                   </Label>
-                  <p className="text-sm text-muted-foreground mb-2">{question}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{question.title}</p>
                   <Textarea
                     id={`question-${index}`}
-                    value={answers[index]}
+                    value={answers[index] || ''}
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
                     placeholder="Escribe tu respuesta aquí..."
                     className="min-h-[80px]"
+                    required={question.isObligatory}
                   />
                 </div>
               ))}

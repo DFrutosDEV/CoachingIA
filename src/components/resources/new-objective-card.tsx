@@ -69,6 +69,8 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
     if (!email || email.length < 3) return
 
     setIsCheckingEmail(true)
+    // Agregar timeout de 1.5 segundos
+    await new Promise(resolve => setTimeout(resolve, 1500))
     try {
       const response = await fetch(`/api/users/check-email?email=${encodeURIComponent(email)}`)
       const result = await response.json()

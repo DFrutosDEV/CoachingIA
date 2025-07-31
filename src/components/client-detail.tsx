@@ -18,7 +18,7 @@ import { AIGoalsGenerator } from "./ui/ai-goals-generator"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { formatDate } from "@/utils/validatesInputs"
 
-import { Goal, NextSession, ClientDetailProps, Objective } from "@/types"
+import { Goal, NextSession, ClientDetailProps } from "@/types"
 
 export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: ClientDetailProps) {
   const [activeTab, setActiveTab] = useState("info")
@@ -144,15 +144,13 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
 
                 <div>
                   <h4 className="mb-2 text-sm font-medium">Última Sesión</h4>
-                  <div className="rounded-lg border p-3">
+                  {client.lastSession.date ? (
+                    <div className="rounded-lg border p-3">
                     <div className="flex justify-between">
                       <div className="font-medium">
-                        {Object.keys(client.lastSession).length > 0 
-                          ? `${formatDate(new Date((client.lastSession as NextSession).date))} - ${(client.lastSession as NextSession).objective.title}`
-                          : "No se encontro una sesión"
-                        }
+                        {`${formatDate(new Date(client.lastSession.date))} - ${client.lastSession.objective.title}`}
                       </div>
-                      <Badge variant="outline">{Object.keys(client.lastSession).length > 0 ? "Programada" : "No programada"}</Badge>
+                      <Badge variant="outline">Programada</Badge>
                     </div>
                     <div className="mt-3 flex gap-2">
                       <Button size="sm" variant="outline" className="w-full gap-1">
@@ -165,6 +163,9 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                       </Button>
                     </div>
                   </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No existen sesiones previas</p>
+                  )}
                 </div>
 
                 <div>

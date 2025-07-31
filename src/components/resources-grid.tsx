@@ -7,7 +7,8 @@ import {
   CoachCard,
   TicketCard,
   PdaCard,
-  ConfigFormCard
+  ConfigFormCard,
+  ConfigFormsManagerCard
 } from "@/components/resources"
 
 export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" }) {
@@ -37,6 +38,9 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
 
       {/* Visualiza tu formulario de configuración */}
       {userType === "client" && <ConfigFormCard />}
+
+      {/* Gestionar Formularios de Configuración */}
+      {userType === "admin" && <ConfigFormsManagerCard />}
     </div>
   )
 }

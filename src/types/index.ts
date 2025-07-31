@@ -62,8 +62,8 @@ export interface ClientResponse {
   phone: string;
   startDate: string;
   sessions: number;
-  nextSession: NextSession | {};
-  lastSession: NextSession | {};
+  nextSession: NextSession;
+  lastSession: NextSession;
   progress: number;
   status: "active" | "pending" | "inactive";
   focus: string;

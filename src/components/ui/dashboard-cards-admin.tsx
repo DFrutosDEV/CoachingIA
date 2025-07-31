@@ -5,8 +5,30 @@ import { Button } from "@/components/ui/button"
 import { Users, UserCircle, BarChart3, ArrowRight, FileText } from "lucide-react"
 import Link from "next/link"
 
+// Interfaces para los tipos de datos
+interface RecentUser {
+  name: string;
+  email: string;
+  type: string;
+  date: string;
+}
+
+interface PlatformStat {
+  value: string;
+  change: string;
+  positive: boolean;
+}
+
+interface PlatformStats {
+  conversionRate: PlatformStat;
+  avgSessionsPerUser: PlatformStat;
+  avgSessionTime: PlatformStat;
+  churnRate: PlatformStat;
+  monthlyRevenue: PlatformStat;
+}
+
 // Card 1: Total Usuarios
-export function TotalUsersCard() {
+export function TotalUsersCard({ totalUsers = 0, newUsersThisMonth = 0 }) {
   return (
     <Card data-swapy-item="total-users">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -14,8 +36,8 @@ export function TotalUsersCard() {
         <Users className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">1,248</div>
-        <p className="text-xs text-muted-foreground">+86 este mes</p>
+        <div className="text-2xl font-bold">{totalUsers.toLocaleString()}</div>
+        <p className="text-xs text-muted-foreground">+{newUsersThisMonth} este mes</p>
         <div className="mt-4">
           <Link href="/dashboard/admin/users">
             <Button size="sm" variant="outline" className="w-full">
@@ -30,7 +52,7 @@ export function TotalUsersCard() {
 }
 
 // Card 2: Coaches Activos
-export function ActiveCoachesCard() {
+export function ActiveCoachesCard({ activeCoaches = 0, newCoachesThisMonth = 0 }) {
   return (
     <Card data-swapy-item="active-coaches">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -38,8 +60,8 @@ export function ActiveCoachesCard() {
         <UserCircle className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">64</div>
-        <p className="text-xs text-muted-foreground">+12 este mes</p>
+        <div className="text-2xl font-bold">{activeCoaches}</div>
+        <p className="text-xs text-muted-foreground">+{newCoachesThisMonth} este mes</p>
         <div className="mt-4">
           <Link href="/dashboard/admin/coaches">
             <Button size="sm" variant="outline" className="w-full">
@@ -54,7 +76,7 @@ export function ActiveCoachesCard() {
 }
 
 // Card 3: Sesiones Realizadas
-export function CompletedSessionsCard() {
+export function CompletedSessionsCard({ completedSessions = 0, completedSessionsThisMonth = 0 }) {
   return (
     <Card data-swapy-item="completed-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -62,8 +84,8 @@ export function CompletedSessionsCard() {
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">3,879</div>
-        <p className="text-xs text-muted-foreground">+458 este mes</p>
+        <div className="text-2xl font-bold">{completedSessions.toLocaleString()}</div>
+        <p className="text-xs text-muted-foreground">+{completedSessionsThisMonth} este mes</p>
         <div className="mt-4">
           <Link href="/dashboard/admin/analytics">
             <Button size="sm" variant="outline" className="w-full">
@@ -78,7 +100,7 @@ export function CompletedSessionsCard() {
 }
 
 // Card 4: Reportes
-export function ReportsCard() {
+export function ReportsCard({ pendingReports = 0 }) {
   return (
     <Card data-swapy-item="reports">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -86,7 +108,7 @@ export function ReportsCard() {
         <FileText className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">12</div>
+        <div className="text-2xl font-bold">{pendingReports}</div>
         <p className="text-xs text-muted-foreground">Pendientes de revisión</p>
         <div className="mt-4">
           <Link href="/dashboard/admin/reports">
@@ -102,7 +124,7 @@ export function ReportsCard() {
 }
 
 // Card 5: Nuevos Usuarios
-export function NewUsersCard() {
+export function NewUsersCard({ recentUsers = [] }: { recentUsers?: RecentUser[] }) {
   return (
     <Card data-swapy-item="new-users">
       <CardHeader>
@@ -111,38 +133,38 @@ export function NewUsersCard() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {[
-            { name: "Ana López", email: "ana.lopez@ejemplo.com", type: "Cliente", date: "Hoy" },
-            { name: "Roberto Fernández", email: "roberto.f@ejemplo.com", type: "Coach", date: "Ayer" },
-            { name: "Carmen Ruiz", email: "carmen.ruiz@ejemplo.com", type: "Cliente", date: "Hace 2 días" },
-            { name: "Javier Moreno", email: "javier.m@ejemplo.com", type: "Cliente", date: "Hace 3 días" },
-            { name: "Elena Castro", email: "elena.c@ejemplo.com", type: "Coach", date: "Hace 5 días" },
-          ].map((user, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-            >
-              <div className="space-y-1">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                      user.type === "Coach" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {user.type}
-                  </span>
-                  <span className="text-xs text-muted-foreground">{user.date}</span>
+          {recentUsers.length > 0 ? (
+            recentUsers.map((user, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+              >
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
+                        user.type === "Coach" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {user.type}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{user.date}</span>
+                  </div>
                 </div>
+                <Link href="/dashboard/admin/clients">
+                  <Button size="sm" variant="outline">
+                    Ver perfil
+                  </Button>
+                </Link>
               </div>
-              <Link href="/dashboard/admin/clients">
-                <Button size="sm" variant="outline">
-                  Ver perfil
-                </Button>
-              </Link>
+            ))
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">No hay nuevos usuarios</p>
             </div>
-          ))}
+          )}
         </div>
       </CardContent>
     </Card>
@@ -150,7 +172,15 @@ export function NewUsersCard() {
 }
 
 // Card 6: Rendimiento de la Plataforma
-export function PlatformPerformanceCard() {
+export function PlatformPerformanceCard({ platformStats }: { platformStats?: PlatformStats }) {
+  const stats = [
+    { metric: "Tasa de Conversión", ...platformStats?.conversionRate },
+    { metric: "Sesiones Promedio por Usuario", ...platformStats?.avgSessionsPerUser },
+    { metric: "Tiempo Promedio de Sesión", ...platformStats?.avgSessionTime },
+    { metric: "Tasa de Abandono", ...platformStats?.churnRate },
+    { metric: "Ingresos Mensuales", ...platformStats?.monthlyRevenue },
+  ]
+
   return (
     <Card data-swapy-item="platform-performance">
       <CardHeader>
@@ -159,13 +189,7 @@ export function PlatformPerformanceCard() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {[
-            { metric: "Tasa de Conversión", value: "8.2%", change: "+1.2%", positive: true },
-            { metric: "Sesiones Promedio por Usuario", value: "3.5", change: "+0.3", positive: true },
-            { metric: "Tiempo Promedio de Sesión", value: "52 min", change: "+4 min", positive: true },
-            { metric: "Tasa de Abandono", value: "12.8%", change: "-2.3%", positive: true },
-            { metric: "Ingresos Mensuales", value: "€24,580", change: "+€3,450", positive: true },
-          ].map((stat, index) => (
+          {stats.map((stat, index) => (
             <div
               key={index}
               className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
