@@ -1,8 +1,7 @@
 import { store } from '../redux/store'
 import { login, logout, setLoading, setError } from '../redux/slices/authSlice'
 import { setSession, clearSession } from '../redux/slices/sessionSlice'
-import { addNotification } from '../redux/slices/uiSlice'
-import { useAppSelector } from '../redux/hooks'
+
 // Tipos para la respuesta de la API
 interface Role {
   _id: string
@@ -44,6 +43,7 @@ interface LoginResponse {
   success: boolean
   message: string
   user?: ApiUser
+  token?: string
   error?: string
 }
 
@@ -98,125 +98,71 @@ export class AuthService {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Para incluir cookies httpOnly
-        body: JSON.stringify({
-          email,
-          contrasena: password
-        }),
+        body: JSON.stringify({ email, password }),
       })
 
       const data: LoginResponse = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Error en el login')
+      if (data.success && data.user) {
+        const user = mapApiUserToStore(data.user)
+        dispatch(login({ user, token: data.token || '' }))
+        dispatch(setSession({ isLoggedIn: true, userType: user.role.code }))
+        return { success: true, user }
+      } else {
+        dispatch(setError(data.error || 'Error de autenticación'))
+        return { success: false, error: data.error }
       }
-
-      if (!data.success || !data.user) {
-        throw new Error(data.message || 'Credenciales inválidas')
-      }
-
-      // Mapear usuario de la API al formato del store
-      const user = mapApiUserToStore(data.user)
-      // Generar un token simple (en producción usar JWT)
-      const token = btoa(`${user.email}:${Date.now()}`)
-      
-      // Actualizar el estado global con Redux
-      dispatch(login({ user, token }))
-      
-      // Actualizar sesión (solo información no sensible)
-      const primaryRole = user.role.name.toLowerCase()
-      dispatch(setSession({ isLoggedIn: true, userType: primaryRole }))
-      
-      // Mostrar notificación de éxito
-      dispatch(addNotification({
-        type: 'success',
-        message: 'Inicio de sesión exitoso',
-        duration: 3000
-      }))
-      
-      return { success: true, user }
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
-      
+      const errorMessage = error instanceof Error ? error.message : 'Error de conexión'
       dispatch(setError(errorMessage))
-      dispatch(addNotification({
-        type: 'error',
-        message: errorMessage,
-        duration: 5000
-      }))
-      
       return { success: false, error: errorMessage }
     } finally {
       dispatch(setLoading(false))
     }
   }
 
-  // Función de logout con Redux
-  static logout() {
+  // Función de logout que limpia el estado global
+  static async logout() {
     const dispatch = store.dispatch
     
-    dispatch(logout())
-    dispatch(clearSession())
-    dispatch(addNotification({
-      type: 'info',
-      message: 'Sesión cerrada correctamente',
-      duration: 2000
-    }))
+    try {
+      // Limpiar el estado de autenticación
+      dispatch(logout())
+      dispatch(clearSession())
+      
+      // Redirigir al login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+      
+      return { success: true }
+    } catch (error) {
+      console.error('Error durante logout:', error)
+      return { success: false, error: 'Error durante logout' }
+    }
   }
 
-  // Función para verificar si el usuario está autenticado
+  // Verificar si el usuario está autenticado
   static isAuthenticated(): boolean {
     const state = store.getState()
     return state.auth.isAuthenticated
   }
 
-  // Función para obtener el usuario actual
+  // Obtener usuario actual
   static getCurrentUser() {
     const state = store.getState()
     return state.auth.user
   }
-
-  // Función para verificar si el usuario tiene un rol específico
-  static hasRole(role: string): boolean {
-    const state = store.getState()
-    return state.auth.user?.roles?.includes(role) || false
-  }
-
-  // Función para obtener todos los roles del usuario
-  static getUserRoles(): string[] {
-    const state = store.getState()
-    return state.auth.user?.roles || []
-  }
 }
 
-// Hook personalizado para usar el servicio de autenticación con Redux
+// Hook personalizado para usar el servicio de autenticación
 export const useAuthService = () => {
-  const { user, isAuthenticated, isLoading } = useAppSelector(state => state.auth)
-
-  const login = async (email: string, password: string) => {
-    return await AuthService.login(email, password)
-  }
-
-  const logout = () => {
-    AuthService.logout()
-  }
-
-  const hasRole = (role: string) => {
-    return AuthService.hasRole(role)
-  }
-
-  const getUserRoles = () => {
-    return AuthService.getUserRoles()
-  }
-
   return {
-    user,
-    isAuthenticated,
-    isLoading,
-    login,
-    logout,
-    hasRole,
-    getUserRoles,
+    login: AuthService.login.bind(AuthService),
+    logout: AuthService.logout.bind(AuthService),
+    isAuthenticated: AuthService.isAuthenticated.bind(AuthService),
+    getCurrentUser: AuthService.getCurrentUser.bind(AuthService),
+    getToken: AuthService.getToken.bind(AuthService),
+    getAuthHeaders: AuthService.getAuthHeaders.bind(AuthService),
   }
 } 

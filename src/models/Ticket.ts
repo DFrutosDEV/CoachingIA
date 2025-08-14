@@ -1,60 +1,112 @@
-import mongoose, { Document, Schema, ObjectId } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ITicket extends Document {
+  _id: string;
   title: string;
   description: string;
-  status: string;
-  priority: string;
-  assignedTo: ObjectId[];
-  createdBy: ObjectId;
-  creationDate: Date;
+  category: 'bug' | 'suggestion' | 'complaint' | 'other';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: 'pending' | 'in_progress' | 'resolved' | 'closed';
+  reporterUser: mongoose.Types.ObjectId;
+  reporterName: string;
+  reporterEmail: string;
+  reporterPhone?: string;
+  assignedTo?: mongoose.Types.ObjectId;
+  response?: string;
+  responseBy?: mongoose.Types.ObjectId;
+  responseDate?: Date;
+  attachments?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  closedAt?: Date;
+  closedBy?: mongoose.Types.ObjectId;
 }
 
 const TicketSchema: Schema = new Schema({
   title: {
     type: String,
-    required: [true, 'The title is required'],
+    required: true,
     trim: true,
-    maxlength: [50, 'The title cannot exceed 50 characters']
+    maxlength: 200
   },
   description: {
     type: String,
-    required: [true, 'The description is required'],
+    required: true,
     trim: true,
-    maxlength: [500, 'The description cannot exceed 500 characters']
+    maxlength: 2000
   },
-  status: {
-    type: Boolean,
-    required: [true, 'The status is required'],
-    default: 'open',
-    enum: ['open', 'in_progress', 'closed']
+  category: {
+    type: String,
+    enum: ['bug', 'suggestion', 'complaint', 'other'],
+    default: 'other',
+    required: true
   },
   priority: {
     type: String,
-    required: [true, 'The priority is required'],
+    enum: ['low', 'medium', 'high', 'critical'],
+    default: 'medium',
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'in_progress', 'resolved', 'closed'],
+    default: 'pending',
+    required: true
+  },
+  reporterUser: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  reporterName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  reporterEmail: {
+    type: String,
+    required: true,
     trim: true,
-    maxlength: [50, 'The priority cannot exceed 50 characters'],
-    enum: ['low', 'medium', 'high']
+    lowercase: true
   },
-  assignedTo: [{
+  reporterPhone: {
+    type: String,
+    trim: true
+  },
+  assignedTo: {
     type: Schema.Types.ObjectId,
-    ref: 'Profile',
-    required: false
+    ref: 'User'
+  },
+  response: {
+    type: String,
+    trim: true,
+    maxlength: 2000
+  },
+  responseBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  responseDate: {
+    type: Date
+  },
+  attachments: [{
+    type: String
   }],
-  createdBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'Profile',
-    required: false
+  closedAt: {
+    type: Date
   },
-  creationDate: {
-    type: Date,
-    default: Date.now
+  closedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   }
 }, {
   timestamps: true
 });
 
-TicketSchema.index({ title: 1 });
-TicketSchema.index({ status: 1 });
+TicketSchema.index({ status: 1, createdAt: -1 });
+TicketSchema.index({ reporterUser: 1 });
+TicketSchema.index({ assignedTo: 1 });
+TicketSchema.index({ category: 1 });
+TicketSchema.index({ priority: 1 });
 
-export default mongoose.models.Ticket || mongoose.model<ITicket>('Ticket', TicketSchema); 
+export default mongoose.models.Report || mongoose.model<ITicket>('Ticket', TicketSchema);

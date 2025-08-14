@@ -1,6 +1,6 @@
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { ServicesGrid } from "@/components/services-grid"
+import { ServicesGrid } from "@/components/services-grid-coachs"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 

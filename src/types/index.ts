@@ -133,6 +133,7 @@ export interface Profile {
   profilePicture: string;
   bio: string;
   phone: string;
+  address: string;
   indexDashboard: number[];
   clients: string[];
   enterprise: string;
@@ -175,4 +176,37 @@ export interface ClientGoal {
   description: string;
   isCompleted: boolean;
   objectiveTitle: string;
+}
+
+// Tipos para reportes
+export interface Report {
+  _id: string;
+  title: string;
+  description: string;
+  category: 'bug' | 'suggestion' | 'complaint' | 'other';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: 'pending' | 'in_progress' | 'resolved' | 'closed';
+  reporterUser: string;
+  reporterName: string;
+  reporterEmail: string;
+  reporterPhone?: string;
+  assignedTo?: string;
+  assignedToName?: string;
+  response?: string;
+  responseBy?: string;
+  responseByName?: string;
+  responseDate?: string;
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
+  closedAt?: string;
+  closedBy?: string;
+  closedByName?: string;
+}
+
+export interface ReportResponse {
+  _id: string;
+  response: string;
+  responseBy: string;
+  responseDate: string;
 } 

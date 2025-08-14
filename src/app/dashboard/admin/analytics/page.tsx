@@ -1,20 +1,6 @@
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { AnalyticsComponent } from "@/components/report-analytics"
-import { ReportGraphics } from "@/components/report-graphics"
 import { BarChart3 } from "lucide-react"
-
-// Podrías pasar estos datos como props en el futuro
-const analyticsData = [
-  { metric: "Cantidad de usuarios", value: "19", change: "+2", positive: true, period: "Ayer" },
-  { metric: "Cantidad de coaches", value: "35", change: "+5", positive: true, period: "Ayer" },
-  { metric: "Cantidad de empresas", value: "12", change: "-2", positive: true, period: "Ayer" },
-  { metric: "Cantidad de usuarios activos", value: "17", change: "+5", positive: true, period: "Ayer" },
-  { metric: "Cantidad de coaches activos", value: "17", change: "+5", positive: true, period: "Ayer" },
-  { metric: "Cantidad de empresas activas", value: "12", change: "-2", positive: true, period: "Ayer" },
-  { metric: "Cantidad de sesiones semanales", value: "17", change: "+5", positive: true, period: "Ayer" },
-  { metric: "Cantidad de sesiones mensuales", value: "17", change: "+5", positive: true, period: "Ayer" },
-];
 
 export default function AdminAnalyticsPage() {
   return (
@@ -32,8 +18,9 @@ export default function AdminAnalyticsPage() {
           <p className="text-sm text-muted-foreground">
             Visualiza métricas clave sobre el rendimiento, uso y crecimiento de la plataforma.
           </p>
-          <AnalyticsComponent analyticsData={analyticsData} />
-          <ReportGraphics />
+          <div className="p-4 border rounded">
+            <p>Contenido de analytics temporal</p>
+          </div>
         </main>
       </div>
     </div>

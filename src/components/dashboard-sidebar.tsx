@@ -16,9 +16,13 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
   const router = useRouter()
   const { logout } = useAuthService()
 
-  const handleLogout = () => {
-    logout()
-    router.push('/login')
+  const handleLogout = async () => {
+    try {
+      await logout()
+      router.push('/login')
+    } catch (error) {
+      console.error('Error durante logout:', error)
+    }
   }
 
   return (

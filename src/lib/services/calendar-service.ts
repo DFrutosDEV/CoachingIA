@@ -34,10 +34,10 @@ export class CalendarService {
       }
 
       // Determinar el tipo de usuario
-      const userRoles = AuthService.getUserRoles()
+      const userRoles = currentUser.roles
       const userType = userRoles.includes('admin') ? 'admin' : 
                       userRoles.includes('coach') ? 'coach' : 
-                      userRoles.includes('client') ? 'client' : 'client'
+                      userRoles.includes('client') ? 'client' : 'enterprise'
 
       // Obtener la zona horaria del navegador
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -57,7 +57,10 @@ export class CalendarService {
       }
 
       const response = await fetch(`${this.baseUrl}?${searchParams}`, {
-        headers: AuthService.getAuthHeaders()
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${AuthService.getToken()}`
+        }
       })
 
       if (!response.ok) {

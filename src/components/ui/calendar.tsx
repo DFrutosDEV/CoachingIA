@@ -220,7 +220,7 @@ export default function SessionsPage() {
       {/* Modal de detalles de la sesión */}
       <Dialog 
         open={selectedSession !== null} 
-        onOpenChange={(isOpen) => {
+        onOpenChange={(isOpen: boolean) => {
           if (!isOpen) {
             handleCloseModal()
           }

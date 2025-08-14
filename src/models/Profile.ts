@@ -6,6 +6,7 @@ export interface IProfile extends Document {
   profilePicture: string;
   bio: string;
   phone: string;
+  address: string;
   indexDashboard: number[];
   clients: ObjectId[];
   enterprise: ObjectId;
@@ -34,6 +35,11 @@ const ProfileSchema: Schema = new Schema({
     default: ''
   },
   phone: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  address: {
     type: String,
     trim: true,
     default: ''

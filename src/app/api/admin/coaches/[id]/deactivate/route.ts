@@ -6,12 +6,12 @@ import User from '@/models/User';
 // PUT /api/admin/coaches/[id]/deactivate - Dar de baja a un coach
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(

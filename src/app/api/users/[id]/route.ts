@@ -6,12 +6,12 @@ import mongoose from 'mongoose';
 // GET /api/users/[id] - Obtener un usuario específico
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } = await params;
     
     // Validar que el ID sea válido
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -55,12 +55,12 @@ export async function GET(
 // PUT /api/users/[id] - Actualizar un usuario específico
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     
     // Validar que el ID sea válido
@@ -148,12 +148,12 @@ export async function PUT(
 // DELETE /api/users/[id] - Eliminar un usuario específico (soft delete)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } = await params;
     
     // Validar que el ID sea válido
     if (!mongoose.Types.ObjectId.isValid(id)) {

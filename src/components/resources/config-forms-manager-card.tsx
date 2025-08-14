@@ -195,109 +195,106 @@ export function ConfigFormsManagerCard() {
           </div>
         </CardContent>
         <CardFooter>
-            <Button
-              onClick={() => setIsDialogOpen(true)}
-              variant="outlined"
-              size="small"
-              className="flex-1"
-            >
-              Revisar Formulario
-            </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outlined" className="w-full">
+                Gestionar Formulario
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] z-[9999]">
+              <DialogHeader>
+                <DialogTitle>
+                  Revisar Formularios de Configuración
+                </DialogTitle>
+                <DialogDescription>
+                  Aquí puedes ver y gestionar todas las preguntas de configuración del sistema.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 py-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-sm font-medium">Total: {configForms.length} formularios</h4>
+                  <Button onClick={handleCreateNew} size="small" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Agregar Nueva Pregunta
+                  </Button>
+                </div>
+
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {configForms.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">No hay formularios de configuración</p>
+                      <p className="text-sm text-gray-400">Crea la primera pregunta para comenzar</p>
+                    </div>
+                  ) : (
+                    configForms.map((form, index) => (
+                      <div key={form._id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-sm font-medium text-gray-600">#{index + 1}</span>
+                              <h3 className="font-medium">{form.title}</h3>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {form.isObligatory && (
+                                <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
+                                  Obligatorio
+                                </span>
+                              )}
+                              {form.active ? (
+                                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
+                                  Activo
+                                </span>
+                              ) : (
+                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                  Inactivo
+                                </span>
+                              )}
+                              <span className="text-xs text-gray-500">
+                                Creado: {new Date(form.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={form.active}
+                              onCheckedChange={() => handleToggleActive(form._id, form.active)}
+                            />
+                            <Button
+                              variant="text"
+                              size="small"
+                              onClick={() => handleEdit(form)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="text"
+                              size="small"
+                              onClick={() => handleDelete(form._id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outlined" onClick={() => setIsDialogOpen(false)}>
+                  Cerrar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardFooter>
       </Card>
 
-      {/* Modal para revisar formularios */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] z-[9999]">
-          <DialogHeader>
-            <DialogTitle>
-              Revisar Formularios de Configuración
-            </DialogTitle>
-            <DialogDescription>
-              Aquí puedes ver y gestionar todas las preguntas de configuración del sistema.
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="flex justify-between items-center">
-              <h4 className="text-sm font-medium">Total: {configForms.length} formularios</h4>
-              <Button onClick={handleCreateNew} size="small" className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Agregar Nueva Pregunta
-              </Button>
-            </div>
-
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {configForms.length === 0 ? (
-                <div className="text-center py-8">
-                  <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No hay formularios de configuración</p>
-                  <p className="text-sm text-gray-400">Crea la primera pregunta para comenzar</p>
-                </div>
-              ) : (
-                configForms.map((form, index) => (
-                  <div key={form._id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm font-medium text-gray-600">#{index + 1}</span>
-                          <h3 className="font-medium">{form.title}</h3>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {form.isObligatory && (
-                            <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
-                              Obligatorio
-                            </span>
-                          )}
-                          {form.active ? (
-                            <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
-                              Activo
-                            </span>
-                          ) : (
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                              Inactivo
-                            </span>
-                          )}
-                          <span className="text-xs text-gray-500">
-                            Creado: {new Date(form.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={form.active}
-                          onCheckedChange={() => handleToggleActive(form._id, form.active)}
-                        />
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => handleEdit(form)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => handleDelete(form._id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outlined" onClick={() => setIsDialogOpen(false)}>
-              Cerrar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Modal para crear/editar formulario */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

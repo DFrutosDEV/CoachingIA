@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { ServicesGrid } from "@/components/services-grid"
+import { ServicesGrid } from "@/components/services-grid-coachs"
 import { Users, TrendingUp, UserCheck, UserX } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
