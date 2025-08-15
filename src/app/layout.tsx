@@ -9,6 +9,7 @@ import { ReduxProvider } from '../components/redux-provider'
 import { ThemeSync } from '../components/theme-sync'
 import { DebugRedux } from '../components/debug-redux'
 import { Toaster } from 'sonner'
+import { RouteGuard } from '../components/auth/RouteGuard'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -61,11 +62,13 @@ export default function RootLayout({
           >
             <MUIProvider>
               <ThemeSync />
+              <RouteGuard>
                 <ClientLayout>
                   {children}
                   <Toaster position="bottom-right" richColors />
-                  {process.env.NODE_ENV === 'development' && <DebugRedux />}  
+                  {/* {process.env.NODE_ENV === 'development' && <DebugRedux />}   */}
                 </ClientLayout>
+              </RouteGuard>
             </MUIProvider>
           </ThemeProvider>
         </ReduxProvider>

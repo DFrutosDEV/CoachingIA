@@ -12,18 +12,6 @@ export {
   logout,
   setLoading as setAuthLoading,
   updateUser,
-  setClients,
-  addClient,
-  updateClient,
-  removeClient,
-  setCoaches,
-  addCoach,
-  updateCoach,
-  removeCoach,
-  setEnterprises,
-  addEnterprise,
-  updateEnterprise,
-  removeEnterprise,
   setError,
   clearError
 } from './slices/authSlice'
@@ -51,7 +39,7 @@ export {
 } from './slices/uiSlice'
 
 // Tipos exportados
-export type { User, Client, Coach, Enterprise } from './slices/authSlice'
+export type { User } from './slices/authSlice'
 export type { Notification } from './slices/uiSlice'
 
 // Servicios

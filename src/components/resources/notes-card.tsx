@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FileText, ArrowRight } from "lucide-react"
 import { useAppSelector } from "@/lib/redux/hooks"
-import { RootState } from "@/lib/redux/store"
+
 import { toast } from "sonner"
 
 export function NotesCard() {
@@ -44,7 +44,7 @@ export function NotesCard() {
   const [isSendingNote, setIsSendingNote] = useState(false)
   
   // Obtener usuario autenticado y datos del estado global
-  const user = useAppSelector((state: RootState) => state.auth.user)
+  const user = useAppSelector(state => state.auth.user)
 
   const handleNoteFormChange = (field: string, value: string) => {
     setNoteForm(prev => ({

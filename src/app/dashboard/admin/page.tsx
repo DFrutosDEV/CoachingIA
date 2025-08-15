@@ -85,6 +85,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (user?._id) {
       fetchBasicData()
+    } else {
+      setError('No se encontró información del usuario')
+      setLoading(false)
     }
   }, [user?._id])
 

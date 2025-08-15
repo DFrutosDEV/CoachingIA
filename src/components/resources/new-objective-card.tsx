@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Target, ArrowRight, User, Mail, Phone, Calendar } from "lucide-react"
 import { useAppSelector } from "@/lib/redux/hooks"
-import { RootState } from "@/lib/redux/store"
 import { toast } from "sonner"
 
 interface NewObjectiveCardProps {
@@ -55,7 +54,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
   const [fieldsEnabled, setFieldsEnabled] = useState(false)
   
   // Obtener usuario autenticado y datos del estado global
-  const user = useAppSelector((state: RootState) => state.auth.user)
+  const user = useAppSelector(state => state.auth.user)
 
   const handleClientFormChange = (field: string, value: string) => {
     setClientForm(prev => ({

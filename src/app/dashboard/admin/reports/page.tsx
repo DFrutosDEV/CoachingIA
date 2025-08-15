@@ -9,8 +9,7 @@ import { ReportUsers } from "@/components/report-users";
 import { ReportDetailModal } from "@/components/ui/report-detail-modal";
 import { FileText, Filter } from "lucide-react";
 import { Report } from "@/types";
-import { useSelector } from 'react-redux';
-import { RootState } from '@/lib/redux/store';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 export default function AdminReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -23,7 +22,7 @@ export default function AdminReportsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [error, setError] = useState<string | null>(null);
 
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
 
   // Cargar reportes
   const fetchReports = async () => {

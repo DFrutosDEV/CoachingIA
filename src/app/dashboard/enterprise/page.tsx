@@ -12,15 +12,75 @@ import {
   NewUsersCard,
   CompanyPerformanceCard
 } from "@/components/ui/dashboard-cards-enterprise"
+import { useAppSelector } from '@/lib/redux/hooks'
+
+// Interfaces para los tipos de datos
+interface DashboardData {
+  totalClients: {
+    count: number;
+    changeText: string;
+  };
+  activeCoaches: {
+    count: number;
+    changeText: string;
+  };
+  completedSessions: {
+    count: number;
+    changeText: string;
+  };
+  reports: {
+    count: number;
+    changeText: string;
+  };
+  newUsers: {
+    name: string;
+    email: string;
+    type: string;
+    date: string;
+  }[];
+  performanceStats: {
+    metric: string;
+    value: string;
+    change: string;
+    positive: boolean;
+  }[];
+}
 
 export default function EnterpriseDashboard() {
   const [isReady, setIsReady] = useState(false)
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
+  // Redux para obtener el usuario logueado
+  const user = useAppSelector(state => state.auth.user)
   
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null)
   const largeCardsRef = useRef<HTMLDivElement>(null)
   const swapySmallRef = useRef<any>(null)
   const swapyLargeRef = useRef<any>(null)
+
+  // Función para cargar datos del dashboard
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/enterprise/dashboard?enterpriseId=${user?.enterprise?._id}`)
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar los datos del dashboard')
+      }
+      
+      const data = await response.json()
+      setDashboardData(data)
+      setError(null)
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      setError('Error al cargar los datos del dashboard')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     // Marcar como listo después de que el componente se monte
@@ -30,6 +90,16 @@ export default function EnterpriseDashboard() {
 
     return () => clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    // Cargar datos cuando el usuario esté disponible
+    if (user?.enterprise?._id) {
+      fetchDashboardData()
+    } else {
+      setError('No se encontró información de la empresa')
+      setLoading(false)
+    }
+  }, [user])
 
   useEffect(() => {
     // Solo inicializar swapy cuando esté listo
@@ -108,31 +178,54 @@ export default function EnterpriseDashboard() {
               </p>
             </div>
 
-            {/* Zona de drag and drop para cards pequeñas (4 cards arriba - 25% cada una) */}
-            <div ref={smallCardsRef} className="small-cards-container grid gap-6 md:grid-cols-4">
-              <div data-swapy-slot="1" className="w-full">
-                <TotalClientsCard />
+            {/* Mostrar loading o error */}
+            {loading && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Cargando datos del dashboard...</p>
               </div>
-              <div data-swapy-slot="2" className="w-full">
-                <ActiveCoachesCard />
+            )}
+            
+            {error && (
+              <div className="text-center py-8">
+                <p className="text-red-600">{error}</p>
+                <button 
+                  onClick={fetchDashboardData}
+                  className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                >
+                  Reintentar
+                </button>
               </div>
-              <div data-swapy-slot="3" className="w-full">
-                <CompletedSessionsCard />
-              </div>
-              <div data-swapy-slot="4" className="w-full">
-                <ReportsCard />
-              </div>
-            </div>
+            )}
 
-            {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
-            <div ref={largeCardsRef} className="large-cards-container grid gap-6 md:grid-cols-2">
-              <div data-swapy-slot="5" className="w-full">
-                <NewUsersCard />
-              </div>
-              <div data-swapy-slot="6" className="w-full">
-                <CompanyPerformanceCard />
-              </div>
-            </div>
+            {/* Zona de drag and drop para cards pequeñas (4 cards arriba - 25% cada una) */}
+            {dashboardData && !loading && !error && (
+              <>
+                <div ref={smallCardsRef} className="small-cards-container grid gap-6 md:grid-cols-4">
+                  <div data-swapy-slot="1" className="w-full">
+                    <TotalClientsCard data={dashboardData.totalClients} />
+                  </div>
+                  <div data-swapy-slot="2" className="w-full">
+                    <ActiveCoachesCard data={dashboardData.activeCoaches} />
+                  </div>
+                  <div data-swapy-slot="3" className="w-full">
+                    <CompletedSessionsCard data={dashboardData.completedSessions} />
+                  </div>
+                  <div data-swapy-slot="4" className="w-full">
+                    <ReportsCard data={dashboardData.reports} />
+                  </div>
+                </div>
+
+                {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
+                <div ref={largeCardsRef} className="large-cards-container grid gap-6 md:grid-cols-2">
+                  <div data-swapy-slot="5" className="w-full">
+                    <NewUsersCard data={dashboardData.newUsers} />
+                  </div>
+                  <div data-swapy-slot="6" className="w-full">
+                    <CompanyPerformanceCard data={dashboardData.performanceStats} />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </main>
       </div>
