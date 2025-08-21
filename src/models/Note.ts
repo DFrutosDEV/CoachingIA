@@ -4,6 +4,7 @@ export interface INote extends Document {
   title: string;
   content: string;
   clientId: ObjectId;
+  objectiveId: ObjectId;
   sessionId: ObjectId;
   coachId: ObjectId;
   createdBy: ObjectId;
@@ -31,7 +32,10 @@ const NoteSchema: Schema = new Schema({
   sessionId: {
     type: Schema.Types.ObjectId,
     ref: 'Meet',
-    required: [true, 'La sesión es requerida']
+  },
+  objectiveId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Objective',
   },
   coachId: {
     type: Schema.Types.ObjectId,
@@ -54,6 +58,7 @@ const NoteSchema: Schema = new Schema({
 NoteSchema.index({ title: 1 });
 NoteSchema.index({ clientId: 1 });
 NoteSchema.index({ sessionId: 1 });
+NoteSchema.index({ objectiveId: 1 });
 NoteSchema.index({ coachId: 1 });
 NoteSchema.index({ createdBy: 1 });
 

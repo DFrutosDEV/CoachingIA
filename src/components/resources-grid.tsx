@@ -19,9 +19,6 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
         <NotificationCard userType={userType} />
       )}
 
-      {/* Notas */}
-      {userType === "coach" && <NotesCard />}
-
       {/* Agregar Cliente */}
       {(userType === "coach" || userType === "admin") && (
         <NewObjectiveCard userType={userType} />

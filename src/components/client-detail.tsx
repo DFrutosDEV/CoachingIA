@@ -364,6 +364,8 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
         objectiveData={selectedObjectiveData}
         isOpen={isObjectiveDetailModalOpen}
         onClose={() => setIsObjectiveDetailModalOpen(false)}
+        clientId={client._id}
+        coachId={user?._id}
       />
     </>
   )

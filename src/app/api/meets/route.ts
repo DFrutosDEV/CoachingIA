@@ -56,54 +56,53 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/meets - Obtener meets de un cliente
+// GET /api/meets - Obtener sesiones con filtros opcionales
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     
     const { searchParams } = new URL(request.url);
+    const objectiveId = searchParams.get('objectiveId');
     const clientId = searchParams.get('clientId');
     const coachId = searchParams.get('coachId');
-    const timezone = searchParams.get('timezone') || 'America/Mexico_City';
     
-    if (!clientId) {
-      return NextResponse.json(
-        { error: 'Client ID es requerido' },
-        { status: 400 }
-      );
+    // Construir filtro
+    const filter: any = {};
+    
+    if (objectiveId) {
+      filter.objectiveId = objectiveId;
     }
-
-    const query: any = { 
-      clientId, 
-      isCancelled: false 
-    };
-
+    
+    if (clientId) {
+      filter.clientId = clientId;
+    }
+    
     if (coachId) {
-      query.coachId = coachId;
+      filter.coachId = coachId;
     }
 
-    const meets = await Meet.find(query)
-      .populate('objectiveId', 'title description')
-      .sort({ date: 1 });
+    // Obtener sesiones ordenadas por fecha
+    const meets = await Meet.find(filter)
+      .sort({ date: -1 });
 
-    // Transformar las fechas a la zona horaria del cliente
-    const meetsWithLocalTime = meets.map(meet => {
-      const meetObj = meet.toObject();
-      return {
-        ...meetObj,
-        localDate: meet.getLocalDateString(timezone),
-        localTime: meet.getLocalTime(timezone),
-        time: meet.getLocalTime(timezone) // Mantener compatibilidad con el frontend
-      };
-    });
+    const formattedMeets = meets.map(meet => ({
+      _id: meet._id.toString(),
+      date: meet.date,
+      link: meet.link,
+      objectiveId: meet.objectiveId?.toString(),
+      clientId: meet.clientId?.toString(),
+      coachId: meet.coachId?.toString(),
+      isCancelled: meet.isCancelled,
+      createdAt: meet.createdAt
+    }));
 
     return NextResponse.json({
       success: true,
-      meets: meetsWithLocalTime
+      meets: formattedMeets
     });
 
   } catch (error) {
-    console.error('Error al obtener meets:', error);
+    console.error('Error al obtener sesiones:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
