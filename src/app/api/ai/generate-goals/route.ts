@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { aiService } from '@/lib/services/ai-service-unified';
+import { aiService } from '@/lib/services/ai-service';
 import connectDB from '@/lib/mongodb';
 import Objective from '@/models/Objective';
 import Goal from '@/models/Goal';
@@ -59,12 +59,12 @@ export async function POST(request: NextRequest) {
       coachNotes: [] // Aquí puedes agregar las notas si las tienes
     };
 
-    // Verificar si hay proveedores de IA disponibles
-    const currentProvider = await aiService.getCurrentProvider();
-    if (!currentProvider.available) {
+    // Verificar si Gemini está disponible
+    const isGeminiAvailable = await aiService.checkGeminiStatus();
+    if (!isGeminiAvailable) {
       return NextResponse.json(
         { 
-          error: `No hay proveedores de IA disponibles: ${currentProvider.error}`,
+          error: 'Gemini Pro no está disponible. Verifica tu API Key de Google AI.',
           fallback: true 
         },
         { status: 503 }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       goals: createdGoals,
-      message: 'Objetivos generados exitosamente con IA'
+      message: 'Objetivos generados exitosamente con Gemini Pro'
     });
 
   } catch (error) {
@@ -112,24 +112,27 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Endpoint para verificar el estado de los proveedores de IA
+// Endpoint para verificar el estado de Gemini
 export async function GET() {
   try {
-    const currentProvider = await aiService.getCurrentProvider();
-    const availableProviders = await aiService.getAvailableProviders();
+    const isGeminiAvailable = await aiService.checkGeminiStatus();
 
     return NextResponse.json({
-      currentProvider: currentProvider,
-      availableProviders: availableProviders,
-      environment: process.env.NODE_ENV
+      provider: 'Google Gemini Pro',
+      available: isGeminiAvailable,
+      environment: process.env.NODE_ENV,
+      message: isGeminiAvailable 
+        ? 'Gemini Pro está funcionando correctamente' 
+        : 'Gemini Pro no está disponible. Verifica tu API Key.'
     });
   } catch (error) {
-    console.error('Error verificando proveedores de IA:', error);
+    console.error('Error verificando Gemini:', error);
     return NextResponse.json(
       { 
-        currentProvider: { name: 'Ninguno', available: false, error: 'Error de verificación' },
-        availableProviders: [],
-        error: 'No se pudo verificar el estado de los proveedores'
+        provider: 'Google Gemini Pro',
+        available: false,
+        error: 'Error de verificación',
+        message: 'No se pudo verificar el estado de Gemini Pro'
       },
       { status: 500 }
     );

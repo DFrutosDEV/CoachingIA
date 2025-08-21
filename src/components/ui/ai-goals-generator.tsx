@@ -23,28 +23,31 @@ export function AIGoalsGenerator({
   const [isGenerating, setIsGenerating] = useState(false)
   const [numberOfGoals, setNumberOfGoals] = useState(5)
   const [aiStatus, setAiStatus] = useState<{
-    currentProvider: { name: string; available: boolean; error?: string }
-    availableProviders: Array<{ name: string; available: boolean; error?: string }>
+    provider: string
+    available: boolean
+    message: string
     environment: string
   } | null>(null)
   const [generatedGoals, setGeneratedGoals] = useState<Goal[]>([])
   const [error, setError] = useState<string | null>(null)
 
-  // Verificar estado de los proveedores de IA al abrir el modal
+  // Verificar estado de Gemini al abrir el modal
   const checkAIStatus = async () => {
     try {
       const response = await fetch('/api/ai/generate-goals')
       const data = await response.json()
       
       setAiStatus({
-        currentProvider: data.currentProvider,
-        availableProviders: data.availableProviders || [],
-        environment: data.environment
+        provider: data.provider || 'Google Gemini Pro',
+        available: data.available || false,
+        message: data.message || 'Estado desconocido',
+        environment: data.environment || 'unknown'
       })
     } catch (error) {
       setAiStatus({
-        currentProvider: { name: 'Ninguno', available: false, error: 'Error de conexión' },
-        availableProviders: [],
+        provider: 'Google Gemini Pro',
+        available: false,
+        message: 'Error de conexión',
         environment: 'unknown'
       })
     }
@@ -62,7 +65,7 @@ export function AIGoalsGenerator({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          objectiveId: objective.title, // Usar title como ID temporal
+          objectiveId: objective._id,
           numberOfGoals
         })
       })
@@ -95,7 +98,7 @@ export function AIGoalsGenerator({
     setAiStatus(null)
   }
 
-  // Verificar proveedores de IA cuando se abre el modal
+  // Verificar Gemini cuando se abre el modal
   if (isOpen && !aiStatus) {
     checkAIStatus()
   }
@@ -106,59 +109,37 @@ export function AIGoalsGenerator({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Generar Objetivos con IA
+            Generar Objetivos con Gemini Pro
           </DialogTitle>
         </DialogHeader>
 
-                  <div className="space-y-4">
-            {/* Estado de los Proveedores de IA */}
-            {aiStatus && (
-              <div className="space-y-3">
-                {/* Proveedor Actual */}
-                <div className="flex items-center gap-2 p-3 rounded-lg border">
-                  {aiStatus.currentProvider.available ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4 text-red-500" />
-                  )}
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      {aiStatus.currentProvider.available 
-                        ? `${aiStatus.currentProvider.name} disponible` 
-                        : `${aiStatus.currentProvider.name} no disponible`
-                      }
-                    </p>
-                    {aiStatus.currentProvider.error && (
-                      <p className="text-xs text-muted-foreground">{aiStatus.currentProvider.error}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Entorno: {aiStatus.environment}
-                    </p>
-                  </div>
-                  <Badge variant={aiStatus.currentProvider.available ? "active" : "inactive"}>
-                    {aiStatus.currentProvider.available ? "Conectado" : "Desconectado"}
-                  </Badge>
-                </div>
-
-                {/* Proveedores Disponibles */}
-                {aiStatus.availableProviders.length > 0 && (
-                  <div className="p-3 rounded-lg border bg-muted/50">
-                    <p className="text-sm font-medium mb-2">Proveedores Disponibles:</p>
-                    <div className="space-y-1">
-                      {aiStatus.availableProviders.map((provider, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${provider.available ? 'bg-green-500' : 'bg-red-500'}`} />
-                          <span>{provider.name}</span>
-                          {!provider.available && provider.error && (
-                            <span className="text-muted-foreground">({provider.error})</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+        <div className="space-y-4">
+          {/* Estado de Gemini */}
+          {aiStatus && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 p-3 rounded-lg border">
+                {aiStatus.available ? (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-red-500" />
                 )}
+                <div className="flex-1">
+                  <p className="text-sm font-medium">
+                    {aiStatus.provider}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {aiStatus.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Entorno: {aiStatus.environment}
+                  </p>
+                </div>
+                <Badge variant={aiStatus.available ? "default" : "secondary"}>
+                  {aiStatus.available ? "Conectado" : "Desconectado"}
+                </Badge>
               </div>
-            )}
+            </div>
+          )}
 
           {/* Información del objetivo */}
           <div className="p-3 rounded-lg bg-muted/50">
@@ -186,13 +167,13 @@ export function AIGoalsGenerator({
           {/* Botón de generación */}
           <Button
             onClick={generateGoals}
-            disabled={!aiStatus?.currentProvider.available || isGenerating}
+            disabled={!aiStatus?.available || isGenerating}
             className="w-full"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generando objetivos...
+                Generando objetivos con Gemini...
               </>
             ) : (
               <>
@@ -243,15 +224,15 @@ export function AIGoalsGenerator({
           )}
 
           {/* Instrucciones de configuración */}
-          {aiStatus && !aiStatus.currentProvider.available && (
+          {aiStatus && !aiStatus.available && (
             <div className="p-4 rounded-lg border border-amber-200 bg-amber-50">
-              <h4 className="font-medium text-amber-800 mb-2">Configurar Proveedor de IA</h4>
+              <h4 className="font-medium text-amber-800 mb-2">Configurar Gemini Pro</h4>
               <ol className="text-sm text-amber-700 space-y-1">
-                <li>1. Configura las variables de entorno en <code className="bg-amber-100 px-1 rounded">.env.local</code></li>
-                <li>2. Obtén una API key del proveedor deseado (Hugging Face, Google AI, OpenAI)</li>
-                <li>3. Establece <code className="bg-amber-100 px-1 rounded">AI_PROVIDER</code> en tu archivo .env</li>
+                <li>1. Ve a <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google AI Studio</a></li>
+                <li>2. Crea una nueva API Key</li>
+                <li>3. Agrega <code className="bg-amber-100 px-1 rounded">GOOGLE_AI_API_KEY=tu_api_key</code> en tu archivo <code className="bg-amber-100 px-1 rounded">.env.local</code></li>
                 <li>4. Reinicia la aplicación</li>
-                <li>5. Consulta <code className="bg-amber-100 px-1 rounded">ENV_EXAMPLE.md</code> para más detalles</li>
+                <li>5. Ejecuta <code className="bg-amber-100 px-1 rounded">npm run check:gemini</code> para verificar</li>
               </ol>
             </div>
           )}

@@ -27,11 +27,19 @@ self.addEventListener('fetch', (event) => {
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+            
+            // ✅ Solo cachear requests HTTP/HTTPS (no chrome-extension, etc.)
+            if (event.request.url.startsWith('http')) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseToCache);
+                })
+                .catch((error) => {
+                  console.warn('Service Worker: Error cacheando request:', error);
+                });
+            }
+            
             return response;
           });
       })

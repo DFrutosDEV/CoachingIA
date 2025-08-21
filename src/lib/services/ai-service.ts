@@ -19,11 +19,13 @@ interface GeneratedGoal {
 }
 
 export class AIService {
+  private apiKey: string;
   private baseUrl: string;
 
   constructor() {
-    // Ollama por defecto corre en localhost:11434
-    this.baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+    this.apiKey = process.env.GOOGLE_AI_API_KEY || '';
+    // Usar el modelo gemini-1.5-pro que está disponible
+    this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent';
   }
 
   async generateGoalsForObjective(
@@ -32,31 +34,43 @@ export class AIService {
     numberOfGoals: number = 5
   ): Promise<GeneratedGoal[]> {
     try {
+      if (!this.apiKey) {
+        throw new Error('API Key de Google AI no configurada');
+      }
+
       const prompt = this.buildPrompt(objective, metrics, numberOfGoals);
       
-      const response = await fetch(`${this.baseUrl}/api/generate`, {
+      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama3.1:8b',
-          prompt: prompt,
-          stream: false,
-          options: {
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
             temperature: 0.7,
-            top_p: 0.9,
-            max_tokens: 1000
+            topP: 0.9,
+            maxOutputTokens: 1000
           }
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Error en la API de Ollama: ${response.statusText}`);
+        const errorData = await response.text();
+        throw new Error(`Error en la API de Gemini: ${response.statusText} - ${errorData}`);
       }
 
       const data = await response.json();
-      const generatedText = data.response;
+      
+      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+        throw new Error('Respuesta inválida de Gemini');
+      }
+
+      const generatedText = data.candidates[0].content.parts[0].text;
       
       return this.parseGeneratedGoals(generatedText, numberOfGoals);
     } catch (error) {
@@ -151,30 +165,34 @@ export class AIService {
     }));
   }
 
-  // Método para verificar si Ollama está disponible
-  async checkOllamaStatus(): Promise<boolean> {
+  // Método para verificar si Gemini está disponible
+  async checkGeminiStatus(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/tags`);
-      return response.ok;
-    } catch (error) {
-      console.error('Ollama no está disponible:', error);
-      return false;
-    }
-  }
-
-  // Método para obtener modelos disponibles
-  async getAvailableModels(): Promise<string[]> {
-    try {
-      const response = await fetch(`${this.baseUrl}/api/tags`);
-      if (!response.ok) {
-        throw new Error('No se pudo obtener la lista de modelos');
+      if (!this.apiKey) {
+        return false;
       }
 
-      const data = await response.json();
-      return data.models?.map((model: any) => model.name) || [];
+      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: 'Hola, responde solo con "OK"'
+            }]
+          }],
+          generationConfig: {
+            maxOutputTokens: 10
+          }
+        })
+      });
+
+      return response.ok;
     } catch (error) {
-      console.error('Error obteniendo modelos:', error);
-      return [];
+      console.error('Gemini no está disponible:', error);
+      return false;
     }
   }
 }

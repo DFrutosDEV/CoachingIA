@@ -24,16 +24,7 @@ export default function ClientsPage() {
       setLoading(true);
       setError(null);
       
-      //! MOVER A UN MIDDLEWARE
-      if (!isAuthenticated || !user?._id) {
-        throw new Error('Usuario no autenticado');
-      }
-
-      if (!user.roles.includes('coach')) {
-        throw new Error('El usuario no tiene permisos de coach');
-      }
-      
-      const response = await fetch(`/api/coach/clients?coachId=${user._id}`);
+      const response = await fetch(`/api/coach/clients?coachId=${user?._id}`);
       
       if (!response.ok) {
         throw new Error('Error al obtener los clientes');

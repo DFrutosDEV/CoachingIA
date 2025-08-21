@@ -14,7 +14,7 @@ import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, isLoading } = useAuthService()
+  const { login } = useAuthService()
   
   // Estados para manejar el formulario y "Recuérdame"
   const [email, setEmail] = useState("")
@@ -119,8 +119,8 @@ export default function LoginPage() {
                       Recuérdame
                     </Label>
                   </div>
-                  <Button variant="outlined" type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+                  <Button variant="outlined" type="submit" className="w-full">
+                    Iniciar Sesión
                   </Button>
                 </form>
               </CardContent>

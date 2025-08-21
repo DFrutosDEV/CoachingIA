@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Target, ArrowRight, User, Mail, Phone, Calendar } from "lucide-react"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { toast } from "sonner"
+import { isValidEmail } from "@/utils/validatesInputs"
 
 interface NewObjectiveCardProps {
   userType: "coach" | "admin" | "enterprise"
@@ -66,6 +67,12 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
   // Función para verificar si existe un usuario por email
   const checkEmailExists = async (email: string) => {
     if (!email || email.length < 3) return
+
+    // Si el email no es valido, mostrar un toast de error
+    if (!isValidEmail(email)) {
+      toast.error('Ingrese un email válido')
+      return
+    }
 
     setIsCheckingEmail(true)
     // Agregar timeout de 1.5 segundos

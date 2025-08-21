@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
+import { generateToken } from '@/lib/auth-jwt';
 import User from '@/models/User';
 import Role from '@/models/Role';
 import Profile from '@/models/Profile';
@@ -26,10 +27,10 @@ export async function POST(request) {
     await connectMongoDB();
     
     // Obtener datos del cuerpo de la petición
-    const { email, contrasena } = await request.json();
-    
+    const { email, password } = await request.json();
+    console.log('🔍 Datos recibidos:', { email, password });
     // Validar que se proporcionen email y contraseña
-    if (!email || !contrasena) {
+    if (!email || !password) {
       return NextResponse.json(
         { 
           success: false, 
@@ -39,12 +40,12 @@ export async function POST(request) {
       );
     }
     
-    console.log('🔍 Intentando login con:', { email, password: contrasena });
+    console.log('🔍 Intentando login con:', { email, password });
     
     // Buscar usuario por email y contraseña (usando el campo correcto 'password')
     const user = await User.findOne({ 
       email: email.toLowerCase(),
-      password: contrasena,
+      password: password,
       active: true
     });
     
@@ -60,7 +61,7 @@ export async function POST(request) {
       );
     }
 
-    // Devuelve el perfil del usuario con el rol activo y la empresa asociada activa y no eliminada
+    // Primero obtener el perfil para extraer el rol
     const profile = await Profile.findOne({ user: user._id })
     .populate({
       path: 'role',
@@ -73,6 +74,25 @@ export async function POST(request) {
       select: 'name logo address phone email website socialMedia',
       match: { active: true, isDeleted: false }
     });
+
+    // Verificar que el perfil tenga un rol válido
+    if (!profile || !profile.role) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: 'Usuario sin perfil o rol válido' 
+        },
+        { status: 401 }
+      );
+    }
+
+    // Generar token JWT con el rol del perfil
+    const token = generateToken({
+      userId: user._id,
+      email: user.email,
+      role: profile.role.name.toLowerCase()
+    }, '6h');
+    console.log('🔑 Token generado exitosamente');
     
     // Login exitoso - retornar datos del usuario
     const userResponse = {
@@ -93,7 +113,8 @@ export async function POST(request) {
       {
         success: true,
         message: 'Login exitoso',
-        user: userResponse
+        user: userResponse,
+        token: token
       },
       { status: 200 }
     );

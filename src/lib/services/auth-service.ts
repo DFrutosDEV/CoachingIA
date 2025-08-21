@@ -1,6 +1,7 @@
 import { store } from '../redux/store'
 import { login, logout, setLoading, setError } from '../redux/slices/authSlice'
 import { setSession, clearSession } from '../redux/slices/sessionSlice'
+import { axiosClient } from './axios-client'
 
 // Tipos para la respuesta de la API
 interface Role {
@@ -93,27 +94,37 @@ export class AuthService {
     try {
       dispatch(setLoading(true))
 
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      // ✅ Usar axiosClient en lugar de fetch
+      const response = await axiosClient.post(this.baseUrl, {
+        email,
+        password
       })
 
-      const data: LoginResponse = await response.json()
+      const data: LoginResponse = response.data
 
       if (data.success && data.user) {
         const user = mapApiUserToStore(data.user)
-        dispatch(login({ user, token: data.token || '' }))
+        const token = data.token || ''
+        
+        console.log('🔑 AUTH SERVICE: Token recibido:', !!token)
+        if (token) {
+          console.log('🔑 AUTH SERVICE: Token (primeros 20 chars):', token.substring(0, 20) + '...')
+        }
+        
+        dispatch(login({ user, token }))
         dispatch(setSession({ isLoggedIn: true, userType: user.role.code }))
+        
+        // ✅ Debug: Verificar que el token se guardó en Redux
+        const stateAfterLogin = store.getState()
+        console.log('🔍 AUTH SERVICE: Token en Redux después del login:', !!stateAfterLogin.auth.token)
+        
         return { success: true, user }
       } else {
         dispatch(setError(data.error || 'Error de autenticación'))
         return { success: false, error: data.error }
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error de conexión'
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || error.message || 'Error de conexión'
       dispatch(setError(errorMessage))
       return { success: false, error: errorMessage }
     } finally {

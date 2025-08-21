@@ -4,7 +4,7 @@
 
 ### ¿Qué hace?
 
-El sistema utiliza **Ollama** con el modelo **Llama 3.1 8B** para generar objetivos automáticamente basándose en:
+El sistema utiliza **Google Gemini Pro** para generar objetivos automáticamente basándose en:
 
 - **Objetivo principal** del cliente
 - **Enfoque** (focus) del cliente
@@ -19,12 +19,13 @@ El sistema utiliza **Ollama** con el modelo **Llama 3.1 8B** para generar objeti
 ✅ **Consistencia**: Mantiene un estándar de calidad  
 ✅ **Personalización**: Se adapta al contexto específico del cliente  
 ✅ **Escalabilidad**: Puede manejar múltiples clientes simultáneamente  
-✅ **Privacidad**: Todo se procesa localmente  
+✅ **Alta calidad**: Gemini Pro ofrece respuestas más precisas y contextuales  
+✅ **Sin instalación local**: No requiere software adicional  
 
 ## 📁 Archivos Implementados
 
 ### Servicios de IA
-- `src/lib/services/ai-service.ts` - Servicio principal de IA
+- `src/lib/services/ai-service.ts` - Servicio principal de IA con Gemini
 - `src/app/api/ai/generate-goals/route.ts` - API endpoint para generar objetivos
 
 ### Componentes de UI
@@ -32,27 +33,27 @@ El sistema utiliza **Ollama** con el modelo **Llama 3.1 8B** para generar objeti
 - Integrado en `src/components/client-detail.tsx` - Botón "IA" en la pestaña de objetivos
 
 ### Utilidades
-- `scripts/check-ollama.js` - Script para verificar instalación de Ollama
-- `OLLAMA_SETUP.md` - Guía completa de instalación
+- `scripts/check-gemini.js` - Script para verificar configuración de Gemini
 - `AI_FEATURES.md` - Esta documentación
 
 ## 🔧 Configuración Rápida
 
-### 1. Instalar Ollama
+### 1. Obtener API Key de Google AI
 ```bash
-# Descargar desde https://ollama.ai
-# O usar curl (Linux/macOS)
-curl -fsSL https://ollama.ai/install.sh | sh
+# Ve a https://makersuite.google.com/app/apikey
+# Crea una nueva API Key
+# Copia la clave generada
 ```
 
-### 2. Descargar Modelo
+### 2. Configurar Variable de Entorno
 ```bash
-ollama pull llama3.1:8b
+# En tu archivo .env
+GOOGLE_AI_API_KEY=tu_api_key_aqui
 ```
 
-### 3. Verificar Instalación
+### 3. Verificar Configuración
 ```bash
-npm run check:ollama
+npm run check:gemini
 ```
 
 ### 4. Usar en la Aplicación
@@ -68,7 +69,7 @@ npm run check:ollama
 
 1. **Recopilación de Datos**: El sistema recopila toda la información relevante del cliente
 2. **Construcción del Prompt**: Se crea un prompt estructurado con el contexto
-3. **Generación con IA**: Ollama procesa el prompt y genera objetivos
+3. **Generación con IA**: Gemini Pro procesa el prompt y genera objetivos
 4. **Validación**: Se valida y limpia la respuesta JSON
 5. **Guardado**: Los objetivos se guardan en la base de datos
 
@@ -135,17 +136,11 @@ FORMATO DE RESPUESTA (JSON):
 En `src/lib/services/ai-service.ts`:
 
 ```typescript
-options: {
+generationConfig: {
   temperature: 0.7,    // 0.0-1.0 (creatividad)
-  top_p: 0.9,         // 0.0-1.0 (diversidad)
-  max_tokens: 1000    // Máximo tokens de respuesta
+  topP: 0.9,          // 0.0-1.0 (diversidad)
+  maxOutputTokens: 1000 // Máximo tokens de respuesta
 }
-```
-
-### Cambiar Modelo
-
-```typescript
-model: 'llama3.1:8b', // Cambiar por otro modelo
 ```
 
 ### Modificar Prompt
@@ -159,24 +154,24 @@ Puedes personalizar el prompt en el método `buildPrompt()` para:
 
 ## 🐛 Solución de Problemas
 
-### Ollama no responde
+### API Key no configurada
 ```bash
-# Verificar estado
-npm run check:ollama
+# Verificar configuración
+npm run check:gemini
 
-# Reiniciar servicio
-ollama serve
+# Asegúrate de tener la variable de entorno:
+GOOGLE_AI_API_KEY=tu_api_key_aqui
 ```
 
-### Generación lenta
-- Usa modelo más pequeño: `ollama pull llama3.1:3b`
-- Reduce `max_tokens` en la configuración
-- Reduce `temperature` para respuestas más directas
+### Error de cuota excedida
+- Verifica tu cuota en Google AI Studio
+- Considera actualizar tu plan si es necesario
+- Implementa rate limiting si es necesario
 
-### Error de memoria
-- Cierra otras aplicaciones
-- Usa modelo más pequeño
-- Reinicia Ollama
+### Error de conexión
+- Verifica tu conexión a internet
+- Asegúrate de que no haya firewall bloqueando las conexiones
+- Verifica que la API Key sea válida
 
 ### Objetivos de baja calidad
 - Ajusta el prompt para ser más específico
@@ -195,6 +190,7 @@ Los logs se guardan en la consola del servidor:
 - Número de objetivos generados
 - Tasa de éxito de generación
 - Tiempo promedio de respuesta
+- Uso de cuota de API
 
 ## 🔮 Futuras Mejoras
 
@@ -208,14 +204,14 @@ Los logs se guardan en la consola del servidor:
 
 ### Modelos Alternativos
 
-- **Mistral 7B**: Mejor rendimiento en español
-- **CodeLlama**: Para objetivos técnicos
-- **Phi-2**: Modelo más pequeño y rápido
+- **Gemini Pro Vision**: Para análisis de contenido visual
+- **Gemini Flash**: Para respuestas más rápidas
+- **Otros proveedores**: OpenAI, Anthropic como alternativas
 
 ## 🤝 Contribuir
 
 ### Reportar Bugs
-1. Verifica que Ollama esté funcionando
+1. Verifica que la API Key esté configurada
 2. Revisa los logs del servidor
 3. Proporciona contexto del error
 
@@ -224,19 +220,19 @@ Los logs se guardan en la consola del servidor:
 2. Documenta los cambios
 3. Comparte resultados
 
-### Agregar Modelos
-1. Prueba el modelo localmente
+### Agregar Funcionalidades
+1. Prueba las nuevas características
 2. Actualiza la documentación
 3. Ajusta parámetros según sea necesario
 
 ## 📞 Soporte
 
 Para problemas técnicos:
-1. Revisa `OLLAMA_SETUP.md`
-2. Ejecuta `npm run check:ollama`
+1. Revisa esta documentación
+2. Ejecuta `npm run check:gemini`
 3. Consulta los logs de la aplicación
-4. Verifica la documentación oficial de Ollama
+4. Verifica la documentación oficial de Google AI
 
 ---
 
-**Nota**: Esta funcionalidad requiere Ollama instalado y ejecutándose localmente. Para uso en producción, considera implementar un servicio de IA en la nube como alternativa. 
+**Nota**: Esta funcionalidad requiere una API Key válida de Google AI. Para uso en producción, asegúrate de configurar las cuotas y límites apropiados. 

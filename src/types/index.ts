@@ -35,14 +35,15 @@ export interface GoalWithProgress {
 }
 
 export interface Objective {
+  _id: string;
   title: string;
+  progress: number;
   totalGoals: number;
   completedGoals: number;
   hasGoals: boolean;
   isCompleted: boolean;
   active: boolean;
   createdAt: string;
-  updatedAt: string;	
   coach: string;
 }
 

@@ -77,3 +77,8 @@ export const formatDateTime = (date: Date, options?: Intl.DateTimeFormatOptions)
   const locale = getBrowserLocale()
   return date.toLocaleString(locale, options)
 }
+
+export const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}

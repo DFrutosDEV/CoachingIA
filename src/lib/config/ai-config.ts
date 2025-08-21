@@ -1,5 +1,5 @@
 export interface AIConfig {
-  provider: 'ollama' | 'openai' | 'anthropic' | 'google';
+  provider: 'google' | 'openai' | 'anthropic';
   apiKey?: string;
   baseUrl?: string;
   model: string;
@@ -8,20 +8,19 @@ export interface AIConfig {
 }
 
 export const getAIConfig = (): AIConfig => {
-  const environment = process.env.NODE_ENV;
-  const provider = process.env.AI_PROVIDER as AIConfig['provider'] || 'ollama';
+  const provider = process.env.AI_PROVIDER as AIConfig['provider'] || 'google';
 
-  // Configuración por defecto para desarrollo (Ollama)
+  // Configuración por defecto para Gemini
   const defaultConfig: AIConfig = {
-    provider: 'ollama',
-    baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-    model: 'llama3.1:8b',
+    provider: 'google',
+    apiKey: process.env.GOOGLE_AI_API_KEY,
+    model: 'gemini-1.5-pro',
     temperature: 0.7,
     maxTokens: 1000
   };
 
-  // Configuración para producción (APIs en la nube)
-  const productionConfigs: Record<string, AIConfig> = {
+  // Configuración para otros proveedores
+  const providerConfigs: Record<string, AIConfig> = {
     openai: {
       provider: 'openai',
       apiKey: process.env.OPENAI_API_KEY,
@@ -39,56 +38,58 @@ export const getAIConfig = (): AIConfig => {
     google: {
       provider: 'google',
       apiKey: process.env.GOOGLE_AI_API_KEY,
-      model: 'gemini-pro',
+      model: 'gemini-1.5-pro',
       temperature: 0.7,
       maxTokens: 1000
     }
   };
 
-  // En desarrollo, usar Ollama por defecto
-  if (environment === 'development') {
-    return defaultConfig;
+  // Usar el proveedor configurado o fallback a Google
+  const config = providerConfigs[provider];
+  if (config && config.apiKey) {
+    return config;
   }
-
-  // En producción, usar el proveedor configurado o fallback a OpenAI
-  if (environment === 'production') {
-    const config = productionConfigs[provider];
-    if (config && config.apiKey) {
-      return config;
-    }
-    
-    // Fallback a OpenAI si no hay configuración válida
-    console.warn(`Proveedor ${provider} no configurado, usando OpenAI como fallback`);
-    return productionConfigs.openai;
-  }
-
+  
+  // Fallback a Google si no hay configuración válida
+  console.warn(`Proveedor ${provider} no configurado, usando Google Gemini como fallback`);
   return defaultConfig;
 };
 
-export const isOllamaAvailable = async (): Promise<boolean> => {
+export const isGeminiAvailable = async (): Promise<boolean> => {
   try {
     const config = getAIConfig();
-    if (config.provider !== 'ollama') return false;
+    if (config.provider !== 'google' || !config.apiKey) return false;
 
-    const response = await fetch(`${config.baseUrl}/api/tags`);
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-goog-api-key': `${config.apiKey}`
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: 'Hello World!'
+          }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 10
+        }
+      })
+    });
+    
     return response.ok;
   } catch {
     return false;
   }
 };
 
-export const shouldUseOllama = (): boolean => {
-  const environment = process.env.NODE_ENV;
+export const shouldUseGemini = (): boolean => {
   const forceProvider = process.env.AI_PROVIDER;
   
-  // En desarrollo, usar Ollama si está disponible
-  if (environment === 'development' && !forceProvider) {
+  // Usar Gemini por defecto
+  if (!forceProvider || forceProvider === 'google') {
     return true;
-  }
-  
-  // Si se fuerza un proveedor específico, respetarlo
-  if (forceProvider && forceProvider !== 'ollama') {
-    return false;
   }
   
   return false;

@@ -79,6 +79,10 @@ const authSlice = createSlice({
       state.error = null
     },
     
+    setToken: (state, action: PayloadAction<string>) => {
+      state.token = action.payload
+    },
+    
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload
     },
@@ -124,6 +128,7 @@ const authSlice = createSlice({
 export const {
   login,
   logout,
+  setToken,
   setLoading,
   updateUser,
   setEnterprises,

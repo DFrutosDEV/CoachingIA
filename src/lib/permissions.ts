@@ -19,19 +19,19 @@ export const dashboardRoutePermissions: RoutePermission[] = [
   },
   {
     path: '/dashboard/coach',
-    allowedRoles: ['admin', 'coach'],
+    allowedRoles: process.env.NODE_ENV === 'development' ? ['admin', 'coach'] : ['coach'],
     requiresAuth: true,
     description: 'Panel de coach - Administradores y coaches'
   },
   {
     path: '/dashboard/client',
-    allowedRoles: ['admin', 'coach', 'client'],
+    allowedRoles: process.env.NODE_ENV === 'development' ? ['admin', 'client'] : ['client'],
     requiresAuth: true,
     description: 'Panel de cliente - Todos los roles autenticados'
   },
   {
     path: '/dashboard/enterprise',
-    allowedRoles: ['admin', 'enterprise'],
+    allowedRoles: process.env.NODE_ENV === 'development' ? ['admin', 'enterprise'] : ['enterprise'],
     requiresAuth: true,
     description: 'Panel empresarial - Administradores y empresas'
   }
@@ -47,19 +47,19 @@ export const apiRoutePermissions: RoutePermission[] = [
   },
   {
     path: '/api/coach',
-    allowedRoles: ['admin', 'coach'],
+    allowedRoles: ['coach'],
     requiresAuth: true,
     description: 'APIs de coach'
   },
   {
     path: '/api/client',
-    allowedRoles: ['admin', 'coach', 'client'],
+    allowedRoles: ['coach', 'client'],
     requiresAuth: true,
     description: 'APIs de cliente'
   },
   {
     path: '/api/enterprise',
-    allowedRoles: ['admin', 'enterprise'],
+    allowedRoles: ['enterprise'],
     requiresAuth: true,
     description: 'APIs empresariales'
   }
