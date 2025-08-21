@@ -12,7 +12,6 @@ export function verifyToken(token) {
     }
     // Remover 'Bearer ' si está presente
     const cleanToken = token.startsWith('Bearer ') ? token.slice(7) : token;
-    console.log('🔍 variable de entorno JWT_SECRET:', process);
     const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
     return decoded;
   } catch (error) {

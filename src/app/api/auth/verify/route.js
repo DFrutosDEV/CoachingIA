@@ -3,6 +3,8 @@ import { verifyToken, extractTokenFromRequest } from '@/lib/auth-jwt';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
 import mongoose from 'mongoose';
+import Enterprise from '@/models/Enterprise';
+import Role from '@/models/Role';
 
 // Conectar a MongoDB
 async function connectMongoDB() {
@@ -65,11 +67,13 @@ export async function GET(request) {
     const profile = await Profile.findOne({ user: user._id })
       .populate({
         path: 'role',
+        model: Role,
         select: 'name code',
         match: { active: true }
       })
       .populate({
         path: 'enterprise',
+        model: Enterprise,
         select: 'name logo address phone email website socialMedia',
         match: { active: true, isDeleted: false }
       });
