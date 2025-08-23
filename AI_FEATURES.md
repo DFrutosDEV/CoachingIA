@@ -21,6 +21,7 @@ El sistema utiliza **Google Gemini Pro** para generar objetivos automáticamente
 ✅ **Escalabilidad**: Puede manejar múltiples clientes simultáneamente  
 ✅ **Alta calidad**: Gemini Pro ofrece respuestas más precisas y contextuales  
 ✅ **Sin instalación local**: No requiere software adicional  
+✅ **Gratuito**: Plan gratuito disponible con límites razonables
 
 ## 📁 Archivos Implementados
 
@@ -47,7 +48,7 @@ El sistema utiliza **Google Gemini Pro** para generar objetivos automáticamente
 
 ### 2. Configurar Variable de Entorno
 ```bash
-# En tu archivo .env
+# En tu archivo .env.local
 GOOGLE_AI_API_KEY=tu_api_key_aqui
 ```
 
@@ -163,7 +164,7 @@ npm run check:gemini
 GOOGLE_AI_API_KEY=tu_api_key_aqui
 ```
 
-### Error de cuota excedida
+### Error de cuota excedida (429)
 - Verifica tu cuota en Google AI Studio
 - Considera actualizar tu plan si es necesario
 - Implementa rate limiting si es necesario
@@ -206,7 +207,6 @@ Los logs se guardan en la consola del servidor:
 
 - **Gemini Pro Vision**: Para análisis de contenido visual
 - **Gemini Flash**: Para respuestas más rápidas
-- **Otros proveedores**: OpenAI, Anthropic como alternativas
 
 ## 🤝 Contribuir
 
@@ -235,4 +235,4 @@ Para problemas técnicos:
 
 ---
 
-**Nota**: Esta funcionalidad requiere una API Key válida de Google AI. Para uso en producción, asegúrate de configurar las cuotas y límites apropiados. 
+**Nota**: Esta funcionalidad utiliza exclusivamente Google Gemini Pro. Para uso en producción, asegúrate de configurar las cuotas y límites apropiados. 

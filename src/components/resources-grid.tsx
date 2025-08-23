@@ -11,7 +11,7 @@ import {
   ConfigFormsManagerCard
 } from "@/components/resources"
 
-export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" }) {
+export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" | "enterprise" }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
       {/* Notificaciones */}

@@ -29,7 +29,7 @@ export default function AdminReportsPage() {
            </p>
           <Card>
             <CardContent className="pt-7">
-              <ReportUsers reports={sampleReports} />
+              {/* <ReportUsers reports={sampleReports} /> */}
             </CardContent>
           </Card>
         </main>

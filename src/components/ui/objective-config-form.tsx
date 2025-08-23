@@ -25,9 +25,10 @@ interface ConfigFileItem {
 interface ObjectiveConfigFormProps {
   objectiveId: string;
   isReadOnly?: boolean;
+  handleConfigFormCompleted?: (isCompleted: boolean) => void;
 }
 
-export function ObjectiveConfigForm({ objectiveId, isReadOnly = false }: ObjectiveConfigFormProps) {
+export function ObjectiveConfigForm({ objectiveId, isReadOnly = false, handleConfigFormCompleted }: ObjectiveConfigFormProps) {
   const [configQuestions, setConfigQuestions] = useState<ConfigQuestion[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -128,6 +129,7 @@ export function ObjectiveConfigForm({ objectiveId, isReadOnly = false }: Objecti
       setHasConfigFile(true);
       setActiveTab("view");
       toast.success('Formulario de configuración guardado correctamente');
+      handleConfigFormCompleted?.(true);
     } catch (error) {
       console.error('Error:', error);
       toast.error(error instanceof Error ? error.message : 'Error al guardar el formulario');

@@ -9,24 +9,22 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Clock, Mail, MessageSquare, Phone, FileText, ClipboardMinus, CalendarIcon, BarChart, Pencil, Sparkles, Target, Eye } from "lucide-react"
+import { Calendar, Clock, Mail, MessageSquare, Phone, FileText, CalendarIcon, BarChart, Target, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import { GoalsModal } from "./ui/goals-modal"
 import { ConfigFormModal } from "./ui/config-form-modal"
-import { AIGoalsGenerator } from "./ui/ai-goals-generator"
 import { ObjectiveDetailModal } from "./ui/objective-detail-modal"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { formatDate } from "@/utils/validatesInputs"
 import { toast } from "sonner"
 
-import { Goal, NextSession, ClientDetailProps, Objective } from "@/types"
+import { Goal, ClientDetailProps, Objective } from "@/types"
 
 export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: ClientDetailProps) {
   const [activeTab, setActiveTab] = useState("info")
   const [isGoalsModalOpen, setIsGoalsModalOpen] = useState(false)
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false)
-  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false)
   const [objectives, setObjectives] = useState<Objective[]>([])
   const [loadingObjectives, setLoadingObjectives] = useState(false)
   const [selectedObjectiveData, setSelectedObjectiveData] = useState<any>(null)
@@ -47,20 +45,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
       return;
     }
     setIsConfigModalOpen(true)
-  }
-
-  const handleAIGeneratorOpen = () => {
-    if (!client?.activeObjectiveId) {
-      // Mostrar mensaje de que el cliente no tiene un objetivo activo
-      return;
-    }
-    setIsAIGeneratorOpen(true)
-  }
-
-  const handleAIGoalsGenerated = (generatedGoals: Goal[]) => {
-    if (client) {
-      onUpdateClient(client._id, generatedGoals)
-    }
   }
 
   // Función para cargar los objetivos del cliente
@@ -240,19 +224,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-medium">Objetivos del Cliente</h4>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-1" 
-                        onClick={handleAIGeneratorOpen}
-                        disabled={!client.activeObjectiveId}
-                        title={!client.activeObjectiveId ? "El cliente no tiene un objetivo activo" : "Generar objetivos con IA"}
-                      >
-                        <Sparkles className="h-4 w-4" />
-                        Generar con IA
-                      </Button>
-                    </div>
                   </div>
                   
                   {loadingObjectives ? (
@@ -271,13 +242,13 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                               <Target className="h-4 w-4 text-primary" />
                               <h5 className="font-medium">{objective.title}</h5>
                             </div>
-                                                         <div className="flex items-center gap-2">
-                               <Badge variant={objective.active ? "active" : "inactive"}>
-                                 {objective.active ? "Activo" : "Inactivo"}
-                               </Badge>
-                               <Badge variant={objective.isCompleted ? "active" : "outline"}>
-                                 {objective.isCompleted ? "Completado" : "En Progreso"}
-                               </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={objective.active ? "active" : "inactive"}>
+                                {objective.active ? "Activo" : "Inactivo"}
+                              </Badge>
+                              <Badge variant={objective.isCompleted ? "active" : "outline"}>
+                                {objective.isCompleted ? "Completado" : "En Progreso"}
+                              </Badge>
                               <Eye className="h-4 w-4 text-muted-foreground" />
                             </div>
                           </div>
@@ -305,7 +276,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                     <div className="text-center py-8">
                       <Target className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-muted-foreground">No hay objetivos definidos para este cliente</p>
-                      <p className="text-sm text-muted-foreground mt-1">Haz clic en "Generar con IA" para crear nuevos objetivos</p>
                     </div>
                   )}
                 </div>
@@ -350,13 +320,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
         clientId={client._id}
         coachId={user?._id || ''}
         objectiveId={client.activeObjectiveId}
-      />
-
-      <AIGoalsGenerator
-        isOpen={isAIGeneratorOpen}
-        onClose={() => setIsAIGeneratorOpen(false)}
-        objective={{ _id: client.activeObjectiveId || '', title: client.activeObjectiveId || '', progress: 0, totalGoals: 0, completedGoals: 0, hasGoals: false, isCompleted: false, active: true, createdAt: '', coach: '' }}
-        onGoalsGenerated={handleAIGoalsGenerated}
       />
 
       <ObjectiveDetailModal

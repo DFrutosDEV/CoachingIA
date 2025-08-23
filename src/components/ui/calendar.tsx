@@ -290,7 +290,7 @@ export default function SessionsPage() {
                   Cerrar
                 </Button>
 
-                {user?.role.name === 'coach' && (
+                {user?.role === 'coach' && (
                   <Button 
                     variant="secondary" 
                     onClick={handleReschedule}

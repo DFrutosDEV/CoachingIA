@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { RootState } from '@/lib/redux/store';
-import { AuthClient } from '@/lib/auth-client';
+import { AuthService } from '@/lib/services/auth-service';
 import { logout, setLoading, setError } from '@/lib/redux/slices/authSlice';
 
 export const useAuth = () => {
@@ -20,14 +20,14 @@ export const useAuth = () => {
       dispatch(setError(null));
       
       // Usar AuthClient que maneja localStorage automáticamente
-      const result = await AuthClient.loginUser(email, password);
+      const result = await AuthService.login(email, password);
       
       console.log('✅ Login exitoso desde hook');
       
       // Redirigir al dashboard según el rol
-      const userRole = result.user?.role?.name?.toLowerCase();
+      const userRole = result.user?.role;
       if (userRole) {
-        router.push(`/dashboard/${userRole}`);
+        router.push(`/dashboard/${userRole.toLowerCase()}`);
       } else {
         router.push('/dashboard');
       }
@@ -48,7 +48,7 @@ export const useAuth = () => {
       dispatch(setLoading(true));
       
       // Usar AuthClient que maneja localStorage automáticamente
-      AuthClient.logoutUser();
+      AuthService.logout();
       
       console.log('✅ Logout exitoso desde hook');
     } catch (error: any) {
@@ -58,42 +58,28 @@ export const useAuth = () => {
     }
   };
 
-  // ✅ Restaurar sesión al cargar la app
-  const restoreSession = () => {
-    try {
-      AuthClient.restoreSession();
-    } catch (error) {
-      console.error('❌ Error restaurando sesión:', error);
-    }
-  };
-
   // ✅ Verificar si el usuario tiene un rol específico
   const hasRole = (role: string): boolean => {
-    return user?.roles?.includes(role.toLowerCase()) ?? false;
+    return user?.role === role;
   };
 
   // ✅ Verificar si el usuario tiene permisos específicos
   const hasPermission = (permission: string): boolean => {
-    // Implementar lógica de permisos según tu sistema
     return isAuthenticated;
   };
 
   return {
-    // Estado
     user,
     isAuthenticated,
     isLoading,
     token,
     error,
     
-    // Funciones
     login,
     logout: logoutUser,
-    restoreSession,
     hasRole,
     hasPermission,
     
-    // Utilidades
     clearError: () => dispatch(setError(null)),
   };
 };

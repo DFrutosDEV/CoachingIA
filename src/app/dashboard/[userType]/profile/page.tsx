@@ -226,9 +226,9 @@ export default function ProfilePage() {
                   <CardContent className="flex flex-col items-center space-y-4">
                     <div className="relative">
                       <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center">
-                        {user.profile?.avatar ? (
+                        {user.profile?.profilePicture ? (
                           <img
-                            src={user.profile.avatar}
+                            src={user.profile.profilePicture}
                             alt="Foto de perfil"
                             className="w-24 h-24 rounded-full object-cover"
                           />

@@ -7,7 +7,7 @@ export interface IGoal extends Document {
   clientId: ObjectId;
   day: string;
   isCompleted: boolean;
-  feedbackId: ObjectId;
+  feedbackId?: ObjectId;
   isDeleted: boolean;
 }
 
@@ -46,7 +46,8 @@ const GoalSchema: Schema = new Schema({
   feedbackId: {
     type: Schema.Types.ObjectId,
     ref: 'Feedback',
-    required: false
+    required: false,
+    default: null
   },
   isDeleted: {
     type: Boolean,

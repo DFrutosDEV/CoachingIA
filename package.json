@@ -9,9 +9,7 @@
     "lint": "next lint",
     "migrate": "ts-node --project tsconfig.migrate.json -r dotenv/config scripts/migrate.ts",
     "migrate:rollback": "ts-node --project tsconfig.migrate.json -r dotenv/config scripts/rollback.ts",
-    "check:gemini": "node scripts/check-gemini.js",
-    "check:env": "node scripts/check-env.js",
-    "list:gemini-models": "node scripts/list-gemini-models.js"
+    "check:gemini": "node scripts/check-gemini.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

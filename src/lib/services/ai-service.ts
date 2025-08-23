@@ -1,4 +1,5 @@
 import { Goal, Objective } from '@/types';
+import { getAIConfig, AIConfig } from '@/lib/config/ai-config';
 
 interface AIMetrics {
   clientFocus: string;
@@ -19,13 +20,10 @@ interface GeneratedGoal {
 }
 
 export class AIService {
-  private apiKey: string;
-  private baseUrl: string;
+  private config: AIConfig;
 
   constructor() {
-    this.apiKey = process.env.GOOGLE_AI_API_KEY || '';
-    // Usar el modelo gemini-1.5-pro que está disponible
-    this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent';
+    this.config = getAIConfig();
   }
 
   async generateGoalsForObjective(
@@ -34,30 +32,13 @@ export class AIService {
     numberOfGoals: number = 5
   ): Promise<GeneratedGoal[]> {
     try {
-      if (!this.apiKey) {
-        throw new Error('API Key de Google AI no configurada');
+      if (!this.config.apiKey) {
+        throw new Error('API Key de Google Gemini no configurada');
       }
 
       const prompt = this.buildPrompt(objective, metrics, numberOfGoals);
-      
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topP: 0.9,
-            maxOutputTokens: 1000
-          }
-        })
-      });
+      console.log("Prompt:", prompt);
+      const response = await this.callGeminiAPI(prompt);
 
       if (!response.ok) {
         const errorData = await response.text();
@@ -65,16 +46,11 @@ export class AIService {
       }
 
       const data = await response.json();
-      
-      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-        throw new Error('Respuesta inválida de Gemini');
-      }
-
-      const generatedText = data.candidates[0].content.parts[0].text;
+      const generatedText = this.extractTextFromResponse(data);
       
       return this.parseGeneratedGoals(generatedText, numberOfGoals);
     } catch (error) {
-      console.error('Error generando objetivos con IA:', error);
+      console.error('Error generando objetivos con Gemini:', error);
       throw new Error('No se pudieron generar objetivos automáticamente');
     }
   }
@@ -165,14 +141,49 @@ export class AIService {
     }));
   }
 
+  private async callGeminiAPI(prompt: string): Promise<Response> {
+    const baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+    
+    return fetch(`${baseUrl}?key=${this.config.apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: this.config.temperature,
+          topP: 0.9,
+          maxOutputTokens: this.config.maxTokens
+        }
+      })
+    });
+  }
+
+  private extractTextFromResponse(data: any): string {
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+      throw new Error('Respuesta inválida de Google Gemini');
+    }
+    return data.candidates[0].content.parts[0].text;
+  }
+
   // Método para verificar si Gemini está disponible
-  async checkGeminiStatus(): Promise<boolean> {
+  async checkGeminiStatus(): Promise<{ available: boolean; provider: string; message: string; environment: string }> {
     try {
-      if (!this.apiKey) {
-        return false;
+      if (!this.config.apiKey) {
+        return {
+          available: false,
+          provider: 'Google Gemini',
+          message: 'API Key de Google Gemini no configurada',
+          environment: process.env.NODE_ENV || 'unknown'
+        };
       }
 
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -189,10 +200,20 @@ export class AIService {
         })
       });
 
-      return response.ok;
+      return {
+        available: response.ok,
+        provider: 'Google Gemini',
+        message: response.ok ? 'Google Gemini conectado correctamente' : `Error ${response.status}: ${response.statusText}`,
+        environment: process.env.NODE_ENV || 'unknown'
+      };
     } catch (error) {
-      console.error('Gemini no está disponible:', error);
-      return false;
+      console.error('Google Gemini no está disponible:', error);
+      return {
+        available: false,
+        provider: 'Google Gemini',
+        message: `Error de conexión: ${error instanceof Error ? error.message : 'Error desconocido'}`,
+        environment: process.env.NODE_ENV || 'unknown'
+      };
     }
   }
 }

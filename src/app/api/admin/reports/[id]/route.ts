@@ -5,12 +5,13 @@ import User from '@/models/User';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectDB();
 
-    const report: any = await Ticket.findById(params.id)
+    const report: any = await Ticket.findById(id)
       .populate('reporterUser', 'name email')
       .populate('assignedTo', 'name email')
       .populate('responseBy', 'name email')
@@ -65,15 +66,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectDB();
 
     const body = await request.json();
     const { action, ...updateData } = body;
 
-    const report = await Ticket.findById(params.id);
+    const report = await Ticket.findById(id);
     if (!report) {
       return NextResponse.json(
         { success: false, error: 'Reporte no encontrado' },
@@ -104,7 +106,7 @@ export async function PUT(
         }
 
         updatedReport = await Ticket.findByIdAndUpdate(
-          params.id,
+          id,
           {
             response,
             responseBy,
@@ -137,7 +139,7 @@ export async function PUT(
         }
 
         updatedReport = await Ticket.findByIdAndUpdate(
-          params.id,
+          id,
           {
             status: 'closed',
             closedBy,
@@ -169,7 +171,7 @@ export async function PUT(
         }
 
         updatedReport = await Ticket.findByIdAndUpdate(
-          params.id,
+          id,
           {
             status: 'resolved',
             updatedAt: new Date()
@@ -194,7 +196,7 @@ export async function PUT(
         }
 
         updatedReport = await Ticket.findByIdAndUpdate(
-          params.id,
+          id,
           {
             assignedTo: assignedTo || null,
             updatedAt: new Date()
@@ -215,7 +217,7 @@ export async function PUT(
         }
 
         updatedReport = await Ticket.findByIdAndUpdate(
-          params.id,
+          id,
           {
             status,
             updatedAt: new Date()
@@ -278,12 +280,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await connectDB();
 
-    const report = await Ticket.findById(params.id);
+    const report = await Ticket.findById(id);
     if (!report) {
       return NextResponse.json(
         { success: false, error: 'Reporte no encontrado' },
@@ -291,7 +294,7 @@ export async function DELETE(
       );
     }
 
-    await Ticket.findByIdAndDelete(params.id);
+    await Ticket.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,

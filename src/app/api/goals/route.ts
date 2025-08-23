@@ -2,39 +2,75 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
 
-// POST /api/goals - Crear múltiples goals para un cliente
+// POST /api/goals - Crear goals (múltiples o individual)
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
     
-    const { clientId, coachId, objectiveId, goals } = await request.json();
+    const body = await request.json();
+    const { clientId, coachId, objectiveId, goals, description, day } = body;
     
-    if (!clientId || !coachId || !objectiveId || !goals || !Array.isArray(goals)) {
-      return NextResponse.json(
-        { error: 'clientId, coachId, objectiveId y goals son requeridos' },
-        { status: 400 }
-      );
+    // Si se proporciona description y day, crear una meta individual
+    if (description && day) {
+      if (!clientId || !coachId || !objectiveId) {
+        return NextResponse.json(
+          { error: 'clientId, coachId y objectiveId son requeridos' },
+          { status: 400 }
+        );
+      }
+
+      const newGoal = new Goal({
+        objectiveId,
+        description,
+        createdBy: coachId,
+        clientId,
+        day,
+        isCompleted: false,
+        isDeleted: false
+      });
+
+      const createdGoal = await newGoal.save();
+
+      return NextResponse.json({
+        success: true,
+        message: 'Meta creada correctamente',
+        goal: createdGoal
+      });
+    }
+    
+    // Si se proporciona goals array, crear múltiples metas
+    if (goals && Array.isArray(goals)) {
+      if (!clientId || !coachId || !objectiveId) {
+        return NextResponse.json(
+          { error: 'clientId, coachId, objectiveId y goals son requeridos' },
+          { status: 400 }
+        );
+      }
+
+      // Crear los goals en la base de datos
+      const goalsToCreate = goals.map((goal: any) => ({
+        objectiveId,
+        description: goal.description || goal.title,
+        createdBy: coachId,
+        clientId,
+        day: goal.day || 'Lunes',
+        isCompleted: false,
+        isDeleted: false
+      }));
+
+      const createdGoals = await Goal.insertMany(goalsToCreate);
+
+      return NextResponse.json({
+        success: true,
+        message: `${createdGoals.length} metas creadas correctamente`,
+        goals: createdGoals
+      });
     }
 
-    // Crear los goals en la base de datos
-    const goalsToCreate = goals.map((goal: any) => ({
-      objectiveId,
-      description: goal.title,
-      createdBy: coachId,
-      clientId,
-      day: goal.day || 'Lunes',
-      isCompleted: false,
-      feedbackId: null, // Por ahora siempre null, se puede actualizar después
-      isDeleted: false
-    }));
-
-    const createdGoals = await Goal.insertMany(goalsToCreate);
-
-    return NextResponse.json({
-      success: true,
-      message: `${createdGoals.length} objetivos creados correctamente`,
-      goals: createdGoals
-    });
+    return NextResponse.json(
+      { error: 'Se requiere description y day para meta individual, o goals array para múltiples metas' },
+      { status: 400 }
+    );
 
   } catch (error) {
     console.error('Error al crear goals:', error);

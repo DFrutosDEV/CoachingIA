@@ -5,19 +5,21 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Sparkles, AlertCircle, CheckCircle } from "lucide-react"
-import { Goal, Objective } from "@/types"
+import { Goal } from "@/types"
 
 interface AIGoalsGeneratorProps {
   isOpen: boolean
   onClose: () => void
-  objective: Objective
+  objectiveId: string
+  objectiveTitle: string
   onGoalsGenerated: (goals: Goal[]) => void
 }
 
 export function AIGoalsGenerator({ 
   isOpen, 
   onClose, 
-  objective, 
+  objectiveId,
+  objectiveTitle,
   onGoalsGenerated 
 }: AIGoalsGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -32,20 +34,20 @@ export function AIGoalsGenerator({
   const [error, setError] = useState<string | null>(null)
 
   // Verificar estado de Gemini al abrir el modal
-  const checkAIStatus = async () => {
+  const checkGeminiStatus = async () => {
     try {
       const response = await fetch('/api/ai/generate-goals')
       const data = await response.json()
       
       setAiStatus({
-        provider: data.provider || 'Google Gemini Pro',
+        provider: data.provider || 'Google Gemini',
         available: data.available || false,
         message: data.message || 'Estado desconocido',
         environment: data.environment || 'unknown'
       })
     } catch (error) {
       setAiStatus({
-        provider: 'Google Gemini Pro',
+        provider: 'Google Gemini',
         available: false,
         message: 'Error de conexión',
         environment: 'unknown'
@@ -65,7 +67,7 @@ export function AIGoalsGenerator({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          objectiveId: objective._id,
+          objectiveId: objectiveId,
           numberOfGoals
         })
       })
@@ -100,7 +102,7 @@ export function AIGoalsGenerator({
 
   // Verificar Gemini cuando se abre el modal
   if (isOpen && !aiStatus) {
-    checkAIStatus()
+    checkGeminiStatus()
   }
 
   return (
@@ -109,7 +111,7 @@ export function AIGoalsGenerator({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Generar Objetivos con Gemini Pro
+            Generar Objetivos con Google Gemini
           </DialogTitle>
         </DialogHeader>
 
@@ -134,7 +136,7 @@ export function AIGoalsGenerator({
                     Entorno: {aiStatus.environment}
                   </p>
                 </div>
-                <Badge variant={aiStatus.available ? "default" : "secondary"}>
+                <Badge variant={aiStatus.available ? "active" : "inactive"}>
                   {aiStatus.available ? "Conectado" : "Desconectado"}
                 </Badge>
               </div>
@@ -144,7 +146,7 @@ export function AIGoalsGenerator({
           {/* Información del objetivo */}
           <div className="p-3 rounded-lg bg-muted/50">
             <h4 className="font-medium mb-1">Objetivo Principal</h4>
-            <p className="text-sm text-muted-foreground">{objective.title}</p>
+            <p className="text-sm text-muted-foreground">{objectiveTitle}</p>
           </div>
 
           {/* Configuración */}
@@ -226,7 +228,7 @@ export function AIGoalsGenerator({
           {/* Instrucciones de configuración */}
           {aiStatus && !aiStatus.available && (
             <div className="p-4 rounded-lg border border-amber-200 bg-amber-50">
-              <h4 className="font-medium text-amber-800 mb-2">Configurar Gemini Pro</h4>
+              <h4 className="font-medium text-amber-800 mb-2">Configurar Google Gemini</h4>
               <ol className="text-sm text-amber-700 space-y-1">
                 <li>1. Ve a <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google AI Studio</a></li>
                 <li>2. Crea una nueva API Key</li>

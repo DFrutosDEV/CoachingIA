@@ -53,7 +53,8 @@ export async function GET(
           title: objective.title,
           isCompleted: objective.isCompleted,
           active: objective.active,
-          createdAt: objective.createdAt
+          createdAt: objective.createdAt,
+          configFile: objective.configFile
         },
         goals: goals.map(goal => ({
           _id: goal._id.toString(),

@@ -6,10 +6,10 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { ClientsList } from "../../../../components/clients-list"
 import { ClientDetail } from "../../../../components/client-detail"
 import { Users } from "lucide-react"
-import { Client, Goal } from "@/types"
+import { ClientResponse, Goal } from "@/types"
 
 export default function EnterpriseClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientResponse[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 

@@ -1,41 +1,5 @@
+import { User, Enterprise } from '@/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-
-// Tipos para el estado de autenticación
-export interface Role {
-  _id: string
-  name: string
-  code: string
-}
-
-interface Profile {
-  _id: string
-  profilePicture: string
-  bio: string
-  indexDashboard: number[]
-}
-
-interface Enterprise {
-  _id: string
-  name: string
-  logo: string
-  address: string
-  phone: string
-  email: string
-  website: string
-  socialMedia: string[]
-}
-
-export interface User {
-  _id: string
-  role: Role
-  profile: Profile
-  enterprise: Enterprise | null
-  name: string
-  lastName: string
-  email: string
-  roles: string[]
-  age?: number
-} 
 
 interface AuthState {
   user: User | null
@@ -46,7 +10,6 @@ interface AuthState {
   error: string | null
 }
 
-// Estado inicial
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
@@ -56,12 +19,10 @@ const initialState: AuthState = {
   error: null,
 }
 
-// Slice de autenticación
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // Acciones de autenticación
     login: (state, action: PayloadAction<{ user: User; token: string }>) => {
       state.user = action.payload.user
       state.isAuthenticated = true
@@ -93,7 +54,6 @@ const authSlice = createSlice({
       }
     },
     
-    // Acciones para Empresas
     setEnterprises: (state, action: PayloadAction<Enterprise | null>) => {
       state.enterprises = action.payload
     },
@@ -114,7 +74,6 @@ const authSlice = createSlice({
       state.enterprises = null
     },
     
-    // Acciones generales
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload
     },

@@ -8,6 +8,7 @@ import Role from '@/models/Role'
 import { generateJitsiLink } from '@/utils/generateJitsiLinks'
 import { fromZonedTime } from 'date-fns-tz'
 
+// POST: Crear un nuevo objetivo
 export async function POST(request: NextRequest) {
   try {
     await connectDB()

@@ -2,6 +2,7 @@ import { store } from '../redux/store'
 import { login, logout, setLoading, setError } from '../redux/slices/authSlice'
 import { setSession, clearSession } from '../redux/slices/sessionSlice'
 import { axiosClient } from './axios-client'
+import { User } from '@/types'
 
 // Tipos para la respuesta de la API
 interface Role {
@@ -28,28 +29,16 @@ interface Enterprise {
   socialMedia: string[]
 }
 
-interface ApiUser {
-  _id: string
-  role: Role
-  profile: Profile
-  enterprise: Enterprise | null
-  name: string
-  lastName: string
-  email: string
-  roles: string[]
-  age?: number
-}
-
 interface LoginResponse {
   success: boolean
   message: string
-  user?: ApiUser
+  user?: User
   token?: string
   error?: string
 }
 
 // Función para mapear usuario de la API al formato del store
-const mapApiUserToStore = (apiUser: ApiUser) => {
+const mapApiUserToStore = (apiUser: User) => {
   return {
     _id: apiUser._id,
     role: apiUser.role || apiUser.roles[0],
@@ -112,7 +101,7 @@ export class AuthService {
         }
         
         dispatch(login({ user, token }))
-        dispatch(setSession({ isLoggedIn: true, userType: user.role.code }))
+        dispatch(setSession({ isLoggedIn: true, userType: user.role }))
         
         // ✅ Debug: Verificar que el token se guardó en Redux
         const stateAfterLogin = store.getState()
@@ -156,13 +145,13 @@ export class AuthService {
   // Verificar si el usuario está autenticado
   static isAuthenticated(): boolean {
     const state = store.getState()
-    return state.auth.isAuthenticated
+    return state.auth.isAuthenticated ?? false
   }
 
   // Obtener usuario actual
-  static getCurrentUser() {
+  static getCurrentUser(): User | null {
     const state = store.getState()
-    return state.auth.user
+    return state.auth.user ?? null
   }
 }
 
