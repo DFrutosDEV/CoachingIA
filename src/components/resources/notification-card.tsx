@@ -15,7 +15,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Bell, ArrowRight } from "lucide-react"
+// Usar input checkbox nativo en lugar de componente personalizado
+import { Bell, ArrowRight, X } from "lucide-react"
 import { useAppSelector } from "@/lib/redux/hooks"
 
 import { toast } from "sonner"
@@ -29,10 +30,17 @@ export function NotificationCard({ userType }: NotificationCardProps) {
   
   // Estados para el autocompletado de notificaciones
   const [recipientSearch, setRecipientSearch] = useState("")
-  const [selectedRecipient, setSelectedRecipient] = useState<{id: string, name: string} | null>(null)
+  const [selectedRecipients, setSelectedRecipients] = useState<{id: string, name: string}[]>([])
   const [showRecipientSuggestions, setShowRecipientSuggestions] = useState(false)
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  
+  // Estados para los checkboxes de notificaciones masivas
+  const [massNotificationChecks, setMassNotificationChecks] = useState({
+    allClients: false,      // Para coach: notificar a todos sus clientes
+    allCoaches: false,      // Para admin: notificar a todos los coaches
+    allUsers: false         // Para admin: notificar a todos los usuarios
+  })
   
   // Obtener usuario autenticado y datos del estado global
   const user = useAppSelector(state => state.auth.user)
@@ -65,7 +73,11 @@ export function NotificationCard({ userType }: NotificationCardProps) {
       if (response.ok) {
         const result = await response.json()
         if (result.success) {
-          setSearchResults(result.users || [])
+          // Filtrar usuarios que ya están seleccionados
+          const filteredUsers = (result.users || []).filter((user: any) => 
+            !selectedRecipients.some(recipient => recipient.id === user._id)
+          )
+          setSearchResults(filteredUsers)
           setShowRecipientSuggestions(true)
         } else {
           setSearchResults([])
@@ -92,7 +104,6 @@ export function NotificationCard({ userType }: NotificationCardProps) {
 
   const handleRecipientInputChange = (value: string) => {
     setRecipientSearch(value)
-    setSelectedRecipient(null)
     
     if (value.length >= 3) {
       debounceSearch(value)
@@ -103,10 +114,30 @@ export function NotificationCard({ userType }: NotificationCardProps) {
   }
 
   const handleRecipientSelect = (user: any) => {
-    setSelectedRecipient({ id: user._id, name: `${user.name} ${user.lastName}` })
-    setRecipientSearch(`${user.name} ${user.lastName}`)
+    const newRecipient = { id: user._id, name: `${user.name} ${user.lastName}` }
+    setSelectedRecipients(prev => [...prev, newRecipient])
+    setRecipientSearch("")
     setShowRecipientSuggestions(false)
     setSearchResults([])
+  }
+
+  const handleRemoveRecipient = (recipientId: string) => {
+    setSelectedRecipients(prev => prev.filter(recipient => recipient.id !== recipientId))
+  }
+
+  const handleMassNotificationChange = (checkType: keyof typeof massNotificationChecks, checked: boolean) => {
+    setMassNotificationChecks(prev => ({
+      ...prev,
+      [checkType]: checked
+    }))
+    
+    // Si se activa un checkbox masivo, limpiar selecciones individuales
+    if (checked) {
+      setSelectedRecipients([])
+      setRecipientSearch("")
+      setShowRecipientSuggestions(false)
+      setSearchResults([])
+    }
   }
 
   const handleNotificationFormChange = (field: string, value: string) => {
@@ -117,8 +148,12 @@ export function NotificationCard({ userType }: NotificationCardProps) {
   }
 
   const handleSendNotification = async () => {
-    if (!selectedRecipient) {
-      toast.error('Por favor selecciona un destinatario')
+    // Verificar que haya destinatarios seleccionados o checkboxes activos
+    const hasIndividualRecipients = selectedRecipients.length > 0
+    const hasMassNotification = Object.values(massNotificationChecks).some(check => check)
+    
+    if (!hasIndividualRecipients && !hasMassNotification) {
+      toast.error('Por favor selecciona al menos un destinatario o una opción de notificación masiva')
       return
     }
 
@@ -135,17 +170,28 @@ export function NotificationCard({ userType }: NotificationCardProps) {
     setIsSendingNotification(true)
 
     try {
+      const requestBody: any = {
+        title: notificationForm.title,
+        message: notificationForm.message,
+        userId: user._id
+      }
+
+      // Agregar destinatarios individuales si existen
+      if (hasIndividualRecipients) {
+        requestBody.recipients = selectedRecipients.map(r => r.id)
+      }
+
+      // Agregar configuración de notificaciones masivas
+      if (hasMassNotification) {
+        requestBody.massNotification = massNotificationChecks
+      }
+
       const response = await fetch('/api/notification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          recipients: [selectedRecipient.id], // Array con el ID del destinatario
-          title: notificationForm.title,
-          message: notificationForm.message,
-          userId: user._id
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       const result = await response.json()
@@ -156,9 +202,14 @@ export function NotificationCard({ userType }: NotificationCardProps) {
         // Resetear formulario
         setNotificationForm({ title: '', message: '' })
         setRecipientSearch("")
-        setSelectedRecipient(null)
+        setSelectedRecipients([])
         setShowRecipientSuggestions(false)
         setSearchResults([])
+        setMassNotificationChecks({
+          allClients: false,
+          allCoaches: false,
+          allUsers: false
+        })
       } else {
         toast.error(`Error: ${result.error}`)
       }
@@ -168,6 +219,19 @@ export function NotificationCard({ userType }: NotificationCardProps) {
     } finally {
       setIsSendingNotification(false)
     }
+  }
+
+  const resetForm = () => {
+    setNotificationForm({ title: '', message: '' })
+    setRecipientSearch("")
+    setSelectedRecipients([])
+    setShowRecipientSuggestions(false)
+    setSearchResults([])
+    setMassNotificationChecks({
+      allClients: false,
+      allCoaches: false,
+      allUsers: false
+    })
   }
 
   return (
@@ -204,46 +268,137 @@ export function NotificationCard({ userType }: NotificationCardProps) {
               Crear Notificación
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Crear Notificación</DialogTitle>
-              <DialogDescription>Envía una notificación a {userType === "coach" ? "un cliente" : "uno o varios usuarios"}.</DialogDescription>
+              <DialogDescription>
+                Envía una notificación a {userType === "coach" ? "tus clientes" : "usuarios del sistema"}.
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2 relative">
-                <Label htmlFor="recipient">Destinatario{userType === "coach" ? "" : "s"}</Label>
-                <Input 
-                  id="recipient" 
-                  placeholder="Escribe 3 letras para empezar a buscar..."
-                  value={recipientSearch}
-                  onChange={(e) => handleRecipientInputChange(e.target.value)}
-                  onFocus={() => recipientSearch.length >= 3 && setShowRecipientSuggestions(true)}
-                />
-                {isSearching && (
-                  <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
-                    <div className="text-sm text-muted-foreground">Buscando usuarios...</div>
+              {/* Checkboxes para notificaciones masivas */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Notificaciones Masivas</Label>
+                
+                {/* Checkbox para coach: notificar a todos sus clientes */}
+                {userType === "coach" && (
+                  <div className="flex items-center space-x-2">
+                                         <input
+                       type="checkbox"
+                       id="allClients"
+                       checked={massNotificationChecks.allClients}
+                       onChange={(e) => handleMassNotificationChange('allClients', e.target.checked)}
+                       className="h-4 w-4 rounded border-2 border-border"
+                     />
+                    <Label htmlFor="allClients" className="text-sm">
+                      Notificar a todos mis clientes
+                    </Label>
                   </div>
                 )}
-                {showRecipientSuggestions && searchResults.length > 0 && !isSearching && (
-                  <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
-                    {searchResults.map((searchUser) => (
-                      <div
-                        key={searchUser._id}
-                        className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
-                        onClick={() => handleRecipientSelect(searchUser)}
-                      >
-                        <div className="font-medium text-foreground">{searchUser.name} {searchUser.lastName}</div>
-                        <div className="text-sm text-muted-foreground">{searchUser.email}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {recipientSearch.length >= 3 && searchResults.length === 0 && showRecipientSuggestions && !isSearching && (
-                  <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
-                    <div className="text-sm text-muted-foreground">No se encontraron usuarios</div>
-                  </div>
+                
+                {/* Checkboxes para admin */}
+                {userType === "admin" && (
+                  <>
+                                         <div className="flex items-center space-x-2">
+                       <input
+                         type="checkbox"
+                         id="allCoaches"
+                         checked={massNotificationChecks.allCoaches}
+                         onChange={(e) => handleMassNotificationChange('allCoaches', e.target.checked)}
+                         className="h-4 w-4 rounded border-2 border-border"
+                       />
+                       <Label htmlFor="allCoaches" className="text-sm">
+                         Notificar a todos los coaches
+                       </Label>
+                     </div>
+                     <div className="flex items-center space-x-2">
+                       <input
+                         type="checkbox"
+                         id="allUsers"
+                         checked={massNotificationChecks.allUsers}
+                         onChange={(e) => handleMassNotificationChange('allUsers', e.target.checked)}
+                         className="h-4 w-4 rounded border-2 border-border"
+                       />
+                      <Label htmlFor="allUsers" className="text-sm">
+                        Notificar a todos los usuarios
+                      </Label>
+                    </div>
+                  </>
                 )}
               </div>
+
+              {/* Separador */}
+              {!Object.values(massNotificationChecks).some(check => check) && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">O seleccionar individualmente</span>
+                    </div>
+                  </div>
+
+                  {/* Selección individual de destinatarios */}
+                  <div className="grid gap-2 relative">
+                    <Label htmlFor="recipient">Destinatarios</Label>
+                    <Input 
+                      id="recipient" 
+                      placeholder="Escribe 3 letras para empezar a buscar..."
+                      value={recipientSearch}
+                      onChange={(e) => handleRecipientInputChange(e.target.value)}
+                      onFocus={() => recipientSearch.length >= 3 && setShowRecipientSuggestions(true)}
+                    />
+                    {isSearching && (
+                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                        <div className="text-sm text-muted-foreground">Buscando usuarios...</div>
+                      </div>
+                    )}
+                    {showRecipientSuggestions && searchResults.length > 0 && !isSearching && (
+                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                        {searchResults.map((searchUser) => (
+                          <div
+                            key={searchUser._id}
+                            className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
+                            onClick={() => handleRecipientSelect(searchUser)}
+                          >
+                            <div className="font-medium text-foreground">{searchUser.name} {searchUser.lastName}</div>
+                            <div className="text-sm text-muted-foreground">{searchUser.email}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {recipientSearch.length >= 3 && searchResults.length === 0 && showRecipientSuggestions && !isSearching && (
+                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                        <div className="text-sm text-muted-foreground">No se encontraron usuarios</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lista de destinatarios seleccionados */}
+                  {selectedRecipients.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Destinatarios seleccionados:</Label>
+                      <div className="space-y-1">
+                        {selectedRecipients.map((recipient) => (
+                          <div key={recipient.id} className="flex items-center justify-between p-2 bg-accent rounded-md">
+                            <span className="text-sm">{recipient.name}</span>
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={() => handleRemoveRecipient(recipient.id)}
+                              className="h-6 w-6 p-0 min-w-0"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
               <div className="grid gap-2">
                 <Label htmlFor="title">Título</Label>
                 <Input 
@@ -268,11 +423,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                 variant="outlined" 
                 onClick={() => {
                   setShowNotificationDialog(false)
-                  setNotificationForm({ title: '', message: '' })
-                  setRecipientSearch("")
-                  setSelectedRecipient(null)
-                  setShowRecipientSuggestions(false)
-                  setSearchResults([])
+                  resetForm()
                 }}
                 disabled={isSendingNotification}
               >
