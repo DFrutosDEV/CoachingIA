@@ -179,10 +179,9 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
             </div>
 
             <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
-              <TabsList className="grid w-full grid-cols-3 border-solid border-2 border-border rounded-md bg-card p-1 h-auto">
+              <TabsList className="grid w-full grid-cols-2 border-solid border-2 border-border rounded-md bg-card p-1 h-auto">
                 <TabsTrigger value="info" className="data-[state=active]:bg-accent">Info</TabsTrigger>
                 <TabsTrigger value="objectives" className="data-[state=active]:bg-accent">Objetivos</TabsTrigger>
-                <TabsTrigger value="notes" className="data-[state=active]:bg-accent">Notas</TabsTrigger>
               </TabsList>
 
               <TabsContent value="info" className="space-y-4 mt-4">

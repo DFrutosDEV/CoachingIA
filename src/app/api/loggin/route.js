@@ -65,6 +65,7 @@ export async function POST(request) {
     const profile = await Profile.findOne({ user: user._id })
     .populate({
       path: 'role',
+      model: Role,
       select: 'name code',
       match: { active: true }
     })
