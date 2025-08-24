@@ -113,7 +113,17 @@ export class AuthService {
         return { success: false, error: data.error }
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error || error.message || 'Error de conexión'
+      // Manejar específicamente errores de login
+      let errorMessage = 'Error de conexión'
+      
+      if (error.response?.status === 401) {
+        errorMessage = error.response?.data?.message || 'Credenciales inválidas'
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       dispatch(setError(errorMessage))
       return { success: false, error: errorMessage }
     } finally {

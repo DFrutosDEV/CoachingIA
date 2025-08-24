@@ -15,7 +15,7 @@ import { toast } from "sonner"
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuthService()
-  
+
   // Estados para manejar el formulario y "Recuérdame"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    
+
     const result = await login(email, password)
     if (result.success) {
       toast.success("Iniciando sesión...")
@@ -57,6 +57,7 @@ export default function LoginPage() {
       } else {
         toast.error("Error al iniciar sesión")
       }
+      console.log('❌ Login fallido:', result)
     }
   }
 
@@ -98,13 +99,13 @@ export default function LoginPage() {
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">Contraseña</Label>
                     </div>
-                    <Input 
-                      id="password" 
-                      name="password" 
-                      type="password" 
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required 
+                      required
                     />
                   </div>
                   <div className="flex items-center space-x-2">

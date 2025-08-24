@@ -40,7 +40,8 @@ axiosClient.interceptors.response.use(
     return response
   },
   (error) => {
-    if (error.response?.status === 401) {
+    // No hacer logout automático en el endpoint de login
+    if (error.response?.status === 401 && !error.config?.url?.includes('/api/loggin')) {
       console.log('🚫 Axios: Token expirado o inválido, haciendo logout')
       store.dispatch(logout())
       
