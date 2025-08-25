@@ -154,9 +154,12 @@ export interface Coach {
   email: string;
   avatar: string;
   bio: string;
+  enterprise?: Enterprise;
   specialties: string[];
   rating: number;
   clientsCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Tipos para props de componentes

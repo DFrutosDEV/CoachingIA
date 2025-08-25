@@ -6,6 +6,7 @@ export interface IGoal extends Document {
   createdBy: ObjectId;
   clientId: ObjectId;
   day: string;
+  date: Date;
   isCompleted: boolean;
   feedbackId?: ObjectId;
   isDeleted: boolean;
@@ -38,6 +39,10 @@ const GoalSchema: Schema = new Schema({
   day: {
     type: String,
     required: [true, 'The day is required']
+  },
+  date: {
+    type: Date,
+    required: [true, 'The date is required']
   },
   isCompleted: {
     type: Boolean,

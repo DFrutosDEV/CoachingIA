@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
     const clients = await Promise.all(coachProfile.clients.map(async (clientProfile: any) => {
       const clientUser = clientProfile.user;
       
-      console.log(clientProfile);
       // Buscar el objetivo activo del cliente
       const activeObjective = await Objective.findOne({
         coachId: coachProfile._id,
@@ -127,7 +126,7 @@ export async function GET(request: NextRequest) {
         _id: clientUser._id.toString(),
         name: `${clientUser.name} ${clientUser.lastName}`,
         email: clientUser.email,
-        phone: clientUser.phone || 'No especificado',
+        phone: clientUser.phone,
         startDate: formatDate(new Date(clientUser.createdAt)),
         sessions: completedSessions,
         nextSession: nextSession ? {

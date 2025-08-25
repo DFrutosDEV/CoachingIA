@@ -19,13 +19,6 @@ export default function ServicesPage() {
                 <h1 className="text-3xl font-bold">Servicios</h1>
                 <p className="text-muted-foreground">Aca encontraras los servicios que tienes contratados.</p>
               </div>
-              <div>
-                <Link href="/dashboard/client/services/create">
-                  <Button>
-                    Contratar servicio
-                  </Button>
-                </Link>
-              </div>
             </div>
             <ServicesGrid />
           </div>

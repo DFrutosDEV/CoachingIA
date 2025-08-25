@@ -20,6 +20,8 @@ import { formatDate } from "@/utils/validatesInputs"
 import { toast } from "sonner"
 
 import { Goal, ClientDetailProps, Objective } from "@/types"
+import { sendMessage } from "@/utils/wpp-methods"
+import { sendEmail } from "@/utils/sendEmail"
 
 export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: ClientDetailProps) {
   const [activeTab, setActiveTab] = useState("info")
@@ -39,28 +41,19 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
     setIsGoalsModalOpen(false)
   }
 
-  const handleConfigFormOpen = () => {
-    if (!client?.activeObjectiveId) {
-      // Mostrar mensaje de que el cliente no tiene un objetivo activo
-      return;
-    }
-    setIsConfigModalOpen(true)
-  }
-
-  // Función para cargar los objetivos del cliente
   const fetchObjectives = async () => {
     if (!client?._id) return;
-    
+
     try {
       setLoadingObjectives(true);
       const response = await fetch(`/api/client/objectives?clientId=${client._id}`);
-      
+
       if (!response.ok) {
         throw new Error('Error al obtener los objetivos');
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setObjectives(data.objectives);
       } else {
@@ -74,17 +67,16 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
     }
   };
 
-  // Función para obtener detalles de un objetivo específico
   const handleObjectiveSelect = async (objectiveId: string) => {
     try {
       const response = await fetch(`/api/client/objectives/${objectiveId}`);
-      
+
       if (!response.ok) {
         throw new Error('Error al obtener los detalles del objetivo');
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setSelectedObjectiveData(data.data);
         setIsObjectiveDetailModalOpen(true);
@@ -97,7 +89,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
     }
   };
 
-  // Cargar objetivos cuando se abre la pestaña de objetivos
   useEffect(() => {
     if (activeTab === "objectives" && client?._id && objectives.length === 0) {
       fetchObjectives();
@@ -105,7 +96,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
   }, [activeTab, client?._id]);
 
   if (!isOpen && activeTab !== "info") {
-     setActiveTab("info");
+    setActiveTab("info");
   }
 
   if (!client) {
@@ -141,7 +132,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                 <Calendar className="h-4 w-4" />
                 Programar
               </Button>
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button variant="outline" size="sm" className="gap-1" onClick={() => client.phone ? sendMessage({ phone: client.phone }) : sendEmail({ email: client.email })}>
                 <MessageSquare className="h-4 w-4" />
                 Mensaje
               </Button>
@@ -149,17 +140,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                 <FileText className="h-4 w-4" />
                 Ver PDA
               </Button>
-              {/* <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1"
-                onClick={handleConfigFormOpen}
-                disabled={!client.activeObjectiveId}
-                title={!client.activeObjectiveId ? "El cliente no tiene un objetivo activo" : "Ver formulario de configuración"}
-              >
-                <ClipboardMinus className="h-4 w-4" />
-                Ver Formulario de configuración
-              </Button> */}
             </div>
 
             <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
@@ -192,23 +172,23 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                   <h4 className="mb-2 text-sm font-medium">Última Sesión</h4>
                   {client.lastSession.date ? (
                     <div className="rounded-lg border p-3">
-                    <div className="flex justify-between">
-                      <div className="font-medium">
-                        {`${formatDate(new Date(client.lastSession.date))} - ${client.lastSession.objective.title}`}
+                      <div className="flex justify-between">
+                        <div className="font-medium">
+                          {`${formatDate(new Date(client.lastSession.date))} - ${client.lastSession.objective.title}`}
+                        </div>
+                        <Badge variant="outline">Programada</Badge>
                       </div>
-                      <Badge variant="outline">Programada</Badge>
+                      <div className="mt-3 flex gap-2">
+                        <Button size="sm" variant="outline" className="w-full gap-1">
+                          <Clock className="h-3 w-3" />
+                          Reprogramar
+                        </Button>
+                        <Button size="sm" className="w-full gap-1">
+                          <Calendar className="h-3 w-3" />
+                          Iniciar
+                        </Button>
+                      </div>
                     </div>
-                    <div className="mt-3 flex gap-2">
-                      <Button size="sm" variant="outline" className="w-full gap-1">
-                        <Clock className="h-3 w-3" />
-                        Reprogramar
-                      </Button>
-                      <Button size="sm" className="w-full gap-1">
-                        <Calendar className="h-3 w-3" />
-                        Iniciar
-                      </Button>
-                    </div>
-                  </div>
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">No existen sesiones previas</p>
                   )}
@@ -225,7 +205,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-medium">Objetivos del Cliente</h4>
                   </div>
-                  
+
                   {loadingObjectives ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="text-center">
@@ -252,15 +232,15 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                               <Eye className="h-4 w-4 text-muted-foreground" />
                             </div>
                           </div>
-                          
+
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                               <span>Progreso: {objective.progress}%</span>
                               <span>{objective.completedGoals} de {objective.totalGoals} metas</span>
                             </div>
                             <div className="h-2 w-full rounded-full bg-muted">
-                              <div 
-                                className="h-full rounded-full bg-primary transition-all duration-300" 
+                              <div
+                                className="h-full rounded-full bg-primary transition-all duration-300"
                                 style={{ width: `${objective.progress}%` }}
                               ></div>
                             </div>
@@ -291,12 +271,12 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                 </div>
                 <div className="space-y-3">
                   {client.notes?.length > 0 ? (
-                      client.notes.map((note) => (
-                        <div key={note._id} className="rounded-lg border p-3">
-                          <div className="mb-1 text-xs text-muted-foreground">{formatDate(new Date(note.createdAt))}</div>
-                          <p className="text-sm">{note.content}</p>
-                        </div>
-                      ))
+                    client.notes.map((note) => (
+                      <div key={note._id} className="rounded-lg border p-3">
+                        <div className="mb-1 text-xs text-muted-foreground">{formatDate(new Date(note.createdAt))}</div>
+                        <p className="text-sm">{note.content}</p>
+                      </div>
+                    ))
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">No hay notas registradas.</p>
                   )}

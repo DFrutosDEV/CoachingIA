@@ -5,9 +5,8 @@ import { CoachCard } from "./coach-card";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw } from "lucide-react";
 
-interface Coach {
+interface CoachResponse {
   id: string;
-  userId: string;
   name: string;
   lastName: string;
   email: string;
@@ -16,19 +15,16 @@ interface Coach {
   bio: string;
   profilePicture?: string;
   active: boolean;
-  firstLogin: boolean;
-  clientsCount: number;
   enterprise?: {
     id: string;
     name: string;
     logo?: string;
   } | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 export function ServicesGrid() {
-  const [coaches, setCoaches] = useState<Coach[]>([]);
+  const [coaches, setCoaches] = useState<CoachResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,14 +32,14 @@ export function ServicesGrid() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch('/api/admin/coaches');
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Error al cargar coaches');
       }
-      
+
       setCoaches(data.data || []);
     } catch (err) {
       console.error('Error fetching coaches:', err);
@@ -106,13 +102,12 @@ export function ServicesGrid() {
           Actualizar
         </Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {coaches.map((coach) => (
-          <CoachCard 
+          <CoachCard
             key={coach.id}
             id={coach.id}
-            userId={coach.userId}
             name={coach.name}
             lastName={coach.lastName}
             email={coach.email}
@@ -121,15 +116,8 @@ export function ServicesGrid() {
             bio={coach.bio}
             profilePicture={coach.profilePicture}
             active={coach.active}
-            firstLogin={coach.firstLogin}
-            clientsCount={coach.clientsCount}
             enterprise={coach.enterprise}
             createdAt={coach.createdAt}
-            updatedAt={coach.updatedAt}
-            onDeactivate={(coachId) => {
-              // Remover el coach de la lista local
-              setCoaches(prevCoaches => prevCoaches.filter(c => c.id !== coachId));
-            }}
           />
         ))}
       </div>

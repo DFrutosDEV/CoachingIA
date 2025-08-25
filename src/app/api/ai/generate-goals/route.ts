@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { aiService } from '@/lib/services/ai-service';
 import connectDB from '@/lib/mongodb';
 import Objective from '@/models/Objective';
-import Goal from '@/models/Goal';
 import Profile from '@/models/Profile';
 import dotenv from 'dotenv';
+import { addWeeks } from 'date-fns';
 
 dotenv.config({ path: '.env' });
 dotenv.config({ path: '.env.local' });
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Obtener el objetivo
     const objective = await Objective.findById(objectiveId);
+    console.log(objective);
     if (!objective) {
       return NextResponse.json(
         { error: 'Objetivo no encontrado' },
@@ -63,21 +64,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtener objetivos existentes del cliente
-    const existingGoals = await Goal.find({
-      clientId: objective.clientId,
-      isDeleted: false
-    }).sort({ createdAt: -1 }).limit(10);
-
     // Preparar métricas para la IA
     const metrics = {
-      clientFocus: client.focus || 'Desarrollo personal',
       clientBio: client.bio,
-      currentGoals: existingGoals,
-      performanceMetrics: {
-        sessionsCompleted: client.sessions || 0,
-        lastSessionDate: client.lastSession?.date || null
-      },
+      configFile: objective.configFile,
       coachNotes: []
     };
 
@@ -94,17 +84,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Generar objetivos con Gemini
-    const generatedGoals = await aiService.generateGoalsForObjective(
-      objective,
-      metrics,
-      numberOfGoals
-    );
+    const generatedGoals = await aiService.generateGoalsForObjective(objective, metrics, numberOfGoals);
 
     // Convertir a formato Goal
     const goals = generatedGoals.map((goal, index) => ({
       _id: `generated-${Date.now()}-${index}`,
       description: goal.description,
       day: goal.day,
+      date: addWeeks(new Date(), index),
       isCompleted: goal.isCompleted,
       clientId: objective.clientId,
       objectiveId: objective._id,

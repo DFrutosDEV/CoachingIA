@@ -2,15 +2,14 @@ import { Goal, Objective } from '@/types';
 import { getAIConfig, AIConfig } from '@/lib/config/ai-config';
 
 interface AIMetrics {
-  clientFocus: string;
   clientBio?: string;
-  currentGoals?: Goal[];
-  performanceMetrics?: {
-    sessionsCompleted: number;
-    averageRating?: number;
-    lastSessionDate?: string;
-  };
+  configFile?: ConfigFile[];
   coachNotes?: string[];
+}
+
+interface ConfigFile {
+  question: string;
+  answer: string;
 }
 
 interface GeneratedGoal {
@@ -62,22 +61,16 @@ export class AIService {
 
     OBJETIVO PRINCIPAL: ${objective.title}
     
-    ENFOQUE DEL CLIENTE: ${metrics.clientFocus}
-    
     BIOGRAFÍA: ${metrics.clientBio || 'No disponible'}
     
     MÉTRICAS ACTUALES:
-    - Sesiones completadas: ${metrics.performanceMetrics?.sessionsCompleted || 0}
-    - Calificación promedio: ${metrics.performanceMetrics?.averageRating || 'No disponible'}
-    - Última sesión: ${metrics.performanceMetrics?.lastSessionDate || 'No disponible'}
-    
-    OBJETIVOS ANTERIORES: ${metrics.currentGoals?.map(g => g.description).join(', ') || 'Ninguno'}
+    - Formulario de configuración: ${metrics.configFile?.map(f => `${f.question}: ${f.answer}`).join(', ') || 'No disponible'}
     
     NOTAS DEL COACH: ${metrics.coachNotes?.join(', ') || 'No hay notas'}
     
     INSTRUCCIONES:
     1. Genera ${numberOfGoals} objetivos específicos, medibles y alcanzables
-    2. Cada objetivo debe estar relacionado con el objetivo principal
+    2. Cada objetivo debe estar relacionado con el objetivo principal y el formulario de configuración
     3. Considera el progreso actual del cliente
     4. Los objetivos deben ser realistas y motivadores
     5. Incluye un día sugerido para cada objetivo (lunes, martes, miércoles, etc.)
@@ -90,6 +83,8 @@ export class AIService {
         "isCompleted": false
       }
     ]
+
+    Responde con el idioma del cliente.
     
     Responde SOLO con el JSON, sin texto adicional.`;
   }
