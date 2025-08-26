@@ -22,19 +22,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Verificar que el cliente existe y obtener su perfil
-    const client = await User.findById(clientId);
-    if (!client) {
-      return NextResponse.json(
-        { error: 'Cliente no encontrado' },
-        { status: 404 }
-      );
-    }
-
-    // Obtener el perfil del cliente
-    const clientProfile = await Profile.findOne({ user: clientId, isDeleted: false });
+    const clientProfile = await Profile.findById(clientId);
     if (!clientProfile) {
       return NextResponse.json(
-        { error: 'Perfil del cliente no encontrado' },
+        { error: 'Cliente no encontrado' },
         { status: 404 }
       );
     }
