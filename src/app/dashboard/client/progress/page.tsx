@@ -10,33 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Clock, FileText, User } from "lucide-react"
 import { formatDate } from "@/utils/validatesInputs"
-
-interface Objective {
-  _id: string;
-  title: string;
-  progress: number;
-  totalGoals: number;
-  completedGoals: number;
-  hasGoals: boolean;
-  isCompleted: boolean;
-  active: boolean;
-  createdAt: string;
-  coach: string;
-}
-
-interface Goal {
-  _id: string;
-  description: string;
-  isCompleted: boolean;
-  day: string;
-}
-
-interface Note {
-  _id: string;
-  content: string;
-  createdBy: string;
-  createdAt: string;
-}
+import { Goal, Note, Objective } from "@/types"
 
 interface ObjectiveDetails {
   objective: {
@@ -64,15 +38,15 @@ export default function ProgressPage() {
     try {
       setLoading(true)
       setError(null)
-      
-      const response = await HttpClient.get(`/api/client/objectives?clientId=${user?._id}`)
-      
+
+      const response = await HttpClient.get(`/api/client/objectives?clientId=${user?.profile?._id}`)
+
       if (!response.ok) {
         throw new Error('Error al obtener los objetivos')
       }
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         setObjectives(result.objectives)
       } else {
@@ -90,15 +64,15 @@ export default function ProgressPage() {
   const fetchObjectiveDetails = async (objectiveId: string) => {
     try {
       setLoadingDetails(true)
-      
+
       const response = await HttpClient.get(`/api/client/objectives/${objectiveId}`)
-      
+
       if (!response.ok) {
         throw new Error('Error al obtener los detalles del objetivo')
       }
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         setSelectedObjective(result.data)
         setShowModal(true)
@@ -152,7 +126,7 @@ export default function ProgressPage() {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <p className="text-red-500 mb-4">Error: {error}</p>
-                <button 
+                <button
                   onClick={fetchObjectives}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                 >
@@ -179,7 +153,7 @@ export default function ProgressPage() {
               <h1 className="text-3xl font-bold">Progreso</h1>
               <p className="text-muted-foreground">Progreso de tus objetivos y metas.</p>
             </div>
-            
+
             <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
               {objectives.length === 0 ? (
                 <Card>
@@ -194,8 +168,8 @@ export default function ProgressPage() {
                 </Card>
               ) : (
                 objectives.map((objective) => (
-                  <Card 
-                    key={objective._id} 
+                  <Card
+                    key={objective._id}
                     className="cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => fetchObjectiveDetails(objective._id)}
                   >
@@ -232,12 +206,12 @@ export default function ProgressPage() {
                           <span className="text-sm font-medium">Progreso</span>
                           <span className="text-sm font-medium">{objective.progress}%</span>
                         </div>
-                        
+
                         {objective.hasGoals ? (
                           <>
                             <div className="h-2 w-full rounded-full bg-muted">
-                              <div 
-                                className="h-full rounded-full bg-primary transition-all duration-300" 
+                              <div
+                                className="h-full rounded-full bg-primary transition-all duration-300"
                                 style={{ width: `${objective.progress}%` }}
                               ></div>
                             </div>
@@ -268,7 +242,7 @@ export default function ProgressPage() {
               <DialogHeader>
                 <DialogTitle className="text-xl">{selectedObjective.objective.title}</DialogTitle>
               </DialogHeader>
-              
+
               <div className="space-y-6">
                 {/* Metas */}
                 <div>
@@ -276,7 +250,7 @@ export default function ProgressPage() {
                     <CheckCircle className="h-5 w-5" />
                     Metas ({selectedObjective.goals.length})
                   </h3>
-                  
+
                   {selectedObjective.goals.length === 0 ? (
                     <p className="text-muted-foreground">No hay metas asignadas a este objetivo</p>
                   ) : (
@@ -304,7 +278,7 @@ export default function ProgressPage() {
                     <FileText className="h-5 w-5" />
                     Notas ({selectedObjective.notes.length})
                   </h3>
-                  
+
                   {selectedObjective.notes.length === 0 ? (
                     <p className="text-muted-foreground">No hay notas para este objetivo</p>
                   ) : (

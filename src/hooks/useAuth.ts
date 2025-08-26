@@ -27,7 +27,7 @@ export const useAuth = () => {
       // Redirigir al dashboard según el rol
       const userRole = result.user?.role;
       if (userRole) {
-        router.push(`/dashboard/${userRole.toLowerCase()}`);
+        router.push(`/dashboard/${userRole.name.toLowerCase()}`);
       } else {
         router.push('/dashboard');
       }
@@ -60,7 +60,7 @@ export const useAuth = () => {
 
   // ✅ Verificar si el usuario tiene un rol específico
   const hasRole = (role: string): boolean => {
-    return user?.role === role;
+    return user?.role.name === role;
   };
 
   // ✅ Verificar si el usuario tiene permisos específicos

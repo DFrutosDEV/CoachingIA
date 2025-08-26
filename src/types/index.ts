@@ -117,7 +117,7 @@ export interface ClientBasicData {
 // Tipos para usuarios y perfiles
 export interface User {
   _id: string;
-  role: string;
+  role: Role;
   profile: Profile;
   enterprise: Enterprise | null;
   name: string;
@@ -125,6 +125,12 @@ export interface User {
   email: string;
   roles: string[];
   age?: number;
+}
+
+export interface Role {
+  _id: string;
+  name: string;
+  client: string;
 }
 
 export interface Profile {

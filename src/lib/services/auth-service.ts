@@ -101,7 +101,7 @@ export class AuthService {
         }
         
         dispatch(login({ user, token }))
-        dispatch(setSession({ isLoggedIn: true, userType: user.role }))
+        dispatch(setSession({ isLoggedIn: true, userType: user.role.name }))
         
         // ✅ Debug: Verificar que el token se guardó en Redux
         const stateAfterLogin = store.getState()

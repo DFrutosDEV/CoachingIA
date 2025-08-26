@@ -20,13 +20,13 @@ export const DebugRedux: React.FC = () => {
   }
 
   return (
-    <div style={{ 
-      position: 'fixed', 
-      bottom: '10px', 
-      right: '10px', 
-      background: '#000', 
-      color: '#fff', 
-      padding: '8px', 
+    <div style={{
+      position: 'fixed',
+      bottom: '10px',
+      right: '10px',
+      background: '#000',
+      color: '#fff',
+      padding: '8px',
       fontSize: '12px',
       borderRadius: '4px',
       zIndex: 9999,

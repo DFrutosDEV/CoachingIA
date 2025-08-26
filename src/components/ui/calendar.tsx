@@ -41,9 +41,9 @@ const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
 
   return (
     <div className="rbc-toolbar">
-      {label()} 
+      {label()}
       <span className="rbc-btn-group">
-        <button 
+        <button
           type="button"
           className={toolbar.view === 'month' ? 'rbc-active' : ''}
           onClick={() => toolbar.onView('month')}
@@ -83,7 +83,7 @@ export default function SessionsPage() {
       setError(null)
 
       const result = await CalendarService.getSessions()
-      
+
       if (result.success) {
         // Las fechas ya vienen correctamente formateadas del API
         console.log('Sesiones recibidas:', result.events);
@@ -184,7 +184,7 @@ export default function SessionsPage() {
           Actualizar
         </Button>
       </div>
-      
+
       <div style={{ height: "calc(100vh - 200px)" }} className="calendar-container">
         <Calendar
           localizer={localizer}
@@ -193,7 +193,7 @@ export default function SessionsPage() {
           endAccessor="end"
           style={{ height: "100%" }}
           view="month"
-          views={['month']} 
+          views={['month']}
           components={{
             toolbar: CustomToolbar,
           }}
@@ -218,8 +218,8 @@ export default function SessionsPage() {
       </div>
 
       {/* Modal de detalles de la sesión */}
-      <Dialog 
-        open={selectedSession !== null} 
+      <Dialog
+        open={selectedSession !== null}
         onOpenChange={(isOpen: boolean) => {
           if (!isOpen) {
             handleCloseModal()
@@ -266,16 +266,16 @@ export default function SessionsPage() {
                 {/* Fecha */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="text-right font-medium col-span-1">Fecha:</span>
-                  <span className="col-span-3">{dayjs(selectedSession.start).format("LLLL")}</span> 
+                  <span className="col-span-3">{dayjs(selectedSession.start).format("LLLL")}</span>
                 </div>
                 {/* Enlace */}
                 {selectedSession.link && (
                   <div className="grid grid-cols-4 items-center gap-4">
                     <span className="text-right font-medium col-span-1">Enlace:</span>
                     <span className="col-span-3">
-                      <a 
-                        href={selectedSession.link} 
-                        target="_blank" 
+                      <a
+                        href={selectedSession.link}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
                       >
@@ -290,9 +290,9 @@ export default function SessionsPage() {
                   Cerrar
                 </Button>
 
-                {user?.role === 'coach' && (
-                  <Button 
-                    variant="secondary" 
+                {user?.role.name === 'coach' && (
+                  <Button
+                    variant="secondary"
                     onClick={handleReschedule}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
