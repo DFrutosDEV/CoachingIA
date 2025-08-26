@@ -66,7 +66,7 @@ export default function RootLayout({
                 <ClientLayout>
                   {children}
                   <Toaster position="bottom-right" richColors />
-                  {/* {process.env.NODE_ENV === 'development' && <DebugRedux />}   */}
+                  {process.env.NODE_ENV === 'development' && <DebugRedux />}
                 </ClientLayout>
               </RouteGuard>
             </MUIProvider>

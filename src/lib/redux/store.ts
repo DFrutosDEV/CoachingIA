@@ -32,9 +32,14 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredPaths: ['persist'],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools: {
+    name: 'CoachingIA Redux Store',
+    trace: true,
+    traceLimit: 25,
+  },
 })
 
 export const persistor = persistStore(store)
