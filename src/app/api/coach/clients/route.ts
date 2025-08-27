@@ -124,6 +124,7 @@ export async function GET(request: NextRequest) {
 
       return {
         _id: clientUser._id.toString(),
+        profileId: clientProfile._id.toString(),
         name: `${clientUser.name} ${clientUser.lastName}`,
         email: clientUser.email,
         phone: clientUser.phone,

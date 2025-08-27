@@ -1,36 +1,27 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 
 export interface IFeedback extends Document {
-  coachId: string;
-  clientId: string;
-  objectiveId: string;
+  coachId: ObjectId;
+  clientId: ObjectId;
+  objectiveId: ObjectId;
   feedback: string;
 }
 
 const FeedbackSchema: Schema = new Schema({
   coachId: {
-    type: String,
-    required: [true, 'The coachId is required'],
-    trim: true,
-    maxlength: [50, 'The coachId cannot exceed 50 characters']
+    type: Schema.Types.ObjectId,
+    ref: 'Profile',
+    required: [true, 'The coachId is required']
   },
   clientId: {
-    type: String,
-    required: [true, 'The clientId is required'],
-    trim: true,
-    maxlength: [50, 'The clientId cannot exceed 50 characters']
-  },
-  enterpriseId: {
-    type: String,
-    required: [true, 'The enterpriseId is required'],
-    trim: true,
-    maxlength: [50, 'The enterpriseId cannot exceed 50 characters']
+    type: Schema.Types.ObjectId,
+    ref: 'Profile',
+    required: [true, 'The clientId is required']
   },
   objectiveId: {
-    type: String,
-    required: [true, 'The objectiveId is required'],
-    trim: true,
-    maxlength: [50, 'The objectiveId cannot exceed 50 characters']
+    type: Schema.Types.ObjectId,
+    ref: 'Objective',
+    required: [true, 'The objectiveId is required']
   },
   feedback: {
     type: String,

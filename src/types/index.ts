@@ -58,6 +58,7 @@ export interface ObjectiveProgress {
 // Tipos para clientes
 export interface ClientResponse {
   _id: string;
+  profileId: string;
   name: string;
   email: string;
   phone: string;
