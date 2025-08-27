@@ -13,8 +13,8 @@ import { Calendar, Clock, Mail, MessageSquare, Phone, FileText, CalendarIcon, Ba
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import { GoalsModal } from "./ui/goals-modal"
-import { ConfigFormModal } from "./ui/config-form-modal"
 import { ObjectiveDetailModal } from "./ui/objective-detail-modal"
+import { FinalizeObjectiveModal } from "./ui/finalize-objective-modal"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { formatDate } from "@/utils/validatesInputs"
 import { toast } from "sonner"
@@ -26,7 +26,6 @@ import { sendEmail } from "@/utils/sendEmail"
 export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: ClientDetailProps) {
   const [activeTab, setActiveTab] = useState("info")
   const [isGoalsModalOpen, setIsGoalsModalOpen] = useState(false)
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false)
   const [objectives, setObjectives] = useState<Objective[]>([])
   const [loadingObjectives, setLoadingObjectives] = useState(false)
   const [selectedObjectiveData, setSelectedObjectiveData] = useState<any>(null)
@@ -46,7 +45,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
 
     try {
       setLoadingObjectives(true);
-      const response = await fetch(`/api/client/objectives?clientId=${client._id}`);
+      const response = await fetch(`/api/client/objectives?clientId=${client.profileId}`);
 
       if (!response.ok) {
         throw new Error('Error al obtener los objetivos');
@@ -169,6 +168,32 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                 </div>
 
                 <div>
+                  <h4 className="mb-2 text-sm font-medium">Próxima Sesión</h4>
+                  {client.nextSession.date ? (
+                    <div className="rounded-lg border p-3">
+                      <div className="flex justify-between">
+                        <div className="font-medium">
+                          {`${formatDate(new Date(client.nextSession.date))} - ${client.nextSession.objective.title}`}
+                        </div>
+                        <Badge variant="outline">Programada</Badge>
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <Button size="sm" variant="outline" className="w-full gap-1">
+                          <Clock className="h-3 w-3" />
+                          Reprogramar
+                        </Button>
+                        <Button size="sm" className="w-full gap-1">
+                          <Calendar className="h-3 w-3" />
+                          Iniciar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No existen sesiones programadas</p>
+                  )}
+                </div>
+
+                <div>
                   <h4 className="mb-2 text-sm font-medium">Última Sesión</h4>
                   {client.lastSession.date ? (
                     <div className="rounded-lg border p-3">
@@ -216,7 +241,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                   ) : objectives.length > 0 ? (
                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                       {objectives.map((objective) => (
-                        <div key={objective._id} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => handleObjectiveSelect(objective._id)}>
+                        <div key={objective._id} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <Target className="h-4 w-4 text-primary" />
@@ -229,11 +254,32 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                               <Badge variant={objective.isCompleted ? "active" : "outline"}>
                                 {objective.isCompleted ? "Completado" : "En Progreso"}
                               </Badge>
-                              <Eye className="h-4 w-4 text-muted-foreground" />
+                              <div className="flex items-center gap-1">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleObjectiveSelect(objective._id)
+                                  }}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                {objective.active && !objective.isCompleted && (
+                                  <FinalizeObjectiveModal
+                                    objectiveId={objective._id}
+                                    objectiveTitle={objective.title}
+                                    onObjectiveFinalized={fetchObjectives}
+                                  />
+                                )}
+                              </div>
                             </div>
                           </div>
 
-                          <div className="space-y-2">
+                          <div 
+                            className="space-y-2 cursor-pointer" 
+                            onClick={() => handleObjectiveSelect(objective._id)}
+                          >
                             <div className="flex justify-between text-sm">
                               <span>Progreso: {objective.progress}%</span>
                               <span>{objective.completedGoals} de {objective.totalGoals} metas</span>
@@ -294,20 +340,12 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
         </DialogContent>
       </Dialog>
 
-      <ConfigFormModal
-        isOpen={isConfigModalOpen}
-        onClose={() => setIsConfigModalOpen(false)}
-        clientId={client._id}
-        coachId={user?._id || ''}
-        objectiveId={client.activeObjectiveId}
-      />
-
       <ObjectiveDetailModal
         objectiveData={selectedObjectiveData}
         isOpen={isObjectiveDetailModalOpen}
         onClose={() => setIsObjectiveDetailModalOpen(false)}
-        clientId={client._id}
-        coachId={user?._id}
+        clientId={client?.profileId}
+        coachId={user?.profile?._id}
       />
     </>
   )

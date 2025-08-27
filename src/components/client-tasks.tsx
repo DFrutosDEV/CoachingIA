@@ -1,21 +1,141 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+
+interface Goal {
+  _id: string;
+  description: string;
+  day: number;
+  isCompleted: boolean;
+  createdAt: string;
+}
+
+interface Note {
+  _id: string;
+  title: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+  sessionInfo?: {
+    date: string;
+    link: string;
+  };
+}
+
+interface Objective {
+  _id: string;
+  title: string;
+  isCompleted: boolean;
+  active: boolean;
+  createdAt: string;
+  coach: string;
+}
+
+interface Feedback {
+  _id: string;
+  feedback: string;
+  createdAt: string;
+}
+
+interface TasksData {
+  currentObjective: Objective | null;
+  goals: Goal[];
+  notes: Note[];
+  feedback: Feedback | null;
+  hasData: boolean;
+}
 
 const ClientTasks: React.FC = () => {
   const theme = useTheme();
-  const [isDailyTaskCompleted, setIsDailyTaskCompleted] = useState(false);
+  const { user } = useAuth();
+  const [tasksData, setTasksData] = useState<TasksData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [updatingGoal, setUpdatingGoal] = useState<string | null>(null);
 
-  const handleDailyTaskClick = () => {
-    setIsDailyTaskCompleted(!isDailyTaskCompleted);
-    if (!isDailyTaskCompleted) {
-      toast.success('¡Tarea diaria completada!', {
-        position: 'bottom-center',
-      });
+  // Cargar datos de tareas
+  const loadTasksData = async () => {
+    if (!user?._id) return;
+    
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/client/tasks?profileId=${user.profile._id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setTasksData(result.data);
+      } else {
+        toast.error('Error al cargar las tareas');
+      }
+    } catch (error) {
+      console.error('Error al cargar tareas:', error);
+      toast.error('Error al cargar las tareas');
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Actualizar estado de una tarea
+  const updateGoalStatus = async (goalId: string, isCompleted: boolean) => {
+    try {
+      setUpdatingGoal(goalId);
+      const response = await fetch(`/api/client/tasks/goals/${goalId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isCompleted }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Actualizar el estado local
+        setTasksData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            goals: prev.goals.map(goal => 
+              goal._id === goalId 
+                ? { ...goal, isCompleted } 
+                : goal
+            )
+          };
+        });
+
+        toast.success(result.message);
+      } else {
+        toast.error('Error al actualizar la tarea');
+      }
+    } catch (error) {
+      console.error('Error al actualizar tarea:', error);
+      toast.error('Error al actualizar la tarea');
+    } finally {
+      setUpdatingGoal(null);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    loadTasksData();
+  }, [user?._id]);
+
+  // Separar tareas completadas e incompletas
+  const completedGoals = tasksData?.goals.filter(goal => goal.isCompleted) || [];
+  const incompleteGoals = tasksData?.goals.filter(goal => !goal.isCompleted) || [];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: theme.palette.primary.main }}></div>
+          <p style={{ color: theme.palette.text.secondary }}>Cargando tareas...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full" style={{
@@ -34,43 +154,96 @@ const ClientTasks: React.FC = () => {
           }}>
             Tareas Diarias y Pasadas
           </h2>
-          {/* Sección Tarea Diaria */}
-          <div 
-            onClick={handleDailyTaskClick}
-            className={`h-1/2 rounded p-4 mb-4 cursor-pointer transition-all duration-200 hover:opacity-90 ${isDailyTaskCompleted ? 'ring-2 ring-green-500' : ''}`}
-            style={{
-              border: `1px dashed ${theme.palette.divider}`,
-              backgroundColor: theme.palette.action.hover
-            }}
-          >
-            <div className="flex justify-between items-center">
-              <h3 className="mt-0 mb-2" style={{ color: theme.palette.text.primary }}>Tarea Diaria</h3>
-              {isDailyTaskCompleted && (
-                <span className="text-green-500 text-sm">✓ Completada</span>
-              )}
+          
+          {tasksData?.currentObjective && (
+            <div className="mb-4 p-3 rounded" style={{
+              backgroundColor: theme.palette.info.light,
+              color: theme.palette.info.contrastText
+            }}>
+              <h3 className="text-sm font-semibold mb-1">Objetivo Actual: {tasksData.currentObjective.title}</h3>
+              <p className="text-xs">Coach: {tasksData.currentObjective.coach}</p>
             </div>
-            <p className="m-0" style={{ color: theme.palette.text.secondary }}>Descripción de la tarea diaria aquí...</p>
-          </div>
+          )}
 
-          {/* Sección Tareas Pasadas (dividida) */}
-          <div className="flex gap-4">
-            {/* Columna Tareas Completadas */}
-            <div className="flex-1">
-              <h4 className="mt-0" style={{ color: theme.palette.text.primary }}>Completadas</h4>
-              <ul className="pl-5 m-0" style={{ color: theme.palette.text.secondary }}>
-                <li>Tarea A (Completada)</li>
-                <li>Tarea B (Completada)</li>
-              </ul>
+          {/* Sección Tareas por Día */}
+          {tasksData?.goals && tasksData.goals.length > 0 ? (
+            <div className="space-y-3 max-h-76 overflow-y-auto pr-2 scrollbar-thin">
+              {tasksData.goals.map((goal) => (
+                <div 
+                  key={goal._id}
+                  onClick={() => updateGoalStatus(goal._id, !goal.isCompleted)}
+                  className={`p-3 rounded cursor-pointer transition-all duration-200 hover:opacity-90 ${
+                    goal.isCompleted ? 'ring-2 ring-green-500' : ''
+                  }`}
+                  style={{
+                    border: `1px dashed ${theme.palette.divider}`,
+                    backgroundColor: goal.isCompleted 
+                      ? theme.palette.success.light 
+                      : theme.palette.action.hover
+                  }}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1">
+                      <h3 className="text-sm font-medium mb-1" style={{ color: theme.palette.text.primary }}>
+                        Día {goal.day}
+                      </h3>
+                      <p className="text-xs" style={{ color: theme.palette.text.secondary }}>
+                        {goal.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center ml-2">
+                      {updatingGoal === goal._id ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: theme.palette.primary.main }}></div>
+                      ) : (
+                        <>
+                          {goal.isCompleted && (
+                            <span className="text-green-500 text-sm mr-2">✓</span>
+                          )}
+                          <span className="text-xs px-2 py-1 rounded-full" style={{
+                            backgroundColor: goal.isCompleted 
+                              ? theme.palette.success.main 
+                              : theme.palette.warning.main,
+                            color: goal.isCompleted 
+                              ? theme.palette.success.contrastText 
+                              : theme.palette.warning.contrastText
+                          }}>
+                            {goal.isCompleted ? 'Completada' : 'Pendiente'}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            {/* Columna Tareas Incompletas */}
-            <div className="flex-1">
-              <h4 className="mt-0" style={{ color: theme.palette.text.primary }}>Incompletas</h4>
-              <ul className="pl-5 m-0" style={{ color: theme.palette.text.secondary }}>
-                <li>Tarea C (Incompleta)</li>
-                <li>Tarea D (Incompleta)</li>
-              </ul>
+          ) : (
+            <div className="text-center py-8" style={{ color: theme.palette.text.secondary }}>
+              <p>No hay tareas asignadas</p>
             </div>
-          </div>
+          )}
+
+          {/* Resumen de tareas */}
+          {tasksData?.goals && tasksData.goals.length > 0 && (
+            <div className="mt-4 p-3 rounded" style={{
+              backgroundColor: theme.palette.background.default,
+              border: `1px solid ${theme.palette.divider}`
+            }}>
+              <h4 className="text-sm font-semibold mb-2" style={{ color: theme.palette.text.primary }}>
+                Resumen
+              </h4>
+              <div className="flex gap-4 text-xs">
+                <span style={{ color: theme.palette.success.main }}>
+                  Completadas: {completedGoals.length}
+                </span>
+                <span style={{ color: theme.palette.warning.main }}>
+                  Pendientes: {incompleteGoals.length}
+                </span>
+                <span style={{ color: theme.palette.text.secondary }}>
+                  Total: {tasksData?.goals?.length || 0}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sección Notas (Derecha) */}
@@ -85,54 +258,41 @@ const ClientTasks: React.FC = () => {
             Notas del Coach
           </h2>
           <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100%-4rem)]">
-            {/* Card 1 */}
-            <div className="rounded-lg p-4" style={{
-              border: `1px solid ${theme.palette.divider}`,
-              backgroundColor: theme.palette.background.default
-            }}>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-semibold" style={{ color: theme.palette.text.primary }}>15 Marzo 2024</h3>
-                <span className="text-xs px-2 py-1 rounded-full" style={{
-                  backgroundColor: theme.palette.info.main,
-                  color: theme.palette.info.contrastText
-                }}>Importante</span>
+            {tasksData?.notes && tasksData.notes.length > 0 ? (
+              tasksData.notes.map((note) => (
+                <div key={note._id} className="rounded-lg p-4" style={{
+                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: theme.palette.background.default
+                }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs px-2 py-1 rounded-full" style={{
+                      backgroundColor: theme.palette.info.main,
+                      color: theme.palette.info.contrastText
+                    }}>
+                      {note.title || 'Nota'}
+                    </span>
+                    <h3 className="text-sm font-semibold" style={{ color: theme.palette.text.primary }}>
+                      {new Date(note.createdAt).toLocaleDateString('es-ES')}
+                    </h3>
+                  </div>
+                  <p className="text-sm mb-2" style={{ color: theme.palette.text.secondary }}>
+                    {note.content}
+                  </p>
+                  {note.sessionInfo && (
+                    <div className="text-xs" style={{ color: theme.palette.text.secondary }}>
+                      <p>Sesión: {new Date(note.sessionInfo.date).toLocaleDateString('es-ES')}</p>
+                    </div>
+                  )}
+                  <p className="text-xs mt-1" style={{ color: theme.palette.text.secondary }}>
+                    Por: {note.createdBy}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8" style={{ color: theme.palette.text.secondary }}>
+                <p>No hay notas disponibles</p>
               </div>
-              <p className="text-sm mb-2" style={{ color: theme.palette.text.secondary }}>
-                Mejorar la técnica de respiración durante los ejercicios de cardio.
-              </p>
-            </div>
-
-            <div className="rounded-lg p-4" style={{
-              border: `1px solid ${theme.palette.divider}`,
-              backgroundColor: theme.palette.background.default
-            }}>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-semibold" style={{ color: theme.palette.text.primary }}>14 Marzo 2024</h3>
-                <span className="text-xs px-2 py-1 rounded-full" style={{
-                  backgroundColor: theme.palette.info.main,
-                  color: theme.palette.info.contrastText
-                }}>Progreso</span>
-              </div>
-              <p className="text-sm mb-2" style={{ color: theme.palette.text.secondary }}>
-                Excelente progreso en los ejercicios de peso muerto. Aumentar peso gradualmente.
-              </p>
-            </div>
-
-            <div className="rounded-lg p-4" style={{
-              border: `1px solid ${theme.palette.divider}`,
-              backgroundColor: theme.palette.background.default
-            }}>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-semibold" style={{ color: theme.palette.text.primary }}>13 Marzo 2024</h3>
-                <span className="text-xs px-2 py-1 rounded-full" style={{
-                  backgroundColor: theme.palette.warning.main,
-                  color: theme.palette.warning.contrastText
-                }}>Recordatorio</span>
-              </div>
-              <p className="text-sm mb-2" style={{ color: theme.palette.text.secondary }}>
-                Mantener el control de la dieta durante los fines de semana. Seguir el plan de comidas establecido.
-              </p>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -150,8 +310,28 @@ const ClientTasks: React.FC = () => {
           }}>
             Feedback
           </h2>
-          {/* Contenido de feedback aquí */}
-          <p style={{ color: theme.palette.text.secondary }}>Feedback general sobre el proceso...</p>
+          {tasksData?.feedback ? (
+            <div className="p-4 rounded" style={{
+              backgroundColor: theme.palette.background.default,
+              border: `1px solid ${theme.palette.divider}`
+            }}>
+              <div className="mb-2">
+                <span className="text-xs px-2 py-1 rounded-full" style={{
+                  backgroundColor: theme.palette.success.main,
+                  color: theme.palette.success.contrastText
+                }}>
+                  {new Date(tasksData.feedback.createdAt).toLocaleDateString('es-ES')}
+                </span>
+              </div>
+              <p className="text-sm" style={{ color: theme.palette.text.secondary }}>
+                {tasksData.feedback.feedback}
+              </p>
+            </div>
+          ) : (
+            <div className="text-center py-8" style={{ color: theme.palette.text.secondary }}>
+              <p>No hay feedback disponible</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
