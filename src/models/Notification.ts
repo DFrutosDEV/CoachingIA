@@ -3,10 +3,10 @@ import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 export interface INotification extends Document {
   title: string;
   description: string;
-  createdBy: ObjectId;
-  coachId: ObjectId;
-  clientId: ObjectId;
-  read: boolean;
+  createdAt: Date;
+  userIdRecipients: ObjectId[];
+  userIdSender: ObjectId;
+  userIdRead: ObjectId[];
 }
 
 const NotificationSchema: Schema = new Schema({
@@ -22,31 +22,32 @@ const NotificationSchema: Schema = new Schema({
     trim: true,
     maxlength: [500, 'The description cannot exceed 500 characters']
   },
-  createdBy: {
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  userIdRecipients: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Profile',
+    required: true
+  },
+  userIdSender: {
     type: Schema.Types.ObjectId,
     ref: 'Profile',
     required: true
   },
-  coachId: {
-    type: Schema.Types.ObjectId,
+  userIdRead: {
+    type: [Schema.Types.ObjectId],
     ref: 'Profile',
-    required: true
-  },
-  clientId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Profile',
-    required: true
-  },
-  read: {
-    type: Boolean,
-    default: false
+    default: []
   }
 }, {
   timestamps: true
 });
 
 NotificationSchema.index({ title: 1 });
-NotificationSchema.index({ clientId: 1 });
-NotificationSchema.index({ read: 1 });
+NotificationSchema.index({ userIdRecipients: 1 });
+NotificationSchema.index({ userIdSender: 1 });
+NotificationSchema.index({ userIdRead: 1 });
 
 export default mongoose.models.Notification || mongoose.model<INotification>('Notification', NotificationSchema); 

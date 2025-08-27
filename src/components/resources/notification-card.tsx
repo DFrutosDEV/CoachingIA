@@ -172,8 +172,8 @@ export function NotificationCard({ userType }: NotificationCardProps) {
     try {
       const requestBody: any = {
         title: notificationForm.title,
-        message: notificationForm.message,
-        userId: user._id
+        description: notificationForm.message,
+        profileId: user.profile?._id
       }
 
       // Agregar destinatarios individuales si existen
