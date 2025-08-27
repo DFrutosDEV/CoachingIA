@@ -11,10 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { useAuthService } from "@/lib/services/auth-service"
 import { toast } from "sonner"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuthService()
+  const { isAuthenticated, user } = useAuth()
 
   // Estados para manejar el formulario y "Recuérdame"
   const [email, setEmail] = useState("")
@@ -23,19 +25,30 @@ export default function LoginPage() {
 
   // Cargar email guardado al montar el componente
   useEffect(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail")
-    if (savedEmail) {
-      setEmail(savedEmail)
-      setRememberMe(true)
+    // Verificar si ya está autenticado
+    if (isAuthenticated && user) {
+      router.push(`/dashboard/${user.role.name.toLowerCase()}`)
+      return
     }
-  }, [])
+
+    // Solo acceder a localStorage en el cliente
+    if (typeof window !== 'undefined') {
+      const savedEmail = localStorage.getItem("rememberedEmail")
+      if (savedEmail) {
+        setEmail(savedEmail)
+        setRememberMe(true)
+      }
+    }
+  }, [isAuthenticated, user, router])
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const result = await login(email, password)
+    
     if (result.success) {
       toast.success("Iniciando sesión...")
+      
       // Manejar localStorage según el estado de "Recuérdame"
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email)
@@ -43,11 +56,11 @@ export default function LoginPage() {
         localStorage.removeItem("rememberedEmail")
       }
 
-      const user = result.user
-      if (user) {
+      if (result.success && 'user' in result && result.user) {
+        const user = result.user
         setTimeout(() => {
           // Determinar la ruta basada en el primer rol o el rol principal
-          const primaryRole = user.roles[0] || 'client'
+          const primaryRole = user.role?.name?.toLowerCase() || 'client'
           router.push(`/dashboard/${primaryRole}`)
         }, 1000)
       }
@@ -57,7 +70,6 @@ export default function LoginPage() {
       } else {
         toast.error("Error al iniciar sesión")
       }
-      console.log('❌ Login fallido:', result)
     }
   }
 

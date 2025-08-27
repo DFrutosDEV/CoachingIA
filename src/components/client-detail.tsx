@@ -248,9 +248,11 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
                               <h5 className="font-medium">{objective.title}</h5>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Badge variant={objective.active ? "active" : "inactive"}>
-                                {objective.active ? "Activo" : "Inactivo"}
-                              </Badge>
+                              {objective.active && (
+                                <Badge variant="active">
+                                  Activo
+                                </Badge>
+                              )}
                               <Badge variant={objective.isCompleted ? "active" : "outline"}>
                                 {objective.isCompleted ? "Completado" : "En Progreso"}
                               </Badge>
