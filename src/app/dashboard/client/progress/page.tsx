@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Clock, FileText, User } from "lucide-react"
 import { formatDate } from "@/utils/validatesInputs"
 import { Goal, Note, Objective } from "@/types"
+import { FinalizeObjectiveModal } from "@/components/ui/finalize-objective-modal"
 
 interface ObjectiveDetails {
   objective: {
@@ -170,8 +171,7 @@ export default function ProgressPage() {
                 objectives.map((objective) => (
                   <Card
                     key={objective._id}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => fetchObjectiveDetails(objective._id)}
+                    className="hover:shadow-md transition-shadow"
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -187,6 +187,13 @@ export default function ProgressPage() {
                               Completado
                             </Badge>
                           )}
+                          {objective.active && !objective.isCompleted && (
+                            <FinalizeObjectiveModal
+                              objectiveId={objective._id}
+                              objectiveTitle={objective.title}
+                              onObjectiveFinalized={fetchObjectives}
+                            />
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -200,7 +207,10 @@ export default function ProgressPage() {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent 
+                      className="cursor-pointer"
+                      onClick={() => fetchObjectiveDetails(objective._id)}
+                    >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Progreso</span>

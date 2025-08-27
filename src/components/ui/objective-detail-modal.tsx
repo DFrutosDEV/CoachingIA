@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -34,6 +35,7 @@ import { ObjectiveConfigForm } from "./objective-config-form"
 import { CreateNoteModal } from "./create-note-modal"
 import { AIGoalsGenerator } from "./ai-goals-generator"
 import { toast } from "sonner"
+import { FinalizeObjectiveModal } from "./finalize-objective-modal"
 
 interface Goal {
   _id: string;
@@ -360,11 +362,19 @@ export function ObjectiveDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0 gap-0">
-        <DialogHeader className="p-6 pb-4">
+        <DialogHeader className="p-6 pb-4 mt-4 flex flex-row justify-between items-center">
           <DialogTitle className="text-2xl flex items-center gap-2">
             <Target className="h-6 w-6" />
             {objective.title}
           </DialogTitle>
+          {objective.active && !objective.isCompleted && (
+          <DialogDescription>
+            <FinalizeObjectiveModal
+              objectiveId={objective.id}
+              objectiveTitle={objective.title}
+            />
+          </DialogDescription>
+          )}
         </DialogHeader>
 
         <div className="flex-1 overflow-auto p-6">
