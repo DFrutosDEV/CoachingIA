@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
         createdBy: coachId,
         clientId,
         day,
+        date: new Date().toISOString(),
         isCompleted: false,
         isDeleted: false
       });
@@ -48,12 +49,13 @@ export async function POST(request: NextRequest) {
       }
 
       // Crear los goals en la base de datos
-      const goalsToCreate = goals.map((goal: any) => ({
+      const goalsToCreate = goals.map((goal: any, index: number) => ({
         objectiveId,
         description: goal.description || goal.title,
         createdBy: coachId,
         clientId,
         day: goal.day || 'Lunes',
+        date: new Date(new Date().setDate(new Date().getDate() + index)).toISOString(),
         isCompleted: false,
         isDeleted: false
       }));
@@ -87,26 +89,9 @@ export async function GET(request: NextRequest) {
     await connectDB();
     
     const { searchParams } = new URL(request.url);
-    const clientId = searchParams.get('clientId');
     const objectiveId = searchParams.get('objectiveId');
-    
-    if (!clientId) {
-      return NextResponse.json(
-        { error: 'Client ID es requerido' },
-        { status: 400 }
-      );
-    }
 
-    const query: any = { 
-      clientId, 
-      isDeleted: false 
-    };
-
-    if (objectiveId) {
-      query.objectiveId = objectiveId;
-    }
-
-    const goals = await Goal.find(query)
+    const goals = await Goal.find({ objectiveId, isDeleted: false })
       .populate('objectiveId', 'title description')
       .sort({ day: 1, createdAt: 1 });
 

@@ -87,7 +87,7 @@ export function CreateNoteModal({
     try {
       setSaving(true);
       
-             const noteData = {
+        const noteData = {
          title: title.trim(),
          content: content.trim(),
          objectiveId,
