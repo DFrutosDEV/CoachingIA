@@ -55,3 +55,5 @@ export async function POST(req) {
 
 --------------------------------------------------------------------------
 C:\Users\Daniel Frutos\Documents\CoachingIA\src\components\ui\goals-modal.tsx REVISAR PARA ELIMINAR
+
+C:\Users\Daniel Frutos\Documents\CoachingIA\src\app\api\objective\finalize\route.ts // REVISAR QUE FINALICE CORRECTAMENTE EL OBJETIVO

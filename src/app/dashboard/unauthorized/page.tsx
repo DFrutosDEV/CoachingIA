@@ -10,7 +10,7 @@ export default function UnauthorizedPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md mb-0">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
             <AlertTriangle className="h-8 w-8 text-red-600" />
@@ -39,11 +39,11 @@ export default function UnauthorizedPage() {
             </Button>
             
             <Button 
-              onClick={() => router.push('/dashboard')} 
+              onClick={() => router.push('/login')} 
               className="w-full"
             >
               <Home className="mr-2 h-4 w-4" />
-              Ir al Dashboard Principal
+              Ir al Login
             </Button>
           </div>
         </CardContent>
