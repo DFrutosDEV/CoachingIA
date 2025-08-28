@@ -85,8 +85,8 @@ export async function GET(request: NextRequest) {
 
     // Transformar los datos para el calendario
     const calendarEvents = meets.map(meet => {
-      const clientName = `${meet.clientId?.user?.name} ${meet.clientId?.user?.lastName}` || 'Cliente desconocido';
-      const coachName = `${meet.coachId?.user?.name} ${meet.coachId?.user?.lastName}` || 'Coach desconocido';
+      const clientName = `${meet.clientId?.name} ${meet.clientId?.lastName}` || 'Cliente desconocido';
+      const coachName = `${meet.coachId?.name} ${meet.coachId?.lastName}` || 'Coach desconocido';
 
       // Convertir la fecha UTC a la zona horaria del usuario
       const utcDate = new Date(meet.date);

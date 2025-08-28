@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { User, Mail, Calendar, Shield, Edit, Save, Camera } from "lucide-react"
+import { User, Edit, Save, Camera, Upload, X } from "lucide-react"
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks"
 import { updateUser } from "@/lib/redux/slices/authSlice"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
+import { toast } from "sonner"
 
 export default function ProfilePage() {
   const params = useParams()
@@ -19,64 +20,235 @@ export default function ProfilePage() {
   const user = useAppSelector(state => state.auth.user)
   const dispatch = useAppDispatch()
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [previewImage, setPreviewImage] = useState<string>('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    lastName: user?.lastName || '',
+    name: user?.profile?.name || '',
+    lastName: user?.profile?.lastName || '',
     email: user?.email || '',
-    phone: user?.profile?.phone || '',
-    address: user?.profile?.address || '',
-    bio: ''
+    age: user?.profile?.age || '',
+    phoneCountryCode: '',
+    phoneArea: '',
+    phoneNumber: '',
+    bio: user?.profile?.bio || '',
+    address: user?.profile?.address || ''
   })
+
+  // Función para parsear el teléfono existente en sus componentes
+  const parsePhone = (phone: string) => {
+    if (!phone) return { countryCode: '', area: '', number: '' }
+    
+    // Remover espacios y caracteres especiales
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '')
+    
+    // Si empieza con + (formato internacional)
+    if (cleanPhone.startsWith('+')) {
+      // Buscar el código de país (1-3 dígitos)
+      let countryCode = ''
+      let remainingNumber = ''
+      
+      // Códigos de país más comunes
+      const countryCodes = [
+        '1', '7', '20', '27', '30', '31', '32', '33', '34', '36', '39', '40', '41', '43', '44', '45', '46', '47', '48', '49',
+        '51', '52', '53', '54', '55', '56', '57', '58', '60', '61', '62', '63', '64', '65', '66', '81', '82', '84', '86', '90', '91', '92', '93', '94', '95', '98', '971', '972', '973', '974', '975', '976', '977', '994', '995', '996', '998', '999'
+      ]
+      
+      // Intentar encontrar el código de país
+      for (const code of countryCodes) {
+        if (cleanPhone.startsWith('+' + code)) {
+          countryCode = code
+          remainingNumber = cleanPhone.substring(code.length + 1)
+          break
+        }
+      }
+      
+      if (countryCode && remainingNumber.length >= 7) {
+        // Para números con 7+ dígitos, dividir en área y número (combinando prefijo)
+        if (remainingNumber.length >= 10) {
+          return {
+            countryCode,
+            area: remainingNumber.substring(0, 2),
+            number: remainingNumber.substring(2) // Combinar prefijo + número
+          }
+        } else {
+          // Para números más cortos, solo área y número
+          return {
+            countryCode,
+            area: remainingNumber.substring(0, Math.floor(remainingNumber.length / 2)),
+            number: remainingNumber.substring(Math.floor(remainingNumber.length / 2))
+          }
+        }
+      }
+    }
+    
+    // Si no empieza con + pero tiene 10+ dígitos, asumir que es nacional
+    if (cleanPhone.length >= 10) {
+      return {
+        countryCode: '',
+        area: cleanPhone.substring(0, 2),
+        number: cleanPhone.substring(2) // Combinar prefijo + número
+      }
+    }
+    
+    // Si no coincide con ningún formato, devolver como está
+    return { countryCode: '', area: '', number: cleanPhone }
+  }
 
   useEffect(() => {
     if (user) {
+      const phoneParts = parsePhone(user.profile?.phone || '')
       setFormData({
-        name: user.name || '',
-        lastName: user.lastName || '',
+        name: user.profile?.name || '',
+        lastName: user.profile?.lastName || '',
         email: user.email || '',
-        phone: user.profile?.phone || '',
-        address: user.profile?.address || '',
-        bio: ''
+        age: user.profile?.age || '',
+        phoneCountryCode: phoneParts.countryCode,
+        phoneArea: phoneParts.area,
+        phoneNumber: phoneParts.number,
+        bio: user.profile?.bio || '',
+        address: user.profile?.address || ''
       })
     }
   }, [user])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleSave = () => {
-    if (user) {
-      dispatch(updateUser({
-        name: formData.name,
-        lastName: formData.lastName,
-        email: formData.email,
-        profile: {
-          ...user.profile,
-          phone: formData.phone,
-          address: formData.address
-        }
+    
+    // Validar que solo se ingresen números en los campos de teléfono
+    if (name === 'phoneCountryCode' || name === 'phoneArea' || name === 'phoneNumber') {
+      const numericValue = value.replace(/[^0-9]/g, '')
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
       }))
     }
-    setIsEditing(false)
   }
 
   const handleCancel = () => {
     if (user) {
+      const phoneParts = parsePhone(user.profile?.phone || '')
       setFormData({
-        name: user.name || '',
-        lastName: user.lastName || '',
+        name: user.profile?.name || '',
+        lastName: user.profile?.lastName || '',
         email: user.email || '',
-        phone: user.profile?.phone || '',
-        address: user.profile?.address || '',
-        bio: ''
+        age: user.profile?.age || '',
+        phoneCountryCode: phoneParts.countryCode,
+        phoneArea: phoneParts.area,
+        phoneNumber: phoneParts.number,
+        bio: user.profile?.bio || '',
+        address: user.profile?.address || ''
       })
     }
     setIsEditing(false)
+    setSelectedImage(null)
+    setPreviewImage('')
+  }
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validar tamaño (10MB)
+      const maxSize = 10 * 1024 * 1024
+      if (file.size > maxSize) {
+        toast.error('La imagen no puede pesar más de 10MB')
+        return
+      }
+
+      // Validar tipo de archivo
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Solo se permiten archivos JPG, PNG y WebP')
+        return
+      }
+
+      setSelectedImage(file)
+      
+      // Crear preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!user) return
+
+    // Validar campos obligatorios del teléfono
+    const countryCode = formData.phoneCountryCode.replace(/\s/g, '')
+    const area = formData.phoneArea.replace(/\s/g, '')
+    const number = formData.phoneNumber.replace(/\s/g, '')
+    
+    if (!countryCode || !area || !number || !formData.name || !formData.lastName) {
+      toast.error('Todos los campos son obligatorios')
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      // Concatenar los campos del teléfono en formato E.164
+      let fullPhone = ''
+      if (countryCode && area && number) {
+        fullPhone = `+${countryCode}${area}${number}`
+      }
+      
+      const formDataToSend = new FormData()
+      formDataToSend.append('userId', user._id)
+      formDataToSend.append('name', formData.name)
+      formDataToSend.append('lastName', formData.lastName)
+      formDataToSend.append('age', formData.age.toString())
+      formDataToSend.append('phone', fullPhone)
+      formDataToSend.append('bio', formData.bio)
+      // formDataToSend.append('address', formData.address)
+      
+      if (selectedImage) {
+        formDataToSend.append('profilePicture', selectedImage)
+      }
+
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        body: formDataToSend
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Actualizar el estado del usuario con los nuevos datos del perfil
+        dispatch(updateUser({
+          email: formData.email,
+          profile: {
+            ...user.profile,
+            name: formData.name,
+            lastName: formData.lastName,
+            age: formData.age ? parseInt(formData.age.toString()) : undefined,
+            phone: fullPhone,
+            bio: formData.bio,
+            // address: formData.address,
+            profilePicture: result.data.profilePicture || user.profile?.profilePicture
+          }
+        }))
+
+        toast.success('Perfil actualizado exitosamente')
+        setIsEditing(false)
+        setSelectedImage(null)
+        setPreviewImage('')
+      } else {
+        toast.error(result.error || 'Error al actualizar el perfil')
+      }
+    } catch (error) {
+      console.error('Error al guardar perfil:', error)
+      toast.error('Error al actualizar el perfil')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (!user) {
@@ -104,11 +276,19 @@ export default function ProfilePage() {
               <div className="flex gap-2">
                 {isEditing ? (
                   <>
-                    <Button onClick={handleSave} className="gap-2">
+                    <Button 
+                      onClick={handleSave} 
+                      className="gap-2"
+                      disabled={isLoading}
+                    >
                       <Save className="h-4 w-4" />
-                      Guardar
+                      {isLoading ? 'Guardando...' : 'Guardar'}
                     </Button>
-                    <Button variant="outline" onClick={handleCancel}>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleCancel}
+                      disabled={isLoading}
+                    >
                       Cancelar
                     </Button>
                   </>
@@ -135,9 +315,9 @@ export default function ProfilePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-3">
                       <div className="space-y-2">
-                        <Label htmlFor="name">Nombre</Label>
+                        <Label htmlFor="name">Nombre <span className="text-red-500">*</span></Label>
                         <Input
                           id="name"
                           name="name"
@@ -148,7 +328,7 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName">Apellido</Label>
+                        <Label htmlFor="lastName">Apellido <span className="text-red-500">*</span></Label>
                         <Input
                           id="lastName"
                           name="lastName"
@@ -156,6 +336,21 @@ export default function ProfilePage() {
                           onChange={handleInputChange}
                           disabled={!isEditing}
                           className={!isEditing ? "bg-muted" : ""}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="age">Edad</Label>
+                        <Input
+                          id="age"
+                          name="age"
+                          type="number"
+                          min="0"
+                          max="120"
+                          value={formData.age}
+                          onChange={handleInputChange}
+                          disabled={!isEditing}
+                          className={!isEditing ? "bg-muted" : ""}
+                          placeholder="Edad"
                         />
                       </div>
                     </div>
@@ -174,29 +369,54 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Teléfono</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={!isEditing ? "bg-muted" : ""}
-                        placeholder="Agregar número de teléfono"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Dirección</Label>
-                      <Input
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={!isEditing ? "bg-muted" : ""}
-                        placeholder="Agregar dirección"
-                      />
+                      <Label htmlFor="phone">Teléfono <span className="text-red-500">*</span></Label>
+                      <div className="grid gap-2 md:grid-cols-3">
+                        <div className="flex flex-col gap-1">
+                          <Input
+                            id="phoneCountryCode"
+                            name="phoneCountryCode"
+                            value={formData.phoneCountryCode}
+                            onChange={handleInputChange}
+                            disabled={!isEditing}
+                            className={!isEditing ? "bg-muted" : ""}
+                            placeholder="54"
+                            maxLength={3}
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground">País <span className="text-red-500">*</span></p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Input
+                            id="phoneArea"
+                            name="phoneArea"
+                            value={formData.phoneArea}
+                            onChange={handleInputChange}
+                            disabled={!isEditing}
+                            className={!isEditing ? "bg-muted" : ""}
+                            placeholder="11"
+                            maxLength={2}
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground">Área <span className="text-red-500">*</span></p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Input
+                            id="phoneNumber"
+                            name="phoneNumber"
+                            value={formData.phoneNumber}
+                            onChange={handleInputChange}
+                            disabled={!isEditing}
+                            className={!isEditing ? "bg-muted" : ""}
+                            placeholder="40317700"
+                            maxLength={10}
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground">Número <span className="text-red-500">*</span></p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Formato: +[país] [área] [número] (ej: +54 11 40317700, +1 415 5552671)
+                      </p>
                     </div>
 
                     <div className="space-y-2">
@@ -212,6 +432,19 @@ export default function ProfilePage() {
                         rows={4}
                       />
                     </div>
+
+                    {/* <div className="space-y-2">
+                      <Label htmlFor="address">Dirección</Label>
+                      <Input
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        className={!isEditing ? "bg-muted" : ""}
+                        placeholder="Agregar dirección"
+                      />
+                    </div> */}
                   </CardContent>
                 </Card>
               </div>
@@ -225,8 +458,14 @@ export default function ProfilePage() {
                   </CardHeader>
                   <CardContent className="flex flex-col items-center space-y-4">
                     <div className="relative">
-                      <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center">
-                        {user.profile?.profilePicture ? (
+                      <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                        {previewImage ? (
+                          <img
+                            src={previewImage}
+                            alt="Preview de foto de perfil"
+                            className="w-24 h-24 rounded-full object-cover"
+                          />
+                        ) : user.profile?.profilePicture ? (
                           <img
                             src={user.profile.profilePicture}
                             alt="Foto de perfil"
@@ -237,57 +476,56 @@ export default function ProfilePage() {
                         )}
                       </div>
                       {isEditing && (
-                        <Button
-                          size="sm"
-                          className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
-                          disabled
-                        >
-                          <Camera className="h-4 w-4" />
-                        </Button>
+                        <div className="absolute -bottom-2 -right-2 flex gap-1">
+                          <Button
+                            size="sm"
+                            className="rounded-full w-8 h-8 p-0"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            <Camera className="h-4 w-4" />
+                          </Button>
+                          {selectedImage && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="rounded-full w-8 h-8 p-0"
+                              onClick={() => {
+                                setSelectedImage(null)
+                                setPreviewImage('')
+                                if (fileInputRef.current) {
+                                  fileInputRef.current.value = ''
+                                }
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </div>
-                    <div className="text-center">
-                      <p className="font-medium">{user.name} {user.lastName}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Información de la cuenta */}
-                <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-sm">
-                      <Shield className="h-4 w-4" />
-                      Información de la Cuenta
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">ID de Usuario:</span>
-                      <span className="text-sm font-mono">{user._id.slice(-8)}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Tipo de Usuario:</span>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded capitalize">
-                        {userType}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Roles:</span>
-                      <div className="flex gap-1">
-                        {user.roles.map((role: string, index: number) => (
-                          <span
-                            key={index}
-                            className="text-xs bg-primary/10 text-primary px-2 py-1 rounded capitalize"
-                          >
-                            {role}
-                          </span>
-                        ))}
+                    
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                    
+                    {isEditing && (
+                      <div className="text-center space-y-2">
+                        <p className="text-xs text-muted-foreground">
+                          Formatos: JPG, PNG, WebP
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Máximo: 10MB
+                        </p>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Estado:</span>
-                      <span className="text-sm text-green-600 font-medium">Activo</span>
+                    )}
+                    
+                    <div className="text-center">
+                      <p className="font-medium">{user.profile?.name || ''} {user.profile?.lastName || ''}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
                   </CardContent>
                 </Card>

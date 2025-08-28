@@ -79,3 +79,59 @@ export function decodeTokenUnsafe(token: string): any {
     return null;
   }
 }
+
+/**
+ * Obtiene el token JWT desde Redux Persist o localStorage
+ * @returns {string | null} El token JWT o null si no existe
+ */
+export function getStoredToken(): string | null {
+  try {
+    // Intentar obtener del Redux Persist primero
+    const persistAuth = localStorage.getItem('persist:auth')
+    if (persistAuth) {
+      const authData = JSON.parse(persistAuth)
+      if (authData.token) {
+        // El token está serializado como string por Redux Persist
+        const token = JSON.parse(authData.token)
+        if (token && token !== 'null') {
+          return token
+        }
+      }
+    }
+    
+    // Si no está en Redux Persist, intentar localStorage directo
+    const directToken = localStorage.getItem('token')
+    if (directToken && directToken !== 'null') {
+      return directToken
+    }
+    
+    return null
+  } catch (error) {
+    console.error('❌ Error obteniendo token almacenado:', error)
+    return null
+  }
+}
+
+/**
+ * Guarda el token JWT en localStorage (para compatibilidad)
+ * @param {string} token - El token JWT a guardar
+ */
+export function storeToken(token: string): void {
+  try {
+    localStorage.setItem('token', token)
+  } catch (error) {
+    console.error('❌ Error guardando token:', error)
+  }
+}
+
+/**
+ * Limpia el token JWT de localStorage
+ */
+export function clearStoredToken(): void {
+  try {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userRole')
+  } catch (error) {
+    console.error('❌ Error limpiando token:', error)
+  }
+}

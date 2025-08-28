@@ -121,11 +121,8 @@ export interface User {
   role: Role;
   profile: Profile;
   enterprise: Enterprise | null;
-  name: string;
-  lastName: string;
   email: string;
   roles: string[];
-  age?: number;
 }
 
 export interface Role {
@@ -139,6 +136,9 @@ export interface Profile {
   user: string;
   role: string;
   profilePicture: string;
+  name: string;
+  lastName: string;
+  age?: number;
   bio: string;
   phone: string;
   address: string;

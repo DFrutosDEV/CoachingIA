@@ -13,7 +13,7 @@ async function connectMongoDB() {
   }
   
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tu_base_de_datos');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/coachingia');
   } catch (error) {
     console.error('❌ Error conectando a MongoDB:', error);
     throw error;
@@ -39,7 +39,7 @@ export async function GET(request) {
 
     // Verificar token
     const decoded = verifyToken(token);
-    
+
     if (!decoded) {
       return NextResponse.json(
         { 
@@ -49,11 +49,10 @@ export async function GET(request) {
         { status: 401 }
       );
     }
-
     // Buscar usuario actual
     const user = await User.findById(decoded.userId).select('-password');
     
-    if (!user || !user.active) {
+    if (!user || user.isDeleted) {
       return NextResponse.json(
         { 
           success: false, 
@@ -75,7 +74,7 @@ export async function GET(request) {
         path: 'enterprise',
         model: Enterprise,
         select: 'name logo address phone email website socialMedia',
-        match: { active: true, isDeleted: false }
+        match: { isDeleted: false }
       });
 
     return NextResponse.json(

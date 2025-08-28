@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@mui/material"
-import { Bell, Menu, UserCircle } from "lucide-react"
+import { Menu, UserCircle } from "lucide-react"
+import { NotificationsModal } from "@/components/ui/notifications-modal"
 
 interface HeaderProps {
   userType: "client" | "coach" | "admin" | "enterprise"
@@ -16,10 +17,7 @@ export function DashboardHeader({ userType }: HeaderProps) {
         </Button>
       </div>
       <div className="flex items-center gap-2 ml-auto">
-        <Button variant="text">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notificaciones</span>
-        </Button>
+        <NotificationsModal userType={userType} />
         <Link href={`/dashboard/${userType}/profile`}>
           <Button variant="text" className="rounded-full">
             <UserCircle className="h-6 w-6" />

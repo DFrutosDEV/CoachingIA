@@ -4,6 +4,9 @@ export interface IProfile extends Document {
   user: ObjectId;
   role: ObjectId;
   profilePicture: string;
+  name: string;
+  lastName: string;
+  age?: number;
   bio: string;
   phone: string;
   address: string;
@@ -27,6 +30,23 @@ const ProfileSchema: Schema = new Schema({
   profilePicture: {
     type: String,
     default: ''
+  },
+  name: {
+    type: String,
+    required: [true, 'The name is required'],
+    trim: true,
+    maxlength: [50, 'The name cannot exceed 50 characters']
+  },
+  lastName: {
+    type: String,
+    required: [true, 'The last name is required'],
+    trim: true,
+    maxlength: [50, 'The last name cannot exceed 50 characters']
+  },
+  age: {
+    type: Number,
+    min: [0, 'The age cannot be negative'],
+    max: [120, 'The age cannot be greater than 120']
   },
   bio: {
     type: String,
@@ -66,7 +86,6 @@ const ProfileSchema: Schema = new Schema({
   timestamps: true
 });
 
-ProfileSchema.index({ user: 1 });
-ProfileSchema.index({ isDeleted: 1 });
+ProfileSchema.index({ user: 1, isDeleted: 1, role: 1 });
 
 export default mongoose.models.Profile || mongoose.model<IProfile>('Profile', ProfileSchema); 

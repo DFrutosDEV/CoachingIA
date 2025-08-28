@@ -45,7 +45,7 @@ function MyComponent() {
   
   return (
     <div>
-      {isAuthenticated ? `Hola ${user?.name}` : 'No autenticado'}
+      {isAuthenticated ? `Hola ${user?.profile?.name}` : 'No autenticado'}
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { axiosClient } from '@/lib/services/axios-client'
+import { getStoredToken } from '@/lib/token-utils'
 
 // Tipos de roles
 type UserRole = 'admin' | 'coach' | 'client' | 'enterprise'
@@ -35,7 +36,8 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
       if (pathname.startsWith('/dashboard')) {
         console.log(`🔒 [${timestamp}] ROUTE GUARD CLIENTE: Ruta protegida ${pathname}`)
         
-        const { token } = JSON.parse(localStorage.getItem('persist:auth') || '{}')
+        // Obtener token usando la función utilitaria
+        const token = getStoredToken()
         console.log('🔍 Token en cliente:', !!token)
         
         if (!token) {
@@ -57,6 +59,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
           console.log(`✅ [${timestamp}] ROUTE GUARD CLIENTE: Token válido en servidor`)
           
           // Verificar permisos específicos
+          console.log('🔍 Datos del usuario:', response.data.user)
           const userRole = response.data.user?.role?.name?.toLowerCase()
           console.log(`👤 [${timestamp}] ROUTE GUARD CLIENTE: Usuario con rol '${userRole}'`)
           

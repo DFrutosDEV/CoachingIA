@@ -18,21 +18,27 @@ const colors = {
 const profilesToMigrate = [
   {
     userEmail: 'admin@coach.com',
-    roleName: 'Admin',
+    roleName: 'admin',
     bio: 'Administrador del sistema',
-    profilePicture: ''
+    profilePicture: '',
+    phone: '+1234567890',
+    address: 'Oficina Principal'
   },
   {
     userEmail: 'coach@coach.com',
-    roleName: 'Coach',
+    roleName: 'coach',
     bio: 'Coach profesional especializado en desarrollo personal',
-    profilePicture: ''
+    profilePicture: '',
+    phone: '+1234567891',
+    address: 'Centro de Coaching'
   },
   {
     userEmail: 'cliente@coach.com',
-    roleName: 'Client',
+    roleName: 'client',
     bio: 'Cliente en proceso de coaching',
-    profilePicture: ''
+    profilePicture: '',
+    phone: '+1234567892',
+    address: 'Dirección del Cliente'
   }
 ];
 
@@ -40,6 +46,8 @@ export const migrateName = 'migrate-profiles-20250623';
 
 export async function up(): Promise<void> {
   console.log(`${colors.blue}🔄 Ejecutando migración: ${migrateName}${colors.reset}`);
+  console.log(`${colors.yellow}⚠️  NOTA: Esta migración es opcional. La migración de usuarios ya crea los perfiles.${colors.reset}`);
+  console.log(`${colors.yellow}   Esta migración solo actualiza información adicional de los perfiles existentes.${colors.reset}\n`);
   
   try {
     let successCount = 0;
@@ -55,7 +63,7 @@ export async function up(): Promise<void> {
         throw new Error(`No se encontró el usuario con email "${profileData.userEmail}". Asegúrate de ejecutar la migración de usuarios primero.`);
       }
       
-      console.log(`${colors.blue}      👤 Usuario encontrado: ${user.name} ${user.lastName} (ID: ${user._id})${colors.reset}`);
+      console.log(`${colors.blue}      👤 Usuario encontrado: ${user.email} (ID: ${user._id})${colors.reset}`);
       
       // Verificar si el perfil ya existe
       const existingProfile = await (Profile as any).findOne({ 
@@ -64,8 +72,24 @@ export async function up(): Promise<void> {
       });
       
       if (existingProfile) {
-        console.log(`${colors.yellow}   ⚠️  Perfil para usuario "${profileData.userEmail}" ya existe${colors.reset}`);
-        skipCount++;
+        console.log(`${colors.blue}   🔄 Actualizando perfil existente para "${profileData.userEmail}"${colors.reset}`);
+        
+        // Actualizar el perfil existente con información adicional
+        const updateData = {
+          bio: profileData.bio,
+          phone: profileData.phone,
+          address: profileData.address
+        };
+        
+        await (Profile as any).findByIdAndUpdate(existingProfile._id, updateData);
+        
+        console.log(`${colors.green}   ✅ Perfil actualizado exitosamente${colors.reset}`);
+        console.log(`${colors.green}      👤 Usuario: ${user.email}${colors.reset}`);
+        console.log(`${colors.green}      📝 Bio: ${profileData.bio}${colors.reset}`);
+        console.log(`${colors.green}      📞 Teléfono: ${profileData.phone}${colors.reset}`);
+        console.log(`${colors.green}      🏠 Dirección: ${profileData.address}${colors.reset}`);
+        
+        successCount++;
         continue;
       }
       
@@ -84,6 +108,8 @@ export async function up(): Promise<void> {
         role: new mongoose.Types.ObjectId(role._id),
         profilePicture: profileData.profilePicture,
         bio: profileData.bio,
+        phone: profileData.phone,
+        address: profileData.address,
         indexDashboard: [],
         clients: [],
         enterprise: null,
@@ -94,17 +120,19 @@ export async function up(): Promise<void> {
       await newProfile.save();
       
       console.log(`${colors.green}   ✅ Perfil creado exitosamente${colors.reset}`);
-      console.log(`${colors.green}      👤 Usuario: ${user.name} ${user.lastName}${colors.reset}`);
+      console.log(`${colors.green}      👤 Usuario: ${user.email}${colors.reset}`);
       console.log(`${colors.green}      📧 Email: ${user.email}${colors.reset}`);
       console.log(`${colors.green}      👤 Rol: ${role.name}${colors.reset}`);
       console.log(`${colors.green}      📝 Bio: ${profileData.bio}${colors.reset}`);
+      console.log(`${colors.green}      📞 Teléfono: ${profileData.phone}${colors.reset}`);
+      console.log(`${colors.green}      🏠 Dirección: ${profileData.address}${colors.reset}`);
       
       successCount++;
     }
     
     console.log(`${colors.green}✅ Migración ${migrateName} completada exitosamente${colors.reset}`);
-    console.log(`${colors.green}   📊 Perfiles creados: ${successCount}${colors.reset}`);
-    console.log(`${colors.yellow}   📊 Perfiles omitidos (ya existían): ${skipCount}${colors.reset}\n`);
+    console.log(`${colors.green}   📊 Perfiles actualizados: ${successCount}${colors.reset}`);
+    console.log(`${colors.yellow}   📊 Perfiles omitidos (no se encontró usuario): ${skipCount}${colors.reset}\n`);
     
   } catch (error) {
     console.error(`${colors.red}❌ Error en migración ${migrateName}:${colors.reset}`, error);
@@ -118,19 +146,27 @@ export async function down(): Promise<void> {
   try {
     let deletedCount = 0;
     
-    // Eliminar todos los perfiles que se crearon en esta migración
+    // Restaurar valores por defecto en los perfiles
     for (const profileData of profilesToMigrate) {
       // Buscar el usuario por email
       const user = await (User as any).findOne({ email: profileData.userEmail });
       
       if (user) {
-        const deletedProfile = await (Profile as any).deleteOne({ user: user._id });
+        const profile = await (Profile as any).findOne({ user: user._id });
         
-        if (deletedProfile.deletedCount > 0) {
-          console.log(`${colors.yellow}   🗑️  Perfil de ${profileData.userEmail} eliminado${colors.reset}`);
+        if (profile) {
+          // Restaurar valores por defecto
+          const updateData = {
+            bio: '',
+            phone: '',
+            address: ''
+          };
+          
+          await (Profile as any).findByIdAndUpdate(profile._id, updateData);
+          console.log(`${colors.yellow}   🔄 Perfil de ${profileData.userEmail} restaurado a valores por defecto${colors.reset}`);
           deletedCount++;
         } else {
-          console.log(`${colors.yellow}   ⚠️  Perfil de ${profileData.userEmail} no encontrado para eliminar${colors.reset}`);
+          console.log(`${colors.yellow}   ⚠️  Perfil de ${profileData.userEmail} no encontrado${colors.reset}`);
         }
       } else {
         console.log(`${colors.yellow}   ⚠️  Usuario ${profileData.userEmail} no encontrado${colors.reset}`);
@@ -138,7 +174,7 @@ export async function down(): Promise<void> {
     }
     
     console.log(`${colors.yellow}✅ Migración ${migrateName} revertida exitosamente${colors.reset}`);
-    console.log(`${colors.yellow}   📊 Perfiles eliminados: ${deletedCount}${colors.reset}\n`);
+    console.log(`${colors.yellow}   📊 Perfiles restaurados a valores por defecto: ${deletedCount}${colors.reset}\n`);
     
   } catch (error) {
     console.error(`${colors.red}❌ Error revirtiendo migración ${migrateName}:${colors.reset}`, error);

@@ -33,7 +33,7 @@ export const DebugRedux: React.FC = () => {
       maxWidth: '300px'
     }}>
       <div><strong>Debug Redux:</strong></div>
-      <div>User: {authState.user?.name + ' ' + authState.user?.lastName || 'No user'}</div>
+      <div>User: {authState.user?.profile?.name + ' ' + authState.user?.profile?.lastName || 'No user'}</div>
       <div>Token: {authState.token ? 'Yes' : 'No'}</div>
       <div>Authenticated: {authState.isAuthenticated ? 'Yes' : 'No'}</div>
       <div>Redux Theme: {sessionState.theme}</div>

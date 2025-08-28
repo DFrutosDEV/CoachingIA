@@ -24,13 +24,7 @@ export class HttpClient {
   private static async handleResponse(response: Response) {
     // Si es 401, hacer logout automático
     if (response.status === 401) {
-      console.warn('🚨 Token expirado o inválido - Redirigiendo al login');
       store.dispatch(logout());
-      
-      // Redirigir al login (solo en el cliente)
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
     }
     
     return response;

@@ -221,7 +221,7 @@ export default function CoachDashboard() {
             <div>
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-4xl font-bold">Bienvenido, {user?.name} {user?.lastName}</h1>
+                  <h1 className="text-4xl font-bold">Bienvenido, {user?.profile?.name} {user?.profile?.lastName}</h1>
                   <p className="text-muted-foreground pt-2">Aquí tienes un resumen de tus sesiones y clientes.</p>
                 </div>
                 <Button

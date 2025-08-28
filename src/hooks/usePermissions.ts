@@ -8,6 +8,7 @@ import {
   getRoutePermission,
   type UserRole 
 } from '@/lib/permissions'
+import { getStoredToken } from '@/lib/token-utils'
 
 interface UsePermissionsReturn {
   hasPermission: (path: string) => boolean
@@ -44,7 +45,8 @@ export function usePermissions(): UsePermissionsReturn {
         console.log(`🔍 [${timestamp}] HOOK: Rol no encontrado en localStorage, buscando en token...`)
         
         // Si no está en localStorage, intentar obtener del token
-        const token = localStorage.getItem('token')
+        const token = getStoredToken()
+        
         if (token) {
           console.log(`🎫 [${timestamp}] HOOK: Token encontrado, decodificando...`)
           

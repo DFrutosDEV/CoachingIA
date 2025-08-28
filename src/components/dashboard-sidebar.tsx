@@ -2,8 +2,17 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Home, Users, Calendar, Building, FileText, Settings, BarChart, LogOut, UserCircle, File, BookOpenCheck } from "lucide-react"
 import { useAuthService } from "@/lib/services/auth-service"
 
@@ -15,21 +24,31 @@ interface SidebarProps {
 export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
   const router = useRouter()
   const { logout } = useAuthService()
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true)
+  }
 
   const handleLogout = async () => {
     try {
       await logout()
+      setShowLogoutModal(false)
       router.push('/login')
     } catch (error) {
       console.error('Error durante logout:', error)
     }
   }
 
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false)
+  }
+
   return (
     <div className={`border-r bg-muted/40 ${className}`}>
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 min-h-15">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+          <Link href={`/dashboard/${userType}`} className="flex items-center gap-2 font-semibold">
             <span className="text-primary font-bold">CoachingIA</span>
           </Link>
         </div>
@@ -188,13 +207,33 @@ export function DashboardSidebar({ userType, className = "" }: SidebarProps) {
           <Button 
             variant="text" 
             className="w-full justify-start gap-2"
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
           >
             <LogOut className="h-4 w-4" />
             Cerrar Sesión
           </Button>
         </div>
       </div>
+
+      {/* Modal de confirmación de logout */}
+      <Dialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar cierre de sesión</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que quieres cerrar sesión? Tendrás que volver a iniciar sesión para acceder a tu cuenta.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelLogout}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleLogout}>
+              Cerrar Sesión
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

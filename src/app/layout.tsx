@@ -11,6 +11,7 @@ import { DebugRedux } from '../components/debug-redux'
 import { Toaster } from 'sonner'
 import { RouteGuard } from '../components/auth/RouteGuard'
 
+
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -27,16 +28,6 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'Coaching IA',
   description: 'Coaching IA',
-  generator: 'coaching-ia',
-  manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Coaching IA',
-  },
-  formatDetection: {
-    telephone: false,
-  },
 }
 
 export default function RootLayout({
@@ -62,13 +53,13 @@ export default function RootLayout({
           >
             <MUIProvider>
               <ThemeSync />
-              <RouteGuard>
-                <ClientLayout>
-                  {children}
-                  <Toaster position="bottom-right" richColors />
-                  {process.env.NODE_ENV === 'development' && <DebugRedux />}
-                </ClientLayout>
-              </RouteGuard>
+                                             <RouteGuard>
+                  <ClientLayout>
+                    {children}
+                    <Toaster position="bottom-right" richColors />
+                    {process.env.NODE_ENV === 'development' && <DebugRedux />}
+                  </ClientLayout>
+                </RouteGuard>
             </MUIProvider>
           </ThemeProvider>
         </ReduxProvider>

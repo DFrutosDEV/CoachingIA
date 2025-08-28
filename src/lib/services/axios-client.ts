@@ -14,16 +14,8 @@ axiosClient.interceptors.request.use(
     const state = store.getState()
     const token = state.auth.token
     
-    console.log('🔍 AXIOS INTERCEPTOR: URL:', config.url)
-    console.log('🔍 AXIOS INTERCEPTOR: Token en store:', !!token)
-    console.log('🔍 AXIOS INTERCEPTOR: Headers antes:', config.headers)
-    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('🔑 AXIOS: Token agregado automáticamente')
-      console.log('🔍 AXIOS INTERCEPTOR: Headers después:', config.headers)
-    } else {
-      console.log('⚠️ AXIOS: No hay token en el store')
     }
     
     return config
@@ -42,13 +34,7 @@ axiosClient.interceptors.response.use(
   (error) => {
     // No hacer logout automático en el endpoint de login
     if (error.response?.status === 401 && !error.config?.url?.includes('/api/loggin')) {
-      console.log('🚫 Axios: Token expirado o inválido, haciendo logout')
       store.dispatch(logout())
-      
-      // Redirigir al login
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login'
-      }
     }
     
     return Promise.reject(error)

@@ -13,7 +13,7 @@ async function connectMongoDB() {
   }
   
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tu_base_de_datos');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/coachingia');
     console.log('✅ Conectado a MongoDB');
   } catch (error) {
     console.error('❌ Error conectando a MongoDB:', error);
@@ -46,7 +46,7 @@ export async function POST(request) {
     const user = await User.findOne({ 
       email: email.toLowerCase(),
       password: password,
-      active: true
+      isDeleted: false
     });
     
     console.log('👤 Usuario encontrado:', user ? 'SÍ' : 'NO');

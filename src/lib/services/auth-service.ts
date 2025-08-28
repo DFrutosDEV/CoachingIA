@@ -43,10 +43,7 @@ const mapApiUserToStore = (apiUser: User) => {
     _id: apiUser._id,
     role: apiUser.role || apiUser.roles[0],
     email: apiUser.email,
-    name: apiUser.name,
-    lastName: apiUser.lastName,
     roles: apiUser.roles,
-    age: apiUser.age,
     profile: apiUser.profile,
     enterprise: apiUser.enterprise,
   }
@@ -95,17 +92,8 @@ export class AuthService {
         const user = mapApiUserToStore(data.user)
         const token = data.token || ''
         
-        console.log('🔑 AUTH SERVICE: Token recibido:', !!token)
-        if (token) {
-          console.log('🔑 AUTH SERVICE: Token (primeros 20 chars):', token.substring(0, 20) + '...')
-        }
-        
         dispatch(login({ user, token }))
         dispatch(setSession({ isLoggedIn: true, userType: user.role.name }))
-        
-        // ✅ Debug: Verificar que el token se guardó en Redux
-        const stateAfterLogin = store.getState()
-        console.log('🔍 AUTH SERVICE: Token en Redux después del login:', !!stateAfterLogin.auth.token)
         
         return { success: true, user }
       } else {
@@ -140,9 +128,13 @@ export class AuthService {
       dispatch(logout())
       dispatch(clearSession())
       
-      // Redirigir al login
+      // Limpiar localStorage
       if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+        localStorage.removeItem('persist:auth')
+        localStorage.removeItem('persist:session')
+        localStorage.removeItem('rememberedEmail')
+        localStorage.removeItem('authToken')
+        localStorage.removeItem('userData')
       }
       
       return { success: true }

@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
 
     // Obtener roles para filtrar por tipo
     const [clientRole, coachRole] = await Promise.all([
-      Role.findOne({ code: 'client' }),
-      Role.findOne({ code: 'coach' })
+      Role.findOne({ code: '1' }),
+      Role.findOne({ code: '2' })
     ]);
 
     if (!clientRole || !coachRole) {
