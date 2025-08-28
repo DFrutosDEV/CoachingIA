@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
     
     // Buscar el rol de coach
-    const coachRole = await Role.findOne({ code: '2', active: true });
+    const coachRole = await Role.findOne({ code: '2' });
     if (!coachRole) {
       return NextResponse.json(
         { error: 'Rol de coach no encontrado' },
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     .populate({
       path: 'user',
       model: User,
-      select: 'name lastName email age active firstLogin createdAt',
+      select: 'email firstLogin createdAt',
       match: { isDeleted: false }
     })
     .populate({
@@ -44,14 +44,14 @@ export async function GET(request: NextRequest) {
     const formattedCoaches = validCoaches.map(coach => ({
       id: coach._id,
       userId: coach.user._id,
-      name: coach.user.name,
-      lastName: coach.user.lastName,
+      name: coach.name,
+      lastName: coach.lastName,
       email: coach.user.email,
-      age: coach.user.age,
+      age: coach.age,
       phone: coach.phone,
       bio: coach.bio,
       profilePicture: coach.profilePicture,
-      active: coach.user.active,
+      active: !coach.isDeleted,
       firstLogin: coach.user.firstLogin,
       clientsCount: coach.clients ? coach.clients.length : 0,
       enterprise: coach.enterprise ? {
