@@ -109,4 +109,4 @@ TicketSchema.index({ assignedTo: 1 });
 TicketSchema.index({ category: 1 });
 TicketSchema.index({ priority: 1 });
 
-export default mongoose.models.Report || mongoose.model<ITicket>('Ticket', TicketSchema);
+export default mongoose.models.Ticket || mongoose.model<ITicket>('Ticket', TicketSchema);

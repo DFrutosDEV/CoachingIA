@@ -120,7 +120,12 @@ export default function AdminClientsPage() {
                   </div>
                 </div>
               ) : (
-                <ClientsList clients={clients || []} onClientSelect={handleClientSelect} />
+                <ClientsList 
+                  clients={clients || []} 
+                  onClientSelect={handleClientSelect} 
+                  isAdmin={true} 
+                  onClientDeleted={fetchClients}
+                />
               )}
             </div>
           </div>
@@ -131,6 +136,7 @@ export default function AdminClientsPage() {
         isOpen={isDetailModalOpen}
         onClose={handleCloseModal}
         onUpdateClient={handleUpdateClient}
+        isAdmin={true}
       />
     </div>
   )

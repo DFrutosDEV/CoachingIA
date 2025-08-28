@@ -299,11 +299,11 @@ export default function AdminDashboard() {
                   recentUsers={basicData?.recentUsers || []}
                 />
               </div>
-              <div data-swapy-slot="6" className="w-full">
+              {/* <div data-swapy-slot="6" className="w-full">
                 <PlatformPerformanceCard 
                   platformStats={basicData?.platformStats}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </main>

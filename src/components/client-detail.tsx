@@ -18,12 +18,11 @@ import { FinalizeObjectiveModal } from "./ui/finalize-objective-modal"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { formatDate } from "@/utils/validatesInputs"
 import { toast } from "sonner"
-
 import { Goal, ClientDetailProps, Objective } from "@/types"
 import { sendMessage } from "@/utils/wpp-methods"
 import { sendEmail } from "@/utils/sendEmail"
 
-export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: ClientDetailProps) {
+export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin }: ClientDetailProps) {
   const [activeTab, setActiveTab] = useState("info")
   const [isGoalsModalOpen, setIsGoalsModalOpen] = useState(false)
   const [objectives, setObjectives] = useState<Objective[]>([])
@@ -112,7 +111,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
 
           <div className="flex-1 overflow-auto p-6">
             <div className="flex flex-col items-center space-y-3 text-center">
-              <Image src={client.avatar || "/placeholder.svg"} alt={client.name} width={86} height={86} className="rounded-full" />
+              {client.avatar && <Image src={client.avatar} alt={client.name} width={86} height={86} className="rounded-full" />}
               <div>
                 <h3 className="text-xl font-bold">{client.name}</h3>
                 <p className="text-sm text-muted-foreground">{client.focus}</p>
@@ -127,10 +126,12 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient }: Client
             </div>
 
             <div className="flex flex-wrap justify-center gap-2 mt-4">
-              <Button variant="outline" size="sm" className="gap-1">
-                <Calendar className="h-4 w-4" />
-                Programar
-              </Button>
+              {!isAdmin && 
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Calendar className="h-4 w-4" />
+                  Programar
+                </Button>
+              }
               <Button variant="outline" size="sm" className="gap-1" onClick={() => client.phone ? sendMessage({ phone: client.phone }) : sendEmail({ email: client.email })}>
                 <MessageSquare className="h-4 w-4" />
                 Mensaje

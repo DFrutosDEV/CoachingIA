@@ -173,8 +173,9 @@ export interface Coach {
 export interface ClientDetailProps {
   client: ClientResponse | null;
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () => void;  
   onUpdateClient: (clientId: string, updatedGoals: Goal[]) => void;
+  isAdmin: boolean;
 }
 
 export interface GoalProgress {

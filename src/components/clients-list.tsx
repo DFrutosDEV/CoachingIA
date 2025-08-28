@@ -13,10 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, MoreVertical, Calendar, MessageSquare, FileText, Filter } from "lucide-react"
+import { Search, MoreVertical, Calendar, MessageSquare, FileText, Filter, Ban } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import { formatDate, formatTime } from "@/utils/validatesInputs"
+import { DeleteClientModal } from "@/components/ui/delete-client-modal"
 
 import { ClientResponse, NextSession } from "@/types"
 
@@ -24,12 +25,16 @@ import { ClientResponse, NextSession } from "@/types"
 interface ClientsListProps {
   clients: ClientResponse[];
   onClientSelect: (clientId: string) => void;
+  isAdmin: boolean;
+  onClientDeleted?: () => void; // Callback para refrescar la lista
 }
 
-export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // Recibir props
+export function ClientsList({ clients, onClientSelect, isAdmin, onClientDeleted }: ClientsListProps) { // Recibir props
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(0)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedClient, setSelectedClient] = useState<{ id: string; name: string } | null>(null)
 
   // Filtrar clientes basado en la búsqueda y el filtro de estado, usando la prop 'clients'
   const filteredClients = clients.filter((client) => {
@@ -46,6 +51,17 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
   // Resetear página si el filtro cambia y la página actual queda vacía
   if (currentPage * 5 >= filteredClients.length && currentPage > 0) {
     setCurrentPage(0);
+  }
+
+  const handleDeleteClick = (clientId: string, clientName: string) => {
+    setSelectedClient({ id: clientId, name: clientName })
+    setDeleteModalOpen(true)
+  }
+
+  const handleClientDeleted = () => {
+    if (onClientDeleted) {
+      onClientDeleted()
+    }
   }
 
   return (
@@ -93,7 +109,7 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
                 <TableHead>Cliente</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Próxima Sesión</TableHead>
-                <TableHead>Progreso</TableHead>
+                <TableHead></TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -107,13 +123,13 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Image
-                          src={client.avatar || "/placeholder.svg"}
+                        {client.avatar && <Image
+                          src={client.avatar}
                           alt={client.name}
                           width={32}
                           height={32}
                           className="rounded-full"
-                        />
+                        />}
                         <div>
                           <div className="font-medium">{client.name}</div>
                           <div className="text-xs text-muted-foreground">{client.focus}</div>
@@ -136,12 +152,6 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
                       }
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-16 rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${client.progress}%` }}></div>
-                        </div>
-                        <span className="text-xs">{client.progress}%</span>
-                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -153,10 +163,12 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="bg-accent" align="end">
                           <DropdownMenuLabel>Acciones Rápidas</DropdownMenuLabel>
-                          <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Programar", client._id); }}>
-                            <Calendar className="mr-2 h-4 w-4" />
-                            <span>Programar sesión</span>
-                          </DropdownMenuItem>
+                          { isAdmin && (
+                            <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); handleDeleteClick(client._id, client.name); }}>
+                              <Ban className="mr-2 h-4 w-4" />
+                              <span>Dar de baja</span>
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Mensaje", client._id); }}>
                             <MessageSquare className="mr-2 h-4 w-4" />
                             <span>Enviar mensaje</span>
@@ -206,6 +218,20 @@ export function ClientsList({ clients, onClientSelect }: ClientsListProps) { // 
           </div>
         )}
       </CardContent>
+      
+      {/* Modal de confirmación para dar de baja */}
+      {selectedClient && (
+        <DeleteClientModal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false)
+            setSelectedClient(null)
+          }}
+          clientId={selectedClient.id}
+          clientName={selectedClient.name}
+          onClientDeleted={handleClientDeleted}
+        />
+      )}
     </Card>
   )
 }

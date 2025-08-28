@@ -4,6 +4,7 @@ import User from '@/models/User'
 import Profile from '@/models/Profile'
 import Role from '@/models/Role'
 import Meet from '@/models/Meet'
+import Ticket from '@/models/Ticket'
 
 export async function GET(request: NextRequest) {
   try {
@@ -151,8 +152,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 9. Reportes pendientes (simulado por ahora)
-    const pendingReports = 12
+    // 9. Tickets pendientes (tickets abiertos)
+    const pendingReports = await Ticket.countDocuments({
+      status: { $in: ['pending', 'in_progress'] }
+    })
 
     const adminBasicData = {
       totalUsers,
