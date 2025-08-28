@@ -14,6 +14,7 @@ export interface IProfile extends Document {
   clients: ObjectId[];
   enterprise: ObjectId;
   isDeleted: boolean;
+  points: number;
 }
 
 const ProfileSchema: Schema = new Schema({
@@ -81,6 +82,10 @@ const ProfileSchema: Schema = new Schema({
   isDeleted: {
     type: Boolean,
     default: false
+  },
+  points: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

@@ -8,7 +8,8 @@ import {
   TicketCard,
   PdaCard,
   ConfigFormCard,
-  ConfigFormsManagerCard
+  ConfigFormsManagerCard,
+  PointsManagerCard
 } from "@/components/resources"
 
 export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "admin" | "enterprise" }) {
@@ -20,7 +21,7 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
       )}
 
       {/* Agregar Cliente */}
-      {(userType === "coach" || userType === "admin") && (
+      {(userType === "coach") && (
         <NewObjectiveCard userType={userType} />
       )}
 
@@ -38,6 +39,9 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
 
       {/* Gestionar Formularios de Configuración */}
       {userType === "admin" && <ConfigFormsManagerCard />}
+
+      {/* Gestionar puntos */}
+      {userType === "admin" && <PointsManagerCard />}
     </div>
   )
 }

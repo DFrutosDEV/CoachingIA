@@ -10,6 +10,9 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
     
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search');
+    
     // Buscar el rol de coach
     const coachRole = await Role.findOne({ code: '2' });
     if (!coachRole) {
@@ -19,11 +22,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Obtener todos los perfiles de coaches con sus datos de usuario
-    const coaches = await Profile.find({ 
+    // Construir query base
+    let query: any = { 
       role: coachRole._id, 
       isDeleted: false 
-    })
+    };
+
+    // Si hay búsqueda, agregar filtros
+    if (search && search.length >= 3) {
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [
+        { name: searchRegex },
+        { lastName: searchRegex }
+      ];
+    }
+
+    // Obtener todos los perfiles de coaches con sus datos de usuario
+    const coaches = await Profile.find(query)
     .populate({
       path: 'user',
       model: User,
@@ -51,6 +66,7 @@ export async function GET(request: NextRequest) {
       phone: coach.phone,
       bio: coach.bio,
       profilePicture: coach.profilePicture,
+      points: coach.points || 0,
       active: !coach.isDeleted,
       firstLogin: coach.user.firstLogin,
       clientsCount: coach.clients ? coach.clients.length : 0,
