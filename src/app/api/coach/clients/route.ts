@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       populate: {
         path: 'user',
         model: User,
-        select: 'name lastName email phone active isDeleted createdAt'
+        select: 'email active isDeleted createdAt'
       }
     });
     
@@ -125,9 +125,9 @@ export async function GET(request: NextRequest) {
       return {
         _id: clientUser._id.toString(),
         profileId: clientProfile._id.toString(),
-        name: `${clientUser.name} ${clientUser.lastName}`,
+        name: `${clientProfile.name} ${clientProfile.lastName}`,
         email: clientUser.email,
-        phone: clientUser.phone,
+        phone: clientProfile.phone,
         startDate: formatDate(new Date(clientUser.createdAt)),
         sessions: completedSessions,
         nextSession: nextSession ? {
@@ -143,9 +143,9 @@ export async function GET(request: NextRequest) {
           objective: lastSession.objectiveId
         } : {},
         progress: goals.length > 0 ? (goals.filter((goal: any) => goal.isCompleted).length / goals.length) * 100 : 0,
-        status: clientUser.active ? 'active' : 'inactive',
+        status: clientProfile.isDeleted ? 'inactive' : 'active',
         focus: activeObjective?.title || 'Sin objetivo',
-        avatar: clientProfile.profilePicture || `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(clientUser.name + ' ' + clientUser.lastName)}`,
+        avatar: clientProfile.profilePicture || `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(clientProfile.name + ' ' + clientProfile.lastName)}`,
         bio: clientProfile.bio || 'Sin información',
         goals: goals,
         upcomingSessions: upcomingSessions,

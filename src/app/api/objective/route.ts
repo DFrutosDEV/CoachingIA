@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       if (!firstName || !lastName || !email) {
         return NextResponse.json({
           success: false,
-          error: 'Para crear un nuevo usuario se requieren: firstName, lastName, email'
+          error: 'There are missing fields'
         }, { status: 400 })
       }
 
@@ -78,19 +78,16 @@ export async function POST(request: NextRequest) {
       if (existingUser) {
         return NextResponse.json({
           success: false,
-          error: 'Ya existe un usuario con este email'
+          error: 'There is already a user with this email'
         }, { status: 400 })
       }
 
       // Crear nuevo usuario
       const newUser = new User({
-        name: firstName,
-        lastName,
         email,
-        phone: phone || '',
         password: 'tempPassword123', //! Contraseña temporal, el usuario deberá cambiarla en su primer login
         active: true,
-        firstLogin: true,
+        firstLogin: false,
         isDeleted: false
       })
 
@@ -98,6 +95,9 @@ export async function POST(request: NextRequest) {
 
       // Crear perfil para el nuevo usuario
       const newProfile = new Profile({
+        name: firstName,
+        lastName: lastName,
+        phone: phone,
         user: savedUser._id,
         role: clientRole._id,
         isDeleted: false
