@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { User, Edit, Save, Camera, Upload, X } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { User, Edit, Save, Camera, X, Trash2, Lock } from "lucide-react"
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks"
 import { updateUser } from "@/lib/redux/slices/authSlice"
 import { useState, useEffect, useRef } from "react"
@@ -24,6 +25,13 @@ export default function ProfilePage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [previewImage, setPreviewImage] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [formData, setFormData] = useState({
     name: user?.profile?.name || '',
     lastName: user?.profile?.lastName || '',
@@ -179,6 +187,99 @@ export default function ProfilePage() {
     }
   }
 
+  const handleClearProfilePicture = async () => {
+    if (!user) return
+
+    setIsLoading(true)
+    try {
+      const formDataToSend = new FormData()
+      formDataToSend.append('userId', user._id)
+      formDataToSend.append('name', user.profile?.name || '')
+      formDataToSend.append('lastName', user.profile?.lastName || '')
+      formDataToSend.append('age', user.profile?.age?.toString() || '')
+      formDataToSend.append('phone', user.profile?.phone || '')
+      formDataToSend.append('bio', user.profile?.bio || '')
+      formDataToSend.append('clearProfilePicture', 'true')
+
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        body: formDataToSend
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Actualizar el estado del usuario
+        dispatch(updateUser({
+          email: user.email,
+          profile: {
+            ...user.profile,
+            profilePicture: ''
+          }
+        }))
+
+        toast.success('Foto de perfil eliminada exitosamente')
+      } else {
+        toast.error(result.error || 'Error al eliminar la foto de perfil')
+      }
+    } catch (error) {
+      console.error('Error al eliminar foto de perfil:', error)
+      toast.error('Error al eliminar la foto de perfil')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (!user) return
+
+    // Validar que las contraseñas coincidan
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Las contraseñas nuevas no coinciden')
+      return
+    }
+
+    // Validar longitud mínima
+    if (passwordData.newPassword.length < 6) {
+      toast.error('La nueva contraseña debe tener al menos 6 caracteres')
+      return
+    }
+
+    setIsChangingPassword(true)
+    try {
+      const response = await fetch('/api/profile/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success('Contraseña actualizada exitosamente')
+        setShowPasswordDialog(false)
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        })
+      } else {
+        toast.error(result.error || 'Error al cambiar la contraseña')
+      }
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error)
+      toast.error('Error al cambiar la contraseña')
+    } finally {
+      setIsChangingPassword(false)
+    }
+  }
+
   const handleSave = async () => {
     if (!user) return
 
@@ -293,10 +394,91 @@ export default function ProfilePage() {
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={() => setIsEditing(true)} className="gap-2">
-                    <Edit className="h-4 w-4" />
-                    Editar Perfil
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={() => setIsEditing(true)} className="gap-2">
+                      <Edit className="h-4 w-4" />
+                      Editar Perfil
+                    </Button>
+                    <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="gap-2">
+                          <Lock className="h-4 w-4" />
+                          Cambiar Contraseña
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Cambiar Contraseña</DialogTitle>
+                          <DialogDescription>
+                            Ingresa tu contraseña actual y la nueva contraseña que deseas usar.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="currentPassword">Contraseña Actual</Label>
+                            <Input
+                              id="currentPassword"
+                              type="password"
+                              value={passwordData.currentPassword}
+                              onChange={(e) => setPasswordData(prev => ({
+                                ...prev,
+                                currentPassword: e.target.value
+                              }))}
+                              placeholder="Ingresa tu contraseña actual"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="newPassword">Nueva Contraseña</Label>
+                            <Input
+                              id="newPassword"
+                              type="password"
+                              value={passwordData.newPassword}
+                              onChange={(e) => setPasswordData(prev => ({
+                                ...prev,
+                                newPassword: e.target.value
+                              }))}
+                              placeholder="Ingresa tu nueva contraseña"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="confirmPassword">Confirmar Nueva Contraseña</Label>
+                            <Input
+                              id="confirmPassword"
+                              type="password"
+                              value={passwordData.confirmPassword}
+                              onChange={(e) => setPasswordData(prev => ({
+                                ...prev,
+                                confirmPassword: e.target.value
+                              }))}
+                              placeholder="Confirma tu nueva contraseña"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setShowPasswordDialog(false)
+                              setPasswordData({
+                                currentPassword: '',
+                                newPassword: '',
+                                confirmPassword: ''
+                              })
+                            }}
+                            disabled={isChangingPassword}
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            onClick={handleChangePassword}
+                            disabled={isChangingPassword || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                          >
+                            {isChangingPassword ? 'Cambiando...' : 'Cambiar Contraseña'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 )}
               </div>
             </div>
@@ -520,6 +702,18 @@ export default function ProfilePage() {
                         <p className="text-xs text-muted-foreground">
                           Máximo: 10MB
                         </p>
+                        {user.profile?.profilePicture && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearProfilePicture}
+                            disabled={isLoading}
+                            className="w-full gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Limpiar Foto
+                          </Button>
+                        )}
                       </div>
                     )}
                     

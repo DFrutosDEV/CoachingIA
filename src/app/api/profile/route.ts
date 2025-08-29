@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
     const bio = formData.get('bio') as string;
     const address = formData.get('address') as string;
     const profilePicture = formData.get('profilePicture') as File;
+    const clearProfilePicture = formData.get('clearProfilePicture') as string;
     
     if (!userId) {
       return NextResponse.json(
@@ -155,6 +156,11 @@ export async function POST(request: NextRequest) {
       // Solo actualizar la imagen si se proporcionó una nueva
       if (profilePictureBase64) {
         updateData.profilePicture = profilePictureBase64;
+      }
+      
+      // Limpiar la foto de perfil si se solicita
+      if (clearProfilePicture === 'true') {
+        updateData.profilePicture = '';
       }
       
       profile = await Profile.findByIdAndUpdate(
