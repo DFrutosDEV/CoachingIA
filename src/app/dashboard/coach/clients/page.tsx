@@ -93,7 +93,7 @@ export default function ClientsPage() {
                   </div>
                 </div>
               ) : (
-                <ClientsList clients={clients} onClientSelect={handleClientSelect} />
+                <ClientsList clients={clients} onClientSelect={handleClientSelect} isAdmin={false} />
               )}
             </div>
           </div>
@@ -104,6 +104,7 @@ export default function ClientsPage() {
         isOpen={isDetailModalOpen}
         onClose={handleCloseModal}
         onUpdateClient={handleUpdateClient}
+        isAdmin={false}
       />
     </div>
   )

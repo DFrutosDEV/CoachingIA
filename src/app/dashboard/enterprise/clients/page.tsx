@@ -47,7 +47,7 @@ export default function EnterpriseClientsPage() {
           <p className="text-sm text-muted-foreground">
             Gestiona y supervisa a los clientes registrados en la plataforma.
           </p>
-          <ClientsList clients={clients || []} onClientSelect={handleClientSelect} />
+          <ClientsList clients={clients || []} onClientSelect={handleClientSelect} isAdmin={false} />
         </main>
       </div>
       <ClientDetail
@@ -55,6 +55,7 @@ export default function EnterpriseClientsPage() {
         isOpen={isDetailModalOpen}
         onClose={handleCloseModal}
         onUpdateClient={handleUpdateClient}
+        isAdmin={false}
       />
     </div>
   )

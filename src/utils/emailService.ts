@@ -109,19 +109,22 @@ function generateEmailContent(emailType: EmailType, data: EmailData): EmailTempl
  */
 async function sendWithResend(to: string, subject: string, html: string, text?: string): Promise<boolean> {
   try {
-    const { Resend } = await import('resend');
-    const resend = new Resend(EMAIL_CONFIG.apiKey);
+    // TODO: Install resend package: npm install resend
+    // const { Resend } = await import('resend');
+    // const resend = new Resend(EMAIL_CONFIG.apiKey);
     
-    const result = await resend.emails.send({
-      from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
-      to: [to],
-      subject,
-      html,
-      text
-    });
+    // const result = await resend.emails.send({
+    //   from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
+    //   to: [to],
+    //   subject,
+    //   html,
+    //   text
+    // });
     
-    console.log('Email sent with Resend:', result);
-    return true;
+    // console.log('Email sent with Resend:', result);
+    // return true;
+    console.log('Resend not configured - skipping email send');
+    return false;
   } catch (error) {
     console.error('Error sending email with Resend:', error);
     return false;
@@ -133,20 +136,23 @@ async function sendWithResend(to: string, subject: string, html: string, text?: 
  */
 async function sendWithSendGrid(to: string, subject: string, html: string, text?: string): Promise<boolean> {
   try {
-    const sgMail = await import('@sendgrid/mail');
-    sgMail.setApiKey(EMAIL_CONFIG.apiKey!);
+    // TODO: Install sendgrid package: npm install @sendgrid/mail
+    // const sgMail = await import('@sendgrid/mail');
+    // sgMail.setApiKey(EMAIL_CONFIG.apiKey!);
     
-    const msg = {
-      to,
-      from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
-      subject,
-      html,
-      text
-    };
+    // const msg = {
+    //   to,
+    //   from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
+    //   subject,
+    //   html,
+    //   text
+    // };
     
-    const result = await sgMail.send(msg);
-    console.log('Email sent with SendGrid:', result);
-    return true;
+    // const result = await sgMail.send(msg);
+    // console.log('Email sent with SendGrid:', result);
+    // return true;
+    console.log('SendGrid not configured - skipping email send');
+    return false;
   } catch (error) {
     console.error('Error sending email with SendGrid:', error);
     return false;
@@ -158,28 +164,31 @@ async function sendWithSendGrid(to: string, subject: string, html: string, text?
  */
 async function sendWithNodemailer(to: string, subject: string, html: string, text?: string): Promise<boolean> {
   try {
-    const nodemailer = await import('nodemailer');
+    // TODO: Install nodemailer package: npm install nodemailer @types/nodemailer
+    // const nodemailer = await import('nodemailer');
     
-    const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
+    // const transporter = nodemailer.createTransporter({
+    //   host: process.env.SMTP_HOST,
+    //   port: parseInt(process.env.SMTP_PORT || '587'),
+    //   secure: false,
+    //   auth: {
+    //     user: process.env.SMTP_USER,
+    //     pass: process.env.SMTP_PASS
+    //   }
+    // });
     
-    const result = await transporter.sendMail({
-      from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
-      to,
-      subject,
-      html,
-      text
-    });
+    // const result = await transporter.sendMail({
+    //   from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
+    //   to,
+    //   subject,
+    //   html,
+    //   text
+    // });
     
-    console.log('Email sent with Nodemailer:', result);
-    return true;
+    // console.log('Email sent with Nodemailer:', result);
+    // return true;
+    console.log('Nodemailer not configured - skipping email send');
+    return false;
   } catch (error) {
     console.error('Error sending email with Nodemailer:', error);
     return false;
