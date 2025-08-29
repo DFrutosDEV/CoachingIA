@@ -170,7 +170,8 @@ export async function GET(request: NextRequest) {
         activeClientsCount,
         scheduledSessionsCount,
         todaySessions: formattedTodaySessions,
-        recentClients
+        recentClients,
+        points: coachProfile.points || 0
       }
     });
 

@@ -12,6 +12,7 @@ import {
   TodaySessionsCard,
   RecentClientsCard
 } from "@/components/ui/dashboard-cards-coach"
+import { PointsCard } from "@/components/ui/points-card"
 import { HttpClient } from "@/lib/utils/http-client"
 import { Button } from "@/components/ui/button"
 import { Move, X } from "lucide-react"
@@ -38,6 +39,7 @@ interface CoachBasicData {
     sessions: number;
     progress: number;
   }>;
+  points: number;
 }
 
 export default function CoachDashboard() {
@@ -224,7 +226,7 @@ export default function CoachDashboard() {
                   <h1 className="text-4xl font-bold">Bienvenido, {user?.profile?.name} {user?.profile?.lastName}</h1>
                   <p className="text-muted-foreground pt-2">Aquí tienes un resumen de tus sesiones y clientes.</p>
                 </div>
-                <Button
+                {/* <Button
                   onClick={toggleDragMode}
                   variant={dragEnabled ? "secondary" : "outline"}
                   size="sm"
@@ -241,7 +243,7 @@ export default function CoachDashboard() {
                       Activar Drag
                     </>
                   )}
-                </Button>
+                </Button> */}
               </div>
               {dragEnabled && (
                 <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-md">
@@ -255,7 +257,7 @@ export default function CoachDashboard() {
             {/* Zona de drag and drop para cards pequeñas (3 cards arriba - 33.33% cada una) */}
             <div 
               ref={smallCardsRef} 
-              className="small-cards-container grid gap-6 md:grid-cols-3"
+              className="small-cards-container grid gap-6 md:grid-cols-4"
             >
               <div data-swapy-slot="1" className="w-full">
                 <NextSessionCard data={basicData?.nextSession} />
@@ -265,6 +267,9 @@ export default function CoachDashboard() {
               </div>
               <div data-swapy-slot="3" className="w-full">
                 <ScheduledSessionsCard count={basicData?.scheduledSessionsCount || 0} />
+              </div>
+              <div data-swapy-slot="4" className="w-full">
+                <PointsCard count={basicData?.points || 0} />
               </div>
             </div>
 

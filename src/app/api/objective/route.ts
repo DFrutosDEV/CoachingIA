@@ -37,6 +37,23 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
+    // Verificar que el coach existe
+    const coachProfile = await Profile.findOne({ _id: coachId })
+    if (!coachProfile) {
+      return NextResponse.json({
+        success: false,
+        error: 'Coach no encontrado'
+      }, { status: 404 })
+    }
+
+    // Verificar que el coach tiene puntos suficientes
+    if (coachProfile.points < 10) {
+      return NextResponse.json({
+        success: false,
+        error: 'Puntos insuficientes'
+      }, { status: 400 })
+    }
+
     // Obtener el ID del rol de cliente
     const clientRole = await Role.findOne({ code: '3' })
     if (!clientRole) {
@@ -93,15 +110,6 @@ export async function POST(request: NextRequest) {
       clientIdToUse = clientId
     }
 
-    // Verificar que el coach existe
-    const coachProfile = await Profile.findOne({ _id: coachId })
-    if (!coachProfile) {
-      return NextResponse.json({
-        success: false,
-        error: 'Coach no encontrado'
-      }, { status: 404 })
-    }
-
     // Obtener el perfil del cliente
     const clientProfile = await Profile.findOne({ _id: clientIdToUse })
     if (!clientProfile) {
@@ -139,6 +147,10 @@ export async function POST(request: NextRequest) {
     })
 
     const savedObjective = await newObjective.save()
+
+    // Sacar 10 puntos al coach
+    coachProfile.points -= 10
+    await coachProfile.save()
 
     // Crear la fecha combinando startDate y startTime
     const dateString = `${startDate}T${startTime}:00`
