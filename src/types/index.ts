@@ -16,6 +16,7 @@ export interface UpcomingSession {
 
 export interface Note {
   _id: string;
+  title: string;
   content: string;
   createdBy: string;
   createdAt: string;
@@ -27,6 +28,7 @@ export interface Goal {
   description: string;
   isCompleted: boolean;
   day: string;
+  date: string;
 }
 
 export interface GoalWithProgress {
@@ -45,6 +47,23 @@ export interface Objective {
   active: boolean;
   createdAt: string;
   coach: string;
+  configFile: {
+    question: string;
+    answer: string;
+  }[];
+}
+
+export interface Session {
+  _id: string;
+  date: string;
+  link: string;
+  objectiveId: string;
+  createdBy: string;
+  clientId: string;
+  coachId: string;
+  isCancelled: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ObjectiveProgress {

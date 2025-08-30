@@ -20,6 +20,8 @@ import { formatDate, formatTime } from "@/utils/validatesInputs"
 import { DeleteClientModal } from "@/components/ui/delete-client-modal"
 
 import { ClientResponse, NextSession } from "@/types"
+import { sendMessage } from "@/utils/wpp-methods"
+import { sendEmail } from "@/utils/sendEmail"
 
 // Definir props para ClientsList
 interface ClientsListProps {
@@ -170,8 +172,10 @@ export function ClientsList({ clients, onClientSelect, isAdmin, onClientDeleted 
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("Mensaje", client._id); }}>
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            <span>Enviar mensaje</span>
+                            <div className="flex items-center gap-2" onClick={() => client.phone ? sendMessage({ phone: client.phone }) : sendEmail({ email: client.email })}>
+                              <MessageSquare className="h-4 w-4" />
+                              Mensaje
+                            </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem className="bg-accent-hover" onClick={(e) => { e.stopPropagation(); console.log("PDA", client._id); }}>
                             <FileText className="mr-2 h-4 w-4" />

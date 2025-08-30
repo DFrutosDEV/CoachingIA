@@ -238,7 +238,7 @@ export default function ClientDashboard() {
                   <h1 className="text-4xl font-bold">Bienvenido, {user?.profile?.name} {user?.profile?.lastName}</h1>
                   <p className="text-muted-foreground pt-2">Aquí tienes un resumen de tu progreso y próximas sesiones.</p>
                 </div>
-                <Button
+                {/* <Button
                   onClick={toggleDragMode}
                   variant={dragEnabled ? "secondary" : "outline"}
                   size="sm"
@@ -255,7 +255,7 @@ export default function ClientDashboard() {
                       Activar Drag
                     </>
                   )}
-                </Button>
+                </Button> */}
               </div>
               {dragEnabled && (
                 <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-md">

@@ -15,6 +15,7 @@ import Image from "next/image"
 import { GoalsModal } from "./ui/goals-modal"
 import { ObjectiveDetailModal } from "./ui/objective-detail-modal"
 import { FinalizeObjectiveModal } from "./ui/finalize-objective-modal"
+import { RescheduleSessionModal } from "./ui/reschedule-session-modal"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { formatDate } from "@/utils/validatesInputs"
 import { toast } from "sonner"
@@ -29,6 +30,8 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
   const [loadingObjectives, setLoadingObjectives] = useState(false)
   const [selectedObjectiveData, setSelectedObjectiveData] = useState<any>(null)
   const [isObjectiveDetailModalOpen, setIsObjectiveDetailModalOpen] = useState(false)
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false)
+  const [selectedSession, setSelectedSession] = useState<any>(null)
 
   const user = useAppSelector(state => state.auth.user)
 
@@ -87,6 +90,28 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
     }
   };
 
+  const handleRescheduleSession = (session: any) => {
+    // Extraer fecha y hora del campo date
+    const sessionDate = new Date(session.date);
+    const dateString = sessionDate.toISOString().split('T')[0];
+    const timeString = sessionDate.toTimeString().slice(0, 5);
+    
+    setSelectedSession({
+      id: session._id || session.id,
+      date: dateString,
+      time: timeString
+    });
+    setIsRescheduleModalOpen(true);
+  };
+
+  const handleSessionRescheduled = () => {
+    // Recargar los datos del cliente para mostrar la sesión actualizada
+    if (onUpdateClient && client) {
+      // Forzar una recarga de los datos del cliente
+      onUpdateClient(client._id, []);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === "objectives" && client?._id && objectives.length === 0) {
       fetchObjectives();
@@ -126,12 +151,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
             </div>
 
             <div className="flex flex-wrap justify-center gap-2 mt-4">
-              {!isAdmin && 
-                <Button variant="outline" size="sm" className="gap-1">
-                  <Calendar className="h-4 w-4" />
-                  Programar
-                </Button>
-              }
               <Button variant="outline" size="sm" className="gap-1" onClick={() => client.phone ? sendMessage({ phone: client.phone }) : sendEmail({ email: client.email })}>
                 <MessageSquare className="h-4 w-4" />
                 Mensaje
@@ -179,11 +198,18 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
                         <Badge variant="outline">Programada</Badge>
                       </div>
                       <div className="mt-3 flex gap-2">
-                        <Button size="sm" variant="outline" className="w-full gap-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="w-full gap-1"
+                          onClick={() => handleRescheduleSession(client.nextSession)}
+                        >
                           <Clock className="h-3 w-3" />
                           Reprogramar
                         </Button>
-                        <Button size="sm" className="w-full gap-1">
+                        <Button size="sm" className="w-full gap-1" onClick={() => {
+                          window.open(client.nextSession.link, '_blank')
+                        }}>
                           <Calendar className="h-3 w-3" />
                           Iniciar
                         </Button>
@@ -203,16 +229,6 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
                           {`${formatDate(new Date(client.lastSession.date))} - ${client.lastSession.objective.title}`}
                         </div>
                         <Badge variant="outline">Programada</Badge>
-                      </div>
-                      <div className="mt-3 flex gap-2">
-                        <Button size="sm" variant="outline" className="w-full gap-1">
-                          <Clock className="h-3 w-3" />
-                          Reprogramar
-                        </Button>
-                        <Button size="sm" className="w-full gap-1">
-                          <Calendar className="h-3 w-3" />
-                          Iniciar
-                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -240,7 +256,10 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
                       </div>
                     </div>
                   ) : objectives.length > 0 ? (
-                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2" onClick={(e) => {
+                      e.stopPropagation()
+                      handleObjectiveSelect(objectives[0]._id)
+                    }}>
                       {objectives.map((objective) => (
                         <div key={objective._id} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                           <div className="flex items-center justify-between mb-3">
@@ -260,11 +279,7 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
                               <div className="flex items-center gap-1">
                                 <Button 
                                   size="sm" 
-                                  variant="outline" 
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleObjectiveSelect(objective._id)
-                                  }}
+                                  variant="outline"
                                 >
                                   <Eye className="h-4 w-4" />
                                 </Button>
@@ -349,6 +364,15 @@ export function ClientDetail({ client, isOpen, onClose, onUpdateClient, isAdmin 
         onClose={() => setIsObjectiveDetailModalOpen(false)}
         clientId={client?.profileId}
         coachId={user?.profile?._id}
+      />
+
+      <RescheduleSessionModal
+        isOpen={isRescheduleModalOpen}
+        onClose={() => setIsRescheduleModalOpen(false)}
+        sessionId={selectedSession?.id || ''}
+        currentDate={selectedSession?.date || ''}
+        currentTime={selectedSession?.time || ''}
+        onSessionRescheduled={handleSessionRescheduled}
       />
     </>
   )
