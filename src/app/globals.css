@@ -39,7 +39,7 @@
     --tab-inactive: 0 0% 100%;
     --scrollbar-thumb: 0 0% 0% / 0.2;
     --scrollbar-thumb-hover: 0 0% 0% / 0.3;
-
+    --background-hover: 0 0% 100% / 0.1;
     --badge-active: 120 58.9% 75%;
     --badge-inactive: 0 77% 75%; 
     --badge-pending: 236 70% 75%; 
@@ -79,7 +79,7 @@
     --tab-inactive: 222.2 84% 4.9%;
     --scrollbar-thumb: 255 255 255 / 0.2;
     --scrollbar-thumb-hover: 255 255 255 / 0.3;
-
+    --background-hover: 0 0% 100% / 0.1;
     --badge-active: 120 58.9% 75%;
     --badge-inactive: 0 77% 75%;
     --badge-pending: 236 70% 75%;
@@ -96,6 +96,12 @@
   }
   .bg-background {
     background-color: hsl(var(--background));
+  }
+  .bg-background-hover {
+    background-color: hsl(var(--background));
+  }
+  .bg-background-hover:hover {
+    background-color: hsl(var(--background-hover));
   }
 }
 

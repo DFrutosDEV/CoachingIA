@@ -13,13 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Trash2, Plus } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "sonner"
-
-interface Goal {
-  _id: string;
-  description: string;
-  isCompleted: boolean;
-  day: string;
-}
+import { Goal } from "@/types"
 
 interface GoalsModalProps {
   isOpen: boolean;
@@ -53,6 +47,7 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
       description: "Nuevo Objetivo",
       isCompleted: false,
       day: "Lunes",
+      date: new Date().toISOString(),
     };
     setGoals(currentGoals => [...currentGoals, newGoal]);
   };

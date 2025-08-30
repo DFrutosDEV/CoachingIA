@@ -345,7 +345,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                 </div>
               </div>
               
-              <div className="grid gap-2">
+              {/* <div className="grid gap-2">
                 <Label htmlFor="phone">Teléfono</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -358,7 +358,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                     className="pl-10"
                   />
                 </div>
-              </div>
+              </div> */}
               
               <div className="grid gap-2">
                 <Label htmlFor="focus">Enfoque principal</Label>

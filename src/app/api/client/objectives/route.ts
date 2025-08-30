@@ -68,7 +68,9 @@ export async function GET(request: NextRequest) {
           isCompleted: objective.isCompleted,
           active: objective.active,
           createdAt: objective.createdAt,
-          coach: `${objective.coachId?.name} ${objective.coachId?.lastName}` || 'Coach no asignado'
+          coach: `${objective.coachId?.name} ${objective.coachId?.lastName}` || 'Coach no asignado',
+          configFile: objective.configFile,
+          sessions: objective.sessions
         };
       })
     );

@@ -49,7 +49,7 @@ export async function GET(
       success: true,
       data: {
         objective: {
-          id: objective._id.toString(),
+          _id: objective._id.toString(),
           title: objective.title,
           isCompleted: objective.isCompleted,
           active: objective.active,

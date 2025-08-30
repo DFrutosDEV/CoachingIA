@@ -5,6 +5,7 @@ import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
 import { formatTime } from '@/utils/validatesInputs';
+import { formatDate } from 'date-fns';
 
 // GET /api/coach/getBasicData - Obtener datos básicos del dashboard del coach
 export async function GET(request: NextRequest) {
@@ -114,9 +115,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener clientes recientes con su progreso
     const recentClients = await Promise.all(
-      coachProfileWithClients.clients.slice(0, 5).map(async (clientProfile: any) => {
-        const client = clientProfile.user;
-        
+      coachProfileWithClients.clients.slice(0, 5).map(async (clientProfile: any) => {    
         // Contar sesiones del cliente
         const sessionsCount = await Meet.countDocuments({
           clientId: clientProfile._id, // Usar profileId del cliente
@@ -139,8 +138,8 @@ export async function GET(request: NextRequest) {
         const progress = totalObjectives > 0 ? Math.round((completedObjectives / totalObjectives) * 100) : 0;
 
         return {
-          id: client._id.toString(),
-          name: `${client.name} ${client.lastName}`,
+          id: clientProfile._id.toString(),
+          name: `${clientProfile.name} ${clientProfile.lastName}`,
           sessions: sessionsCount,
           progress: progress
         };
@@ -149,8 +148,8 @@ export async function GET(request: NextRequest) {
 
     // Transformar las sesiones de hoy al formato esperado
     const formattedTodaySessions = todaySessions.map(session => ({
-      time: `${session.time} - ${formatTime(new Date(session.date), { hour: '2-digit', minute: '2-digit' })}`,
-      client: `${session.clientId.user.name} ${session.clientId.user.lastName}`,
+      time: `${formatDate(new Date(session.date), 'dd/MM/yyyy')} - ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+      client: `${session.clientId.name} ${session.clientId.lastName}`,
       topic: session.objectiveId?.title || 'Sin objetivo definido'
     }));
 
@@ -159,7 +158,7 @@ export async function GET(request: NextRequest) {
       date: nextSession.date,
       link: nextSession.link,
       time: nextSession.time,
-      client: `${nextSession.clientId.user.name} ${nextSession.clientId.user.lastName}`,
+      client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,
       topic: nextSession.objectiveId?.title || 'Sin objetivo definido'
     } : null;
 
