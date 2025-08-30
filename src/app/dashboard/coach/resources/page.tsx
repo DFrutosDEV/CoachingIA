@@ -27,16 +27,17 @@ export default function ResourcesPage() {
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={closeMobileSidebar}
       />
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col">
         <DashboardHeader userType="coach" onToggleSidebar={toggleMobileSidebar} />
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
+        <main className="flex-1 p-6">
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-bold">Recursos</h1>
               <p className="text-muted-foreground">Herramientas y recursos para gestionar tu práctica de coaching.</p>
             </div>
-
-            <ResourcesGrid userType="coach"/>
+            <div className="h-[calc(100vh-200px)] overflow-hidden">
+              <ResourcesGrid userType="coach"/>
+            </div>
           </div>
         </main>
       </div>

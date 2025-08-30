@@ -35,8 +35,9 @@ export default function ResourcesAdminPage() {
               <h1 className="text-3xl font-bold">Recursos</h1>
               <p className="text-muted-foreground">Herramientas y recursos para gestionar la plataforma.</p>
             </div>
-
-            <ResourcesGrid userType="admin"/>
+            <div className="h-[calc(100vh-200px)] overflow-hidden">
+              <ResourcesGrid userType="admin"/>
+            </div>
           </div>
         </main>
       </div>
