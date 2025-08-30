@@ -12,10 +12,11 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { useAuthService } from "@/lib/services/auth-service"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
+import { getStoredToken, getTokenData } from "@/lib/token-utils"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuthService()
+  const { login, logout } = useAuthService()
   const { isAuthenticated, user } = useAuth()
 
   // Estados para manejar el formulario y "Recuérdame"
@@ -25,21 +26,42 @@ export default function LoginPage() {
 
   // Cargar email guardado al montar el componente
   useEffect(() => {
-    // Verificar si ya está autenticado
-    if (isAuthenticated && user) {
-      router.push(`/dashboard/${user.role.name.toLowerCase()}`)
-      return
-    }
+    const checkTokenAndAuth = async () => {
+      // Solo acceder a localStorage en el cliente
+      if (typeof window !== 'undefined') {
+        // 1. Primero verificar si hay un token almacenado
+        const storedToken = getStoredToken()
+        
+        if (storedToken) {
+          // 2. Verificar si el token es válido y no ha expirado
+          const tokenData = getTokenData(storedToken)
+          
+          if (!tokenData) {
+            // Token inválido o expirado - desloguear al usuario
+            console.log('❌ Token inválido o expirado, deslogueando usuario')
+            await logout()
+            toast.error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
+            return
+          }
+        }
 
-    // Solo acceder a localStorage en el cliente
-    if (typeof window !== 'undefined') {
-      const savedEmail = localStorage.getItem("rememberedEmail")
-      if (savedEmail) {
-        setEmail(savedEmail)
-        setRememberMe(true)
+        // 3. Solo después de verificar el token, verificar si está autenticado
+        if (isAuthenticated && user) {
+          router.push(`/dashboard/${user.role.name.toLowerCase()}`)
+          return
+        }
+
+        // 4. Cargar email guardado si no está autenticado
+        const savedEmail = localStorage.getItem("rememberedEmail")
+        if (savedEmail) {
+          setEmail(savedEmail)
+          setRememberMe(true)
+        }
       }
     }
-  }, [isAuthenticated, user, router])
+
+    checkTokenAndAuth()
+  }, [isAuthenticated, user, router, logout])
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

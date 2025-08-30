@@ -237,7 +237,7 @@ export default function AdminDashboard() {
                   <h1 className="text-4xl font-bold">Bienvenido, {user?.profile?.name} {user?.profile?.lastName}</h1>
                   <p className="text-muted-foreground pt-2">Gestiona usuarios, coaches y analiza el rendimiento de la plataforma.</p>
                 </div>
-                <Button
+                {/* <Button
                   onClick={toggleDragMode}
                   variant={dragEnabled ? "secondary" : "outline"}
                   size="sm"
@@ -254,7 +254,7 @@ export default function AdminDashboard() {
                       Activar Drag
                     </>
                   )}
-                </Button>
+                </Button> */}
               </div>
               {dragEnabled && (
                 <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-md">
