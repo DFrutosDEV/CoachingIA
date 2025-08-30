@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Role from '@/models/Role';
 
-// POST /api/client - Crear un nuevo cliente
+// POST /api/client - Crear un nuevo cliente //! SIN USAR
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -68,24 +68,16 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Generar una contraseña temporal
-    const tempPassword = `temp${Math.random().toString(36).substring(2, 15)}`;
+    // Usar contraseña por defecto
+    const defaultPassword = "!Password1";
     
     // Crear nuevo cliente
     const nuevoCliente = new User({
-      name: firstName,
-      lastName: lastName,
       email: email.toLowerCase(),
-      phone: phone || '',
-      password: tempPassword, // En un caso real, esto debería ser hasheado
-      roles: [clientRole._id],
-      biography: '',
-      profilePicture: '',
+      password: defaultPassword,
+      firstLogin: false,
       active: true,
-      isDeleted: false,
-      clients: [],
-      coaches: [assignedCoachId],
-      enterprises: []
+      isDeleted: false
     });
     
     const clienteGuardado = await nuevoCliente.save();

@@ -82,10 +82,13 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
+      // Usar contraseña por defecto
+      const defaultPassword = "!Password1";
+
       // Crear nuevo usuario
       const newUser = new User({
         email,
-        password: 'tempPassword123', //! Contraseña temporal, el usuario deberá cambiarla en su primer login
+        password: defaultPassword,
         active: true,
         firstLogin: false,
         isDeleted: false

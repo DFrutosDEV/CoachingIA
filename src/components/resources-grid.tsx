@@ -4,7 +4,7 @@ import {
   NotificationCard,
   NotesCard,
   NewObjectiveCard,
-  CoachCard,
+  AddUserCard,
   TicketCard,
   PdaCard,
   ConfigFormCard,
@@ -25,8 +25,8 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
         <NewObjectiveCard userType={userType} />
       )}
 
-      {/* Agregar Coach */}
-      {(userType === "admin") && <CoachCard />}
+      {/* Agregar Usuario */}
+      {(userType === "admin") && <AddUserCard />}
 
       {/* Generar Ticket */}
       {(userType === "coach") && <TicketCard />}

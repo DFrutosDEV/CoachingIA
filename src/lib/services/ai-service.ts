@@ -1,4 +1,4 @@
-import { Goal, Objective } from '@/types';
+import { Objective } from '@/types';
 import { getAIConfig, AIConfig } from '@/lib/config/ai-config';
 
 interface AIMetrics {
@@ -32,16 +32,22 @@ export class AIService {
   ): Promise<GeneratedGoal[]> {
     try {
       if (!this.config.apiKey) {
-        throw new Error('API Key de Google Gemini no configurada');
+        throw new Error(`API Key de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no configurada`);
       }
 
       const prompt = this.buildPrompt(objective, metrics, numberOfGoals);
       console.log("Prompt:", prompt);
-      const response = await this.callGeminiAPI(prompt);
+      
+      let response: Response;
+      if (this.config.provider === 'deepseek') {
+        response = await this.callDeepSeekAPI(prompt);
+      } else {
+        response = await this.callGeminiAPI(prompt);
+      }
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Error en la API de Gemini: ${response.statusText} - ${errorData}`);
+        throw new Error(`Error en la API de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'}: ${response.statusText} - ${errorData}`);
       }
 
       const data = await response.json();
@@ -49,7 +55,7 @@ export class AIService {
       
       return this.parseGeneratedGoals(generatedText, numberOfGoals);
     } catch (error) {
-      console.error('Error generando objetivos con Gemini:', error);
+      console.error(`Error generando objetivos con ${this.config.provider}:`, error);
       throw new Error('No se pudieron generar objetivos automáticamente');
     }
   }
@@ -136,6 +142,25 @@ export class AIService {
     }));
   }
 
+  private async callDeepSeekAPI(prompt: string): Promise<Response> {
+    return fetch(`${this.config.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.config.apiKey}`
+      },
+      body: JSON.stringify({
+        model: this.config.model,
+        messages: [{
+          role: 'user',
+          content: prompt
+        }],
+        temperature: this.config.temperature,
+        max_tokens: this.config.maxTokens
+      })
+    });
+  }
+
   private async callGeminiAPI(prompt: string): Promise<Response> {
     const baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
     
@@ -160,52 +185,79 @@ export class AIService {
   }
 
   private extractTextFromResponse(data: any): string {
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-      throw new Error('Respuesta inválida de Google Gemini');
+    if (this.config.provider === 'deepseek') {
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('Respuesta inválida de DeepSeek');
+      }
+      return data.choices[0].message.content;
+    } else {
+      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+        throw new Error('Respuesta inválida de Google Gemini');
+      }
+      return data.candidates[0].content.parts[0].text;
     }
-    return data.candidates[0].content.parts[0].text;
   }
 
-  // Método para verificar si Gemini está disponible
-  async checkGeminiStatus(): Promise<{ available: boolean; provider: string; message: string; environment: string }> {
+  // Método para verificar si el AI está disponible
+  async checkAIStatus(): Promise<{ available: boolean; provider: string; message: string; environment: string }> {
     try {
       if (!this.config.apiKey) {
         return {
           available: false,
-          provider: 'Google Gemini',
-          message: 'API Key de Google Gemini no configurada',
+          provider: this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
+          message: `API Key de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no configurada`,
           environment: process.env.NODE_ENV || 'unknown'
         };
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: 'Hola, responde solo con "OK"'
-            }]
-          }],
-          generationConfig: {
-            maxOutputTokens: 10
-          }
-        })
-      });
+      let response: Response;
+      
+      if (this.config.provider === 'deepseek') {
+        response = await fetch(`${this.config.baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.config.apiKey}`
+          },
+          body: JSON.stringify({
+            model: this.config.model,
+            messages: [{
+              role: 'user',
+              content: 'Hola, responde solo con "OK"'
+            }],
+            max_tokens: 10
+          })
+        });
+      } else {
+        response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: 'Hola, responde solo con "OK"'
+              }]
+            }],
+            generationConfig: {
+              maxOutputTokens: 10
+            }
+          })
+        });
+      }
 
       return {
         available: response.ok,
-        provider: 'Google Gemini',
-        message: response.ok ? 'Google Gemini conectado correctamente' : `Error ${response.status}: ${response.statusText}`,
+        provider: this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
+        message: response.ok ? `${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} conectado correctamente` : `Error ${response.status}: ${response.statusText}`,
         environment: process.env.NODE_ENV || 'unknown'
       };
     } catch (error) {
-      console.error('Google Gemini no está disponible:', error);
+      console.error(`${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no está disponible:`, error);
       return {
         available: false,
-        provider: 'Google Gemini',
+        provider: this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
         message: `Error de conexión: ${error instanceof Error ? error.message : 'Error desconocido'}`,
         environment: process.env.NODE_ENV || 'unknown'
       };

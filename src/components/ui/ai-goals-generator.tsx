@@ -33,21 +33,21 @@ export function AIGoalsGenerator({
   const [generatedGoals, setGeneratedGoals] = useState<Goal[]>([])
   const [error, setError] = useState<string | null>(null)
 
-  // Verificar estado de Gemini al abrir el modal
-  const checkGeminiStatus = async () => {
+  // Verificar estado de AI al abrir el modal
+  const checkAIStatus = async () => {
     try {
       const response = await fetch('/api/ai/generate-goals')
       const data = await response.json()
       
       setAiStatus({
-        provider: data.provider || 'Google Gemini',
+        provider: data.provider || 'AI Service',
         available: data.available || false,
         message: data.message || 'Estado desconocido',
         environment: data.environment || 'unknown'
       })
     } catch (error) {
       setAiStatus({
-        provider: 'Google Gemini',
+        provider: 'AI Service',
         available: false,
         message: 'Error de conexión',
         environment: 'unknown'
@@ -100,9 +100,9 @@ export function AIGoalsGenerator({
     setAiStatus(null)
   }
 
-  // Verificar Gemini cuando se abre el modal
+  // Verificar AI cuando se abre el modal
   if (isOpen && !aiStatus) {
-    checkGeminiStatus()
+    checkAIStatus()
   }
 
   return (
@@ -111,7 +111,7 @@ export function AIGoalsGenerator({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Generar Objetivos con Google Gemini
+            Generar Objetivos con IA
           </DialogTitle>
         </DialogHeader>
 
@@ -175,7 +175,7 @@ export function AIGoalsGenerator({
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generando objetivos con Gemini...
+                Generando objetivos con IA...
               </>
             ) : (
               <>
@@ -228,13 +228,12 @@ export function AIGoalsGenerator({
           {/* Instrucciones de configuración */}
           {aiStatus && !aiStatus.available && (
             <div className="p-4 rounded-lg border border-amber-200 bg-amber-50">
-              <h4 className="font-medium text-amber-800 mb-2">Configurar Google Gemini</h4>
+              <h4 className="font-medium text-amber-800 mb-2">Configurar IA</h4>
               <ol className="text-sm text-amber-700 space-y-1">
-                <li>1. Ve a <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google AI Studio</a></li>
-                <li>2. Crea una nueva API Key</li>
-                <li>3. Agrega <code className="bg-amber-100 px-1 rounded">GOOGLE_AI_API_KEY=tu_api_key</code> en tu archivo <code className="bg-amber-100 px-1 rounded">.env.local</code></li>
-                <li>4. Reinicia la aplicación</li>
-                <li>5. Ejecuta <code className="bg-amber-100 px-1 rounded">npm run check:gemini</code> para verificar</li>
+                <li>1. Configura la variable <code className="bg-amber-100 px-1 rounded">AI_PROVIDER</code> en tu archivo <code className="bg-amber-100 px-1 rounded">.env.local</code>:</li>
+                <li>• Para Google Gemini: <code className="bg-amber-100 px-1 rounded">AI_PROVIDER=google</code> y <code className="bg-amber-100 px-1 rounded">GOOGLE_AI_API_KEY=tu_api_key</code></li>
+                <li>• Para DeepSeek: <code className="bg-amber-100 px-1 rounded">AI_PROVIDER=deepseek</code> y <code className="bg-amber-100 px-1 rounded">DEEPSEEK_API_KEY=tu_api_key</code></li>
+                <li>2. Reinicia la aplicación</li>
               </ol>
             </div>
           )}

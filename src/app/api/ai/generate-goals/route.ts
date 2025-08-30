@@ -11,7 +11,7 @@ dotenv.config({ path: '.env.local' });
 
 export async function GET() {
   try {
-    const aiStatus = await aiService.checkGeminiStatus();
+    const aiStatus = await aiService.checkAIStatus();
     
     return NextResponse.json({
       provider: aiStatus.provider,
@@ -20,11 +20,11 @@ export async function GET() {
       environment: aiStatus.environment
     });
   } catch (error) {
-    console.error('Error verificando estado de Gemini:', error);
+    console.error('Error verificando estado de AI:', error);
     return NextResponse.json({
-      provider: 'Google Gemini',
+      provider: 'AI Service',
       available: false,
-      message: 'Error verificando estado de Gemini',
+      message: 'Error verificando estado de AI',
       environment: process.env.NODE_ENV || 'unknown'
     }, { status: 500 });
   }
@@ -71,19 +71,19 @@ export async function POST(request: NextRequest) {
       coachNotes: []
     };
 
-    // Verificar si Gemini está disponible
-    const aiStatus = await aiService.checkGeminiStatus();
+    // Verificar si AI está disponible
+    const aiStatus = await aiService.checkAIStatus();
     if (!aiStatus.available) {
       return NextResponse.json(
         { 
-          error: `Google Gemini no está disponible. ${aiStatus.message}`,
+          error: `${aiStatus.provider} no está disponible. ${aiStatus.message}`,
           fallback: true 
         },
         { status: 503 }
       );
     }
 
-    // Generar objetivos con Gemini
+    // Generar objetivos con AI
     const generatedGoals = await aiService.generateGoalsForObjective(objective, metrics, numberOfGoals);
 
     // Convertir a formato Goal
