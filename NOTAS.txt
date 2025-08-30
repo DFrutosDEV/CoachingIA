@@ -52,8 +52,21 @@ export async function POST(req) {
   }
 }
 
+--------------------------------------------------------------------------
+PARA DEPLOYAR 
+vercel --prod
+
+MONGODB_URI=mongodb+srv://dfrutosdeveloper:UvhPXveH2baJNsc1@coachingia.ysqkesb.mongodb.net/
+
+import bcrypt from 'bcryptjs'; PARA ENCRIPTAR CONTRASEÑAS
+
+
 
 --------------------------------------------------------------------------
 C:\Users\Daniel Frutos\Documents\CoachingIA\src\components\ui\goals-modal.tsx REVISAR PARA ELIMINAR
 
 C:\Users\Daniel Frutos\Documents\CoachingIA\src\app\api\objective\finalize\route.ts // REVISAR QUE FINALICE CORRECTAMENTE EL OBJETIVO
+
+REVISAR LA CREACION DE CoachingIA
+
+REVISAR bg-background-hover en tema light
