@@ -7,6 +7,7 @@ import Meet from '@/models/Meet'
 import Role from '@/models/Role'
 import { generateJitsiLink } from '@/utils/generateJitsiLinks'
 import { fromZonedTime } from 'date-fns-tz'
+import { sendWelcomeEmail } from '@/lib/services/email-service'
 
 // POST: Crear un nuevo objetivo
 export async function POST(request: NextRequest) {
@@ -107,6 +108,14 @@ export async function POST(request: NextRequest) {
       })
 
       await newProfile.save()
+
+      // Enviar email de bienvenida
+      try {
+        await sendWelcomeEmail(email, firstName, defaultPassword);
+      } catch (emailError) {
+        console.error('Error enviando email de bienvenida:', emailError);
+        // No fallamos la creación del usuario si falla el email
+      }
 
       clientIdToUse = newProfile._id.toString()
     } else {

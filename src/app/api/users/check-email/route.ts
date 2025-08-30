@@ -25,9 +25,8 @@ export async function GET(request: NextRequest) {
     // Buscar usuario por email
     const usuario = await User.findOne({ 
       email: email.toLowerCase(),
-      active: true,
       isDeleted: { $ne: true }
-    }).select('_id name lastName email phone age');
+    }).select('_id email');
 
     if (!usuario) {
       return NextResponse.json({
@@ -51,7 +50,7 @@ export async function GET(request: NextRequest) {
     }).populate({
       path: 'role',
       match: { 
-        code: '3', // Código para rol de cliente
+        code: '3',
         active: true 
       }
     });
@@ -64,11 +63,11 @@ export async function GET(request: NextRequest) {
         user: {
           _id: usuario._id,
           clientId: perfil._id,
-          name: usuario.name,
-          lastName: usuario.lastName,
+          name: perfil.name,
+          lastName: perfil.lastName,
           email: usuario.email,
-          phone: usuario.phone,
-          age: usuario.age
+          phone: perfil.phone,
+          age: perfil.age
         }
       });
     } else {

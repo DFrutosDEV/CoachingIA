@@ -1,8 +1,6 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export interface EmailData {
   to: string;
@@ -35,27 +33,56 @@ const readTemplate = (templateName: string): string => {
   }
 };
 
-export const sendEmailWithResend = async (emailData: EmailData) => {
-  try {
-    resend.domains.create({
-      name: process.env.NEXT_PUBLIC_APP_DOMAIN || '',
-    })
-
-    const { data, error } = await resend.emails.send({
-      from: `CoachingIA <${process.env.NEXT_PUBLIC_APP_EMAIL_FROM}>`,
-      to: [emailData.to],
-      subject: emailData.subject,
-      html: emailData.html,
+// Crear transporter de Nodemailer
+const createTransporter = async () => {
+  const emailProvider = process.env.EMAIL_PROVIDER || 'ethereal';
+  
+  if (emailProvider === 'gmail') {
+    // Configuración para Gmail SMTP
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD // Usar contraseña de aplicación
+      }
     });
+  } else {
+    // Configuración para Ethereal Email (pruebas locales)
+    const testAccount = await nodemailer.createTestAccount();
+    
+    return nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false, // true para 465, false para otros puertos
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass
+      }
+    });
+  }
+};
 
-    if (error) {
-      console.error('Error enviando email con Resend:', error);
-      return { success: false, error: error.message };
+export const sendEmailWithNodemailer = async (emailData: EmailData) => {
+  try {
+    const transporter = await createTransporter();
+    
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || 'CoachingIA <noreply@coachingia.com>',
+      to: emailData.to,
+      subject: emailData.subject,
+      html: emailData.html
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    
+    // Si usamos Ethereal, mostrar la URL de preview
+    if (process.env.EMAIL_PROVIDER !== 'gmail') {
+      console.log('📧 Email enviado (Ethereal):', nodemailer.getTestMessageUrl(info));
     }
 
-    return { success: true, data };
+    return { success: true, data: info };
   } catch (error) {
-    console.error('Error en sendEmailWithResend:', error);
+    console.error('Error enviando email con Nodemailer:', error);
     return { success: false, error: 'Error enviando email' };
   }
 };
@@ -71,7 +98,7 @@ export const sendTemplateEmail = async (
     const template = readTemplate(templateName);
     const html = processTemplate(template, variables);
     
-    return sendEmailWithResend({
+    return sendEmailWithNodemailer({
       to,
       subject,
       html
@@ -101,4 +128,51 @@ export const sendWelcomeEmail = async (email: string, name: string, password: st
     '¡Bienvenido a CoachingIA! - Tus credenciales de acceso',
     variables
   );
+};
+
+export const sendAppointmentConfirmationEmail = async (
+  email: string, 
+  name: string, 
+  appointmentDate: string, 
+  appointmentTime: string,
+  coachName: string
+) => {
+  const variables = {
+    companyName: 'CoachingIA',
+    userName: name,
+    appointmentDate,
+    appointmentTime,
+    coachName,
+    dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
+    companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
+    companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || ''
+  };
+  
+  return sendTemplateEmail(
+    'appointment-confirmation.html',
+    email,
+    'Confirmación de Cita - CoachingIA',
+    variables
+  );
+};
+
+// Función para verificar la configuración de email
+export const checkEmailConfig = async () => {
+  try {
+    const transporter = await createTransporter();
+    await transporter.verify();
+    
+    const provider = process.env.EMAIL_PROVIDER || 'ethereal';
+    return {
+      success: true,
+      provider,
+      message: provider === 'gmail' ? 'Gmail SMTP configurado correctamente' : 'Ethereal Email configurado para pruebas'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    };
+  }
 };
