@@ -3,7 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@mui/material"
 import imgHome1 from "../img/imgHome1.png"
-import { ArrowRight, Users, Calendar, BarChart } from "lucide-react"
+import { ArrowRight, Users, Calendar, BarChart, Target, Zap, Shield, Star, TrendingUp, Clock, Award, Heart } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export default function Home() {
@@ -18,8 +18,11 @@ export default function Home() {
             <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
               Características
             </Link>
-            <Link href="#testimonials" className="text-sm font-medium hover:underline underline-offset-4">
-              Testimonios
+            <Link href="#benefits" className="text-sm font-medium hover:underline underline-offset-4">
+              Beneficios
+            </Link>
+            <Link href="#process" className="text-sm font-medium hover:underline underline-offset-4">
+              Proceso
             </Link>
           </nav>
           <div className="flex gap-4">
@@ -46,7 +49,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Link href="/register">
+                  <Link href="/login">
                     <Button variant="contained" size="large" endIcon={<ArrowRight className="h-4 w-4" />}>
                       Comenzar ahora
                     </Button>
@@ -71,6 +74,31 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Sección de Estadísticas */}
+        {/* <section className="w-full py-12 md:py-24 bg-gradient-to-r from-primary/10 to-secondary/10">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="space-y-2">
+                <div className="text-3xl md:text-4xl font-bold text-primary">500+</div>
+                <p className="text-sm text-muted-foreground">Coaches Certificados</p>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl md:text-4xl font-bold text-primary">10K+</div>
+                <p className="text-sm text-muted-foreground">Sesiones Completadas</p>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl md:text-4xl font-bold text-primary">95%</div>
+                <p className="text-sm text-muted-foreground">Satisfacción</p>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl md:text-4xl font-bold text-primary">24/7</div>
+                <p className="text-sm text-muted-foreground">Soporte Disponible</p>
+              </div>
+            </div>
+          </div>
+        </section> */}
+
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-muted">
           <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -116,57 +144,170 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
+
+        {/* Nueva sección de Beneficios */}
+        <section id="benefits" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Lo que dicen nuestros usuarios
+                  ¿Por qué elegir CoachingIA?
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Historias de éxito de personas que han transformado sus vidas con nuestra plataforma.
+                  Descubre las ventajas únicas que hacen de nuestra plataforma la elección perfecta para tu desarrollo personal.
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              <div className="flex flex-col justify-center space-y-4 rounded-lg border p-6">
-                <div className="flex items-center gap-4">
-                  <Image
-                    src="https://ui-avatars.com/api/?background=random&name=María García"
-                    alt="Avatar"
-                    className="rounded-full"
-                    height={50}
-                    width={50}
-                  />
-                  <div>
-                    <h3 className="text-lg font-bold">María García</h3>
-                    <p className="text-sm text-muted-foreground">Cliente desde 2022</p>
-                  </div>
+            <div className="mx-auto grid max-w-6xl gap-8 py-12 lg:grid-cols-2 lg:gap-12">
+              <div className="flex items-start space-x-4 p-6 rounded-lg border hover:shadow-lg transition-shadow">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400">
+                  <Zap className="h-6 w-6" />
                 </div>
-                <p className="text-muted-foreground">
-                  "Gracias a mi coach he podido superar obstáculos que me impedían avanzar en mi carrera profesional.
-                  Ahora tengo más confianza y claridad sobre mis objetivos."
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Resultados Rápidos</h3>
+                  <p className="text-muted-foreground">
+                    Nuestro método probado te ayuda a ver cambios significativos en las primeras semanas de coaching.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4 p-6 rounded-lg border hover:shadow-lg transition-shadow">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  <Shield className="h-6 w-6" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Confidencialidad Total</h3>
+                  <p className="text-muted-foreground">
+                    Tus sesiones y datos personales están protegidos con los más altos estándares de seguridad.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4 p-6 rounded-lg border hover:shadow-lg transition-shadow">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400">
+                  <Target className="h-6 w-6" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Enfoque Personalizado</h3>
+                  <p className="text-muted-foreground">
+                    Cada sesión se adapta a tus objetivos específicos y tu estilo de aprendizaje único.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4 p-6 rounded-lg border hover:shadow-lg transition-shadow">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400">
+                  <Star className="h-6 w-6" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Calidad Garantizada</h3>
+                  <p className="text-muted-foreground">
+                    Todos nuestros coaches pasan por un riguroso proceso de selección y certificación.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Nueva sección de Proceso */}
+        <section id="process" className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                  Tu camino hacia el éxito
+                </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Un proceso simple y efectivo para alcanzar tus metas personales y profesionales.
                 </p>
               </div>
-              <div className="flex flex-col justify-center space-y-4 rounded-lg border p-6">
-                <div className="flex items-center gap-4">
-                  <Image
-                    src="https://ui-avatars.com/api/?background=random&name=Carlos Rodríguez"
-                    alt="Avatar"
-                    className="rounded-full"
-                    height={50}
-                    width={50}
-                  />
-                  <div>
-                    <h3 className="text-lg font-bold">Carlos Rodríguez</h3>
-                    <p className="text-sm text-muted-foreground">Cliente desde 2023</p>
-                  </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl gap-8 py-12 lg:grid-cols-4 lg:gap-12">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-2xl font-bold">
+                  1
                 </div>
-                <p className="text-muted-foreground">
-                  "La plataforma es muy intuitiva y me ha permitido encontrar un coach que realmente entiende mis
-                  necesidades. Las sesiones son transformadoras."
-                </p>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Personaliza tu perfil</h3>
+                  <p className="text-muted-foreground">
+                    Ingresa tus datos de sesión y completa tu perfil personal.
+                  </p>
+                </div>
               </div>
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-2xl font-bold">
+                  2
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Encuentra tu Coach</h3>
+                  <p className="text-muted-foreground">
+                    Mantente conectado con tu coach y recibe asesoría personalizada.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-2xl font-bold">
+                  3
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Agenda tu sesión</h3>
+                  <p className="text-muted-foreground">
+                    Agenda tu primera sesión en el horario que mejor te convenga.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-2xl font-bold">
+                  4
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold">Transforma tu vida</h3>
+                  <p className="text-muted-foreground">
+                    Comienza tu viaje de transformación personal y alcanza tus metas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección CTA */}
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-r from-primary to-primary/80">
+          <div className="container px-4 md:px-6 mx-auto text-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                ¿Listo para transformar tu vida?
+              </h2>
+              <p className="max-w-[600px] mx-auto md:text-xl">
+                Únete a miles de personas que ya han cambiado sus vidas con CoachingIA.
+              </p>
+              {/* <div className="flex flex-col gap-4 min-[400px]:flex-row justify-center">
+                <Link href="/register">
+                  <Button 
+                    variant="" 
+                    size="large" 
+                    endIcon={<ArrowRight className="h-4 w-4" />}
+                    sx={{ 
+                      backgroundColor: 'white', 
+                      color: 'primary.main',
+                      '&:hover': { backgroundColor: 'white' }
+                    }}
+                  >
+                    Comenzar ahora
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button 
+                    variant="outlined" 
+                    size="large"
+                    sx={{ 
+                      borderColor: 'white', 
+                      color: 'white',
+                      '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' }
+                    }}
+                  >
+                    Ya tengo cuenta
+                  </Button>
+                </Link>
+              </div> */}
             </div>
           </div>
         </section>
@@ -184,19 +325,24 @@ export default function Home() {
               <h3 className="text-sm font-medium">Plataforma</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
+                  <Link href="#features" className="text-muted-foreground hover:text-foreground">
                     Características
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Testimonios
+                  <Link href="#benefits" className="text-muted-foreground hover:text-foreground">
+                    Beneficios
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#process" className="text-muted-foreground hover:text-foreground">
+                    Proceso
                   </Link>
                 </li>
               </ul>
             </div>
             <div className="space-y-3">
-              <h3 className="text-sm font-medium">Empresa</h3>
+              <h3 className="text-sm font-medium font-bold">Empresa</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link href="#" className="text-muted-foreground hover:text-foreground">
