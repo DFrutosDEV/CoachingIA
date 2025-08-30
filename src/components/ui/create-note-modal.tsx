@@ -172,7 +172,7 @@ export function CreateNoteModal({
           {/* Sesión opcional */}
           <div className="space-y-2">
             <Label htmlFor="session">Sesión (opcional)</Label>
-                         <Select value={selectedSessionId} onValueChange={setSelectedSessionId}>
+              <Select value={selectedSessionId} onValueChange={setSelectedSessionId}>
                <SelectTrigger className="w-full bg-background border border-input hover:bg-accent hover:text-accent-foreground">
                  <SelectValue placeholder="Selecciona una sesión (opcional)" />
                </SelectTrigger>

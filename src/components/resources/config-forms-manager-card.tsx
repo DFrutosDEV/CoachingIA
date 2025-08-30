@@ -3,19 +3,14 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@mui/material"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Settings, Plus, Edit, Trash2, ArrowRight, MoreVertical } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Settings, Plus, Edit, Trash2, ArrowRight, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
+import { useSelector } from "react-redux"
+import { RootState } from "@/lib/redux/store"
 
 interface ConfigForm {
   _id: string
@@ -30,13 +25,19 @@ interface ConfigForm {
 export function ConfigFormsManagerCard() {
   const [configForms, setConfigForms] = useState<ConfigForm[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { user } = useSelector((state: RootState) => state.auth)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [editingForm, setEditingForm] = useState<ConfigForm | null>(null)
+  const [deletingForm, setDeletingForm] = useState<ConfigForm | null>(null)
   const [formData, setFormData] = useState({
     title: "",
-    isObligatory: false
+    isObligatory: false,
+    active: true,
+    createdBy: user?.profile._id || ""
   })
   const [loading, setLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // Cargar formularios de configuración
   const loadConfigForms = async () => {
@@ -61,7 +62,7 @@ export function ConfigFormsManagerCard() {
   // Abrir modal para crear nuevo formulario
   const handleCreateNew = () => {
     setEditingForm(null)
-    setFormData({ title: "", isObligatory: false })
+    setFormData({ title: "", isObligatory: false, active: true, createdBy: user?.profile._id || "" })
     setIsEditDialogOpen(true)
     console.log('Modal abierto para crear nuevo formulario')
   }
@@ -71,10 +72,18 @@ export function ConfigFormsManagerCard() {
     setEditingForm(form)
     setFormData({
       title: form.title,
-      isObligatory: form.isObligatory
+      isObligatory: form.isObligatory,
+      active: form.active,
+      createdBy: user?.profile._id || ""
     })
     setIsEditDialogOpen(true)
     console.log('Modal abierto para editar formulario:', form.title)
+  }
+
+  // Abrir modal de confirmación de borrado
+  const handleDeleteClick = (form: ConfigForm) => {
+    setDeletingForm(form)
+    setIsDeleteDialogOpen(true)
   }
 
   // Guardar formulario (crear o actualizar)
@@ -118,51 +127,30 @@ export function ConfigFormsManagerCard() {
     }
   }
 
-  // Cambiar estado activo/inactivo
-  const handleToggleActive = async (formId: string, currentActive: boolean) => {
-    try {
-      const response = await fetch(`/api/config-forms/${formId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ active: !currentActive }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success) {
-          toast.success(currentActive ? 'Formulario desactivado' : 'Formulario activado')
-          loadConfigForms()
-        }
-      }
-    } catch (error) {
-      console.error('Error al cambiar estado:', error)
-      toast.error('Error al cambiar el estado')
-    }
-  }
-
   // Eliminar formulario
-  const handleDelete = async (formId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este formulario?')) {
-      return
-    }
+  const handleDelete = async () => {
+    if (!deletingForm) return
 
+    setDeleteLoading(true)
     try {
-      const response = await fetch(`/api/config-forms/${formId}`, {
+      const response = await fetch(`/api/config-forms/${deletingForm._id}`, {
         method: 'DELETE',
       })
 
       if (response.ok) {
         const data = await response.json()
         if (data.success) {
-          toast.success('Formulario eliminado')
+          toast.success('Pregunta eliminada correctamente')
+          setIsDeleteDialogOpen(false)
+          setDeletingForm(null)
           loadConfigForms()
         }
       }
     } catch (error) {
       console.error('Error al eliminar formulario:', error)
-      toast.error('Error al eliminar el formulario')
+      toast.error('Error al eliminar la pregunta')
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -204,7 +192,7 @@ export function ConfigFormsManagerCard() {
             <DialogContent className="sm:max-w-[600px] z-[9999]">
               <DialogHeader>
                 <DialogTitle>
-                  Revisar Formularios de Configuración
+                  Revisar Formulario de Configuración
                 </DialogTitle>
                 <DialogDescription>
                   Aquí puedes ver y gestionar todas las preguntas de configuración del sistema.
@@ -257,10 +245,6 @@ export function ConfigFormsManagerCard() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Switch
-                              checked={form.active}
-                              onCheckedChange={() => handleToggleActive(form._id, form.active)}
-                            />
                             <Button
                               variant="text"
                               size="small"
@@ -271,7 +255,7 @@ export function ConfigFormsManagerCard() {
                             <Button
                               variant="text"
                               size="small"
-                              onClick={() => handleDelete(form._id)}
+                              onClick={() => handleDeleteClick(form)}
                               className="text-red-600 hover:text-red-700"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -294,19 +278,17 @@ export function ConfigFormsManagerCard() {
         </CardFooter>
       </Card>
 
-
-
       {/* Modal para crear/editar formulario */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px] z-[9999]">
           <DialogHeader>
             <DialogTitle>
-              {editingForm ? 'Editar Formulario' : 'Nuevo Formulario'}
+              {editingForm ? 'Editar pregunta' : 'Nueva pregunta'}
             </DialogTitle>
             <DialogDescription>
               {editingForm
-                ? 'Modifica los detalles del formulario de configuración.'
-                : 'Crea una nueva pregunta de configuración para el sistema.'
+                ? 'Modifica los detalles de la pregunta.'
+                : 'Crea una nueva pregunta para el sistema.'
               }
             </DialogDescription>
           </DialogHeader>
@@ -322,22 +304,111 @@ export function ConfigFormsManagerCard() {
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="isObligatory"
-                checked={formData.isObligatory}
-                onCheckedChange={(checked: boolean) => setFormData({ ...formData, isObligatory: checked })}
-              />
+            <div className="space-y-2">
               <Label htmlFor="isObligatory">Pregunta obligatoria</Label>
+              <Select
+                value={formData.isObligatory ? "obligatory" : "optional"}
+                onValueChange={(value) => setFormData({ ...formData, isObligatory: value === "obligatory" })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-[9999]">
+                  <SelectItem className="bg-background-hover" value="obligatory">Obligatorio</SelectItem>
+                  <SelectItem className="bg-background-hover" value="optional">Opcional</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Estado de la pregunta</Label>
+              <Select
+                value={formData.active ? "active" : "inactive"}
+                onValueChange={(value) => setFormData({ ...formData, active: value === "active" })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-[9999]">
+                  <SelectItem className="bg-background-hover" value="active">Activa</SelectItem>
+                  <SelectItem className="bg-background-hover" value="inactive">Inactiva</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex justify-end gap-2">
             <Button variant="outlined" onClick={() => setIsEditDialogOpen(false)}>
               Cancelar
             </Button>
             <Button variant="contained" onClick={handleSave} disabled={loading}>
               {loading ? 'Guardando...' : (editingForm ? 'Actualizar' : 'Crear')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de confirmación de borrado */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] z-[9999]">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <DialogTitle>Confirmar eliminación</DialogTitle>
+                <DialogDescription>
+                  ¿Estás seguro de que quieres eliminar esta pregunta?
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="py-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-2">Pregunta a eliminar:</h4>
+              <p className="text-gray-700">{deletingForm?.title}</p>
+              <div className="flex items-center gap-2 mt-2">
+                {deletingForm?.isObligatory && (
+                  <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
+                    Obligatorio
+                  </span>
+                )}
+                {deletingForm?.active ? (
+                  <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
+                    Activo
+                  </span>
+                ) : (
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                    Inactivo
+                  </span>
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-3">
+              Esta acción no se puede deshacer. La pregunta será eliminada permanentemente.
+            </p>
+          </div>
+
+          <DialogFooter className="flex justify-end gap-2">
+            <Button 
+              variant="outlined" 
+              onClick={() => {
+                setIsDeleteDialogOpen(false)
+                setDeletingForm(null)
+              }}
+              disabled={deleteLoading}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              variant="contained" 
+              onClick={handleDelete} 
+              disabled={deleteLoading}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteLoading ? 'Eliminando...' : 'Eliminar pregunta'}
             </Button>
           </DialogFooter>
         </DialogContent>
