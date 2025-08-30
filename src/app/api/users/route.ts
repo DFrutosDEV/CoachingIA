@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import Profile from '@/models/Profile';
+import Role from '@/models/Role';
+import { sendWelcomeEmail } from '@/lib/services/email-service';
 
 // GET /api/users - Obtener usuarios (con búsqueda opcional)
 export async function GET(request: NextRequest) {
@@ -11,7 +14,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') || '10');
     
-    let query: any = { active: true, isDeleted: { $ne: true } };
+    let query: any = { isDeleted: { $ne: true } };
     
     // Si hay parámetro de búsqueda, buscar por nombre, apellido o email
     if (search && search.length >= 3) {
@@ -23,17 +26,17 @@ export async function GET(request: NextRequest) {
       ];
     }
     
-    const usuarios = await User.find(query)
-      .select('_id name lastName email')
-      .populate('roles', 'name')
+    const profiles = await Profile.find(query)
+      .populate('user', 'email')
+      .populate('role', 'name code')
       .limit(limit)
       .sort({ name: 1, lastName: 1 });
     
     // Si hay búsqueda, devolver formato para select
     if (search) {
-      const formattedUsers = usuarios.map(user => ({
-        label: `${user.name} ${user.lastName}`,
-        value: user._id.toString()
+      const formattedUsers = profiles.map(profile => ({
+        label: `${profile.name} ${profile.lastName}`,
+        value: profile._id.toString()
       }));
       
       return NextResponse.json({
@@ -46,8 +49,8 @@ export async function GET(request: NextRequest) {
     // Si no hay búsqueda, devolver formato completo
     return NextResponse.json({
       success: true,
-      data: usuarios,
-      total: usuarios.length
+      data: profiles,
+      total: profiles.length
     });
     
   } catch (error) {
@@ -68,14 +71,14 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
-    const { nombre, email, edad } = body;
+    const { name, lastName, email, profile } = body;
     
     // Validaciones básicas
-    if (!nombre || !email) {
+    if (!name || !lastName || !email || !profile) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Nombre y email son requeridos' 
+          error: 'Nombre, apellidos, email y perfil son requeridos' 
         },
         { status: 400 }
       );
@@ -93,19 +96,64 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Obtener el rol correspondiente al perfil
+    const role = await Role.findOne({ code: profile });
+    if (!role) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Perfil no válido' 
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Usar contraseña por defecto
+    const defaultPassword = "!Password1";
+    
     // Crear nuevo usuario
     const nuevoUsuario = new User({
-      nombre,
       email: email.toLowerCase(),
-      edad
+      password: defaultPassword,
+      firstLogin: false,
+      isDeleted: false,
     });
     
     const usuarioGuardado = await nuevoUsuario.save();
     
+    // Crear perfil del usuario
+    const nuevoPerfil = new Profile({
+      user: usuarioGuardado._id,
+      role: role._id,
+      name,
+      lastName,
+      bio: '',
+      phone: '',
+      address: '',
+      indexDashboard: [],
+      clients: [],
+      points: 0
+    });
+    
+    const perfilGuardado = await nuevoPerfil.save();
+    
+    // Populate para devolver datos completos
+    const perfilCompleto = await Profile.findById(perfilGuardado._id)
+      .populate('user', 'email')
+      .populate('role', 'name code');
+    
+    // Enviar email de bienvenida
+    try {
+      await sendWelcomeEmail(email, name, defaultPassword);
+    } catch (emailError) {
+      console.error('Error enviando email de bienvenida:', emailError);
+      // No fallamos la creación del usuario si falla el email
+    }
+    
     return NextResponse.json({
       success: true,
-      data: usuarioGuardado,
-      message: 'Usuario creado exitosamente'
+      data: perfilCompleto,
+      message: 'Usuario creado exitosamente. Se ha enviado un email con las credenciales.'
     }, { status: 201 });
     
   } catch (error: any) {
