@@ -16,6 +16,7 @@ export default function AdminClientsPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
   const user = useAppSelector(state => state.auth.user)
   const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
@@ -81,13 +82,27 @@ export default function AdminClientsPage() {
 
   const selectedClient = clients?.find(client => client._id === selectedClientId) || null;
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
+
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="admin" className="h-full" />
       </div>
+      <DashboardSidebar 
+        userType="admin" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="admin" />
+        <DashboardHeader userType="admin" onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col h-full">
             <div className="mb-4">

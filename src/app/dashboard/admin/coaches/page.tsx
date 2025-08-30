@@ -25,7 +25,7 @@ export default function CoachsPage() {
     totalClients: 0,
     averageClientsPerCoach: 0
   });
-
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/admin/coaches/stats');
@@ -50,13 +50,27 @@ export default function CoachsPage() {
     fetchStats();
   }, []);
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
+
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="admin" className="h-full" />
       </div>
+      <DashboardSidebar 
+        userType="admin" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="admin" />
+        <DashboardHeader userType="admin" onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex items-center gap-4">
             <Users className="h-6 w-6" />

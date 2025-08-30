@@ -1,8 +1,11 @@
+"use client"
+
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { AnalyticsComponent } from "@/components/report-analytics"
 import { ReportGraphics } from "@/components/report-graphics"
 import { BarChart3 } from "lucide-react"
+import { useState } from "react"
 
 // Podrías pasar estos datos como props en el futuro
 const analyticsData = [
@@ -14,13 +17,28 @@ const analyticsData = [
 ];
 
 export default function AdminAnalyticsPage() {
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="enterprise" className="h-full" />
       </div>
+      <DashboardSidebar 
+        userType="enterprise" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="enterprise" />
+        <DashboardHeader userType="enterprise" onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex items-center gap-4">
             <BarChart3 className="h-6 w-6" />

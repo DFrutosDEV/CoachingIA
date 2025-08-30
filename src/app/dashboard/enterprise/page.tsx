@@ -51,6 +51,16 @@ export default function EnterpriseDashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  
+  // Funciones para manejar el sidebar móvil
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
   
   // Redux para obtener el usuario logueado
   const user = useAppSelector(state => state.auth.user)
@@ -164,11 +174,21 @@ export default function EnterpriseDashboard() {
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      {/* Sidebar desktop */}
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="enterprise" className="h-full" />
       </div>
+      
+      {/* Sidebar móvil */}
+      <DashboardSidebar 
+        userType="enterprise" 
+        className="h-full" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
+      
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="enterprise" />
+        <DashboardHeader userType="enterprise" onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>

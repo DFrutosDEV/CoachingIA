@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Clock, FileText, User } from "lucide-react"
 import { formatDate } from "@/utils/validatesInputs"
 import { Goal, Note, Objective } from "@/types"
-import { FinalizeObjectiveModal } from "@/components/ui/finalize-objective-modal"
 
 interface ObjectiveDetails {
   objective: {
@@ -33,6 +32,7 @@ export default function ProgressPage() {
   const [selectedObjective, setSelectedObjective] = useState<ObjectiveDetails | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [loadingDetails, setLoadingDetails] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
   // Función para obtener todos los objetivos
   const fetchObjectives = async () => {
@@ -94,14 +94,28 @@ export default function ProgressPage() {
     }
   }, [user?._id])
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
+
   if (loading) {
     return (
       <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
         <div className="hidden border-r bg-muted/40 md:block">
           <DashboardSidebar userType="client" className="h-full" />
         </div>
+        <DashboardSidebar 
+        userType="client" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
         <div className="flex flex-col overflow-hidden">
-          <DashboardHeader userType="client" />
+          <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
           <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -121,8 +135,14 @@ export default function ProgressPage() {
         <div className="hidden border-r bg-muted/40 md:block">
           <DashboardSidebar userType="client" className="h-full" />
         </div>
-        <div className="flex flex-col overflow-hidden">
-          <DashboardHeader userType="client" />
+        <DashboardSidebar 
+        userType="client" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
+      <div className="flex flex-col overflow-hidden">
+        <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
           <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -146,8 +166,14 @@ export default function ProgressPage() {
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="client" className="h-full" />
       </div>
+      <DashboardSidebar 
+        userType="client" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="client" />
+        <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
@@ -172,6 +198,7 @@ export default function ProgressPage() {
                   <Card
                     key={objective._id}
                     className="hover:shadow-md transition-shadow"
+                    onClick={() => fetchObjectiveDetails(objective._id)}
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -186,13 +213,6 @@ export default function ProgressPage() {
                             <Badge variant="active" className="bg-green-500">
                               Completado
                             </Badge>
-                          )}
-                          {objective.active && !objective.isCompleted && (
-                            <FinalizeObjectiveModal
-                              objectiveId={objective._id}
-                              objectiveTitle={objective.title}
-                              onObjectiveFinalized={fetchObjectives}
-                            />
                           )}
                         </div>
                       </div>
@@ -209,7 +229,6 @@ export default function ProgressPage() {
                     </CardHeader>
                     <CardContent 
                       className="cursor-pointer"
-                      onClick={() => fetchObjectiveDetails(objective._id)}
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">

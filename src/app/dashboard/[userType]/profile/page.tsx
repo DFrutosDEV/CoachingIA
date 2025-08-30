@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const [previewImage, setPreviewImage] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [showPasswordDialog, setShowPasswordDialog] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -360,13 +361,27 @@ export default function ProfilePage() {
     )
   }
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
+
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType={userType} className="h-full" />
       </div>
+      <DashboardSidebar 
+        userType={userType} 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType={userType} />
+        <DashboardHeader userType={userType} onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">

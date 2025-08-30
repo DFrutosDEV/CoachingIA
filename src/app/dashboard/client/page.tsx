@@ -61,6 +61,16 @@ export default function ClientDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [isReady, setIsReady] = useState(false)
   const [dragEnabled, setDragEnabled] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  
+  // Funciones para manejar el sidebar móvil
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen)
+  }
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false)
+  }
   
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null)
@@ -225,11 +235,21 @@ export default function ClientDashboard() {
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+      {/* Sidebar desktop */}
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="client" className="h-full" />
       </div>
+      
+      {/* Sidebar móvil */}
+      <DashboardSidebar 
+        userType="client" 
+        className="h-full bg-background" 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={closeMobileSidebar}
+      />
+      
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="client" />
+        <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
