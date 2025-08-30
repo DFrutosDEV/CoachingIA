@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       populate: {
         path: 'user',
         model: User,
-        select: 'name lastName email phone active isDeleted createdAt'
+        select: 'email isDeleted createdAt'
       }
     })
     .populate({
@@ -156,8 +156,8 @@ export async function GET(request: NextRequest) {
         weekday: 'long', 
         day: 'numeric', 
         month: 'long' 
-      })}, ${session.time}`,
-      coach: `${session.coachId.user.name} ${session.coachId.user.lastName}`,
+      })}, ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+      coach: `${session.coachId.name} ${session.coachId.lastName}`,
       topic: session.objectiveId?.title || 'Sin objetivo definido'
     }));
 
@@ -165,8 +165,8 @@ export async function GET(request: NextRequest) {
     const formattedNextSession = nextSession ? {
       date: nextSession.date,
       link: nextSession.link,
-      time: nextSession.time,
-      coach: `${nextSession.coachId.user.name} ${nextSession.coachId.user.lastName}`,
+      time: new Date(nextSession.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      coach: `${nextSession.coachId.name} ${nextSession.coachId.lastName}`,
       topic: nextSession.objectiveId?.title || 'Sin objetivo definido'
     } : null;
 
