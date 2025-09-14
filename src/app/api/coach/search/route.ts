@@ -25,10 +25,10 @@ export async function GET(request: NextRequest) {
       .select('clients')
       .populate({
         path: 'clients',
-        select: '_id user',
+        select: '_id user name lastName',
         populate: {
           path: 'user',
-          select: '_id name lastName email',
+          select: '_id email',
           match: search && search.length >= 3 ? {
             $or: [
               { name: { $regex: search, $options: 'i' } },
@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
       .filter((client: any) => client.user) // Solo clientes que tengan datos de usuario
       .map((client: any) => ({
         _id: client.user._id,
-        name: client.user.name,
-        lastName: client.user.lastName,
+        name: client.name,
+        lastName: client.lastName,
         email: client.user.email
       }));
     

@@ -62,7 +62,7 @@ export function CoachCard({
 
   return (
     <div key={id}>
-      <Card className="hover:shadow-lg transition-shadow duration-200">
+      <Card className="hover:shadow-lg transition-shadow duration-200 h-full">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
@@ -86,7 +86,7 @@ export function CoachCard({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 flex flex-col justify-between">
           {bio && (
             <p className="text-sm text-muted-foreground line-clamp-2">
               {bio}
@@ -118,8 +118,7 @@ export function CoachCard({
               <span>Registrado: {formatDate(createdAt)}</span>
             </div>
           </div>
-
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 ">
             <Button variant="outlined" size="small" className="flex-1" onClick={handleSendMessage} >
               Enviar Mensaje
             </Button>

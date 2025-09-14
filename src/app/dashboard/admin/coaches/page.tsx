@@ -97,7 +97,7 @@ export default function CoachsPage() {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Coaches Activos</CardTitle>
+                <CardTitle className="text-sm font-medium">Coaches Con Actividad</CardTitle>
                 <UserCheck className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -110,7 +110,7 @@ export default function CoachsPage() {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Coaches Inactivos</CardTitle>
+                <CardTitle className="text-sm font-medium">Coaches Sin Actividad</CardTitle>
                 <UserX className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>

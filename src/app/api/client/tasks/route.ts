@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       populate: {
         path: 'user',
         model: User,
-        select: 'name lastName'
+        select: 'email'
       }
     })
     .populate({
@@ -139,8 +139,8 @@ export async function GET(request: NextRequest) {
       _id: note._id.toString(),
       title: note.title,
       content: note.content,
-      createdBy: note.createdBy?.user ? 
-        `${note.createdBy.user.name} ${note.createdBy.user.lastName}` : 
+      createdBy: note.createdBy ? 
+        `${note.createdBy.name} ${note.createdBy.lastName}` : 
         'Coach',
       createdAt: note.createdAt,
       sessionInfo: note.sessionId ? {
@@ -158,8 +158,8 @@ export async function GET(request: NextRequest) {
           isCompleted: currentObjective.isCompleted,
           active: currentObjective.active,
           createdAt: currentObjective.createdAt,
-          coach: currentObjective.coachId?.user ? 
-            `${currentObjective.coachId.user.name} ${currentObjective.coachId.user.lastName}` : 
+          coach: currentObjective.coachId ? 
+            `${currentObjective.coachId.name} ${currentObjective.coachId.lastName}` : 
             'Coach no asignado'
         },
         goals: formattedGoals,

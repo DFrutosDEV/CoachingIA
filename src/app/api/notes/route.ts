@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
         path: 'createdBy',
         model: Profile,
         populate: {
-          path: 'user',
+          path: 'user name lastName',
           model: 'User',
           select: 'name lastName'
         }
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
       coachId: note.coachId?.toString(),
       sessionId: note.sessionId?.toString(),
       createdBy: note.createdBy?.user ? 
-        `${note.createdBy.user.name} ${note.createdBy.user.lastName}` : 
+        `${note.createdBy.name} ${note.createdBy.lastName}` : 
         'Usuario desconocido',
       createdAt: note.createdAt
     }));

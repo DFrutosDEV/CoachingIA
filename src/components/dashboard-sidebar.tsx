@@ -244,7 +244,7 @@ export function DashboardSidebar({ userType, className = "", isMobileOpen = fals
               ¿Estás seguro de que quieres cerrar sesión? Tendrás que volver a iniciar sesión para acceder a tu cuenta.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="flex justify-end gap-2">
             <Button variant="outline" onClick={handleCancelLogout}>
               Cancelar
             </Button>

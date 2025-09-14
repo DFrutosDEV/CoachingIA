@@ -70,3 +70,5 @@ C:\Users\Daniel Frutos\Documents\CoachingIA\src\app\api\objective\finalize\route
 REVISAR LA CREACION DE CoachingIA
 
 REVISAR bg-background-hover en tema light
+
+

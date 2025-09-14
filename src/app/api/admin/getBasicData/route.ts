@@ -76,52 +76,14 @@ export async function GET(request: NextRequest) {
       date: { $gte: startOfMonth, $lt: now }
     })
 
-    // 7. Nuevos usuarios en los últimos 7 días
-    const recentUsers = await User.aggregate([
-      {
-        $match: {
-          active: true,
-          isDeleted: false,
-          createdAt: { $gte: startOfWeek }
-        }
-      },
-      {
-        $lookup: {
-          from: 'profiles',
-          localField: '_id',
-          foreignField: 'user',
-          as: 'profile'
-        }
-      },
-      {
-        $unwind: '$profile'
-      },
-      {
-        $lookup: {
-          from: 'roles',
-          localField: 'profile.role',
-          foreignField: '_id',
-          as: 'role'
-        }
-      },
-      {
-        $unwind: '$role'
-      },
-      {
-        $project: {
-          name: { $concat: ['$name', ' ', '$lastName'] },
-          email: 1,
-          type: '$role.name',
-          createdAt: 1
-        }
-      },
-      {
-        $sort: { createdAt: -1 }
-      },
-      {
-        $limit: 5
-      }
-    ])
+    // 7. Nuevos profiles en los últimos 7 días
+    const recentProfiles = await Profile.find({
+      createdAt: { $gte: startOfWeek }
+    })
+    .populate('user', 'email')
+    .populate('role', 'name code')
+    .sort({ createdAt: -1 })
+    .limit(5);
 
     // 8. Estadísticas de rendimiento de la plataforma
     const platformStats = {
@@ -164,11 +126,11 @@ export async function GET(request: NextRequest) {
       newCoachesThisMonth,
       completedSessions,
       completedSessionsThisMonth,
-      recentUsers: recentUsers.map(user => ({
-        name: user.name,
-        email: user.email,
-        type: user.type,
-        date: getRelativeDate(user.createdAt)
+      recentUsers: recentProfiles.map(profile => ({
+        name: profile.name,
+        email: profile.user.email,
+        type: profile.role.code,
+        date: getRelativeDate(profile.createdAt)
       })),
       platformStats,
       pendingReports

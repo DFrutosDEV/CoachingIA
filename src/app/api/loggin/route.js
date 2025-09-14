@@ -101,11 +101,11 @@ export async function POST(request) {
       role: profile.role,
       profile: profile,
       enterprise: profile?.enterprise || null,
-      name: user.name,
-      lastName: user.lastName,
+      name: profile.name,
+      lastName: profile.lastName,
       email: user.email,
       roles: [profile.role.name.toLowerCase()],
-      age: user.age,
+      age: profile.age,
     };
     
     console.log('✅ Login exitoso para:', email);

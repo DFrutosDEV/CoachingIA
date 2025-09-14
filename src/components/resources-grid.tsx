@@ -34,9 +34,6 @@ export function ResourcesGrid({ userType }: { userType: "client" | "coach" | "ad
       {/* Visualiza PDA */}
       {userType === "client" && <PdaCard />}
 
-      {/* Visualiza tu formulario de configuración */}
-      {userType === "client" && <ConfigFormCard />}
-
       {/* Gestionar Formularios de Configuración */}
       {userType === "admin" && <ConfigFormsManagerCard />}
 

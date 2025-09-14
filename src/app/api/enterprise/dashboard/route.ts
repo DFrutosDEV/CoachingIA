@@ -118,15 +118,15 @@ export async function GET(request: NextRequest) {
       isDeleted: false,
       createdAt: { $gte: lastWeek }
     })
-    .populate('user', 'name lastName email')
+    .populate('user', 'email')
     .populate('role', 'code name')
     .sort({ createdAt: -1 })
     .limit(5);
 
     const formattedNewUsers = newUsersData.map(profile => ({
-      name: `${profile.user.name} ${profile.user.lastName}`,
+      name: `${profile.name} ${profile.lastName}`,
       email: profile.user.email,
-      type: profile.role.code === 'coach' ? 'Coach' : 'Cliente',
+      type: profile.role.code === '2' ? 'Coach' : 'Cliente',
       date: formatTimeAgo(profile.createdAt)
     }));
 

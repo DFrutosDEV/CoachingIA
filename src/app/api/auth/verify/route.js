@@ -82,10 +82,10 @@ export async function GET(request) {
         success: true,
         user: {
           _id: user._id,
-          name: user.name,
-          lastName: user.lastName,
+          name: profile.name,
+          lastName: profile.lastName,
           email: user.email,
-          age: user.age,
+          age: profile.age,
           role: profile?.role,
           profile: profile,
           enterprise: profile?.enterprise || null,
