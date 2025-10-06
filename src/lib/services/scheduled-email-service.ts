@@ -24,13 +24,15 @@ export const scheduleEmail = async (emailData: ScheduledEmailData) => {
       html: emailData.html,
       sendDate: emailData.sendDate,
       maxRetries: emailData.maxRetries || 3,
-      status: 'pending'
+      status: 'pending',
     });
 
     const savedEmail = await email.save();
-    
-    console.log(`📅 Email programado para ${emailData.sendDate.toISOString()}: ${emailData.to}`);
-    
+
+    console.log(
+      `📅 Email programado para ${emailData.sendDate.toISOString()}: ${emailData.to}`
+    );
+
     return {
       success: true,
       data: {
@@ -38,15 +40,14 @@ export const scheduleEmail = async (emailData: ScheduledEmailData) => {
         to: savedEmail.to,
         subject: savedEmail.subject,
         sendDate: savedEmail.sendDate,
-        status: savedEmail.status
-      }
+        status: savedEmail.status,
+      },
     };
-
   } catch (error) {
     console.error('Error programando email:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido'
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
   }
 };
@@ -66,13 +67,13 @@ export const scheduleMultipleEmails = async (emails: ScheduledEmailData[]) => {
       html: emailData.html,
       sendDate: emailData.sendDate,
       maxRetries: emailData.maxRetries || 3,
-      status: 'pending' as const
+      status: 'pending' as const,
     }));
 
     const savedEmails = await Email.insertMany(emailsToCreate);
-    
+
     console.log(`📅 ${savedEmails.length} emails programados exitosamente`);
-    
+
     return {
       success: true,
       data: savedEmails.map(email => ({
@@ -80,15 +81,14 @@ export const scheduleMultipleEmails = async (emails: ScheduledEmailData[]) => {
         to: email.to,
         subject: email.subject,
         sendDate: email.sendDate,
-        status: email.status
-      }))
+        status: email.status,
+      })),
     };
-
   } catch (error) {
     console.error('Error programando múltiples emails:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido'
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
   }
 };
@@ -106,20 +106,19 @@ export const getScheduledEmails = async (startDate: Date, endDate: Date) => {
     const emails = await Email.find({
       sendDate: {
         $gte: startDate,
-        $lte: endDate
-      }
+        $lte: endDate,
+      },
     }).sort({ sendDate: 1 });
 
     return {
       success: true,
-      data: emails
+      data: emails,
     };
-
   } catch (error) {
     console.error('Error obteniendo emails programados:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido'
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
   }
 };
@@ -134,35 +133,34 @@ export const cancelScheduledEmail = async (emailId: string) => {
     await connectDB();
 
     const email = await Email.findById(emailId);
-    
+
     if (!email) {
       return {
         success: false,
-        error: 'Email no encontrado'
+        error: 'Email no encontrado',
       };
     }
 
     if (email.status !== 'pending') {
       return {
         success: false,
-        error: 'Solo se pueden cancelar emails pendientes'
+        error: 'Solo se pueden cancelar emails pendientes',
       };
     }
 
     await Email.findByIdAndDelete(emailId);
-    
+
     console.log(`🚫 Email cancelado: ${email.to}`);
-    
+
     return {
       success: true,
-      message: 'Email cancelado exitosamente'
+      message: 'Email cancelado exitosamente',
     };
-
   } catch (error) {
     console.error('Error cancelando email:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido'
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
   }
 };
@@ -179,9 +177,9 @@ export const getEmailStats = async () => {
       {
         $group: {
           _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     const pendingCount = stats.find(s => s._id === 'pending')?.count || 0;
@@ -196,8 +194,8 @@ export const getEmailStats = async () => {
       status: 'pending',
       sendDate: {
         $gte: new Date(),
-        $lte: next24Hours
-      }
+        $lte: next24Hours,
+      },
     });
 
     return {
@@ -207,15 +205,14 @@ export const getEmailStats = async () => {
         sent: sentCount,
         failed: failedCount,
         total: pendingCount + sentCount + failedCount,
-        upcoming24h: upcomingEmails
-      }
+        upcoming24h: upcomingEmails,
+      },
     };
-
   } catch (error) {
     console.error('Error obteniendo estadísticas de emails:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido'
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
   }
 };

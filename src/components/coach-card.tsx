@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@mui/material";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Phone, Building2, Calendar } from "lucide-react";
-import { sendMessage } from "@/utils/wpp-methods";
-import { sendEmail } from "@/utils/sendEmail";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@mui/material';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Mail, Phone, Building2, Calendar } from 'lucide-react';
+import { sendMessage } from '@/utils/wpp-methods';
+import { sendEmail } from '@/utils/sendEmail';
 
 interface CoachCardProps {
   id: string;
@@ -39,7 +39,6 @@ export function CoachCard({
   enterprise,
   createdAt,
 }: CoachCardProps) {
-
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -48,7 +47,7 @@ export function CoachCard({
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -67,7 +66,10 @@ export function CoachCard({
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
               <AvatarImage
-                src={profilePicture || `https://ui-avatars.com/api/?background=6366f1&color=fff&size=200&name=${encodeURIComponent(name + ' ' + lastName)}`}
+                src={
+                  profilePicture ||
+                  `https://ui-avatars.com/api/?background=6366f1&color=fff&size=200&name=${encodeURIComponent(name + ' ' + lastName)}`
+                }
                 alt={`${name} ${lastName}`}
               />
               <AvatarFallback className="text-lg font-semibold">
@@ -77,20 +79,20 @@ export function CoachCard({
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-semibold">{`${name} ${lastName}`}</h3>
-                <Badge variant={active ? "active" : "inactive"}>
-                  {active ? "Activo" : "Inactivo"}
+                <Badge variant={active ? 'active' : 'inactive'}>
+                  {active ? 'Activo' : 'Inactivo'}
                 </Badge>
               </div>
-              {age && <p className="text-sm text-muted-foreground">{age} años</p>}
+              {age && (
+                <p className="text-sm text-muted-foreground">{age} años</p>
+              )}
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-3 flex flex-col justify-between">
           {bio && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {bio}
-            </p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{bio}</p>
           )}
 
           <div className="space-y-2">
@@ -119,7 +121,12 @@ export function CoachCard({
             </div>
           </div>
           <div className="flex gap-2 ">
-            <Button variant="outlined" size="small" className="flex-1" onClick={handleSendMessage} >
+            <Button
+              variant="outlined"
+              size="small"
+              className="flex-1"
+              onClick={handleSendMessage}
+            >
               Enviar Mensaje
             </Button>
           </div>

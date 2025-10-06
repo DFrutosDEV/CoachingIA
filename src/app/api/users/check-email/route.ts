@@ -8,51 +8,51 @@ import Role from '@/models/Role';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
-    
+
     if (!email) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Email es requerido' 
+        {
+          success: false,
+          error: 'Email es requerido',
         },
         { status: 400 }
       );
     }
 
     // Buscar usuario por email
-    const usuario = await User.findOne({ 
+    const usuario = await User.findOne({
       email: email.toLowerCase(),
-      isDeleted: { $ne: true }
+      isDeleted: { $ne: true },
     }).select('_id email');
 
     if (!usuario) {
       return NextResponse.json({
         success: true,
         exists: false,
-        user: null
+        user: null,
       });
     }
 
     const role = await Role.findOne({
       code: '3',
       active: true,
-      isDeleted: { $ne: true }
+      isDeleted: { $ne: true },
     });
 
     // Buscar el perfil del usuario que sea de tipo cliente
     const perfil = await Profile.findOne({
       user: usuario._id,
       role: role._id,
-      isDeleted: { $ne: true }
+      isDeleted: { $ne: true },
     }).populate({
       path: 'role',
-      match: { 
+      match: {
         code: '3',
-        active: true 
-      }
+        active: true,
+      },
     });
 
     // Verificar si el usuario tiene perfil de cliente
@@ -67,27 +67,26 @@ export async function GET(request: NextRequest) {
           lastName: perfil.lastName,
           email: usuario.email,
           phone: perfil.phone,
-          age: perfil.age
-        }
+          age: perfil.age,
+        },
       });
     } else {
       // El usuario existe pero no es cliente
       return NextResponse.json({
         success: false,
         exists: true,
-        message: "Este email ya está registrado por favor ingrese otro email",
-        error: "EMAIL_NOT_AVAILABLE"
+        message: 'Este email ya está registrado por favor ingrese otro email',
+        error: 'EMAIL_NOT_AVAILABLE',
       });
     }
-    
   } catch (error) {
     console.error('Error verificando email:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Error interno del servidor' 
+      {
+        success: false,
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );
   }
-} 
+}

@@ -9,11 +9,11 @@ export async function PUT(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
     const body = await request.json();
     const { configFile } = body;
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID de objetivo es requerido' },
@@ -40,7 +40,10 @@ export async function PUT(
     // Verificar que el objetivo no tenga ya configFile (no se puede modificar)
     if (objective.configFile && objective.configFile.length > 0) {
       return NextResponse.json(
-        { error: 'El formulario de configuración ya ha sido completado y no se puede modificar' },
+        {
+          error:
+            'El formulario de configuración ya ha sido completado y no se puede modificar',
+        },
         { status: 400 }
       );
     }
@@ -48,11 +51,11 @@ export async function PUT(
     // Actualizar el objetivo con las respuestas del formulario
     const updatedObjective = await Objective.findByIdAndUpdate(
       id,
-      { 
+      {
         configFile: configFile.map((item: any) => ({
           question: item.question,
-          answer: item.answer
-        }))
+          answer: item.answer,
+        })),
       },
       { new: true }
     );
@@ -60,9 +63,8 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       message: 'Formulario de configuración guardado correctamente',
-      data: updatedObjective
+      data: updatedObjective,
     });
-
   } catch (error) {
     console.error('Error al guardar formulario de configuración:', error);
     return NextResponse.json(
@@ -79,9 +81,9 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID de objetivo es requerido' },
@@ -102,10 +104,9 @@ export async function GET(
       success: true,
       data: {
         configFile: objective.configFile || [],
-        hasConfigFile: objective.configFile && objective.configFile.length > 0
-      }
+        hasConfigFile: objective.configFile && objective.configFile.length > 0,
+      },
     });
-
   } catch (error) {
     console.error('Error al obtener formulario de configuración:', error);
     return NextResponse.json(

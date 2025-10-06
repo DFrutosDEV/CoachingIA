@@ -3,7 +3,9 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Por favor define la variable de entorno MONGODB_URI en tu archivo .env.local');
+  throw new Error(
+    'Por favor define la variable de entorno MONGODB_URI en tu archivo .env.local'
+  );
 }
 
 interface MongooseCache {
@@ -33,7 +35,7 @@ async function connectDB(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then(mongoose => {
       console.log('✅ Conectado a MongoDB');
       return mongoose;
     });
@@ -50,4 +52,4 @@ async function connectDB(): Promise<typeof mongoose> {
   return cached.conn;
 }
 
-export default connectDB; 
+export default connectDB;

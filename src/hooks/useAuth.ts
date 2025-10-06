@@ -7,7 +7,7 @@ import { logout, setLoading, setError } from '@/lib/redux/slices/authSlice';
 export const useAuth = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  
+
   // Obtener estado de autenticación del store
   const { user, isAuthenticated, isLoading, token, error } = useSelector(
     (state: RootState) => state.auth
@@ -18,12 +18,12 @@ export const useAuth = () => {
     try {
       dispatch(setLoading(true));
       dispatch(setError(null));
-      
+
       // Usar AuthClient que maneja localStorage automáticamente
       const result = await AuthService.login(email, password);
-      
+
       console.log('✅ Login exitoso desde hook');
-      
+
       // Redirigir al dashboard según el rol
       const userRole = result.user?.role;
       if (userRole) {
@@ -31,7 +31,7 @@ export const useAuth = () => {
       } else {
         router.push('/dashboard');
       }
-      
+
       return result;
     } catch (error: any) {
       const errorMessage = error.message || 'Error en el login';
@@ -46,10 +46,10 @@ export const useAuth = () => {
   const logoutUser = () => {
     try {
       dispatch(setLoading(true));
-      
+
       // Usar AuthClient que maneja localStorage automáticamente
       AuthService.logout();
-      
+
       console.log('✅ Logout exitoso desde hook');
     } catch (error: any) {
       console.error('❌ Error en logout:', error);
@@ -74,12 +74,12 @@ export const useAuth = () => {
     isLoading,
     token,
     error,
-    
+
     login,
     logout: logoutUser,
     hasRole,
     hasPermission,
-    
+
     clearError: () => dispatch(setError(null)),
   };
 };

@@ -9,10 +9,10 @@ import Enterprise from '@/models/Enterprise';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
-    
+
     // Buscar el rol de coach
     const coachRole = await Role.findOne({ code: '2' });
     if (!coachRole) {
@@ -23,34 +23,31 @@ export async function GET(request: NextRequest) {
     }
 
     // Construir query base
-    let query: any = { 
-      role: coachRole._id, 
-      isDeleted: false 
+    let query: any = {
+      role: coachRole._id,
+      isDeleted: false,
     };
 
     // Si hay búsqueda, agregar filtros
     if (search && search.length >= 3) {
       const searchRegex = new RegExp(search, 'i');
-      query.$or = [
-        { name: searchRegex },
-        { lastName: searchRegex }
-      ];
+      query.$or = [{ name: searchRegex }, { lastName: searchRegex }];
     }
 
     // Obtener todos los perfiles de coaches con sus datos de usuario
     const coaches = await Profile.find(query)
-    .populate({
-      path: 'user',
-      model: User,
-      select: 'email firstLogin createdAt',
-      match: { isDeleted: false }
-    })
-    .populate({
-      path: 'enterprise',
-      model: Enterprise,
-      select: 'name logo'
-    })
-    .sort({ createdAt: -1 });
+      .populate({
+        path: 'user',
+        model: User,
+        select: 'email firstLogin createdAt',
+        match: { isDeleted: false },
+      })
+      .populate({
+        path: 'enterprise',
+        model: Enterprise,
+        select: 'name logo',
+      })
+      .sort({ createdAt: -1 });
 
     // Filtrar coaches que tengan usuario válido
     const validCoaches = coaches.filter(coach => coach.user);
@@ -70,21 +67,22 @@ export async function GET(request: NextRequest) {
       active: !coach.isDeleted,
       firstLogin: coach.user.firstLogin,
       clientsCount: coach.clients ? coach.clients.length : 0,
-      enterprise: coach.enterprise ? {
-        id: coach.enterprise._id,
-        name: coach.enterprise.name,
-        logo: coach.enterprise.logo
-      } : null,
+      enterprise: coach.enterprise
+        ? {
+            id: coach.enterprise._id,
+            name: coach.enterprise.name,
+            logo: coach.enterprise.logo,
+          }
+        : null,
       createdAt: coach.createdAt,
-      updatedAt: coach.updatedAt
+      updatedAt: coach.updatedAt,
     }));
 
     return NextResponse.json({
       success: true,
       data: formattedCoaches,
-      total: formattedCoaches.length
+      total: formattedCoaches.length,
     });
-
   } catch (error) {
     console.error('Error al obtener coaches:', error);
     return NextResponse.json(
@@ -92,4 +90,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

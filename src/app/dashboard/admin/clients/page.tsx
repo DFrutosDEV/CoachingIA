@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { ClientsList } from "../../../../components/clients-list"
-import { ClientDetail } from "../../../../components/client-detail"
-import { toast } from "sonner"
-import { useAppSelector } from "@/lib/redux/hooks"
-import { ClientResponse, Goal } from "@/types"
-import { Users } from "lucide-react"
+import { useState, useEffect } from 'react';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { ClientsList } from '../../../../components/clients-list';
+import { ClientDetail } from '../../../../components/client-detail';
+import { toast } from 'sonner';
+import { useAppSelector } from '@/lib/redux/hooks';
+import { ClientResponse, Goal } from '@/types';
+import { Users } from 'lucide-react';
 
 export default function AdminClientsPage() {
   const [clients, setClients] = useState<ClientResponse[]>([]);
@@ -16,16 +16,16 @@ export default function AdminClientsPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  const user = useAppSelector(state => state.auth.user)
-  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
-  
+  const user = useAppSelector(state => state.auth.user);
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
+
   const fetchClients = async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       //! MOVER A UN MIDDLEWARE
       if (!isAuthenticated || !user?._id) {
         throw new Error('Usuario no autenticado');
@@ -34,15 +34,15 @@ export default function AdminClientsPage() {
       if (!user.roles.includes('admin')) {
         throw new Error('El usuario no tiene permisos de administrador');
       }
-      
+
       const response = await fetch(`/api/admin/clients?adminId=${user._id}`);
-      
+
       if (!response.ok) {
         throw new Error('Error al obtener los clientes');
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setClients(data.clients);
       } else {
@@ -72,7 +72,7 @@ export default function AdminClientsPage() {
     setIsDetailModalOpen(false);
   };
 
-   const handleUpdateClient = (clientId: string, updatedGoals: Goal[]) => {
+  const handleUpdateClient = (clientId: string, updatedGoals: Goal[]) => {
     setClients(prevClients =>
       prevClients?.map(client =>
         client._id === clientId ? { ...client, goals: updatedGoals } : client
@@ -80,29 +80,33 @@ export default function AdminClientsPage() {
     );
   };
 
-  const selectedClient = clients?.find(client => client._id === selectedClientId) || null;
+  const selectedClient =
+    clients?.find(client => client._id === selectedClientId) || null;
 
   const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen)
-  }
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
 
   const closeMobileSidebar = () => {
-    setIsMobileSidebarOpen(false)
-  }
+    setIsMobileSidebarOpen(false);
+  };
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="admin" className="h-full" />
       </div>
-      <DashboardSidebar 
-        userType="admin" 
-        className="h-full bg-background" 
+      <DashboardSidebar
+        userType="admin"
+        className="h-full bg-background"
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={closeMobileSidebar}
       />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="admin" onToggleSidebar={toggleMobileSidebar} />
+        <DashboardHeader
+          userType="admin"
+          onToggleSidebar={toggleMobileSidebar}
+        />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col h-full">
             <div className="mb-4">
@@ -111,7 +115,8 @@ export default function AdminClientsPage() {
                 <h1 className="text-3xl font-bold">Clientes</h1>
               </div>
               <p className="text-muted-foreground">
-                Gestiona y supervisa a todos los clientes registrados en la plataforma.
+                Gestiona y supervisa a todos los clientes registrados en la
+                plataforma.
               </p>
             </div>
             <div className="flex-1 overflow-hidden">
@@ -119,14 +124,16 @@ export default function AdminClientsPage() {
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Cargando clientes...</p>
+                    <p className="text-muted-foreground">
+                      Cargando clientes...
+                    </p>
                   </div>
                 </div>
               ) : error ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
                     <p className="text-destructive mb-4">{error}</p>
-                    <button 
+                    <button
                       onClick={fetchClients}
                       className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                     >
@@ -135,10 +142,10 @@ export default function AdminClientsPage() {
                   </div>
                 </div>
               ) : (
-                <ClientsList 
-                  clients={clients || []} 
-                  onClientSelect={handleClientSelect} 
-                  isAdmin={true} 
+                <ClientsList
+                  clients={clients || []}
+                  onClientSelect={handleClientSelect}
+                  isAdmin={true}
                   onClientDeleted={fetchClients}
                 />
               )}
@@ -154,5 +161,5 @@ export default function AdminClientsPage() {
         isAdmin={true}
       />
     </div>
-  )
+  );
 }

@@ -8,15 +8,15 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     // Obtener todas las empresas no eliminadas
-    const enterprises = await Enterprise.find({ isDeleted: false })
-      .sort({ createdAt: -1 }); // Ordenar por fecha de creación, más recientes primero
+    const enterprises = await Enterprise.find({ isDeleted: false }).sort({
+      createdAt: -1,
+    }); // Ordenar por fecha de creación, más recientes primero
 
     return NextResponse.json({
       success: true,
       data: enterprises,
-      count: enterprises.length
+      count: enterprises.length,
     });
-
   } catch (error) {
     console.error('Error al obtener empresas:', error);
     return NextResponse.json(
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const body = await request.json();
     const {
       name,
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       website,
       socialMedia,
       coaches,
-      employees
+      employees,
     } = body;
 
     // Validar campos requeridos
@@ -64,17 +64,19 @@ export async function POST(request: NextRequest) {
       coaches: coaches || [],
       employees: employees || [],
       active: true,
-      isDeleted: false
+      isDeleted: false,
     });
 
     await newEnterprise.save();
 
-    return NextResponse.json({
-      success: true,
-      message: 'Empresa creada correctamente',
-      data: newEnterprise
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Empresa creada correctamente',
+        data: newEnterprise,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error al crear empresa:', error);
     return NextResponse.json(

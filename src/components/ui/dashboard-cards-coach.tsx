@@ -1,10 +1,24 @@
-'use client'
+'use client';
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@mui/material"
-import { Calendar, Clock, Users, ArrowRight, MessageSquare, Video } from "lucide-react"
-import Link from "next/link"
-import { formatDate } from "@/utils/validatesInputs"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@mui/material';
+import {
+  Calendar,
+  Clock,
+  Users,
+  ArrowRight,
+  MessageSquare,
+  Video,
+} from 'lucide-react';
+import Link from 'next/link';
+import { formatDate } from '@/utils/validatesInputs';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -39,7 +53,9 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">Sin sesiones programadas</div>
-          <p className="text-xs text-muted-foreground">No hay sesiones próximas</p>
+          <p className="text-xs text-muted-foreground">
+            No hay sesiones próximas
+          </p>
           <div className="mt-4">
             <Button variant="outlined" className="w-full" disabled>
               <Clock className="mr-2 h-4 w-4" />
@@ -48,16 +64,18 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  const sessionDate = new Date(data.date)
-  const isToday = sessionDate.toDateString() === new Date().toDateString()
-  const displayDate = isToday ? 'Hoy' : formatDate(sessionDate, {
-    weekday: 'long', 
-    day: 'numeric', 
-    month: 'long' 
-  })
+  const sessionDate = new Date(data.date);
+  const isToday = sessionDate.toDateString() === new Date().toDateString();
+  const displayDate = isToday
+    ? 'Hoy'
+    : formatDate(sessionDate, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      });
 
   return (
     <Card data-swapy-item="next-session">
@@ -66,18 +84,24 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{displayDate}, {data.time}</div>
+        <div className="text-2xl font-bold">
+          {displayDate}, {data.time}
+        </div>
         <p className="text-xs text-muted-foreground">Con {data.client}</p>
         <p className="text-xs text-muted-foreground mt-1">{data.topic}</p>
         <div className="mt-4">
-          <Button variant="outlined" className="w-full" onClick={() => window.open(data.link, '_blank')}>
+          <Button
+            variant="outlined"
+            className="w-full"
+            onClick={() => window.open(data.link, '_blank')}
+          >
             <Clock className="mr-2 h-4 w-4" />
             Iniciar videollamada
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 2: Clientes Activos
@@ -101,7 +125,7 @@ export function ActiveClientsCard({ count }: { count: number }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 3: Sesiones Programadas
@@ -109,7 +133,9 @@ export function ScheduledSessionsCard({ count }: { count: number }) {
   return (
     <Card data-swapy-item="scheduled-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Sesiones Programadas</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          Sesiones Programadas
+        </CardTitle>
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -125,7 +151,7 @@ export function ScheduledSessionsCard({ count }: { count: number }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 4: Sesiones de Hoy
@@ -135,7 +161,9 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
       <Card data-swapy-item="today-sessions" className="flex flex-col h-full">
         <CardHeader>
           <CardTitle>Sesiones de Hoy</CardTitle>
-          <CardDescription>No tienes sesiones programadas para hoy.</CardDescription>
+          <CardDescription>
+            No tienes sesiones programadas para hoy.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-muted-foreground">
@@ -144,7 +172,7 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -162,7 +190,9 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">{session.time}</p>
-                <p className="text-sm text-muted-foreground">{session.client}</p>
+                <p className="text-sm text-muted-foreground">
+                  {session.client}
+                </p>
                 <p className="text-xs text-muted-foreground">{session.topic}</p>
               </div>
               <div className="flex gap-2">
@@ -179,7 +209,7 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 5: Clientes Recientes
@@ -198,16 +228,21 @@ export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card data-swapy-item="recent-clients" className="flex flex-col">
       <CardHeader>
         <CardTitle>Clientes Recientes</CardTitle>
-        <CardDescription>Tus clientes más recientes y su progreso.</CardDescription>
+        <CardDescription>
+          Tus clientes más recientes y su progreso.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto" style={{ maxHeight: "320px" }}>
+      <CardContent
+        className="flex-1 overflow-y-auto"
+        style={{ maxHeight: '320px' }}
+      >
         <div className="space-y-4">
           {clients.map((client, index) => (
             <div
@@ -216,7 +251,9 @@ export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">{client.name}</p>
-                <p className="text-xs text-muted-foreground">{client.sessions} sesiones</p>
+                <p className="text-xs text-muted-foreground">
+                  {client.sessions} sesiones
+                </p>
                 <div className="h-2 w-32 rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-primary"
@@ -240,5 +277,5 @@ export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
         </Link>
       </CardFooter>
     </Card>
-  )
-} 
+  );
+}

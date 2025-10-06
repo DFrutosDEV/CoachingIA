@@ -5,14 +5,17 @@ Este proyecto soporta múltiples proveedores de IA para generar objetivos autom�
 ## Variables de Entorno
 
 ### Variable Principal
+
 - `AI_PROVIDER`: Define qué proveedor usar (`google` o `deepseek`)
 
 ### Variables por Proveedor
 
 #### Google Gemini
+
 - `GOOGLE_AI_API_KEY`: Tu API key de Google AI Studio
 
 #### DeepSeek
+
 - `DEEPSEEK_API_KEY`: Tu API key de DeepSeek
 
 ## Configuración
@@ -42,18 +45,21 @@ DEEPSEEK_API_KEY=tu_api_key_aqui
 ## Ejemplos de Configuración
 
 ### Desarrollo Local (Google Gemini)
+
 ```env
 AI_PROVIDER=google
 GOOGLE_AI_API_KEY=AIzaSyC...
 ```
 
 ### Producción (DeepSeek)
+
 ```env
 AI_PROVIDER=deepseek
 DEEPSEEK_API_KEY=sk-...
 ```
 
 ### Sin IA (Fallback)
+
 Si no configuras ninguna variable, el sistema usará objetivos por defecto.
 
 ## Verificación
@@ -68,12 +74,14 @@ Para verificar que tu configuración funciona:
 ## Características por Proveedor
 
 ### Google Gemini
+
 - ✅ Plan gratuito disponible
 - ✅ API estable y bien documentada
 - ✅ Soporte para múltiples idiomas
 - ✅ Respuestas rápidas
 
 ### DeepSeek
+
 - ✅ Modelo potente y actualizado
 - ✅ Buena comprensión del contexto
 - ✅ Soporte para múltiples idiomas
@@ -82,17 +90,21 @@ Para verificar que tu configuración funciona:
 ## Solución de Problemas
 
 ### Error: "API Key no configurada"
+
 - Verifica que la variable `AI_PROVIDER` esté configurada
 - Verifica que la API key correspondiente esté configurada
 - Reinicia la aplicación después de cambiar las variables
 
 ### Error: "Proveedor no disponible"
+
 - Verifica que tu API key sea válida
 - Verifica que tengas créditos disponibles (especialmente para DeepSeek)
 - Revisa los logs del servidor para más detalles
 
 ### Cambio de Proveedor
+
 Para cambiar de proveedor:
+
 1. Actualiza `AI_PROVIDER` en `.env.local`
 2. Configura la API key correspondiente
 3. Reinicia la aplicación

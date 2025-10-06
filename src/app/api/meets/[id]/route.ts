@@ -10,13 +10,14 @@ export async function PATCH(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
     const updateData = await request.json();
-    
+
     // Obtener la zona horaria del header
-    const timezone = request.headers.get('x-timezone') || 'America/Buenos_Aires';
-    
+    const timezone =
+      request.headers.get('x-timezone') || 'America/Buenos_Aires';
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID de sesión es requerido' },
@@ -38,30 +39,29 @@ export async function PATCH(
       try {
         // Combinar fecha y hora en la zona horaria local del usuario
         const dateString = `${updateData.date}T${updateData.time}:00`;
-        
+
         // Convertir de la zona horaria local a UTC usando date-fns-tz
         const utcDate = fromZonedTime(dateString, timezone);
-        
+
         if (isNaN(utcDate.getTime())) {
           return NextResponse.json(
             { error: 'Fecha inválida' },
             { status: 400 }
           );
         }
-        
+
         updateData.date = utcDate;
-        
+
         console.log('Debug timezone conversion:', {
           originalDate: updateData.date,
           originalTime: updateData.time,
           timezone: timezone,
           dateString: dateString,
-          utcDate: utcDate.toISOString()
+          utcDate: utcDate.toISOString(),
         });
-        
+
         // Remover el campo time ya que no existe en el modelo
         delete updateData.time;
-        
       } catch (error) {
         console.error('Error converting timezone:', error);
         return NextResponse.json(
@@ -72,39 +72,37 @@ export async function PATCH(
     }
 
     // Actualizar la sesión
-    const updatedMeet = await Meet.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    ).populate([
+    const updatedMeet = await Meet.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).populate([
       {
         path: 'clientId',
         select: 'user',
         populate: {
           path: 'user',
-          select: 'name email'
-        }
+          select: 'name email',
+        },
       },
       {
         path: 'coachId',
         select: 'user',
         populate: {
           path: 'user',
-          select: 'name email'
-        }
+          select: 'name email',
+        },
       },
       {
         path: 'objectiveId',
-        select: 'title description'
-      }
+        select: 'title description',
+      },
     ]);
 
     return NextResponse.json({
       success: true,
       message: 'Sesión actualizada correctamente',
-      meet: updatedMeet
+      meet: updatedMeet,
     });
-
   } catch (error) {
     console.error('Error al actualizar sesión:', error);
     return NextResponse.json(
@@ -121,9 +119,9 @@ export async function DELETE(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID de sesión es requerido' },
@@ -145,9 +143,8 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'Sesión eliminada correctamente'
+      message: 'Sesión eliminada correctamente',
     });
-
   } catch (error) {
     console.error('Error al eliminar sesión:', error);
     return NextResponse.json(
@@ -164,9 +161,9 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID de sesión es requerido' },
@@ -174,29 +171,28 @@ export async function GET(
       );
     }
 
-    const meet = await Meet.findById(id)
-      .populate([
-        {
-          path: 'clientId',
-          select: 'user',
-          populate: {
-            path: 'user',
-            select: 'name email'
-          }
+    const meet = await Meet.findById(id).populate([
+      {
+        path: 'clientId',
+        select: 'user',
+        populate: {
+          path: 'user',
+          select: 'name email',
         },
-        {
-          path: 'coachId',
-          select: 'user',
-          populate: {
-            path: 'user',
-            select: 'name email'
-          }
+      },
+      {
+        path: 'coachId',
+        select: 'user',
+        populate: {
+          path: 'user',
+          select: 'name email',
         },
-        {
-          path: 'objectiveId',
-          select: 'title description'
-        }
-      ]);
+      },
+      {
+        path: 'objectiveId',
+        select: 'title description',
+      },
+    ]);
 
     if (!meet) {
       return NextResponse.json(
@@ -207,9 +203,8 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      meet
+      meet,
     });
-
   } catch (error) {
     console.error('Error al obtener sesión:', error);
     return NextResponse.json(
@@ -217,4 +212,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

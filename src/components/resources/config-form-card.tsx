@@ -1,7 +1,14 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Ticket, ArrowRight } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Ticket, ArrowRight } from 'lucide-react';
 
 export function ConfigFormCard() {
   return (
@@ -10,7 +17,9 @@ export function ConfigFormCard() {
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
           <Ticket className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="mt-4">Visualiza tu formulario de configuración</CardTitle>
+        <CardTitle className="mt-4">
+          Visualiza tu formulario de configuración
+        </CardTitle>
         <CardDescription>
           Accede a tu formulario de configuración.
         </CardDescription>
@@ -33,5 +42,5 @@ export function ConfigFormCard() {
       </CardContent>
       <CardFooter></CardFooter>
     </Card>
-  )
-} 
+  );
+}

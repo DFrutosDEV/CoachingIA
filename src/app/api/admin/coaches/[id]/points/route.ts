@@ -9,10 +9,10 @@ export async function PUT(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
     const { points } = await request.json();
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID del coach es requerido' },
@@ -45,10 +45,9 @@ export async function PUT(
       message: 'Puntos actualizados exitosamente',
       data: {
         id: coachProfile._id,
-        points: coachProfile.points
-      }
+        points: coachProfile.points,
+      },
     });
-
   } catch (error) {
     console.error('Error al actualizar puntos del coach:', error);
     return NextResponse.json(

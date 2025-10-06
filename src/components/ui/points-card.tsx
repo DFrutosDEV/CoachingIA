@@ -1,11 +1,17 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Coins, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Coins, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface PointsCardProps {
-  count: number
+  count: number;
 }
 
 export function PointsCard({ count }: PointsCardProps) {
@@ -18,8 +24,9 @@ export function PointsCard({ count }: PointsCardProps) {
         bgColor: 'bg-red-50',
         borderColor: 'border-red-200',
         icon: Minus,
-        message: 'Necesitas puntos para generar objetivos. Contacta al administrador.'
-      }
+        message:
+          'Necesitas puntos para generar objetivos. Contacta al administrador.',
+      };
     } else if (count <= 19) {
       return {
         status: 'low',
@@ -27,8 +34,9 @@ export function PointsCard({ count }: PointsCardProps) {
         bgColor: 'bg-orange-50',
         borderColor: 'border-orange-200',
         icon: TrendingDown,
-        message: 'Tienes pocos puntos. Considera solicitar más al administrador.'
-      }
+        message:
+          'Tienes pocos puntos. Considera solicitar más al administrador.',
+      };
     } else {
       return {
         status: 'good',
@@ -36,13 +44,13 @@ export function PointsCard({ count }: PointsCardProps) {
         bgColor: 'bg-green-50',
         borderColor: 'border-green-200',
         icon: TrendingUp,
-        message: 'Tienes suficientes puntos para generar objetivos.'
-      }
+        message: 'Tienes suficientes puntos para generar objetivos.',
+      };
     }
-  }
+  };
 
-  const pointsStatus = getPointsStatus()
-  const StatusIcon = pointsStatus.icon
+  const pointsStatus = getPointsStatus();
+  const StatusIcon = pointsStatus.icon;
 
   return (
     <Card data-swapy-item="scheduled-sessions" className="h-full">
@@ -52,13 +60,16 @@ export function PointsCard({ count }: PointsCardProps) {
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         <div className="flex flex-col">
-            <div className="text-2xl font-bold">{count}</div>
-            <p className="text-xs text-muted-foreground">Puntos disponibles</p>
+          <div className="text-2xl font-bold">{count}</div>
+          <p className="text-xs text-muted-foreground">Puntos disponibles</p>
         </div>
-        <Badge variant="outline" className={`${pointsStatus.bgColor} ${pointsStatus.borderColor} ${pointsStatus.color} mt-2`}>
-            <StatusIcon className="h-3 w-3 mr-1" /> {pointsStatus.message}
+        <Badge
+          variant="outline"
+          className={`${pointsStatus.bgColor} ${pointsStatus.borderColor} ${pointsStatus.color} mt-2`}
+        >
+          <StatusIcon className="h-3 w-3 mr-1" /> {pointsStatus.message}
         </Badge>
       </CardContent>
     </Card>
-  )
+  );
 }

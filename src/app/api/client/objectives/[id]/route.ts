@@ -11,9 +11,9 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID de objetivo es requerido' },
@@ -33,17 +33,16 @@ export async function GET(
     // Obtener los Goals del objetivo
     const goals = await Goal.find({
       objectiveId: objective._id,
-      isDeleted: false
-    })
-    .sort({ createdAt: -1 });
+      isDeleted: false,
+    }).sort({ createdAt: -1 });
 
     // Obtener las notas relacionadas con este objetivo
     const notes = await Note.find({
       objectiveId: objective._id,
-      isDeleted: false
+      isDeleted: false,
     })
-    .populate('createdBy', 'name lastName')
-    .sort({ createdAt: -1 });
+      .populate('createdBy', 'name lastName')
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,
@@ -54,24 +53,23 @@ export async function GET(
           isCompleted: objective.isCompleted,
           active: objective.active,
           createdAt: objective.createdAt,
-          configFile: objective.configFile
+          configFile: objective.configFile,
         },
         goals: goals.map(goal => ({
           _id: goal._id.toString(),
           description: goal.description,
           isCompleted: goal.isCompleted,
           day: goal.day,
-          createdAt: goal.createdAt
+          createdAt: goal.createdAt,
         })),
         notes: notes.map(note => ({
           _id: note._id.toString(),
           content: note.content,
           createdBy: `${note.createdBy?.name} ${note.createdBy?.lastName}`,
-          createdAt: note.createdAt
-        }))
-      }
+          createdAt: note.createdAt,
+        })),
+      },
     });
-
   } catch (error) {
     console.error('Error al obtener detalles del objetivo:', error);
     return NextResponse.json(
@@ -79,4 +77,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

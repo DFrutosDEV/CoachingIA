@@ -32,12 +32,14 @@ export class AIService {
   ): Promise<GeneratedGoal[]> {
     try {
       if (!this.config.apiKey) {
-        throw new Error(`API Key de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no configurada`);
+        throw new Error(
+          `API Key de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no configurada`
+        );
       }
 
       const prompt = this.buildPrompt(objective, metrics, numberOfGoals);
-      console.log("Prompt:", prompt);
-      
+      console.log('Prompt:', prompt);
+
       let response: Response;
       if (this.config.provider === 'deepseek') {
         response = await this.callDeepSeekAPI(prompt);
@@ -47,20 +49,29 @@ export class AIService {
 
       if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Error en la API de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'}: ${response.statusText} - ${errorData}`);
+        throw new Error(
+          `Error en la API de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'}: ${response.statusText} - ${errorData}`
+        );
       }
 
       const data = await response.json();
       const generatedText = this.extractTextFromResponse(data);
-      
+
       return this.parseGeneratedGoals(generatedText, numberOfGoals);
     } catch (error) {
-      console.error(`Error generando objetivos con ${this.config.provider}:`, error);
+      console.error(
+        `Error generando objetivos con ${this.config.provider}:`,
+        error
+      );
       throw new Error('No se pudieron generar objetivos automáticamente');
     }
   }
 
-  private buildPrompt(objective: Objective, metrics: AIMetrics, numberOfGoals: number): string {
+  private buildPrompt(
+    objective: Objective,
+    metrics: AIMetrics,
+    numberOfGoals: number
+  ): string {
     return `Eres un coach profesional experto en desarrollo personal y profesional. 
     
     Necesito que generes ${numberOfGoals} objetivos específicos y medibles para un cliente basándote en la siguiente información:
@@ -95,7 +106,10 @@ export class AIService {
     Responde SOLO con el JSON, sin texto adicional.`;
   }
 
-  private parseGeneratedGoals(generatedText: string, expectedCount: number): GeneratedGoal[] {
+  private parseGeneratedGoals(
+    generatedText: string,
+    expectedCount: number
+  ): GeneratedGoal[] {
     try {
       // Limpiar el texto para extraer solo el JSON
       const jsonMatch = generatedText.match(/\[[\s\S]*\]/);
@@ -104,7 +118,7 @@ export class AIService {
       }
 
       const goals = JSON.parse(jsonMatch[0]);
-      
+
       // Validar que sea un array y tenga la estructura correcta
       if (!Array.isArray(goals)) {
         throw new Error('La respuesta no es un array válido');
@@ -114,7 +128,7 @@ export class AIService {
       const validGoals = goals.slice(0, expectedCount).map((goal, index) => ({
         description: goal.description || `Objetivo ${index + 1}`,
         day: goal.day || 'lunes',
-        isCompleted: goal.isCompleted || false
+        isCompleted: goal.isCompleted || false,
       }));
 
       return validGoals;
@@ -126,19 +140,27 @@ export class AIService {
   }
 
   private generateDefaultGoals(count: number): GeneratedGoal[] {
-    const days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    const days = [
+      'lunes',
+      'martes',
+      'miércoles',
+      'jueves',
+      'viernes',
+      'sábado',
+      'domingo',
+    ];
     const defaultGoals = [
       'Revisar progreso semanal y establecer prioridades',
       'Practicar técnicas de gestión del tiempo',
       'Desarrollar habilidades de comunicación',
       'Establecer metas específicas para la semana',
-      'Evaluar resultados y ajustar estrategias'
+      'Evaluar resultados y ajustar estrategias',
     ];
 
     return Array.from({ length: count }, (_, index) => ({
       description: defaultGoals[index] || `Objetivo ${index + 1}`,
       day: days[index % days.length],
-      isCompleted: false
+      isCompleted: false,
     }));
   }
 
@@ -147,40 +169,47 @@ export class AIService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`
+        Authorization: `Bearer ${this.config.apiKey}`,
       },
       body: JSON.stringify({
         model: this.config.model,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }],
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
         temperature: this.config.temperature,
-        max_tokens: this.config.maxTokens
-      })
+        max_tokens: this.config.maxTokens,
+      }),
     });
   }
 
   private async callGeminiAPI(prompt: string): Promise<Response> {
-    const baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
-    
+    const baseUrl =
+      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+
     return fetch(`${baseUrl}?key=${this.config.apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
         generationConfig: {
           temperature: this.config.temperature,
           topP: 0.9,
-          maxOutputTokens: this.config.maxTokens
-        }
-      })
+          maxOutputTokens: this.config.maxTokens,
+        },
+      }),
     });
   }
 
@@ -191,7 +220,11 @@ export class AIService {
       }
       return data.choices[0].message.content;
     } else {
-      if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+      if (
+        !data.candidates ||
+        !data.candidates[0] ||
+        !data.candidates[0].content
+      ) {
         throw new Error('Respuesta inválida de Google Gemini');
       }
       return data.candidates[0].content.parts[0].text;
@@ -199,70 +232,92 @@ export class AIService {
   }
 
   // Método para verificar si el AI está disponible
-  async checkAIStatus(): Promise<{ available: boolean; provider: string; message: string; environment: string }> {
+  async checkAIStatus(): Promise<{
+    available: boolean;
+    provider: string;
+    message: string;
+    environment: string;
+  }> {
     try {
       if (!this.config.apiKey) {
         return {
           available: false,
-          provider: this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
+          provider:
+            this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
           message: `API Key de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no configurada`,
-          environment: process.env.NODE_ENV || 'unknown'
+          environment: process.env.NODE_ENV || 'unknown',
         };
       }
 
       let response: Response;
-      
+
       if (this.config.provider === 'deepseek') {
         response = await fetch(`${this.config.baseUrl}/chat/completions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.config.apiKey}`
+            Authorization: `Bearer ${this.config.apiKey}`,
           },
           body: JSON.stringify({
             model: this.config.model,
-            messages: [{
-              role: 'user',
-              content: 'Hola, responde solo con "OK"'
-            }],
-            max_tokens: 10
-          })
+            messages: [
+              {
+                role: 'user',
+                content: 'Hola, responde solo con "OK"',
+              },
+            ],
+            max_tokens: 10,
+          }),
         });
       } else {
-        response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: 'Hola, responde solo con "OK"'
-              }]
-            }],
-            generationConfig: {
-              maxOutputTokens: 10
-            }
-          })
-        });
+        response = await fetch(
+          `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: 'Hola, responde solo con "OK"',
+                    },
+                  ],
+                },
+              ],
+              generationConfig: {
+                maxOutputTokens: 10,
+              },
+            }),
+          }
+        );
       }
 
       return {
         available: response.ok,
-        provider: this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
-        message: response.ok ? `${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} conectado correctamente` : `Error ${response.status}: ${response.statusText}`,
-        environment: process.env.NODE_ENV || 'unknown'
+        provider:
+          this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
+        message: response.ok
+          ? `${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} conectado correctamente`
+          : `Error ${response.status}: ${response.statusText}`,
+        environment: process.env.NODE_ENV || 'unknown',
       };
     } catch (error) {
-      console.error(`${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no está disponible:`, error);
+      console.error(
+        `${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'} no está disponible:`,
+        error
+      );
       return {
         available: false,
-        provider: this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
+        provider:
+          this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini',
         message: `Error de conexión: ${error instanceof Error ? error.message : 'Error desconocido'}`,
-        environment: process.env.NODE_ENV || 'unknown'
+        environment: process.env.NODE_ENV || 'unknown',
       };
     }
   }
 }
 
-export const aiService = new AIService(); 
+export const aiService = new AIService();

@@ -1,14 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DashboardHeader } from "@/components/dashboard-header";
-import { DashboardSidebar } from "@/components/dashboard-sidebar";
-import { ReportUsers } from "@/components/report-users";
-import { ReportDetailModal } from "@/components/ui/report-detail-modal";
-import { FileText, Filter } from "lucide-react";
-import { Report } from "@/types";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { ReportUsers } from '@/components/report-users';
+import { ReportDetailModal } from '@/components/ui/report-detail-modal';
+import { FileText, Filter } from 'lucide-react';
+import { Report } from '@/types';
 import { useAppSelector } from '@/lib/redux/hooks';
 
 export default function AdminReportsPage() {
@@ -21,7 +33,7 @@ export default function AdminReportsPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [error, setError] = useState<string | null>(null);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const user = useAppSelector(state => state.auth.user);
 
   // Cargar reportes
@@ -29,12 +41,12 @@ export default function AdminReportsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams({
         page: '1',
         limit: '50',
         sortBy: 'createdAt',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       });
 
       if (statusFilter !== 'all') params.append('status', statusFilter);
@@ -97,7 +109,7 @@ export default function AdminReportsPage() {
         body: JSON.stringify({
           action: 'respond',
           response,
-          responseBy: user?._id
+          responseBy: user?._id,
         }),
       });
 
@@ -105,9 +117,9 @@ export default function AdminReportsPage() {
 
       if (data.success) {
         // Actualizar el reporte en la lista
-        setReports(prev => prev.map(report => 
-          report._id === reportId ? data.data : report
-        ));
+        setReports(prev =>
+          prev.map(report => (report._id === reportId ? data.data : report))
+        );
         setSelectedReport(data.data);
       } else {
         throw new Error(data.error || 'Error al responder al reporte');
@@ -128,7 +140,7 @@ export default function AdminReportsPage() {
         },
         body: JSON.stringify({
           action: 'close',
-          closedBy: user?._id
+          closedBy: user?._id,
         }),
       });
 
@@ -136,9 +148,9 @@ export default function AdminReportsPage() {
 
       if (data.success) {
         // Actualizar el reporte en la lista
-        setReports(prev => prev.map(report => 
-          report._id === reportId ? data.data : report
-        ));
+        setReports(prev =>
+          prev.map(report => (report._id === reportId ? data.data : report))
+        );
         setSelectedReport(data.data);
         setIsModalOpen(false);
       } else {
@@ -160,7 +172,7 @@ export default function AdminReportsPage() {
         },
         body: JSON.stringify({
           action: 'resolve',
-          resolvedBy: user?._id
+          resolvedBy: user?._id,
         }),
       });
 
@@ -168,9 +180,9 @@ export default function AdminReportsPage() {
 
       if (data.success) {
         // Actualizar el reporte en la lista
-        setReports(prev => prev.map(report => 
-          report._id === reportId ? data.data : report
-        ));
+        setReports(prev =>
+          prev.map(report => (report._id === reportId ? data.data : report))
+        );
         setSelectedReport(data.data);
       } else {
         throw new Error(data.error || 'Error al resolver el reporte');
@@ -182,34 +194,39 @@ export default function AdminReportsPage() {
   };
 
   const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen)
-  }
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
 
   const closeMobileSidebar = () => {
-    setIsMobileSidebarOpen(false)
-  }
+    setIsMobileSidebarOpen(false);
+  };
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="admin" className="h-full" />
       </div>
-      <DashboardSidebar 
-        userType="admin" 
-        className="h-full bg-background" 
+      <DashboardSidebar
+        userType="admin"
+        className="h-full bg-background"
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={closeMobileSidebar}
       />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="admin" onToggleSidebar={toggleMobileSidebar} />
+        <DashboardHeader
+          userType="admin"
+          onToggleSidebar={toggleMobileSidebar}
+        />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <FileText className="h-6 w-6" />
-              <h1 className="text-lg font-semibold md:text-2xl">Gestión de Reportes</h1>
+              <h1 className="text-lg font-semibold md:text-2xl">
+                Gestión de Reportes
+              </h1>
             </div>
           </div>
-          
+
           <p className="text-sm text-muted-foreground">
             Revisa y gestiona los reportes enviados por usuarios y coaches.
           </p>
@@ -239,10 +256,13 @@ export default function AdminReportsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Categoría</label>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <Select
+                    value={categoryFilter}
+                    onValueChange={setCategoryFilter}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar categoría" />
                     </SelectTrigger>
@@ -255,10 +275,13 @@ export default function AdminReportsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Prioridad</label>
-                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                  <Select
+                    value={priorityFilter}
+                    onValueChange={setPriorityFilter}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar prioridad" />
                     </SelectTrigger>
@@ -278,18 +301,18 @@ export default function AdminReportsPage() {
           {/* Lista de reportes */}
           <Card>
             <CardHeader>
-              <CardTitle>
-                Reportes ({filteredReports.length})
-              </CardTitle>
+              <CardTitle>Reportes ({filteredReports.length})</CardTitle>
               <CardDescription>
-                {isLoading ? 'Cargando reportes...' : 
-                 error ? `Error: ${error}` : 
-                 `Mostrando ${filteredReports.length} de ${reports.length} reportes`}
+                {isLoading
+                  ? 'Cargando reportes...'
+                  : error
+                    ? `Error: ${error}`
+                    : `Mostrando ${filteredReports.length} de ${reports.length} reportes`}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-7">
-              <ReportUsers 
-                reports={filteredReports} 
+              <ReportUsers
+                reports={filteredReports}
                 onViewReport={handleViewReport}
                 isLoading={isLoading}
               />

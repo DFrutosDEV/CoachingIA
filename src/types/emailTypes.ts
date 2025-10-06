@@ -10,7 +10,7 @@ export enum EmailType {
   PAYMENT_CONFIRMATION = 'payment_confirmation',
   PAYMENT_FAILED = 'payment_failed',
   COURSE_ENROLLMENT = 'course_enrollment',
-  FEEDBACK_REQUEST = 'feedback_request'
+  FEEDBACK_REQUEST = 'feedback_request',
 }
 
 export interface EmailData {

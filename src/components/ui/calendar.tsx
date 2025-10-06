@@ -1,11 +1,16 @@
-"use client" // Necesario ya que usaremos hooks como useState y event handlers
+'use client'; // Necesario ya que usaremos hooks como useState y event handlers
 
-import React, { useState, useEffect } from "react"
-import { Calendar, dayjsLocalizer, Event, ToolbarProps } from "react-big-calendar"
-import dayjs from "dayjs"
-import localizedFormat from "dayjs/plugin/localizedFormat"
-import "dayjs/locale/es"
-import "react-big-calendar/lib/css/react-big-calendar.css"
+import React, { useState, useEffect } from 'react';
+import {
+  Calendar,
+  dayjsLocalizer,
+  Event,
+  ToolbarProps,
+} from 'react-big-calendar';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import 'dayjs/locale/es';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import {
   Dialog,
   DialogContent,
@@ -13,18 +18,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { CalendarService } from "@/lib/services/calendar-service"
-import RescheduleModal from "./reschedule-modal"
-import { useAppSelector } from "@/lib/redux/hooks"
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { CalendarService } from '@/lib/services/calendar-service';
+import RescheduleModal from './reschedule-modal';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 // Extiende dayjs con el plugin y configura el locale
-dayjs.extend(localizedFormat)
-dayjs.locale("es")
+dayjs.extend(localizedFormat);
+dayjs.locale('es');
 
 // Crea el localizador usando dayjs
-const localizer = dayjsLocalizer(dayjs)
+const localizer = dayjsLocalizer(dayjs);
 
 // Toolbar simplificado que funciona correctamente
 const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
@@ -57,53 +62,54 @@ const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
 
 // Definición local del tipo para evitar conflictos
 interface SessionEvent {
-  id: string
-  title: string
-  start: Date
-  end: Date
-  description?: string
-  client: string
-  coach: string
-  link: string
-  time: string
-  objectiveTitle: string
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  description?: string;
+  client: string;
+  coach: string;
+  link: string;
+  time: string;
+  objectiveTitle: string;
 }
 
 export default function SessionsPage() {
-  const [sessions, setSessions] = useState<SessionEvent[]>([])
-  const [selectedSession, setSelectedSession] = useState<SessionEvent | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showRescheduleModal, setShowRescheduleModal] = useState(false)
-  const user = useAppSelector(state => state.auth.user)
+  const [sessions, setSessions] = useState<SessionEvent[]>([]);
+  const [selectedSession, setSelectedSession] = useState<SessionEvent | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const user = useAppSelector(state => state.auth.user);
   // Función para cargar las sesiones desde el API
   const loadSessions = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const result = await CalendarService.getSessions()
+      const result = await CalendarService.getSessions();
 
       if (result.success) {
         // Las fechas ya vienen correctamente formateadas del API
         console.log('Sesiones recibidas:', result.events);
-        setSessions(result.events)
+        setSessions(result.events);
       } else {
-        setError(result.error || 'Error al cargar las sesiones')
+        setError(result.error || 'Error al cargar las sesiones');
       }
-
     } catch (err) {
-      console.error('Error cargando sesiones:', err)
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      console.error('Error cargando sesiones:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Cargar sesiones al montar el componente
   useEffect(() => {
-    loadSessions()
-  }, [])
+    loadSessions();
+  }, []);
 
   // Debug: Log cuando cambian las sesiones
   useEffect(() => {
@@ -113,59 +119,65 @@ export default function SessionsPage() {
   }, [sessions]);
 
   const handleSelectEvent = (event: SessionEvent) => {
-    console.log("Sesión seleccionada:", event)
-    setSelectedSession(event)
-  }
+    console.log('Sesión seleccionada:', event);
+    setSelectedSession(event);
+  };
 
   const handleCloseModal = () => {
-    setSelectedSession(null)
-  }
+    setSelectedSession(null);
+  };
 
   const handleSelectSlot = (slotInfo: {
-    start: Date
-    end: Date
-    slots: Date[] | string[]
-    action: "select" | "click" | "doubleClick"
+    start: Date;
+    end: Date;
+    slots: Date[] | string[];
+    action: 'select' | 'click' | 'doubleClick';
   }) => {
-    console.log("Slot seleccionado:", slotInfo)
+    console.log('Slot seleccionado:', slotInfo);
     // Aquí podrías permitir crear una nueva sesión en el slot seleccionado
-  }
+  };
 
   // Función para recargar las sesiones
   const handleRefresh = () => {
-    loadSessions()
-  }
+    loadSessions();
+  };
 
   // Función para abrir el modal de reprogramación
   const handleReschedule = () => {
-    setShowRescheduleModal(true)
-  }
+    setShowRescheduleModal(true);
+  };
 
   // Función para cerrar el modal de reprogramación
   const handleCloseRescheduleModal = () => {
-    setShowRescheduleModal(false)
-  }
+    setShowRescheduleModal(false);
+  };
 
   // Función que se ejecuta cuando se reprograma exitosamente
   const handleRescheduleSuccess = () => {
-    loadSessions() // Recargar las sesiones
-    handleCloseModal() // Cerrar el modal de detalles
-  }
+    loadSessions(); // Recargar las sesiones
+    handleCloseModal(); // Cerrar el modal de detalles
+  };
 
   if (loading) {
     return (
-      <div className="p-2 flex items-center justify-center" style={{ height: "calc(100vh - 150px)" }}>
+      <div
+        className="p-2 flex items-center justify-center"
+        style={{ height: 'calc(100vh - 150px)' }}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
           <p>Cargando sesiones...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
-      <div className="p-2 flex items-center justify-center" style={{ height: "calc(100vh - 150px)" }}>
+      <div
+        className="p-2 flex items-center justify-center"
+        style={{ height: 'calc(100vh - 150px)' }}
+      >
         <div className="text-center">
           <p className="text-red-600 mb-4">Error: {error}</p>
           <Button onClick={handleRefresh} variant="outline">
@@ -173,7 +185,7 @@ export default function SessionsPage() {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -185,13 +197,16 @@ export default function SessionsPage() {
         </Button>
       </div>
 
-      <div style={{ height: "calc(100vh - 200px)" }} className="calendar-container">
+      <div
+        style={{ height: 'calc(100vh - 200px)' }}
+        className="calendar-container"
+      >
         <Calendar
           localizer={localizer}
           events={sessions}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: "100%" }}
+          style={{ height: '100%' }}
           view="month"
           views={['month']}
           components={{
@@ -201,18 +216,18 @@ export default function SessionsPage() {
           onSelectSlot={handleSelectSlot}
           selectable
           messages={{
-            next: "Siguiente",
-            previous: "Anterior",
-            today: "Hoy",
-            month: "Mes",
-            week: "Semana",
-            day: "Día",
-            agenda: "Agenda",
-            date: "Fecha",
-            time: "Hora",
-            event: "Sesión",
-            noEventsInRange: "No hay sesiones en este rango.",
-            showMore: total => `+ Ver más (${total})`
+            next: 'Siguiente',
+            previous: 'Anterior',
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'Día',
+            agenda: 'Agenda',
+            date: 'Fecha',
+            time: 'Hora',
+            event: 'Sesión',
+            noEventsInRange: 'No hay sesiones en este rango.',
+            showMore: total => `+ Ver más (${total})`,
           }}
         />
       </div>
@@ -222,7 +237,7 @@ export default function SessionsPage() {
         open={selectedSession !== null}
         onOpenChange={(isOpen: boolean) => {
           if (!isOpen) {
-            handleCloseModal()
+            handleCloseModal();
           }
         }}
       >
@@ -245,33 +260,49 @@ export default function SessionsPage() {
               <div className="grid gap-4 py-4">
                 {/* Cliente */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <span className="text-right font-medium col-span-1">Cliente:</span>
+                  <span className="text-right font-medium col-span-1">
+                    Cliente:
+                  </span>
                   <span className="col-span-3">{selectedSession.client}</span>
                 </div>
                 {/* Coach */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <span className="text-right font-medium col-span-1">Coach:</span>
+                  <span className="text-right font-medium col-span-1">
+                    Coach:
+                  </span>
                   <span className="col-span-3">{selectedSession.coach}</span>
                 </div>
                 {/* Objetivo */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <span className="text-right font-medium col-span-1">Objetivo:</span>
-                  <span className="col-span-3">{selectedSession.objectiveTitle}</span>
+                  <span className="text-right font-medium col-span-1">
+                    Objetivo:
+                  </span>
+                  <span className="col-span-3">
+                    {selectedSession.objectiveTitle}
+                  </span>
                 </div>
                 {/* Hora */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <span className="text-right font-medium col-span-1">Hora:</span>
+                  <span className="text-right font-medium col-span-1">
+                    Hora:
+                  </span>
                   <span className="col-span-3">{selectedSession.time}</span>
                 </div>
                 {/* Fecha */}
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <span className="text-right font-medium col-span-1">Fecha:</span>
-                  <span className="col-span-3">{dayjs(selectedSession.start).format("LLLL")}</span>
+                  <span className="text-right font-medium col-span-1">
+                    Fecha:
+                  </span>
+                  <span className="col-span-3">
+                    {dayjs(selectedSession.start).format('LLLL')}
+                  </span>
                 </div>
                 {/* Enlace */}
                 {selectedSession.link && (
                   <div className="grid grid-cols-4 items-center gap-4">
-                    <span className="text-right font-medium col-span-1">Enlace:</span>
+                    <span className="text-right font-medium col-span-1">
+                      Enlace:
+                    </span>
                     <span className="col-span-3">
                       <a
                         href={selectedSession.link}
@@ -318,13 +349,13 @@ export default function SessionsPage() {
         .calendar-container .rbc-calendar {
           background: transparent;
         }
-        
+
         .calendar-container .rbc-toolbar {
           background: transparent;
           border: none;
           margin-bottom: 1rem;
         }
-        
+
         .calendar-container .rbc-toolbar button {
           background: hsl(var(--background));
           color: hsl(var(--foreground));
@@ -336,30 +367,30 @@ export default function SessionsPage() {
           cursor: pointer;
           transition: all 0.2s;
         }
-        
+
         .calendar-container .rbc-toolbar button:hover {
           background: hsl(var(--accent));
           color: hsl(var(--accent-foreground));
         }
-        
+
         .calendar-container .rbc-toolbar button.rbc-active {
           background: hsl(var(--primary));
           color: hsl(var(--primary-foreground));
           border-color: hsl(var(--primary));
         }
-        
+
         .calendar-container .rbc-toolbar-label {
           font-size: 1.125rem;
           font-weight: 600;
           color: hsl(var(--foreground));
         }
-        
+
         .calendar-container .rbc-month-view {
           background: hsl(var(--background));
           border: 1px solid hsl(var(--border));
           border-radius: 0.5rem;
         }
-        
+
         .calendar-container .rbc-header {
           background: hsl(var(--muted));
           color: hsl(var(--muted-foreground));
@@ -367,31 +398,31 @@ export default function SessionsPage() {
           font-weight: 600;
           border-bottom: 1px solid hsl(var(--border));
         }
-        
+
         .calendar-container .rbc-date-cell {
           padding: 0.25rem;
           color: hsl(var(--foreground));
         }
-        
+
         .calendar-container .rbc-day-bg {
           background: hsl(var(--background));
           border: 1px solid hsl(var(--border));
         }
-        
+
         .calendar-container .rbc-today {
           background: hsl(var(--accent)) !important;
           color: hsl(var(--accent-foreground)) !important;
           font-weight: 600;
         }
-        
+
         .calendar-container .rbc-off-range-bg {
           background: hsl(var(--muted));
         }
-        
+
         .calendar-container .rbc-off-range {
           color: hsl(var(--muted-foreground));
         }
-        
+
         .calendar-container .rbc-event {
           background: hsl(var(--primary));
           color: hsl(var(--primary-foreground));
@@ -401,11 +432,11 @@ export default function SessionsPage() {
           font-size: 0.75rem;
           font-weight: 500;
         }
-        
+
         .calendar-container .rbc-event:hover {
           background: hsl(var(--primary) / 0.9);
         }
-        
+
         .calendar-container .rbc-show-more {
           background: hsl(var(--accent));
           color: hsl(var(--accent-foreground));
@@ -415,11 +446,11 @@ export default function SessionsPage() {
           font-size: 0.75rem;
           font-weight: 500;
         }
-        
+
         .calendar-container .rbc-show-more:hover {
           background: hsl(var(--accent) / 0.9);
         }
       `}</style>
     </div>
-  )
+  );
 }

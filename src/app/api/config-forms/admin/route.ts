@@ -13,17 +13,16 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: configForms
+      data: configForms,
     });
-
   } catch (error) {
     console.error('Error al obtener formularios de configuración:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Error interno del servidor' 
+      {
+        success: false,
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );
   }
-} 
+}

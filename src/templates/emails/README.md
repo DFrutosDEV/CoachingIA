@@ -83,7 +83,7 @@ import { sendEmail, EmailType } from '@/utils/emailService';
 // Email de bienvenida
 const result = await sendEmail('usuario@email.com', EmailType.WELCOME, {
   userName: 'Juan Pérez',
-  dashboardUrl: 'https://coachingia.com/dashboard'
+  dashboardUrl: 'https://coachingia.com/dashboard',
 });
 
 console.log(result); // { success: true, message: 'Email enviado exitosamente' }
@@ -98,7 +98,7 @@ const subscribers = ['user1@email.com', 'user2@email.com', 'user3@email.com'];
 
 const result = await sendBulkEmail(subscribers, EmailType.NEWSLETTER, {
   newsletterTitle: 'Nuevas técnicas de coaching',
-  newsletterContent: 'Contenido del newsletter...'
+  newsletterContent: 'Contenido del newsletter...',
 });
 
 console.log(result);
@@ -118,7 +118,9 @@ Los templates usan variables con sintaxis `{{variable}}`:
 
 ```html
 <h1>¡Hola {{userName}}!</h1>
-<p>Tu cita está confirmada para el {{appointmentDate}} a las {{appointmentTime}}.</p>
+<p>
+  Tu cita está confirmada para el {{appointmentDate}} a las {{appointmentTime}}.
+</p>
 ```
 
 ### Variables Automáticas
@@ -143,7 +145,7 @@ await sendEmail(email, EmailType.APPOINTMENT_CONFIRMATION, {
   appointmentDate: '15 de Marzo, 2024',
   appointmentTime: '14:00',
   coachName: 'Dr. Carlos López',
-  meetingLink: 'https://meet.google.com/abc-defg-hij'
+  meetingLink: 'https://meet.google.com/abc-defg-hij',
 });
 ```
 
@@ -156,7 +158,7 @@ await sendEmail(email, EmailType.APPOINTMENT_CONFIRMATION, {
 ```typescript
 export enum EmailType {
   // ... tipos existentes
-  NEW_EMAIL_TYPE = 'new_email_type'
+  NEW_EMAIL_TYPE = 'new_email_type',
 }
 ```
 
@@ -165,12 +167,12 @@ export enum EmailType {
 ```typescript
 const EMAIL_TEMPLATES: Record<EmailType, string> = {
   // ... templates existentes
-  [EmailType.NEW_EMAIL_TYPE]: 'new-email-type.html'
+  [EmailType.NEW_EMAIL_TYPE]: 'new-email-type.html',
 };
 
 const EMAIL_SUBJECTS: Record<EmailType, string> = {
   // ... asuntos existentes
-  [EmailType.NEW_EMAIL_TYPE]: 'Asunto del nuevo email'
+  [EmailType.NEW_EMAIL_TYPE]: 'Asunto del nuevo email',
 };
 ```
 

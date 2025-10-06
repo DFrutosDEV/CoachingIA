@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       updatedAt: report.updatedAt.toISOString(),
       closedAt: report.closedAt?.toISOString(),
       closedBy: report.closedBy?._id?.toString(),
-      closedByName: report.closedBy?.name
+      closedByName: report.closedBy?.name,
     }));
 
     return NextResponse.json({
@@ -85,11 +85,10 @@ export async function GET(request: NextRequest) {
           totalPages,
           totalReports,
           hasNextPage: page < totalPages,
-          hasPrevPage: page > 1
-        }
-      }
+          hasPrevPage: page > 1,
+        },
+      },
     });
-
   } catch (error) {
     console.error('Error fetching reports:', error);
     return NextResponse.json(
@@ -113,11 +112,17 @@ export async function POST(request: NextRequest) {
       reporterName,
       reporterEmail,
       reporterPhone,
-      attachments
+      attachments,
     } = body;
 
     // Validaciones básicas
-    if (!title || !description || !reporterUser || !reporterName || !reporterEmail) {
+    if (
+      !title ||
+      !description ||
+      !reporterUser ||
+      !reporterName ||
+      !reporterEmail
+    ) {
       return NextResponse.json(
         { success: false, error: 'Faltan campos requeridos' },
         { status: 400 }
@@ -143,29 +148,31 @@ export async function POST(request: NextRequest) {
       reporterName,
       reporterEmail,
       reporterPhone,
-      attachments: attachments || []
+      attachments: attachments || [],
     });
 
     const savedReport = await newReport.save();
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        _id: savedReport._id.toString(),
-        title: savedReport.title,
-        description: savedReport.description,
-        category: savedReport.category,
-        priority: savedReport.priority,
-        status: savedReport.status,
-        reporterUser: savedReport.reporterUser.toString(),
-        reporterName: savedReport.reporterName,
-        reporterEmail: savedReport.reporterEmail,
-        reporterPhone: savedReport.reporterPhone,
-        createdAt: savedReport.createdAt.toISOString(),
-        updatedAt: savedReport.updatedAt.toISOString()
-      }
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          _id: savedReport._id.toString(),
+          title: savedReport.title,
+          description: savedReport.description,
+          category: savedReport.category,
+          priority: savedReport.priority,
+          status: savedReport.status,
+          reporterUser: savedReport.reporterUser.toString(),
+          reporterName: savedReport.reporterName,
+          reporterEmail: savedReport.reporterEmail,
+          reporterPhone: savedReport.reporterPhone,
+          createdAt: savedReport.createdAt.toISOString(),
+          updatedAt: savedReport.updatedAt.toISOString(),
+        },
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating report:', error);
     return NextResponse.json(

@@ -1,16 +1,21 @@
-'use client'
+'use client';
 
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { useAppSelector } from "@/lib/redux/hooks"
-import { useEffect, useState } from "react"
-import { HttpClient } from "@/lib/utils/http-client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Circle, Clock, FileText, User } from "lucide-react"
-import { formatDate } from "@/utils/validatesInputs"
-import { Goal, Note, Objective } from "@/types"
+import { DashboardHeader } from '@/components/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { useAppSelector } from '@/lib/redux/hooks';
+import { useEffect, useState } from 'react';
+import { HttpClient } from '@/lib/utils/http-client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Circle, Clock, FileText, User } from 'lucide-react';
+import { formatDate } from '@/utils/validatesInputs';
+import { Goal, Note, Objective } from '@/types';
 
 interface ObjectiveDetails {
   objective: {
@@ -25,82 +30,87 @@ interface ObjectiveDetails {
 }
 
 export default function ProgressPage() {
-  const user = useAppSelector(state => state.auth.user)
-  const [objectives, setObjectives] = useState<Objective[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedObjective, setSelectedObjective] = useState<ObjectiveDetails | null>(null)
-  const [showModal, setShowModal] = useState(false)
-  const [loadingDetails, setLoadingDetails] = useState(false)
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const user = useAppSelector(state => state.auth.user);
+  const [objectives, setObjectives] = useState<Objective[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedObjective, setSelectedObjective] =
+    useState<ObjectiveDetails | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Función para obtener todos los objetivos
   const fetchObjectives = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await HttpClient.get(`/api/client/objectives?clientId=${user?.profile?._id}`)
+      const response = await HttpClient.get(
+        `/api/client/objectives?clientId=${user?.profile?._id}`
+      );
 
       if (!response.ok) {
-        throw new Error('Error al obtener los objetivos')
+        throw new Error('Error al obtener los objetivos');
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        setObjectives(result.objectives)
+        setObjectives(result.objectives);
       } else {
-        throw new Error(result.error || 'Error desconocido')
+        throw new Error(result.error || 'Error desconocido');
       }
     } catch (err) {
-      console.error('Error fetching objectives:', err)
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      console.error('Error fetching objectives:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Función para obtener detalles de un objetivo
   const fetchObjectiveDetails = async (objectiveId: string) => {
     try {
-      setLoadingDetails(true)
+      setLoadingDetails(true);
 
-      const response = await HttpClient.get(`/api/client/objectives/${objectiveId}`)
+      const response = await HttpClient.get(
+        `/api/client/objectives/${objectiveId}`
+      );
 
       if (!response.ok) {
-        throw new Error('Error al obtener los detalles del objetivo')
+        throw new Error('Error al obtener los detalles del objetivo');
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        setSelectedObjective(result.data)
-        setShowModal(true)
+        setSelectedObjective(result.data);
+        setShowModal(true);
       } else {
-        throw new Error(result.error || 'Error desconocido')
+        throw new Error(result.error || 'Error desconocido');
       }
     } catch (err) {
-      console.error('Error fetching objective details:', err)
-      alert('Error al cargar los detalles del objetivo')
+      console.error('Error fetching objective details:', err);
+      alert('Error al cargar los detalles del objetivo');
     } finally {
-      setLoadingDetails(false)
+      setLoadingDetails(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (user?._id) {
-      fetchObjectives()
+      fetchObjectives();
     }
-  }, [user?._id])
+  }, [user?._id]);
 
   const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen)
-  }
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
 
   const closeMobileSidebar = () => {
-    setIsMobileSidebarOpen(false)
-  }
+    setIsMobileSidebarOpen(false);
+  };
 
   if (loading) {
     return (
@@ -108,14 +118,17 @@ export default function ProgressPage() {
         <div className="hidden border-r bg-muted/40 md:block">
           <DashboardSidebar userType="client" className="h-full" />
         </div>
-        <DashboardSidebar 
-        userType="client" 
-        className="h-full bg-background" 
-        isMobileOpen={isMobileSidebarOpen}
-        onMobileClose={closeMobileSidebar}
-      />
+        <DashboardSidebar
+          userType="client"
+          className="h-full bg-background"
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={closeMobileSidebar}
+        />
         <div className="flex flex-col overflow-hidden">
-          <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
+          <DashboardHeader
+            userType="client"
+            onToggleSidebar={toggleMobileSidebar}
+          />
           <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -126,7 +139,7 @@ export default function ProgressPage() {
           </main>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -135,14 +148,17 @@ export default function ProgressPage() {
         <div className="hidden border-r bg-muted/40 md:block">
           <DashboardSidebar userType="client" className="h-full" />
         </div>
-        <DashboardSidebar 
-        userType="client" 
-        className="h-full bg-background" 
-        isMobileOpen={isMobileSidebarOpen}
-        onMobileClose={closeMobileSidebar}
-      />
-      <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
+        <DashboardSidebar
+          userType="client"
+          className="h-full bg-background"
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={closeMobileSidebar}
+        />
+        <div className="flex flex-col overflow-hidden">
+          <DashboardHeader
+            userType="client"
+            onToggleSidebar={toggleMobileSidebar}
+          />
           <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -158,7 +174,7 @@ export default function ProgressPage() {
           </main>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -166,19 +182,24 @@ export default function ProgressPage() {
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="client" className="h-full" />
       </div>
-      <DashboardSidebar 
-        userType="client" 
-        className="h-full bg-background" 
+      <DashboardSidebar
+        userType="client"
+        className="h-full bg-background"
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={closeMobileSidebar}
       />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="client" onToggleSidebar={toggleMobileSidebar} />
+        <DashboardHeader
+          userType="client"
+          onToggleSidebar={toggleMobileSidebar}
+        />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-bold">Progreso</h1>
-              <p className="text-muted-foreground">Progreso de tus objetivos y metas.</p>
+              <p className="text-muted-foreground">
+                Progreso de tus objetivos y metas.
+              </p>
             </div>
 
             <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -186,7 +207,9 @@ export default function ProgressPage() {
                 <Card>
                   <CardContent className="flex items-center justify-center py-8">
                     <div className="text-center">
-                      <p className="text-muted-foreground">No tienes objetivos asignados aún</p>
+                      <p className="text-muted-foreground">
+                        No tienes objetivos asignados aún
+                      </p>
                       <p className="text-sm text-muted-foreground mt-2">
                         Tu coach te asignará objetivos específicos
                       </p>
@@ -194,7 +217,7 @@ export default function ProgressPage() {
                   </CardContent>
                 </Card>
               ) : (
-                objectives.map((objective) => (
+                objectives.map(objective => (
                   <Card
                     key={objective._id}
                     className="hover:shadow-md transition-shadow"
@@ -202,7 +225,9 @@ export default function ProgressPage() {
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{objective.title}</CardTitle>
+                        <CardTitle className="text-lg">
+                          {objective.title}
+                        </CardTitle>
                         <div className="flex items-center gap-2">
                           {objective.active && (
                             <Badge variant="pending" className="bg-blue-500">
@@ -227,13 +252,13 @@ export default function ProgressPage() {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent 
-                      className="cursor-pointer"
-                    >
+                    <CardContent className="cursor-pointer">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Progreso</span>
-                          <span className="text-sm font-medium">{objective.progress}%</span>
+                          <span className="text-sm font-medium">
+                            {objective.progress}%
+                          </span>
                         </div>
 
                         {objective.hasGoals ? (
@@ -245,7 +270,8 @@ export default function ProgressPage() {
                               ></div>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              {objective.completedGoals} de {objective.totalGoals} metas completadas
+                              {objective.completedGoals} de{' '}
+                              {objective.totalGoals} metas completadas
                             </p>
                           </>
                         ) : (
@@ -269,7 +295,9 @@ export default function ProgressPage() {
           {selectedObjective && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-xl">{selectedObjective.objective.title}</DialogTitle>
+                <DialogTitle className="text-xl">
+                  {selectedObjective.objective.title}
+                </DialogTitle>
               </DialogHeader>
 
               <div className="space-y-6">
@@ -281,11 +309,16 @@ export default function ProgressPage() {
                   </h3>
 
                   {selectedObjective.goals.length === 0 ? (
-                    <p className="text-muted-foreground">No hay metas asignadas a este objetivo</p>
+                    <p className="text-muted-foreground">
+                      No hay metas asignadas a este objetivo
+                    </p>
                   ) : (
                     <div className="space-y-3">
-                      {selectedObjective.goals.map((goal) => (
-                        <div key={goal._id} className="flex items-center gap-3 p-3 border rounded-lg">
+                      {selectedObjective.goals.map(goal => (
+                        <div
+                          key={goal._id}
+                          className="flex items-center gap-3 p-3 border rounded-lg"
+                        >
                           {goal.isCompleted ? (
                             <CheckCircle className="h-5 w-5 text-green-500" />
                           ) : (
@@ -293,7 +326,9 @@ export default function ProgressPage() {
                           )}
                           <div className="flex-1">
                             <p className="font-medium">{goal.description}</p>
-                            <p className="text-sm text-muted-foreground">Día: {goal.day}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Día: {goal.day}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -309,10 +344,12 @@ export default function ProgressPage() {
                   </h3>
 
                   {selectedObjective.notes.length === 0 ? (
-                    <p className="text-muted-foreground">No hay notas para este objetivo</p>
+                    <p className="text-muted-foreground">
+                      No hay notas para este objetivo
+                    </p>
                   ) : (
                     <div className="space-y-3">
-                      {selectedObjective.notes.map((note) => (
+                      {selectedObjective.notes.map(note => (
                         <div key={note._id} className="p-3 border rounded-lg">
                           <p className="text-sm">{note.content}</p>
                           <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
@@ -330,5 +367,5 @@ export default function ProgressPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

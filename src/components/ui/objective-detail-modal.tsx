@@ -1,25 +1,25 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { 
-  Calendar, 
-  CheckCircle, 
-  Circle, 
-  FileText, 
-  User, 
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Calendar,
+  CheckCircle,
+  Circle,
+  FileText,
+  User,
   Clock,
   BarChart3,
   Target,
@@ -28,17 +28,16 @@ import {
   Edit,
   Trash2,
   Save,
-  X
-} from "lucide-react"
-import { formatDate } from "@/utils/validatesInputs"
-import { ObjectiveConfigForm } from "./objective-config-form"
-import { CreateNoteModal } from "./create-note-modal"
-import { AIGoalsGenerator } from "./ai-goals-generator"
-import { toast } from "sonner"
-import { FinalizeObjectiveModal } from "./finalize-objective-modal"
-import { GenerateSessionsModal } from "./generate-sessions-modal"
-import { Goal, Note, Objective, Session } from "@/types"
-
+  X,
+} from 'lucide-react';
+import { formatDate } from '@/utils/validatesInputs';
+import { ObjectiveConfigForm } from './objective-config-form';
+import { CreateNoteModal } from './create-note-modal';
+import { AIGoalsGenerator } from './ai-goals-generator';
+import { toast } from 'sonner';
+import { FinalizeObjectiveModal } from './finalize-objective-modal';
+import { GenerateSessionsModal } from './generate-sessions-modal';
+import { Goal, Note, Objective, Session } from '@/types';
 
 interface ObjectiveDetailData {
   objective: Objective;
@@ -55,16 +54,17 @@ interface ObjectiveDetailModalProps {
   coachId?: string;
 }
 
-export function ObjectiveDetailModal({ 
-  objectiveData, 
-  isOpen, 
+export function ObjectiveDetailModal({
+  objectiveData,
+  isOpen,
   onClose,
   clientId,
-  coachId
+  coachId,
 }: ObjectiveDetailModalProps) {
   const [isCreateNoteModalOpen, setIsCreateNoteModalOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
-  const [isGenerateSessionsModalOpen, setIsGenerateSessionsModalOpen] = useState(false);
+  const [isGenerateSessionsModalOpen, setIsGenerateSessionsModalOpen] =
+    useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -72,7 +72,7 @@ export function ObjectiveDetailModal({
   const [loadingGoals, setLoadingGoals] = useState(false);
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [isFormCompleted, setIsFormCompleted] = useState(false);
-  
+
   // Estados para gestión de metas
   const [isCreatingGoal, setIsCreatingGoal] = useState(false);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
@@ -82,16 +82,20 @@ export function ObjectiveDetailModal({
   // Estados para gestión de sesiones
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingSession, setEditingSession] = useState({ date: '', time: '' });
-  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(
+    null
+  );
 
   // Cargar notas del objetivo
   const loadNotes = async () => {
     if (!objectiveData?.objective._id) return;
-    
+
     try {
       setLoadingNotes(true);
-      const response = await fetch(`/api/notes?objectiveId=${objectiveData.objective._id}`);
-      
+      const response = await fetch(
+        `/api/notes?objectiveId=${objectiveData.objective._id}`
+      );
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -108,11 +112,13 @@ export function ObjectiveDetailModal({
   // Cargar metas del objetivo
   const loadGoals = async () => {
     if (!objectiveData?.objective._id) return;
-    
+
     try {
       setLoadingGoals(true);
-      const response = await fetch(`/api/goals?objectiveId=${objectiveData.objective._id}`);
-      
+      const response = await fetch(
+        `/api/goals?objectiveId=${objectiveData.objective._id}`
+      );
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -129,11 +135,13 @@ export function ObjectiveDetailModal({
   // Cargar sesiones del objetivo
   const loadSessions = async () => {
     if (!objectiveData?.objective._id) return;
-    
+
     try {
       setLoadingSessions(true);
-      const response = await fetch(`/api/meets?objectiveId=${objectiveData.objective._id}`);
-      
+      const response = await fetch(
+        `/api/meets?objectiveId=${objectiveData.objective._id}`
+      );
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -170,7 +178,7 @@ export function ObjectiveDetailModal({
       // Preparar las metas para enviar al servidor
       const goalsToCreate = generatedGoals.map((goal: any) => ({
         title: goal.description || goal.title,
-        day: goal.day || 'Lunes'
+        day: goal.day || 'Lunes',
       }));
 
       const response = await fetch('/api/goals', {
@@ -192,7 +200,9 @@ export function ObjectiveDetailModal({
           // Actualizar el estado local con las nuevas metas
           setGoals(prevGoals => [...prevGoals, ...data.goals]);
           setIsAIGeneratorOpen(false);
-          toast.success(`${data.goals.length} metas generadas con IA exitosamente`);
+          toast.success(
+            `${data.goals.length} metas generadas con IA exitosamente`
+          );
         } else {
           toast.error('Error al guardar las metas generadas');
         }
@@ -270,10 +280,14 @@ export function ObjectiveDetailModal({
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setGoals(prevGoals => 
-            prevGoals.map(goal => 
-              goal._id === goalId 
-                ? { ...goal, description: editingGoal.description, day: editingGoal.day }
+          setGoals(prevGoals =>
+            prevGoals.map(goal =>
+              goal._id === goalId
+                ? {
+                    ...goal,
+                    description: editingGoal.description,
+                    day: editingGoal.day,
+                  }
                 : goal
             )
           );
@@ -309,7 +323,10 @@ export function ObjectiveDetailModal({
     }
   };
 
-  const handleToggleGoalCompletion = async (goalId: string, currentStatus: boolean) => {
+  const handleToggleGoalCompletion = async (
+    goalId: string,
+    currentStatus: boolean
+  ) => {
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
         method: 'PUT',
@@ -324,14 +341,18 @@ export function ObjectiveDetailModal({
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setGoals(prevGoals => 
-            prevGoals.map(goal => 
-              goal._id === goalId 
+          setGoals(prevGoals =>
+            prevGoals.map(goal =>
+              goal._id === goalId
                 ? { ...goal, isCompleted: !currentStatus }
                 : goal
             )
           );
-          toast.success(currentStatus ? 'Meta marcada como pendiente' : 'Meta marcada como completada');
+          toast.success(
+            currentStatus
+              ? 'Meta marcada como pendiente'
+              : 'Meta marcada como completada'
+          );
         }
       }
     } catch (error) {
@@ -403,7 +424,9 @@ export function ObjectiveDetailModal({
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setSessions(prevSessions => prevSessions.filter(session => session._id !== sessionId));
+          setSessions(prevSessions =>
+            prevSessions.filter(session => session._id !== sessionId)
+          );
           toast.success('Sesión eliminada exitosamente');
         }
       }
@@ -423,7 +446,10 @@ export function ObjectiveDetailModal({
     setDeletingSessionId(null);
   };
 
-  const handleToggleSessionCompletion = async (sessionId: string, currentStatus: boolean) => {
+  const handleToggleSessionCompletion = async (
+    sessionId: string,
+    currentStatus: boolean
+  ) => {
     try {
       const response = await fetch(`/api/meets/${sessionId}`, {
         method: 'PATCH',
@@ -440,7 +466,11 @@ export function ObjectiveDetailModal({
         if (data.success) {
           // Recargar las sesiones para obtener los datos actualizados
           loadSessions();
-          toast.success(currentStatus ? 'Sesión marcada como activa' : 'Sesión marcada como cancelada');
+          toast.success(
+            currentStatus
+              ? 'Sesión marcada como activa'
+              : 'Sesión marcada como cancelada'
+          );
         }
       }
     } catch (error) {
@@ -456,13 +486,19 @@ export function ObjectiveDetailModal({
 
   // Función para validar si el formulario de configuración está completado
   const isConfigFormCompleted = () => {
-    return (objectiveData?.objective.configFile && objectiveData.objective.configFile.length > 0) || isFormCompleted;
+    return (
+      (objectiveData?.objective.configFile &&
+        objectiveData.objective.configFile.length > 0) ||
+      isFormCompleted
+    );
   };
 
   // Función para manejar el clic en "Generar con IA"
   const handleAIGeneratorClick = () => {
     if (!isConfigFormCompleted()) {
-      toast.error('Debes completar el formulario de configuración antes de generar metas con IA');
+      toast.error(
+        'Debes completar el formulario de configuración antes de generar metas con IA'
+      );
       return;
     }
     setIsAIGeneratorOpen(true);
@@ -484,12 +520,12 @@ export function ObjectiveDetailModal({
             {objective.title}
           </DialogTitle>
           {objective.active && !objective.isCompleted && (
-          <DialogDescription>
-            <FinalizeObjectiveModal
-              objectiveId={objective._id}
-              objectiveTitle={objective.title}
-            />
-          </DialogDescription>
+            <DialogDescription>
+              <FinalizeObjectiveModal
+                objectiveId={objective._id}
+                objectiveTitle={objective.title}
+              />
+            </DialogDescription>
           )}
         </DialogHeader>
 
@@ -498,13 +534,15 @@ export function ObjectiveDetailModal({
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Información del Objetivo</CardTitle>
+                <CardTitle className="text-lg">
+                  Información del Objetivo
+                </CardTitle>
                 <div className="flex gap-2">
-                  <Badge variant={objective.active ? "active" : "inactive"}>
-                    {objective.active ? "Activo" : "Inactivo"}
+                  <Badge variant={objective.active ? 'active' : 'inactive'}>
+                    {objective.active ? 'Activo' : 'Inactivo'}
                   </Badge>
-                  <Badge variant={objective.isCompleted ? "active" : "outline"}>
-                    {objective.isCompleted ? "Completado" : "En Progreso"}
+                  <Badge variant={objective.isCompleted ? 'active' : 'outline'}>
+                    {objective.isCompleted ? 'Completado' : 'En Progreso'}
                   </Badge>
                 </div>
               </div>
@@ -513,23 +551,29 @@ export function ObjectiveDetailModal({
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Creado: {formatDate(new Date(objective.createdAt))}</span>
+                  <span className="text-sm">
+                    Creado: {formatDate(new Date(objective.createdAt))}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Progreso: {Math.round(progress)}%</span>
+                  <span className="text-sm">
+                    Progreso: {Math.round(progress)}%
+                  </span>
                 </div>
               </div>
-              
+
               {/* Barra de progreso */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Progreso general</span>
-                  <span>{completedGoals} de {totalGoals} metas completadas</span>
+                  <span>
+                    {completedGoals} de {totalGoals} metas completadas
+                  </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted">
-                  <div 
-                    className="h-full rounded-full bg-primary transition-all duration-300" 
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   ></div>
                 </div>
@@ -539,10 +583,30 @@ export function ObjectiveDetailModal({
 
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="grid w-full grid-cols-4 border-solid border-2 border-border rounded-md bg-card p-1 h-auto">
-              <TabsTrigger value="details" className="data-[state=active]:bg-accent">Detalles</TabsTrigger>
-              <TabsTrigger value="config" className="data-[state=active]:bg-accent">Configuración</TabsTrigger>
-              <TabsTrigger value="notes" className="data-[state=active]:bg-accent">Notas</TabsTrigger>
-              <TabsTrigger value="sessions" className="data-[state=active]:bg-accent">Sesiones</TabsTrigger>
+              <TabsTrigger
+                value="details"
+                className="data-[state=active]:bg-accent"
+              >
+                Detalles
+              </TabsTrigger>
+              <TabsTrigger
+                value="config"
+                className="data-[state=active]:bg-accent"
+              >
+                Configuración
+              </TabsTrigger>
+              <TabsTrigger
+                value="notes"
+                className="data-[state=active]:bg-accent"
+              >
+                Notas
+              </TabsTrigger>
+              <TabsTrigger
+                value="sessions"
+                className="data-[state=active]:bg-accent"
+              >
+                Sesiones
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="details" className="space-y-4 mt-4">
@@ -556,9 +620,9 @@ export function ObjectiveDetailModal({
                         Metas ({totalGoals})
                       </CardTitle>
                       <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="gap-1"
                           onClick={() => setIsCreatingGoal(true)}
                         >
@@ -577,22 +641,36 @@ export function ObjectiveDetailModal({
                             <Input
                               placeholder="Descripción de la meta"
                               value={newGoal.description}
-                              onChange={(e) => setNewGoal(prev => ({ ...prev, description: e.target.value }))}
+                              onChange={e =>
+                                setNewGoal(prev => ({
+                                  ...prev,
+                                  description: e.target.value,
+                                }))
+                              }
                             />
                             <Input
                               placeholder="Día (ej: Lunes, Martes, etc.)"
                               value={newGoal.day}
-                              onChange={(e) => setNewGoal(prev => ({ ...prev, day: e.target.value }))}
+                              onChange={e =>
+                                setNewGoal(prev => ({
+                                  ...prev,
+                                  day: e.target.value,
+                                }))
+                              }
                             />
                             <div className="flex gap-2">
                               <Button size="sm" onClick={handleCreateGoal}>
                                 <Save className="h-3 w-3 mr-1" />
                                 Guardar
                               </Button>
-                              <Button size="sm" variant="outline" onClick={() => {
-                                setIsCreatingGoal(false);
-                                setNewGoal({ description: '', day: '' });
-                              }}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setIsCreatingGoal(false);
+                                  setNewGoal({ description: '', day: '' });
+                                }}
+                              >
                                 <X className="h-3 w-3 mr-1" />
                                 Cancelar
                               </Button>
@@ -605,14 +683,24 @@ export function ObjectiveDetailModal({
                         <div className="flex items-center justify-center py-8">
                           <div className="text-center">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                            <p className="text-sm text-muted-foreground">Cargando metas...</p>
+                            <p className="text-sm text-muted-foreground">
+                              Cargando metas...
+                            </p>
                           </div>
                         </div>
                       ) : goals.length > 0 ? (
-                        goals.map((goal) => (
-                          <div key={goal._id} className="flex items-start gap-3 p-3 rounded-lg border">
+                        goals.map(goal => (
+                          <div
+                            key={goal._id}
+                            className="flex items-start gap-3 p-3 rounded-lg border"
+                          >
                             <button
-                              onClick={() => handleToggleGoalCompletion(goal._id, goal.isCompleted)}
+                              onClick={() =>
+                                handleToggleGoalCompletion(
+                                  goal._id,
+                                  goal.isCompleted
+                                )
+                              }
                               className="mt-1 flex-shrink-0"
                             >
                               {goal.isCompleted ? (
@@ -621,24 +709,41 @@ export function ObjectiveDetailModal({
                                 <Circle className="h-4 w-4 text-muted-foreground hover:text-primary" />
                               )}
                             </button>
-                            
+
                             <div className="flex-1 min-w-0">
                               {editingGoalId === goal._id ? (
                                 <div className="space-y-2">
                                   <Input
                                     value={editingGoal.description}
-                                    onChange={(e) => setEditingGoal(prev => ({ ...prev, description: e.target.value }))}
+                                    onChange={e =>
+                                      setEditingGoal(prev => ({
+                                        ...prev,
+                                        description: e.target.value,
+                                      }))
+                                    }
                                   />
                                   <Input
                                     value={editingGoal.day}
-                                    onChange={(e) => setEditingGoal(prev => ({ ...prev, day: e.target.value }))}
+                                    onChange={e =>
+                                      setEditingGoal(prev => ({
+                                        ...prev,
+                                        day: e.target.value,
+                                      }))
+                                    }
                                   />
                                   <div className="flex gap-2">
-                                    <Button size="sm" onClick={() => handleUpdateGoal(goal._id)}>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleUpdateGoal(goal._id)}
+                                    >
                                       <Save className="h-3 w-3 mr-1" />
                                       Guardar
                                     </Button>
-                                    <Button size="sm" variant="outline" onClick={cancelEditing}>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={cancelEditing}
+                                    >
                                       <X className="h-3 w-3 mr-1" />
                                       Cancelar
                                     </Button>
@@ -646,32 +751,37 @@ export function ObjectiveDetailModal({
                                 </div>
                               ) : (
                                 <>
-                                  <p className={`text-sm ${goal.isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+                                  <p
+                                    className={`text-sm ${goal.isCompleted ? 'line-through text-muted-foreground' : ''}`}
+                                  >
                                     {goal.description}
                                   </p>
                                   <div className="flex items-center justify-between mt-1">
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-3 w-3 text-muted-foreground" />
                                       <span className="text-xs text-muted-foreground">
-                                        {goal.day} • {formatDate(new Date(goal.date))}
+                                        {goal.day} •{' '}
+                                        {formatDate(new Date(goal.date))}
                                       </span>
                                     </div>
-                                                                         <div className="flex gap-1">
-                                       <Button
-                                         size="sm"
-                                         variant="outline"
-                                         onClick={() => startEditingGoal(goal)}
-                                       >
-                                         <Edit className="h-3 w-3" />
-                                       </Button>
-                                       <Button
-                                         size="sm"
-                                         variant="outline"
-                                         onClick={() => handleDeleteGoal(goal._id)}
-                                       >
-                                         <Trash2 className="h-3 w-3" />
-                                       </Button>
-                                     </div>
+                                    <div className="flex gap-1">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => startEditingGoal(goal)}
+                                      >
+                                        <Edit className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() =>
+                                          handleDeleteGoal(goal._id)
+                                        }
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 </>
                               )}
@@ -681,24 +791,34 @@ export function ObjectiveDetailModal({
                       ) : (
                         <div className="text-center py-8">
                           <Target className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">No hay metas definidas para este objetivo</p>
-                          
+                          <p className="text-sm text-muted-foreground">
+                            No hay metas definidas para este objetivo
+                          </p>
+
                           {/* Mensaje de configuración requerida */}
                           {!isConfigFormCompleted() && (
                             <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
                               <p className="text-xs text-yellow-700">
-                                ⚠️ Completa el formulario de configuración en la pestaña "Configuración" para generar metas con IA
+                                ⚠️ Completa el formulario de configuración en la
+                                pestaña "Configuración" para generar metas con
+                                IA
                               </p>
                             </div>
                           )}
-                          
+
                           <div className="flex gap-2 justify-center mt-3">
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="outline"
                               onClick={handleAIGeneratorClick}
-                              disabled={!objective.active || !isConfigFormCompleted()}
-                              title={!isConfigFormCompleted() ? 'Completa el formulario de configuración primero' : 'Generar metas con IA'}
+                              disabled={
+                                !objective.active || !isConfigFormCompleted()
+                              }
+                              title={
+                                !isConfigFormCompleted()
+                                  ? 'Completa el formulario de configuración primero'
+                                  : 'Generar metas con IA'
+                              }
                             >
                               <Sparkles className="h-3 w-3 mr-1" />
                               Generar con IA
@@ -708,7 +828,7 @@ export function ObjectiveDetailModal({
                                 </span>
                               )}
                             </Button>
-                            <Button 
+                            <Button
                               size="sm"
                               onClick={() => setIsCreatingGoal(true)}
                             >
@@ -733,11 +853,13 @@ export function ObjectiveDetailModal({
                   <CardContent>
                     <div className="space-y-3 max-h-[400px] overflow-y-auto">
                       {notes.length > 0 ? (
-                        notes.map((note) => (
+                        notes.map(note => (
                           <div key={note._id} className="p-3 rounded-lg border">
                             <div className="flex items-center gap-2 mb-2">
                               <User className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-xs font-medium">{note.createdBy}</span>
+                              <span className="text-xs font-medium">
+                                {note.createdBy}
+                              </span>
                               <span className="text-xs text-muted-foreground">
                                 {formatDate(new Date(note.createdAt))}
                               </span>
@@ -748,7 +870,9 @@ export function ObjectiveDetailModal({
                       ) : (
                         <div className="text-center py-8">
                           <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">No hay notas registradas para este objetivo</p>
+                          <p className="text-sm text-muted-foreground">
+                            No hay notas registradas para este objetivo
+                          </p>
                         </div>
                       )}
                     </div>
@@ -758,7 +882,10 @@ export function ObjectiveDetailModal({
             </TabsContent>
 
             <TabsContent value="config" className="space-y-4 mt-4">
-              <ObjectiveConfigForm objectiveId={objective._id} handleConfigFormCompleted={setIsFormCompleted} />
+              <ObjectiveConfigForm
+                objectiveId={objective._id}
+                handleConfigFormCompleted={setIsFormCompleted}
+              />
             </TabsContent>
 
             <TabsContent value="notes" className="space-y-4 mt-4">
@@ -784,27 +911,37 @@ export function ObjectiveDetailModal({
                       <div className="flex items-center justify-center py-8">
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                          <p className="text-sm text-muted-foreground">Cargando notas...</p>
+                          <p className="text-sm text-muted-foreground">
+                            Cargando notas...
+                          </p>
                         </div>
                       </div>
                     ) : notes.length > 0 ? (
-                      notes.map((note) => (
+                      notes.map(note => (
                         <div key={note._id} className="p-3 rounded-lg border">
                           <div className="flex items-center gap-2 mb-2">
                             <User className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-xs font-medium">{note.createdBy}</span>
+                            <span className="text-xs font-medium">
+                              {note.createdBy}
+                            </span>
                             <span className="text-xs text-muted-foreground">
                               {formatDate(new Date(note.createdAt))}
                             </span>
                           </div>
-                          <h4 className="text-sm font-medium mb-1">{note.title}</h4>
-                          <p className="text-sm text-muted-foreground">{note.content}</p>
+                          <h4 className="text-sm font-medium mb-1">
+                            {note.title}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {note.content}
+                          </p>
                         </div>
                       ))
                     ) : (
                       <div className="text-center py-8">
                         <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">No hay notas registradas para este objetivo</p>
+                        <p className="text-sm text-muted-foreground">
+                          No hay notas registradas para este objetivo
+                        </p>
                         <button
                           onClick={() => setIsCreateNoteModalOpen(true)}
                           className="mt-2 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3"
@@ -817,7 +954,7 @@ export function ObjectiveDetailModal({
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent> 
+            </TabsContent>
             <TabsContent value="sessions" className="space-y-4 mt-4">
               <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 <Card>
@@ -827,9 +964,9 @@ export function ObjectiveDetailModal({
                         <Calendar className="h-5 w-5" />
                         Sesiones ({sessions.length})
                       </CardTitle>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="gap-1"
                         onClick={() => setIsGenerateSessionsModalOpen(true)}
                       >
@@ -844,32 +981,56 @@ export function ObjectiveDetailModal({
                         <div className="flex items-center justify-center py-8">
                           <div className="text-center">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                            <p className="text-sm text-muted-foreground">Cargando sesiones...</p>
+                            <p className="text-sm text-muted-foreground">
+                              Cargando sesiones...
+                            </p>
                           </div>
                         </div>
                       ) : sessions.length > 0 ? (
-                        sessions.map((session) => (
-                          <div key={session._id} className="p-3 rounded-lg border">
+                        sessions.map(session => (
+                          <div
+                            key={session._id}
+                            className="p-3 rounded-lg border"
+                          >
                             {editingSessionId === session._id ? (
                               <div className="space-y-3">
                                 <div className="grid grid-cols-2 gap-2">
                                   <Input
                                     type="date"
                                     value={editingSession.date}
-                                    onChange={(e) => setEditingSession(prev => ({ ...prev, date: e.target.value }))}
+                                    onChange={e =>
+                                      setEditingSession(prev => ({
+                                        ...prev,
+                                        date: e.target.value,
+                                      }))
+                                    }
                                   />
                                   <Input
                                     type="time"
                                     value={editingSession.time}
-                                    onChange={(e) => setEditingSession(prev => ({ ...prev, time: e.target.value }))}
+                                    onChange={e =>
+                                      setEditingSession(prev => ({
+                                        ...prev,
+                                        time: e.target.value,
+                                      }))
+                                    }
                                   />
                                 </div>
                                 <div className="flex gap-2">
-                                  <Button size="sm" onClick={() => handleUpdateSession(session._id)}>
+                                  <Button
+                                    size="sm"
+                                    onClick={() =>
+                                      handleUpdateSession(session._id)
+                                    }
+                                  >
                                     <Save className="h-3 w-3 mr-1" />
                                     Guardar
                                   </Button>
-                                  <Button size="sm" variant="outline" onClick={cancelEditingSession}>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={cancelEditingSession}
+                                  >
                                     <X className="h-3 w-3 mr-1" />
                                     Cancelar
                                   </Button>
@@ -878,30 +1039,48 @@ export function ObjectiveDetailModal({
                             ) : deletingSessionId === session._id ? (
                               <div className="space-y-3">
                                 <div className="p-3 rounded-lg border border-red-200 bg-red-50">
-                                  <h4 className="text-sm font-medium text-red-800 mb-1">¿Estás seguro?</h4>
+                                  <h4 className="text-sm font-medium text-red-800 mb-1">
+                                    ¿Estás seguro?
+                                  </h4>
                                   <p className="text-xs text-red-600">
-                                    Esta acción eliminará la sesión programada para el {new Date(session.date).toLocaleDateString('es-ES', {
-                                      weekday: 'long',
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric'
-                                    })} a las {new Date(session.date).toLocaleTimeString('es-ES', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                      hour12: false
-                                    })}
+                                    Esta acción eliminará la sesión programada
+                                    para el{' '}
+                                    {new Date(session.date).toLocaleDateString(
+                                      'es-ES',
+                                      {
+                                        weekday: 'long',
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                      }
+                                    )}{' '}
+                                    a las{' '}
+                                    {new Date(session.date).toLocaleTimeString(
+                                      'es-ES',
+                                      {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false,
+                                      }
+                                    )}
                                   </p>
                                 </div>
                                 <div className="flex gap-2">
-                                  <Button 
-                                    size="sm" 
+                                  <Button
+                                    size="sm"
                                     variant="destructive"
-                                    onClick={() => handleDeleteSession(session._id)}
+                                    onClick={() =>
+                                      handleDeleteSession(session._id)
+                                    }
                                   >
                                     <Trash2 className="h-3 w-3 mr-1" />
                                     SÍ
                                   </Button>
-                                  <Button size="sm" variant="outline" onClick={cancelDeletingSession}>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={cancelDeletingSession}
+                                  >
                                     <X className="h-3 w-3 mr-1" />
                                     NO
                                   </Button>
@@ -912,20 +1091,25 @@ export function ObjectiveDetailModal({
                                 <div className="flex items-center gap-2 mb-2">
                                   <Calendar className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-xs font-medium">
-                                    {new Date(session.date).toLocaleDateString('es-ES', {
-                                      weekday: 'long',
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric'
-                                    })}
+                                    {new Date(session.date).toLocaleDateString(
+                                      'es-ES',
+                                      {
+                                        weekday: 'long',
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                      }
+                                    )}
                                   </span>
                                 </div>
                                 {session.link && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground">Link:</span>
-                                    <a 
-                                      href={session.link} 
-                                      target="_blank" 
+                                    <span className="text-xs text-muted-foreground">
+                                      Link:
+                                    </span>
+                                    <a
+                                      href={session.link}
+                                      target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-xs text-blue-600 hover:underline"
                                     >
@@ -933,37 +1117,45 @@ export function ObjectiveDetailModal({
                                     </a>
                                   </div>
                                 )}
-                                  <div className="flex items-center justify-between mt-2">
-                                   <div className="flex items-center gap-2">
-                                     <Clock className="h-3 w-3 text-muted-foreground" />
-                                     <span className="text-xs text-muted-foreground">
-                                       {new Date(session.date).toLocaleTimeString('es-ES', {
-                                         hour: '2-digit',
-                                         minute: '2-digit',
-                                         hour12: false
-                                       })}
-                                     </span>
-                                   </div>
-                                   {!session.isCancelled && new Date(session.date) > new Date() && 
-                                   <div className="flex gap-1">
-                                     <Button
-                                       size="sm"
-                                       variant="outline"
-                                       onClick={() => handleEditSession(session)}
-                                       title="Editar sesión"
-                                     >
-                                       <Edit className="h-3 w-3" />
-                                     </Button>
-                                     <Button
-                                       size="sm"
-                                       variant="outline"
-                                       onClick={() => startDeletingSession(session._id)}
-                                       title="Eliminar sesión"
-                                     >
-                                       <Trash2 className="h-3 w-3" />
-                                     </Button>
-                                   </div>}
-                                 </div>
+                                <div className="flex items-center justify-between mt-2">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-xs text-muted-foreground">
+                                      {new Date(
+                                        session.date
+                                      ).toLocaleTimeString('es-ES', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false,
+                                      })}
+                                    </span>
+                                  </div>
+                                  {!session.isCancelled &&
+                                    new Date(session.date) > new Date() && (
+                                      <div className="flex gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() =>
+                                            handleEditSession(session)
+                                          }
+                                          title="Editar sesión"
+                                        >
+                                          <Edit className="h-3 w-3" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() =>
+                                            startDeletingSession(session._id)
+                                          }
+                                          title="Eliminar sesión"
+                                        >
+                                          <Trash2 className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    )}
+                                </div>
                               </>
                             )}
                           </div>
@@ -971,8 +1163,10 @@ export function ObjectiveDetailModal({
                       ) : (
                         <div className="text-center py-8">
                           <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">No hay sesiones registradas para este objetivo</p>
-                          <Button 
+                          <p className="text-sm text-muted-foreground">
+                            No hay sesiones registradas para este objetivo
+                          </p>
+                          <Button
                             onClick={() => setIsGenerateSessionsModalOpen(true)}
                             className="mt-3"
                           >
@@ -1016,5 +1210,5 @@ export function ObjectiveDetailModal({
         coachId={coachId || ''}
       />
     </Dialog>
-  )
+  );
 }

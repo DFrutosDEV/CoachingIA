@@ -1,9 +1,21 @@
-'use client'
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Users, UserCircle, BarChart3, ArrowRight, FileText } from "lucide-react"
-import Link from "next/link"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Users,
+  UserCircle,
+  BarChart3,
+  ArrowRight,
+  FileText,
+} from 'lucide-react';
+import Link from 'next/link';
 
 // Interfaces para los tipos de datos
 interface RecentUser {
@@ -37,7 +49,9 @@ export function TotalUsersCard({ totalUsers = 0, newUsersThisMonth = 0 }) {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{totalUsers.toLocaleString()}</div>
-        <p className="text-xs text-muted-foreground">+{newUsersThisMonth} este mes</p>
+        <p className="text-xs text-muted-foreground">
+          +{newUsersThisMonth} este mes
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/admin/users">
             <Button size="sm" variant="outline" className="w-full">
@@ -48,11 +62,14 @@ export function TotalUsersCard({ totalUsers = 0, newUsersThisMonth = 0 }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 2: Coaches Activos
-export function ActiveCoachesCard({ activeCoaches = 0, newCoachesThisMonth = 0 }) {
+export function ActiveCoachesCard({
+  activeCoaches = 0,
+  newCoachesThisMonth = 0,
+}) {
   return (
     <Card data-swapy-item="active-coaches">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -61,7 +78,9 @@ export function ActiveCoachesCard({ activeCoaches = 0, newCoachesThisMonth = 0 }
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{activeCoaches}</div>
-        <p className="text-xs text-muted-foreground">+{newCoachesThisMonth} este mes</p>
+        <p className="text-xs text-muted-foreground">
+          +{newCoachesThisMonth} este mes
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/admin/coaches">
             <Button size="sm" variant="outline" className="w-full">
@@ -72,20 +91,29 @@ export function ActiveCoachesCard({ activeCoaches = 0, newCoachesThisMonth = 0 }
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 3: Sesiones Realizadas
-export function CompletedSessionsCard({ completedSessions = 0, completedSessionsThisMonth = 0 }) {
+export function CompletedSessionsCard({
+  completedSessions = 0,
+  completedSessionsThisMonth = 0,
+}) {
   return (
     <Card data-swapy-item="completed-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Sesiones Realizadas</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          Sesiones Realizadas
+        </CardTitle>
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{completedSessions.toLocaleString()}</div>
-        <p className="text-xs text-muted-foreground">+{completedSessionsThisMonth} este mes</p>
+        <div className="text-2xl font-bold">
+          {completedSessions.toLocaleString()}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          +{completedSessionsThisMonth} este mes
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/admin/analytics">
             <Button size="sm" variant="outline" className="w-full">
@@ -96,7 +124,7 @@ export function CompletedSessionsCard({ completedSessions = 0, completedSessions
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 4: Reportes
@@ -120,16 +148,22 @@ export function ReportsCard({ pendingReports = 0 }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 5: Nuevos Usuarios
-export function NewUsersCard({ recentUsers = [] }: { recentUsers?: RecentUser[] }) {
+export function NewUsersCard({
+  recentUsers = [],
+}: {
+  recentUsers?: RecentUser[];
+}) {
   return (
     <Card data-swapy-item="new-users">
       <CardHeader>
         <CardTitle>Nuevos Usuarios</CardTitle>
-        <CardDescription>Usuarios registrados en los últimos 7 días.</CardDescription>
+        <CardDescription>
+          Usuarios registrados en los últimos 7 días.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -145,12 +179,16 @@ export function NewUsersCard({ recentUsers = [] }: { recentUsers?: RecentUser[] 
                   <div className="flex items-center gap-2">
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                        user.type === "Coach" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
+                        user.type === 'Coach'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
                       }`}
                     >
                       {user.type}
                     </span>
-                    <span className="text-xs text-muted-foreground">{user.date}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {user.date}
+                    </span>
                   </div>
                 </div>
                 <Link href="/dashboard/admin/clients">
@@ -162,24 +200,33 @@ export function NewUsersCard({ recentUsers = [] }: { recentUsers?: RecentUser[] 
             ))
           ) : (
             <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">No hay nuevos usuarios</p>
+              <p className="text-sm text-muted-foreground">
+                No hay nuevos usuarios
+              </p>
             </div>
           )}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 6: Rendimiento de la Plataforma
-export function PlatformPerformanceCard({ platformStats }: { platformStats?: PlatformStats }) {
+export function PlatformPerformanceCard({
+  platformStats,
+}: {
+  platformStats?: PlatformStats;
+}) {
   const stats = [
-    { metric: "Tasa de Conversión", ...platformStats?.conversionRate },
-    { metric: "Sesiones Promedio por Usuario", ...platformStats?.avgSessionsPerUser },
-    { metric: "Tiempo Promedio de Sesión", ...platformStats?.avgSessionTime },
-    { metric: "Tasa de Abandono", ...platformStats?.churnRate },
-    { metric: "Ingresos Mensuales", ...platformStats?.monthlyRevenue },
-  ]
+    { metric: 'Tasa de Conversión', ...platformStats?.conversionRate },
+    {
+      metric: 'Sesiones Promedio por Usuario',
+      ...platformStats?.avgSessionsPerUser,
+    },
+    { metric: 'Tiempo Promedio de Sesión', ...platformStats?.avgSessionTime },
+    { metric: 'Tasa de Abandono', ...platformStats?.churnRate },
+    { metric: 'Ingresos Mensuales', ...platformStats?.monthlyRevenue },
+  ];
 
   return (
     <Card data-swapy-item="platform-performance">
@@ -198,7 +245,9 @@ export function PlatformPerformanceCard({ platformStats }: { platformStats?: Pla
                 <p className="text-sm font-medium">{stat.metric}</p>
                 <p className="text-xl font-bold">{stat.value}</p>
               </div>
-              <div className={`flex items-center ${stat.positive ? "text-green-600" : "text-red-600"}`}>
+              <div
+                className={`flex items-center ${stat.positive ? 'text-green-600' : 'text-red-600'}`}
+              >
                 <span>{stat.change}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -208,7 +257,7 @@ export function PlatformPerformanceCard({ platformStats }: { platformStats?: Pla
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  className={`ml-1 h-4 w-4 ${stat.positive ? "rotate-0" : "rotate-180"}`}
+                  className={`ml-1 h-4 w-4 ${stat.positive ? 'rotate-0' : 'rotate-180'}`}
                 >
                   <path d="m5 15 7-7 7 7" />
                 </svg>
@@ -226,5 +275,5 @@ export function PlatformPerformanceCard({ platformStats }: { platformStats?: Pla
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

@@ -3,11 +3,13 @@
 ## 🔐 Funcionalidades Implementadas
 
 ### 1. **Redirección Automática a Login**
+
 - **Middleware actualizado**: Detecta usuarios no loggeados y los redirige a `/login`
 - **Detección de token**: Busca el token en headers `Authorization` y cookies
 - **Limpieza automática**: Elimina tokens inválidos del localStorage
 
 ### 2. **Protección de Rutas Mejorada**
+
 - **Middleware inteligente**: Diferencia entre rutas de dashboard (redirige) y APIs (error 401)
 - **Verificación de cookies**: Soporte para tokens almacenados en cookies
 - **Manejo de errores**: Limpia datos corruptos automáticamente
@@ -15,17 +17,14 @@
 ### 3. **Hooks de Autenticación Mejorados**
 
 #### `usePermissions()`
+
 ```typescript
-const { 
-  userRole, 
-  isAuthenticated, 
-  hasPermission, 
-  logout,
-  checkAndRedirect 
-} = usePermissions()
+const { userRole, isAuthenticated, hasPermission, logout, checkAndRedirect } =
+  usePermissions();
 ```
 
 **Nuevas funcionalidades:**
+
 - `logout()`: Limpia todos los datos y redirige a login
 - `isAuthenticated`: Boolean que indica si hay usuario loggeado
 - Redirección automática si no hay usuario en rutas protegidas
@@ -33,6 +32,7 @@ const {
 ### 4. **Componentes de Protección**
 
 #### `AuthGuard` - Protección General
+
 ```typescript
 <AuthGuard requiredRoles={['admin', 'coach']}>
   <ComponenteProtegido />
@@ -40,18 +40,20 @@ const {
 ```
 
 #### Guardias Específicos
+
 - `DashboardGuard`: Para cualquier usuario autenticado
 - `AdminGuard`: Solo administradores
 - `CoachGuard`: Administradores y coaches
 - `EnterpriseGuard`: Administradores y empresas
 
 ### 5. **Rutas Públicas Expandidas**
+
 ```typescript
 // Rutas que NO requieren autenticación
 [
   '/',
   '/login',
-  '/register', 
+  '/register',
   '/signup',
   '/forgot-password',
   '/reset-password',
@@ -60,13 +62,14 @@ const {
   '/terms',
   '/privacy',
   '/api/auth',
-  '/api/health'
-]
+  '/api/health',
+];
 ```
 
 ## 🚀 Flujo de Autenticación
 
 ### 1. **Usuario No Loggeado**
+
 ```
 Usuario accede a /dashboard/admin
 ↓
@@ -76,6 +79,7 @@ Redirige a /login
 ```
 
 ### 2. **Usuario Loggeado Sin Permisos**
+
 ```
 Usuario con rol 'client' accede a /dashboard/admin
 ↓
@@ -85,6 +89,7 @@ Redirige a /dashboard/unauthorized
 ```
 
 ### 3. **Usuario Loggeado Con Permisos**
+
 ```
 Usuario con rol 'admin' accede a /dashboard/admin
 ↓
@@ -96,6 +101,7 @@ Permite acceso
 ## 📝 Ejemplos de Uso
 
 ### Proteger una Página Completa
+
 ```typescript
 // pages/dashboard/admin/page.tsx
 import { AdminGuard } from '@/components/auth/AuthGuard'
@@ -110,6 +116,7 @@ export default function AdminPage() {
 ```
 
 ### Proteger Componentes Específicos
+
 ```typescript
 import { PermissionWrapper } from '@/components/auth/PermissionGuard'
 
@@ -117,7 +124,7 @@ function Navigation() {
   return (
     <nav>
       <a href="/dashboard">Dashboard</a>
-      
+
       <PermissionWrapper requiredRoles={['admin']}>
         <a href="/dashboard/admin">Administración</a>
       </PermissionWrapper>
@@ -127,6 +134,7 @@ function Navigation() {
 ```
 
 ### Usar el Hook de Permisos
+
 ```typescript
 import { usePermissions } from '@/hooks/usePermissions'
 
@@ -140,11 +148,11 @@ function MyComponent() {
   return (
     <div>
       <p>Rol: {userRole}</p>
-      
+
       {hasPermission('/dashboard/admin') && (
         <button>Ir a Admin</button>
       )}
-      
+
       <button onClick={logout}>
         Cerrar Sesión
       </button>
@@ -154,6 +162,7 @@ function MyComponent() {
 ```
 
 ### Verificación Manual de Autenticación
+
 ```typescript
 import { usePermissions } from '@/hooks/usePermissions'
 
@@ -179,22 +188,25 @@ function ProtectedComponent() {
 ## 🔧 Configuración de Tokens
 
 ### En el Frontend (localStorage)
+
 ```javascript
 // Guardar token después del login
-localStorage.setItem('token', 'jwt-token-here')
-localStorage.setItem('userRole', 'admin')
+localStorage.setItem('token', 'jwt-token-here');
+localStorage.setItem('userRole', 'admin');
 ```
 
 ### En Cookies (para SSR)
+
 ```javascript
 // Guardar en cookie para que el middleware pueda leerlo
-document.cookie = `token=${jwtToken}; path=/; secure; samesite=strict`
+document.cookie = `token=${jwtToken}; path=/; secure; samesite=strict`;
 ```
 
 ### Formato del Token JWT
+
 ```json
 {
-  "role": "admin",        // o "userType": "admin"
+  "role": "admin", // o "userType": "admin"
   "userId": "123",
   "exp": 1234567890
 }
@@ -203,18 +215,21 @@ document.cookie = `token=${jwtToken}; path=/; secure; samesite=strict`
 ## 🛡️ Seguridad
 
 ### Middleware
+
 - ✅ Verifica tokens en headers y cookies
 - ✅ Valida formato JWT
 - ✅ Verifica roles y permisos
 - ✅ Redirige según el tipo de ruta (dashboard vs API)
 
 ### Frontend
+
 - ✅ Limpia datos inválidos automáticamente
 - ✅ Redirige usuarios no autenticados
 - ✅ Oculta contenido sin permisos
 - ✅ Función de logout segura
 
 ### Rutas Protegidas
+
 - ✅ `/dashboard/*` requiere autenticación
 - ✅ `/api/*` (excepto públicas) requiere token
 - ✅ Verificación de permisos por rol

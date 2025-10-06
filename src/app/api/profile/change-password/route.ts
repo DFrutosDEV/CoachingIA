@@ -6,14 +6,15 @@ import User from '@/models/User';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { userId, currentPassword, newPassword } = await request.json();
-    
+
     if (!userId || !currentPassword || !newPassword) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'ID de usuario, contraseña actual y nueva contraseña son requeridos' 
+        {
+          success: false,
+          error:
+            'ID de usuario, contraseña actual y nueva contraseña son requeridos',
         },
         { status: 400 }
       );
@@ -22,9 +23,9 @@ export async function POST(request: NextRequest) {
     // Validar que la nueva contraseña tenga al menos 6 caracteres
     if (newPassword.length < 6) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'La nueva contraseña debe tener al menos 6 caracteres' 
+        {
+          success: false,
+          error: 'La nueva contraseña debe tener al menos 6 caracteres',
         },
         { status: 400 }
       );
@@ -34,9 +35,9 @@ export async function POST(request: NextRequest) {
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Usuario no encontrado' 
+        {
+          success: false,
+          error: 'Usuario no encontrado',
         },
         { status: 404 }
       );
@@ -45,9 +46,9 @@ export async function POST(request: NextRequest) {
     // Verificar que la contraseña actual sea correcta
     if (user.password !== currentPassword) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'La contraseña actual es incorrecta' 
+        {
+          success: false,
+          error: 'La contraseña actual es incorrecta',
         },
         { status: 400 }
       );
@@ -56,9 +57,9 @@ export async function POST(request: NextRequest) {
     // Verificar que la nueva contraseña sea diferente a la actual
     if (currentPassword === newPassword) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'La nueva contraseña debe ser diferente a la actual' 
+        {
+          success: false,
+          error: 'La nueva contraseña debe ser diferente a la actual',
         },
         { status: 400 }
       );
@@ -70,16 +71,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Contraseña actualizada exitosamente'
+      message: 'Contraseña actualizada exitosamente',
     });
-    
   } catch (error: any) {
     console.error('Error cambiando contraseña:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Error interno del servidor' 
+      {
+        success: false,
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );

@@ -1,12 +1,18 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertTriangle, ArrowLeft, Home } from 'lucide-react'
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { AlertTriangle, ArrowLeft, Home } from 'lucide-react';
 
 export default function UnauthorizedPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -24,24 +30,22 @@ export default function UnauthorizedPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-500 text-center">
-            Tu rol actual no tiene los permisos necesarios para ver este contenido. 
-            Si crees que esto es un error, contacta al administrador del sistema.
+            Tu rol actual no tiene los permisos necesarios para ver este
+            contenido. Si crees que esto es un error, contacta al administrador
+            del sistema.
           </p>
-          
+
           <div className="flex flex-col space-y-2">
-            <Button 
-              onClick={() => router.back()} 
-              variant="outline" 
+            <Button
+              onClick={() => router.back()}
+              variant="outline"
               className="w-full"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver Atrás
             </Button>
-            
-            <Button 
-              onClick={() => router.push('/login')} 
-              className="w-full"
-            >
+
+            <Button onClick={() => router.push('/login')} className="w-full">
               <Home className="mr-2 h-4 w-4" />
               Ir al Login
             </Button>
@@ -49,5 +53,5 @@ export default function UnauthorizedPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

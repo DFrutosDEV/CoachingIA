@@ -7,34 +7,38 @@ export interface IFeedback extends Document {
   feedback: string;
 }
 
-const FeedbackSchema: Schema = new Schema({
-  coachId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Profile',
-    required: [true, 'The coachId is required']
+const FeedbackSchema: Schema = new Schema(
+  {
+    coachId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Profile',
+      required: [true, 'The coachId is required'],
+    },
+    clientId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Profile',
+      required: [true, 'The clientId is required'],
+    },
+    objectiveId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Objective',
+      required: [true, 'The objectiveId is required'],
+    },
+    feedback: {
+      type: String,
+      required: [true, 'The feedback is required'],
+      trim: true,
+      maxlength: [500, 'The feedback cannot exceed 500 characters'],
+    },
   },
-  clientId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Profile',
-    required: [true, 'The clientId is required']
-  },
-  objectiveId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Objective',
-    required: [true, 'The objectiveId is required']
-  },
-  feedback: {
-    type: String,
-    required: [true, 'The feedback is required'],
-    trim: true,
-    maxlength: [500, 'The feedback cannot exceed 500 characters']
-  },
-}, {
-  timestamps: true
-});
+  {
+    timestamps: true,
+  }
+);
 
 FeedbackSchema.index({ coachId: 1 });
 FeedbackSchema.index({ clientId: 1 });
 FeedbackSchema.index({ objectiveId: 1 });
 
-export default mongoose.models.Feedback || mongoose.model<IFeedback>('Feedback', FeedbackSchema); 
+export default mongoose.models.Feedback ||
+  mongoose.model<IFeedback>('Feedback', FeedbackSchema);

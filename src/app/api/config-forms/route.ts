@@ -13,15 +13,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: configForms
+      data: configForms,
     });
-
   } catch (error) {
     console.error('Error al obtener preguntas de configuración:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Error interno del servidor' 
+      {
+        success: false,
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );
@@ -31,15 +30,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const body = await request.json();
     const { title, isObligatory = false, createdBy } = body;
 
     if (!title || !createdBy) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Título y createdBy son requeridos' 
+        {
+          success: false,
+          error: 'Título y createdBy son requeridos',
         },
         { status: 400 }
       );
@@ -49,24 +48,26 @@ export async function POST(request: NextRequest) {
       title,
       active: true,
       isObligatory,
-      createdBy
+      createdBy,
     });
 
     await newConfigForm.save();
 
-    return NextResponse.json({
-      success: true,
-      data: newConfigForm
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        data: newConfigForm,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error al crear pregunta de configuración:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Error interno del servidor' 
+      {
+        success: false,
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );
   }
-} 
+}

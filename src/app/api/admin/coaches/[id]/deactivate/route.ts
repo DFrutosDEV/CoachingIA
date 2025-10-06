@@ -10,9 +10,9 @@ export async function PUT(
 ) {
   try {
     await connectDB();
-    
+
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { error: 'ID del coach es requerido' },
@@ -38,9 +38,8 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      message: 'Coach dado de baja exitosamente'
+      message: 'Coach dado de baja exitosamente',
     });
-
   } catch (error) {
     console.error('Error al dar de baja al coach:', error);
     return NextResponse.json(
@@ -48,4 +47,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-} 
+}

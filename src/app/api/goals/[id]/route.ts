@@ -12,7 +12,7 @@ export async function PUT(
   try {
     await connectDB();
     const updateData = await request.json();
-    
+
     // Validar que la meta existe
     const existingGoal = await Goal.findById(goalId);
     if (!existingGoal) {
@@ -25,25 +25,22 @@ export async function PUT(
     // Campos permitidos para actualizar
     const allowedFields = ['description', 'day', 'isCompleted'];
     const filteredData: any = {};
-    
+
     allowedFields.forEach(field => {
       if (updateData[field] !== undefined) {
         filteredData[field] = updateData[field];
       }
     });
 
-    const updatedGoal = await Goal.findByIdAndUpdate(
-      goalId,
-      filteredData,
-      { new: true }
-    );
+    const updatedGoal = await Goal.findByIdAndUpdate(goalId, filteredData, {
+      new: true,
+    });
 
     return NextResponse.json({
       success: true,
       message: 'Meta actualizada correctamente',
-      goal: updatedGoal
+      goal: updatedGoal,
     });
-
   } catch (error) {
     console.error('Error al actualizar meta:', error);
     return NextResponse.json(
@@ -61,7 +58,7 @@ export async function DELETE(
   const { id: goalId } = await params;
   try {
     await connectDB();
-    
+
     // Validar que la meta existe
     const existingGoal = await Goal.findById(goalId);
     if (!existingGoal) {
@@ -76,9 +73,8 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'Meta eliminada correctamente'
+      message: 'Meta eliminada correctamente',
     });
-
   } catch (error) {
     console.error('Error al eliminar meta:', error);
     return NextResponse.json(

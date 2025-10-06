@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,148 +9,158 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Search, 
-  User, 
-  Mail, 
-  Coins, 
-  Plus, 
-  Minus, 
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Search,
+  User,
+  Mail,
+  Coins,
+  Plus,
+  Minus,
   Loader2,
   CheckCircle,
-  AlertCircle
-} from "lucide-react"
-import { toast } from "sonner"
+  AlertCircle,
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Coach {
-  id: string
-  name: string
-  lastName: string
-  email: string
-  points: number
+  id: string;
+  name: string;
+  lastName: string;
+  email: string;
+  points: number;
 }
 
 interface PointsManagerModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<Coach[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null)
-  const [newPoints, setNewPoints] = useState<number>(0)
-  const [isUpdating, setIsUpdating] = useState(false)
+export function PointsManagerModal({
+  isOpen,
+  onClose,
+}: PointsManagerModalProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Coach[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null);
+  const [newPoints, setNewPoints] = useState<number>(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Función para buscar coaches
   const searchCoaches = async (query: string) => {
     if (query.length < 3) {
-      setSearchResults([])
-      return
+      setSearchResults([]);
+      return;
     }
 
-    setIsSearching(true)
+    setIsSearching(true);
     try {
-      const response = await fetch(`/api/admin/coaches?search=${encodeURIComponent(query)}`)
-      
+      const response = await fetch(
+        `/api/admin/coaches?search=${encodeURIComponent(query)}`
+      );
+
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json();
         if (result.success) {
-          setSearchResults(result.data || [])
+          setSearchResults(result.data || []);
         } else {
-          setSearchResults([])
+          setSearchResults([]);
         }
       } else {
-        setSearchResults([])
+        setSearchResults([]);
       }
     } catch (error) {
-      console.error('Error al buscar coaches:', error)
-      setSearchResults([])
-      toast.error('Error al buscar coaches')
+      console.error('Error al buscar coaches:', error);
+      setSearchResults([]);
+      toast.error('Error al buscar coaches');
     } finally {
-      setIsSearching(false)
+      setIsSearching(false);
     }
-  }
+  };
 
   // Debounce para la búsqueda
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchQuery.length >= 3) {
-        searchCoaches(searchQuery)
+        searchCoaches(searchQuery);
       } else {
-        setSearchResults([])
+        setSearchResults([]);
       }
-    }, 300)
+    }, 300);
 
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   // Función para seleccionar un coach
   const handleCoachSelect = (coach: Coach) => {
-    setSelectedCoach(coach)
-    setNewPoints(coach.points)
-    setSearchQuery("")
-    setSearchResults([])
-  }
+    setSelectedCoach(coach);
+    setNewPoints(coach.points);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   // Función para actualizar puntos
   const handleUpdatePoints = async () => {
-    if (!selectedCoach) return
+    if (!selectedCoach) return;
 
-    setIsUpdating(true)
+    setIsUpdating(true);
     try {
-      const response = await fetch(`/api/admin/coaches/${selectedCoach.id}/points`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ points: newPoints })
-      })
+      const response = await fetch(
+        `/api/admin/coaches/${selectedCoach.id}/points`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ points: newPoints }),
+        }
+      );
 
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json();
         if (result.success) {
-          toast.success('Puntos actualizados exitosamente')
+          toast.success('Puntos actualizados exitosamente');
           // Actualizar el coach seleccionado con los nuevos puntos
-          setSelectedCoach(prev => prev ? { ...prev, points: newPoints } : null)
+          setSelectedCoach(prev =>
+            prev ? { ...prev, points: newPoints } : null
+          );
           // Cerrar el modal
-          handleClose()
+          handleClose();
         } else {
-          toast.error(result.error || 'Error al actualizar puntos')
+          toast.error(result.error || 'Error al actualizar puntos');
         }
       } else {
-        const error = await response.json()
-        toast.error(error.error || 'Error al actualizar puntos')
+        const error = await response.json();
+        toast.error(error.error || 'Error al actualizar puntos');
       }
     } catch (error) {
-      console.error('Error al actualizar puntos:', error)
-      toast.error('Error al actualizar puntos')
+      console.error('Error al actualizar puntos:', error);
+      toast.error('Error al actualizar puntos');
     } finally {
-      setIsUpdating(false)
+      setIsUpdating(false);
     }
-  }
+  };
 
   // Función para cerrar el modal
   const handleClose = () => {
-    setSearchQuery("")
-    setSearchResults([])
-    setSelectedCoach(null)
-    setNewPoints(0)
-    onClose()
-  }
+    setSearchQuery('');
+    setSearchResults([]);
+    setSelectedCoach(null);
+    setNewPoints(0);
+    onClose();
+  };
 
   // Función para ajustar puntos
   const adjustPoints = (amount: number) => {
-    const newValue = Math.max(0, newPoints + amount)
-    setNewPoints(newValue)
-  }
+    const newValue = Math.max(0, newPoints + amount);
+    setNewPoints(newValue);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -161,7 +171,8 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
             Gestión de Puntos de Coaches
           </DialogTitle>
           <DialogDescription>
-            Busca un coach y gestiona sus puntos para la generación de objetivos.
+            Busca un coach y gestiona sus puntos para la generación de
+            objetivos.
           </DialogDescription>
         </DialogHeader>
 
@@ -177,7 +188,7 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
                     id="search"
                     placeholder="Buscar por nombre, apellido o email..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -195,9 +206,9 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
                 <div className="space-y-2">
                   <Label>Resultados:</Label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {searchResults.map((coach) => (
-                      <Card 
-                        key={coach.id} 
+                    {searchResults.map(coach => (
+                      <Card
+                        key={coach.id}
                         className="cursor-pointer hover:bg-accent transition-colors"
                         onClick={() => handleCoachSelect(coach)}
                       >
@@ -217,7 +228,10 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
                                 </span>
                               </div>
                             </div>
-                            <Badge variant="outline" className="flex items-center gap-1">
+                            <Badge
+                              variant="outline"
+                              className="flex items-center gap-1"
+                            >
                               <Coins className="h-3 w-3" />
                               {coach.points} puntos
                             </Badge>
@@ -229,12 +243,14 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
                 </div>
               )}
 
-              {!isSearching && searchQuery.length >= 3 && searchResults.length === 0 && (
-                <div className="flex items-center justify-center py-4 text-muted-foreground">
-                  <AlertCircle className="h-5 w-5 mr-2" />
-                  No se encontraron coaches
-                </div>
-              )}
+              {!isSearching &&
+                searchQuery.length >= 3 &&
+                searchResults.length === 0 && (
+                  <div className="flex items-center justify-center py-4 text-muted-foreground">
+                    <AlertCircle className="h-5 w-5 mr-2" />
+                    No se encontraron coaches
+                  </div>
+                )}
             </div>
           )}
 
@@ -252,7 +268,10 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
                         {selectedCoach.email}
                       </p>
                     </div>
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1"
+                    >
                       <Coins className="h-3 w-3" />
                       {selectedCoach.points} puntos actuales
                     </Badge>
@@ -275,7 +294,11 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
                           type="number"
                           min="0"
                           value={newPoints}
-                          onChange={(e) => setNewPoints(Math.max(0, parseInt(e.target.value) || 0))}
+                          onChange={e =>
+                            setNewPoints(
+                              Math.max(0, parseInt(e.target.value) || 0)
+                            )
+                          }
                           className="text-center"
                         />
                         <Button
@@ -290,20 +313,26 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
 
                     {/* Diferencia de puntos */}
                     {newPoints !== selectedCoach.points && (
-                      <div className={`p-3 rounded-lg ${
-                        newPoints > selectedCoach.points 
-                          ? 'bg-green-50 border border-green-200' 
-                          : 'bg-red-50 border border-red-200'
-                      }`}>
+                      <div
+                        className={`p-3 rounded-lg ${
+                          newPoints > selectedCoach.points
+                            ? 'bg-green-50 border border-green-200'
+                            : 'bg-red-50 border border-red-200'
+                        }`}
+                      >
                         <div className="flex items-center gap-2">
                           {newPoints > selectedCoach.points ? (
                             <Plus className="h-4 w-4 text-green-600" />
                           ) : (
                             <Minus className="h-4 w-4 text-red-600" />
                           )}
-                          <span className={`font-medium ${
-                            newPoints > selectedCoach.points ? 'text-green-700' : 'text-red-700'
-                          }`}>
+                          <span
+                            className={`font-medium ${
+                              newPoints > selectedCoach.points
+                                ? 'text-green-700'
+                                : 'text-red-700'
+                            }`}
+                          >
                             {newPoints > selectedCoach.points ? '+' : ''}
                             {newPoints - selectedCoach.points} puntos
                           </span>
@@ -322,8 +351,8 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
             Cancelar
           </Button>
           {selectedCoach && (
-            <Button 
-              onClick={handleUpdatePoints} 
+            <Button
+              onClick={handleUpdatePoints}
               disabled={isUpdating || newPoints === selectedCoach.points}
               className="flex items-center gap-2"
             >
@@ -343,5 +372,5 @@ export function PointsManagerModal({ isOpen, onClose }: PointsManagerModalProps)
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

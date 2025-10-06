@@ -7,6 +7,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ### **Tipos de Logs Disponibles:**
 
 #### 🔐 **MIDDLEWARE** - Logs del Middleware
+
 ```
 🔐 [timestamp] MIDDLEWARE: Verificando acceso a /dashboard/admin
 🔒 [timestamp] MIDDLEWARE: Ruta protegida /dashboard/admin - Verificando autenticación
@@ -15,6 +16,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ```
 
 #### 🎫 **TOKEN** - Logs de Decodificación de JWT
+
 ```
 🔍 [timestamp] TOKEN: Decodificando JWT...
 📋 [timestamp] TOKEN: Payload decodificado: {role: "admin", userId: "123", exp: "2024-..."}
@@ -22,6 +24,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ```
 
 #### 🔧 **HOOK** - Logs del Hook usePermissions
+
 ```
 🔧 [timestamp] HOOK: Inicializando usePermissions...
 🔍 [timestamp] HOOK: Buscando rol en localStorage...
@@ -30,12 +33,14 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ```
 
 #### 🔐 **PERMISSION** - Logs de Verificación de Permisos
+
 ```
 🔐 [timestamp] PERMISSION: Usuario 'admin' TIENE permisos para /dashboard/admin
 📋 [timestamp] PERMISSION_CHECK: Roles permitidos: [admin]
 ```
 
 #### 🚪 **LOGOUT** - Logs de Cierre de Sesión
+
 ```
 🚪 [timestamp] LOGOUT: Iniciando proceso de logout...
 🧹 [timestamp] LOGOUT: Limpiando localStorage...
@@ -46,6 +51,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ## 🛠️ **Componentes de Debug**
 
 ### **1. AuthLogger** - Logger Visual en Tiempo Real
+
 - **Ubicación**: Botón flotante en la esquina inferior derecha
 - **Funcionalidades**:
   - Captura automáticamente todos los logs de autenticación
@@ -55,6 +61,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
   - Mantiene los últimos 50 logs
 
 ### **2. AuthStatus** - Panel de Estado Actual
+
 - **Muestra**:
   - Estado de autenticación actual
   - Información del token JWT
@@ -64,6 +71,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
   - Información de debug completa
 
 ### **3. AuthDebugPage** - Panel Completo de Debug
+
 - **Incluye**:
   - Simulador de login con diferentes roles
   - Pruebas de permisos en tiempo real
@@ -73,18 +81,21 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ## 📊 **Cómo Usar los Logs**
 
 ### **Ver Logs en la Consola del Navegador:**
+
 1. Abre las DevTools (F12)
 2. Ve a la pestaña "Console"
 3. Navega por tu aplicación
 4. Verás logs detallados con emojis y timestamps
 
 ### **Usar el Logger Visual:**
+
 1. Busca el botón "Ver Logs" en la esquina inferior derecha
 2. Haz clic para abrir el panel de logs
 3. Navega por la aplicación para ver logs en tiempo real
 4. Usa los botones para limpiar o descargar logs
 
 ### **Probar con el Panel de Debug:**
+
 1. Importa y usa `<AuthDebugPage />` en cualquier página
 2. Simula diferentes roles de usuario
 3. Prueba permisos específicos
@@ -93,6 +104,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ## 🔍 **Ejemplos de Flujos de Logs**
 
 ### **Usuario Sin Autenticar Accede a Dashboard:**
+
 ```
 🔐 [2024-01-15T10:30:00.000Z] MIDDLEWARE: Verificando acceso a /dashboard/admin
 🔒 [2024-01-15T10:30:00.001Z] MIDDLEWARE: Ruta protegida /dashboard/admin - Verificando autenticación
@@ -101,6 +113,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ```
 
 ### **Usuario Admin Accede Exitosamente:**
+
 ```
 🔐 [2024-01-15T10:30:00.000Z] MIDDLEWARE: Verificando acceso a /dashboard/admin
 🔒 [2024-01-15T10:30:00.001Z] MIDDLEWARE: Ruta protegida /dashboard/admin - Verificando autenticación
@@ -116,6 +129,7 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ```
 
 ### **Usuario Sin Permisos:**
+
 ```
 🔐 [2024-01-15T10:30:00.000Z] MIDDLEWARE: Verificando acceso a /dashboard/admin
 👤 [2024-01-15T10:30:00.006Z] MIDDLEWARE: Usuario autenticado con rol 'client' accediendo a /dashboard/admin
@@ -129,16 +143,19 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ## 🎯 **Beneficios del Sistema de Logs**
 
 ### **Para Desarrollo:**
+
 - **Debug fácil**: Ve exactamente qué está pasando en cada paso
 - **Identificación rápida de problemas**: Los logs muestran dónde falla el flujo
 - **Pruebas visuales**: Confirma que los permisos funcionan correctamente
 
 ### **Para Producción:**
+
 - **Monitoreo**: Rastrea intentos de acceso no autorizados
 - **Auditoría**: Historial completo de acciones de autenticación
 - **Troubleshooting**: Diagnóstica problemas de usuarios rápidamente
 
 ### **Para Testing:**
+
 - **Validación automática**: Confirma que los flujos funcionan como esperado
 - **Casos de prueba**: Simula diferentes escenarios fácilmente
 - **Regresión**: Detecta cambios que rompan la autenticación
@@ -146,31 +163,34 @@ He agregado un sistema completo de logging que te permitirá seguir exactamente 
 ## 📝 **Personalización de Logs**
 
 ### **Agregar Nuevos Tipos de Log:**
+
 ```typescript
 // En cualquier archivo
-const timestamp = new Date().toISOString()
-console.log(`🆕 [${timestamp}] CUSTOM: Mi mensaje personalizado`)
+const timestamp = new Date().toISOString();
+console.log(`🆕 [${timestamp}] CUSTOM: Mi mensaje personalizado`);
 ```
 
 ### **Modificar Niveles de Log:**
+
 ```typescript
 // Para logs de error
-console.error(`❌ [${timestamp}] ERROR: Algo salió mal`)
+console.error(`❌ [${timestamp}] ERROR: Algo salió mal`);
 
-// Para logs de advertencia  
-console.log(`⚠️ [${timestamp}] WARNING: Advertencia importante`)
+// Para logs de advertencia
+console.log(`⚠️ [${timestamp}] WARNING: Advertencia importante`);
 
 // Para logs de éxito
-console.log(`✅ [${timestamp}] SUCCESS: Operación exitosa`)
+console.log(`✅ [${timestamp}] SUCCESS: Operación exitosa`);
 ```
 
 ### **Desactivar Logs en Producción:**
+
 ```typescript
 // Agregar al inicio de los archivos
-const isDevelopment = process.env.NODE_ENV === 'development'
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 if (isDevelopment) {
-  console.log(`🔐 [${timestamp}] MIDDLEWARE: ...`)
+  console.log(`🔐 [${timestamp}] MIDDLEWARE: ...`);
 }
 ```
 

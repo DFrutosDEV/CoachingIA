@@ -1,18 +1,18 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { ClientsList } from "../../../../components/clients-list"
-import { ClientDetail } from "../../../../components/client-detail"
-import { Users } from "lucide-react"
-import { ClientResponse, Goal } from "@/types"
+import { useState } from 'react';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { ClientsList } from '../../../../components/clients-list';
+import { ClientDetail } from '../../../../components/client-detail';
+import { Users } from 'lucide-react';
+import { ClientResponse, Goal } from '@/types';
 
 export default function EnterpriseClientsPage() {
   const [clients, setClients] = useState<ClientResponse[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const handleClientSelect = (clientId: string) => {
     setSelectedClientId(clientId);
     setIsDetailModalOpen(true);
@@ -22,7 +22,7 @@ export default function EnterpriseClientsPage() {
     setIsDetailModalOpen(false);
   };
 
-   const handleUpdateClient = (clientId: string, updatedGoals: Goal[]) => {
+  const handleUpdateClient = (clientId: string, updatedGoals: Goal[]) => {
     setClients(prevClients =>
       prevClients?.map(client =>
         client._id === clientId ? { ...client, goals: updatedGoals } : client
@@ -30,29 +30,33 @@ export default function EnterpriseClientsPage() {
     );
   };
 
-  const selectedClient = clients?.find(client => client._id === selectedClientId) || null;
+  const selectedClient =
+    clients?.find(client => client._id === selectedClientId) || null;
 
   const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen)
-  }
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
 
   const closeMobileSidebar = () => {
-    setIsMobileSidebarOpen(false)
-  }
+    setIsMobileSidebarOpen(false);
+  };
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="enterprise" className="h-full" />
       </div>
-      <DashboardSidebar 
-        userType="enterprise" 
-        className="h-full bg-background" 
+      <DashboardSidebar
+        userType="enterprise"
+        className="h-full bg-background"
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={closeMobileSidebar}
       />
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="enterprise" onToggleSidebar={toggleMobileSidebar} />
+        <DashboardHeader
+          userType="enterprise"
+          onToggleSidebar={toggleMobileSidebar}
+        />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex items-center gap-4">
             <Users className="h-6 w-6" />
@@ -61,7 +65,11 @@ export default function EnterpriseClientsPage() {
           <p className="text-sm text-muted-foreground">
             Gestiona y supervisa a los clientes registrados en la plataforma.
           </p>
-          <ClientsList clients={clients || []} onClientSelect={handleClientSelect} isAdmin={false} />
+          <ClientsList
+            clients={clients || []}
+            onClientSelect={handleClientSelect}
+            isAdmin={false}
+          />
         </main>
       </div>
       <ClientDetail
@@ -72,5 +80,5 @@ export default function EnterpriseClientsPage() {
         isAdmin={false}
       />
     </div>
-  )
+  );
 }

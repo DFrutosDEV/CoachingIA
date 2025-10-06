@@ -16,14 +16,14 @@ dayjs.extend(utc);
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const userType = searchParams.get('userType'); // 'coach', 'client', 'admin'
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const timezone = searchParams.get('timezone') || 'America/Buenos_Aires'; // Zona horaria del usuario
-    
+
     if (!userId) {
       return NextResponse.json(
         { error: 'User ID es requerido' },
@@ -32,7 +32,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener el perfil del usuario
-    const userProfile = await Profile.findOne({ user: userId, isDeleted: false });
+    const userProfile = await Profile.findOne({
+      user: userId,
+      isDeleted: false,
+    });
     if (!userProfile) {
       return NextResponse.json(
         { error: 'Perfil de usuario no encontrado' },
@@ -55,7 +58,7 @@ export async function GET(request: NextRequest) {
     if (startDate && endDate) {
       query.date = {
         $gte: new Date(startDate),
-        $lte: new Date(endDate)
+        $lte: new Date(endDate),
       };
     }
 
@@ -67,7 +70,7 @@ export async function GET(request: NextRequest) {
         populate: {
           path: 'user',
           model: User,
-        }
+        },
       })
       .populate({
         path: 'coachId',
@@ -75,7 +78,7 @@ export async function GET(request: NextRequest) {
         populate: {
           path: 'user',
           model: User,
-        }
+        },
       })
       .populate({
         path: 'objectiveId',
@@ -85,13 +88,17 @@ export async function GET(request: NextRequest) {
 
     // Transformar los datos para el calendario
     const calendarEvents = meets.map(meet => {
-      const clientName = `${meet.clientId?.name} ${meet.clientId?.lastName}` || 'Cliente desconocido';
-      const coachName = `${meet.coachId?.name} ${meet.coachId?.lastName}` || 'Coach desconocido';
+      const clientName =
+        `${meet.clientId?.name} ${meet.clientId?.lastName}` ||
+        'Cliente desconocido';
+      const coachName =
+        `${meet.coachId?.name} ${meet.coachId?.lastName}` ||
+        'Coach desconocido';
 
       // Convertir la fecha UTC a la zona horaria del usuario
       const utcDate = new Date(meet.date);
       const zonedDate = toZonedTime(utcDate, timezone);
-      
+
       // Crear fecha de inicio y fin (1 hora de duración por defecto)
       const startDate = new Date(zonedDate);
       const endDate = new Date(zonedDate.getTime() + 60 * 60 * 1000); // +1 hora
@@ -105,20 +112,19 @@ export async function GET(request: NextRequest) {
         client: clientName,
         coach: coachName,
         link: meet.link,
-        time: zonedDate.toLocaleTimeString(getBrowserLocale(), { 
-          hour: '2-digit', 
+        time: zonedDate.toLocaleTimeString(getBrowserLocale(), {
+          hour: '2-digit',
           minute: '2-digit',
-          hour12: false 
+          hour12: false,
         }),
-        objectiveTitle: meet.objectiveId.title
+        objectiveTitle: meet.objectiveId.title,
       };
     });
 
     return NextResponse.json({
       success: true,
-      events: calendarEvents
+      events: calendarEvents,
     });
-
   } catch (error) {
     console.error('Error al obtener sesiones del calendario:', error);
     return NextResponse.json(
@@ -126,4 +132,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

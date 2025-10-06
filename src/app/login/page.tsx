@@ -1,28 +1,34 @@
-"use client"
+'use client';
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@mui/material"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
-import { useAuthService } from "@/lib/services/auth-service"
-import { toast } from "sonner"
-import { useAuth } from "@/hooks/useAuth"
-import { getStoredToken, getTokenData } from "@/lib/token-utils"
+import type React from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from '@mui/material';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { useAuthService } from '@/lib/services/auth-service';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import { getStoredToken, getTokenData } from '@/lib/token-utils';
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { login, logout } = useAuthService()
-  const { isAuthenticated, user } = useAuth()
+  const router = useRouter();
+  const { login, logout } = useAuthService();
+  const { isAuthenticated, user } = useAuth();
 
   // Estados para manejar el formulario y "Recuérdame"
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Cargar email guardado al montar el componente
   useEffect(() => {
@@ -30,70 +36,72 @@ export default function LoginPage() {
       // Solo acceder a localStorage en el cliente
       if (typeof window !== 'undefined') {
         // 1. Primero verificar si hay un token almacenado
-        const storedToken = getStoredToken()
-        
+        const storedToken = getStoredToken();
+
         if (storedToken) {
           // 2. Verificar si el token es válido y no ha expirado
-          const tokenData = getTokenData(storedToken)
-          
+          const tokenData = getTokenData(storedToken);
+
           if (!tokenData) {
             // Token inválido o expirado - desloguear al usuario
-            console.log('❌ Token inválido o expirado, deslogueando usuario')
-            await logout()
-            toast.error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
-            return
+            console.log('❌ Token inválido o expirado, deslogueando usuario');
+            await logout();
+            toast.error(
+              'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'
+            );
+            return;
           }
         }
 
         // 3. Solo después de verificar el token, verificar si está autenticado
         if (isAuthenticated && user) {
-          router.push(`/dashboard/${user.role.name.toLowerCase()}`)
-          return
+          router.push(`/dashboard/${user.role.name.toLowerCase()}`);
+          return;
         }
 
         // 4. Cargar email guardado si no está autenticado
-        const savedEmail = localStorage.getItem("rememberedEmail")
+        const savedEmail = localStorage.getItem('rememberedEmail');
         if (savedEmail) {
-          setEmail(savedEmail)
-          setRememberMe(true)
+          setEmail(savedEmail);
+          setRememberMe(true);
         }
       }
-    }
+    };
 
-    checkTokenAndAuth()
-  }, [isAuthenticated, user, router, logout])
+    checkTokenAndAuth();
+  }, [isAuthenticated, user, router, logout]);
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const result = await login(email, password)
-    
+    const result = await login(email, password);
+
     if (result.success) {
-      toast.success("Iniciando sesión...")
-      
+      toast.success('Iniciando sesión...');
+
       // Manejar localStorage según el estado de "Recuérdame"
       if (rememberMe) {
-        localStorage.setItem("rememberedEmail", email)
+        localStorage.setItem('rememberedEmail', email);
       } else {
-        localStorage.removeItem("rememberedEmail")
+        localStorage.removeItem('rememberedEmail');
       }
 
       if (result.success && 'user' in result && result.user) {
-        const user = result.user
+        const user = result.user;
         setTimeout(() => {
           // Determinar la ruta basada en el primer rol o el rol principal
-          const primaryRole = user.role?.name?.toLowerCase() || 'client'
-          router.push(`/dashboard/${primaryRole}`)
-        }, 1000)
+          const primaryRole = user.role?.name?.toLowerCase() || 'client';
+          router.push(`/dashboard/${primaryRole}`);
+        }, 1000);
       }
     } else {
       if (result.error) {
-        toast.error(result.error)
+        toast.error(result.error);
       } else {
-        toast.error("Error al iniciar sesión")
+        toast.error('Error al iniciar sesión');
       }
     }
-  }
+  };
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center mx-auto">
@@ -102,15 +110,21 @@ export default function LoginPage() {
       </Link>
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Bienvenido a CoachingIA</h1>
-          <p className="text-sm text-muted-foreground">Ingresa tus credenciales para acceder a tu cuenta</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Bienvenido a CoachingIA
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Ingresa tus credenciales para acceder a tu cuenta
+          </p>
         </div>
         <Tabs defaultValue="login" className="w-full">
           <TabsContent value="login">
             <Card>
               <CardHeader>
                 <CardTitle>Iniciar Sesión</CardTitle>
-                <CardDescription>Ingresa tus datos para acceder a tu cuenta</CardDescription>
+                <CardDescription>
+                  Ingresa tus datos para acceder a tu cuenta
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -125,7 +139,7 @@ export default function LoginPage() {
                       autoComplete="email"
                       autoCorrect="off"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -138,7 +152,7 @@ export default function LoginPage() {
                       name="password"
                       type="password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={e => setPassword(e.target.value)}
                       required
                     />
                   </div>
@@ -147,10 +161,13 @@ export default function LoginPage() {
                       type="checkbox"
                       id="rememberMe"
                       checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
+                      onChange={e => setRememberMe(e.target.checked)}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
-                    <Label htmlFor="rememberMe" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    <Label
+                      htmlFor="rememberMe"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
                       Recuérdame
                     </Label>
                   </div>
@@ -164,5 +181,5 @@ export default function LoginPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

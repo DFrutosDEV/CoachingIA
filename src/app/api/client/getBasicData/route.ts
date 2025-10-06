@@ -11,10 +11,10 @@ import { formatDate } from '@/utils/validatesInputs';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('clientId');
-    
+
     if (!clientId) {
       return NextResponse.json(
         { error: 'Client ID es requerido' },
@@ -32,7 +32,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener el perfil del cliente
-    const clientProfile = await Profile.findOne({ user: clientId, isDeleted: false });
+    const clientProfile = await Profile.findOne({
+      user: clientId,
+      isDeleted: false,
+    });
     if (!clientProfile) {
       return NextResponse.json(
         { error: 'Perfil del cliente no encontrado' },
@@ -44,108 +47,111 @@ export async function GET(request: NextRequest) {
     const nextSession = await Meet.findOne({
       clientId: clientProfile._id,
       isCancelled: false,
-      date: { $gte: new Date() }
+      date: { $gte: new Date() },
     })
-    .populate({
-      path: 'coachId',
-      model: Profile,
-      populate: {
-        path: 'user',
-        model: User,
-        select: 'email isDeleted createdAt'
-      }
-    })
-    .populate({
-      path: 'objectiveId',
-      model: Objective,
-      select: 'title'
-    })
-    .sort({ date: 1, time: 1 })
-    .limit(1);
+      .populate({
+        path: 'coachId',
+        model: Profile,
+        populate: {
+          path: 'user',
+          model: User,
+          select: 'email isDeleted createdAt',
+        },
+      })
+      .populate({
+        path: 'objectiveId',
+        model: Objective,
+        select: 'title',
+      })
+      .sort({ date: 1, time: 1 })
+      .limit(1);
 
     // Contar sesiones completadas (meets que ya pasaron y no están canceladas)
     const completedSessions = await Meet.countDocuments({
       clientId: clientProfile._id,
       isCancelled: false,
-      date: { $lt: new Date() }
+      date: { $lt: new Date() },
     });
 
     // Contar sesiones completadas este mes
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
-    
+
     const completedSessionsThisMonth = await Meet.countDocuments({
       clientId: clientProfile._id,
       isCancelled: false,
-      date: { $gte: startOfMonth, $lt: new Date() }
+      date: { $gte: startOfMonth, $lt: new Date() },
     });
 
     // Obtener objetivos del cliente
     const totalObjectives = await Objective.countDocuments({
-      clientId: clientProfile._id
+      clientId: clientProfile._id,
     });
 
     const completedObjectives = await Objective.countDocuments({
       clientId: clientProfile._id,
-      isCompleted: true
+      isCompleted: true,
     });
 
     // Obtener próximas sesiones (próximas 5 sesiones)
     const upcomingSessions = await Meet.find({
       clientId: clientProfile._id,
       isCancelled: false,
-      date: { $gte: new Date() }
+      date: { $gte: new Date() },
     })
-    .populate({
-      path: 'coachId',
-      populate: {
-        path: 'user',
-        select: 'name lastName'
-      }
-    })
-    .populate('objectiveId', 'title')
-    .sort({ date: 1, time: 1 })
-    .limit(5);
+      .populate({
+        path: 'coachId',
+        populate: {
+          path: 'user',
+          select: 'name lastName',
+        },
+      })
+      .populate('objectiveId', 'title')
+      .sort({ date: 1, time: 1 })
+      .limit(5);
 
     // Obtener Goals del cliente para la card de objetivos
     const clientGoals = await Goal.find({
       clientId: clientProfile._id,
-      isDeleted: false
+      isDeleted: false,
     })
-    .populate({
-      path: 'objectiveId',
-      model: Objective,
-      select: 'title'
-    })
-    .sort({ createdAt: -1 });
+      .populate({
+        path: 'objectiveId',
+        model: Objective,
+        select: 'title',
+      })
+      .sort({ createdAt: -1 });
 
     // Obtener los últimos 5 Objectives del cliente para la card de progreso
     const clientObjectives = await Objective.find({
-      clientId: clientProfile._id
+      clientId: clientProfile._id,
     })
-    .sort({ createdAt: -1 })
-    .limit(5);
+      .sort({ createdAt: -1 })
+      .limit(5);
 
     // Calcular progreso de cada Objective basado en sus Goals
     const objectivesWithProgress = await Promise.all(
-      clientObjectives.map(async (objective) => {
+      clientObjectives.map(async objective => {
         const objectiveGoals = await Goal.find({
           objectiveId: objective._id,
           clientId: clientProfile._id,
-          isDeleted: false
+          isDeleted: false,
         });
 
         const totalGoals = objectiveGoals.length;
-        const completedGoals = objectiveGoals.filter(goal => goal.isCompleted).length;
-        const progress = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+        const completedGoals = objectiveGoals.filter(
+          goal => goal.isCompleted
+        ).length;
+        const progress =
+          totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
 
         return {
           title: objective.title,
           progress: Math.round(progress),
           totalGoals,
           completedGoals,
-          hasGoals: totalGoals > 0
+          hasGoals: totalGoals > 0,
         };
       })
     );
@@ -153,35 +159,41 @@ export async function GET(request: NextRequest) {
     // Transformar las próximas sesiones al formato esperado
     const formattedUpcomingSessions = upcomingSessions.map(session => ({
       date: `${formatDate(new Date(session.date), {
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long' 
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
       })}, ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
       coach: `${session.coachId.name} ${session.coachId.lastName}`,
-      topic: session.objectiveId?.title || 'Sin objetivo definido'
+      topic: session.objectiveId?.title || 'Sin objetivo definido',
     }));
 
     // Formatear la próxima sesión
-    const formattedNextSession = nextSession ? {
-      date: nextSession.date,
-      link: nextSession.link,
-      time: new Date(nextSession.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      coach: `${nextSession.coachId.name} ${nextSession.coachId.lastName}`,
-      topic: nextSession.objectiveId?.title || 'Sin objetivo definido'
-    } : null;
+    const formattedNextSession = nextSession
+      ? {
+          date: nextSession.date,
+          link: nextSession.link,
+          time: new Date(nextSession.date).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          }),
+          coach: `${nextSession.coachId.name} ${nextSession.coachId.lastName}`,
+          topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
+        }
+      : null;
 
     // Transformar los Goals al formato esperado para la card de progreso
     const goalsWithProgress = clientGoals.map(goal => ({
       goal: goal.description,
       progress: goal.isCompleted ? 100 : 0,
-      objectiveTitle: goal.objectiveId?.title || 'Sin objetivo'
+      objectiveTitle: goal.objectiveId?.title || 'Sin objetivo',
     }));
 
     // Transformar los Goals para la card de objetivos
     const formattedClientGoals = clientGoals.map(goal => ({
       description: goal.description,
       isCompleted: goal.isCompleted,
-      objectiveTitle: goal.objectiveId?.title || 'Sin objetivo'
+      objectiveTitle: goal.objectiveId?.title || 'Sin objetivo',
     }));
 
     return NextResponse.json({
@@ -196,10 +208,9 @@ export async function GET(request: NextRequest) {
         goalsWithProgress,
         clientGoals: formattedClientGoals,
         hasGoals: clientGoals.length > 0,
-        objectivesWithProgress
-      }
+        objectivesWithProgress,
+      },
     });
-
   } catch (error) {
     console.error('Error al obtener datos básicos del cliente:', error);
     return NextResponse.json(
@@ -207,4 +218,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

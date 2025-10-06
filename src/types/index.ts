@@ -86,7 +86,7 @@ export interface ClientResponse {
   nextSession: NextSession;
   lastSession: NextSession;
   progress: number;
-  status: "active" | "pending" | "inactive";
+  status: 'active' | 'pending' | 'inactive';
   focus: string;
   avatar: string;
   bio: string;
@@ -192,7 +192,7 @@ export interface Coach {
 export interface ClientDetailProps {
   client: ClientResponse | null;
   isOpen: boolean;
-  onClose: () => void;  
+  onClose: () => void;
   onUpdateClient: (clientId: string, updatedGoals: Goal[]) => void;
   isAdmin: boolean;
 }
@@ -240,4 +240,4 @@ export interface ReportResponse {
   response: string;
   responseBy: string;
   responseDate: string;
-} 
+}

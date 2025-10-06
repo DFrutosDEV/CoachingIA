@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@mui/material"
+import { useState } from 'react';
+import { Button } from '@mui/material';
 import {
   Dialog,
   DialogContent,
@@ -10,34 +10,36 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { CheckCircle, Loader2 } from "lucide-react"
-import { toast } from "sonner"
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { CheckCircle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface FinalizeObjectiveModalProps {
-  objectiveId: string
-  objectiveTitle: string
-  onObjectiveFinalized?: () => void
+  objectiveId: string;
+  objectiveTitle: string;
+  onObjectiveFinalized?: () => void;
 }
 
-export function FinalizeObjectiveModal({ 
-  objectiveId, 
-  objectiveTitle, 
-  onObjectiveFinalized 
+export function FinalizeObjectiveModal({
+  objectiveId,
+  objectiveTitle,
+  onObjectiveFinalized,
 }: FinalizeObjectiveModalProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [feedback, setFeedback] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFinalizeObjective = async () => {
     if (!feedback.trim()) {
-      toast.error("Por favor ingresa un feedback antes de finalizar el objetivo")
-      return
+      toast.error(
+        'Por favor ingresa un feedback antes de finalizar el objetivo'
+      );
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const response = await fetch('/api/objective/finalize', {
@@ -47,33 +49,33 @@ export function FinalizeObjectiveModal({
         },
         body: JSON.stringify({
           objectiveId,
-          feedback: feedback.trim()
+          feedback: feedback.trim(),
         }),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        toast.success('Objetivo finalizado exitosamente')
-        setIsOpen(false)
-        setFeedback("")
-        onObjectiveFinalized?.()
+        toast.success('Objetivo finalizado exitosamente');
+        setIsOpen(false);
+        setFeedback('');
+        onObjectiveFinalized?.();
       } else {
-        toast.error(`Error: ${result.error}`)
+        toast.error(`Error: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error finalizando objetivo:', error)
-      toast.error('Error interno del servidor')
+      console.error('Error finalizando objetivo:', error);
+      toast.error('Error interno del servidor');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="outlined" 
+        <Button
+          variant="outlined"
           color="success"
           startIcon={<CheckCircle />}
           size="small"
@@ -85,7 +87,8 @@ export function FinalizeObjectiveModal({
         <DialogHeader>
           <DialogTitle>Finalizar Objetivo</DialogTitle>
           <DialogDescription>
-            Proporciona un feedback final para el objetivo: <strong>"{objectiveTitle}"</strong>
+            Proporciona un feedback final para el objetivo:{' '}
+            <strong>"{objectiveTitle}"</strong>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -95,7 +98,7 @@ export function FinalizeObjectiveModal({
               id="feedback"
               placeholder="Describe el progreso del cliente, logros alcanzados, áreas de mejora y recomendaciones para el futuro..."
               value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              onChange={e => setFeedback(e.target.value)}
               rows={6}
               maxLength={500}
             />
@@ -105,25 +108,31 @@ export function FinalizeObjectiveModal({
           </div>
         </div>
         <DialogFooter className="flex justify-end gap-2">
-          <Button 
-            variant="outlined" 
+          <Button
+            variant="outlined"
             onClick={() => {
-              setIsOpen(false)
-              setFeedback("")
+              setIsOpen(false);
+              setFeedback('');
             }}
             disabled={isSubmitting}
           >
             Cancelar
           </Button>
-          <Button 
+          <Button
             onClick={handleFinalizeObjective}
             disabled={isSubmitting || !feedback.trim()}
-            startIcon={isSubmitting ? <Loader2 className="animate-spin" /> : <CheckCircle />}
+            startIcon={
+              isSubmitting ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <CheckCircle />
+              )
+            }
           >
             {isSubmitting ? 'Finalizando...' : 'Finalizar Objetivo'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

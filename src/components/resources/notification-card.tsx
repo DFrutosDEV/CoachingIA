@@ -1,8 +1,15 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@mui/material"
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@mui/material';
 import {
   Dialog,
   DialogContent,
@@ -11,179 +18,198 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 // Usar input checkbox nativo en lugar de componente personalizado
-import { Bell, ArrowRight, X } from "lucide-react"
-import { useAppSelector } from "@/lib/redux/hooks"
+import { Bell, ArrowRight, X } from 'lucide-react';
+import { useAppSelector } from '@/lib/redux/hooks';
 
-import { toast } from "sonner"
+import { toast } from 'sonner';
 
 interface NotificationCardProps {
-  userType: "coach" | "enterprise" | "admin"
+  userType: 'coach' | 'enterprise' | 'admin';
 }
 
 export function NotificationCard({ userType }: NotificationCardProps) {
-  const [showNotificationDialog, setShowNotificationDialog] = useState(false)
-  
+  const [showNotificationDialog, setShowNotificationDialog] = useState(false);
+
   // Estados para el autocompletado de notificaciones
-  const [recipientSearch, setRecipientSearch] = useState("")
-  const [selectedRecipients, setSelectedRecipients] = useState<{id: string, name: string}[]>([])
-  const [showRecipientSuggestions, setShowRecipientSuggestions] = useState(false)
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  
+  const [recipientSearch, setRecipientSearch] = useState('');
+  const [selectedRecipients, setSelectedRecipients] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [showRecipientSuggestions, setShowRecipientSuggestions] =
+    useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   // Estados para los checkboxes de notificaciones masivas
   const [massNotificationChecks, setMassNotificationChecks] = useState({
-    allClients: false,      // Para coach: notificar a todos sus clientes
-    allCoaches: false,      // Para admin: notificar a todos los coaches
-    allUsers: false         // Para admin: notificar a todos los usuarios
-  })
-  
+    allClients: false, // Para coach: notificar a todos sus clientes
+    allCoaches: false, // Para admin: notificar a todos los coaches
+    allUsers: false, // Para admin: notificar a todos los usuarios
+  });
+
   // Obtener usuario autenticado y datos del estado global
-  const user = useAppSelector(state => state.auth.user)
-  
+  const user = useAppSelector(state => state.auth.user);
+
   // Estados para el formulario de notificación
   const [notificationForm, setNotificationForm] = useState({
     title: '',
-    message: ''
-  })
-  
-  const [isSendingNotification, setIsSendingNotification] = useState(false)
+    message: '',
+  });
+
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
 
   // Función para buscar usuarios en el endpoint
   const searchUsers = async (query: string) => {
     if (query.length < 3) {
-      setSearchResults([])
-      setShowRecipientSuggestions(false)
-      return
+      setSearchResults([]);
+      setShowRecipientSuggestions(false);
+      return;
     }
 
-    setIsSearching(true)
+    setIsSearching(true);
     try {
-      const response = await fetch(`/api/coach/search?search=${encodeURIComponent(query)}&coachId=${user?.profile?._id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await fetch(
+        `/api/coach/search?search=${encodeURIComponent(query)}&coachId=${user?.profile?._id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json();
         if (result.success) {
           // Filtrar usuarios que ya están seleccionados
-          const filteredUsers = (result.users || []).filter((user: any) => 
-            !selectedRecipients.some(recipient => recipient.id === user._id)
-          )
-          setSearchResults(filteredUsers)
-          setShowRecipientSuggestions(true)
+          const filteredUsers = (result.users || []).filter(
+            (user: any) =>
+              !selectedRecipients.some(recipient => recipient.id === user._id)
+          );
+          setSearchResults(filteredUsers);
+          setShowRecipientSuggestions(true);
         } else {
-          setSearchResults([])
-          setShowRecipientSuggestions(false)
+          setSearchResults([]);
+          setShowRecipientSuggestions(false);
         }
       }
     } catch (error) {
-      console.error('Error al buscar usuarios:', error)
-      setSearchResults([])
-      setShowRecipientSuggestions(false)
+      console.error('Error al buscar usuarios:', error);
+      setSearchResults([]);
+      setShowRecipientSuggestions(false);
     } finally {
-      setIsSearching(false)
+      setIsSearching(false);
     }
-  }
+  };
 
   // Debounce para la búsqueda
   const debounceSearch = (() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: NodeJS.Timeout;
     return (query: string) => {
-      clearTimeout(timeoutId)
-      timeoutId = setTimeout(() => searchUsers(query), 300)
-    }
-  })()
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => searchUsers(query), 300);
+    };
+  })();
 
   const handleRecipientInputChange = (value: string) => {
-    setRecipientSearch(value)
-    
+    setRecipientSearch(value);
+
     if (value.length >= 3) {
-      debounceSearch(value)
+      debounceSearch(value);
     } else {
-      setShowRecipientSuggestions(false)
-      setSearchResults([])
+      setShowRecipientSuggestions(false);
+      setSearchResults([]);
     }
-  }
+  };
 
   const handleRecipientSelect = (user: any) => {
-    const newRecipient = { id: user._id, name: `${user.name} ${user.lastName}` }
-    setSelectedRecipients(prev => [...prev, newRecipient])
-    setRecipientSearch("")
-    setShowRecipientSuggestions(false)
-    setSearchResults([])
-  }
+    const newRecipient = {
+      id: user._id,
+      name: `${user.name} ${user.lastName}`,
+    };
+    setSelectedRecipients(prev => [...prev, newRecipient]);
+    setRecipientSearch('');
+    setShowRecipientSuggestions(false);
+    setSearchResults([]);
+  };
 
   const handleRemoveRecipient = (recipientId: string) => {
-    setSelectedRecipients(prev => prev.filter(recipient => recipient.id !== recipientId))
-  }
+    setSelectedRecipients(prev =>
+      prev.filter(recipient => recipient.id !== recipientId)
+    );
+  };
 
-  const handleMassNotificationChange = (checkType: keyof typeof massNotificationChecks, checked: boolean) => {
+  const handleMassNotificationChange = (
+    checkType: keyof typeof massNotificationChecks,
+    checked: boolean
+  ) => {
     setMassNotificationChecks(prev => ({
       ...prev,
-      [checkType]: checked
-    }))
-    
+      [checkType]: checked,
+    }));
+
     // Si se activa un checkbox masivo, limpiar selecciones individuales
     if (checked) {
-      setSelectedRecipients([])
-      setRecipientSearch("")
-      setShowRecipientSuggestions(false)
-      setSearchResults([])
+      setSelectedRecipients([]);
+      setRecipientSearch('');
+      setShowRecipientSuggestions(false);
+      setSearchResults([]);
     }
-  }
+  };
 
   const handleNotificationFormChange = (field: string, value: string) => {
     setNotificationForm(prev => ({
       ...prev,
-      [field]: value
-    }))
-  }
+      [field]: value,
+    }));
+  };
 
   const handleSendNotification = async () => {
     // Verificar que haya destinatarios seleccionados o checkboxes activos
-    const hasIndividualRecipients = selectedRecipients.length > 0
-    const hasMassNotification = Object.values(massNotificationChecks).some(check => check)
-    
+    const hasIndividualRecipients = selectedRecipients.length > 0;
+    const hasMassNotification = Object.values(massNotificationChecks).some(
+      check => check
+    );
+
     if (!hasIndividualRecipients && !hasMassNotification) {
-      toast.error('Por favor selecciona al menos un destinatario o una opción de notificación masiva')
-      return
+      toast.error(
+        'Por favor selecciona al menos un destinatario o una opción de notificación masiva'
+      );
+      return;
     }
 
     if (!notificationForm.title || !notificationForm.message) {
-      toast.error('Por favor completa el título y mensaje')
-      return
+      toast.error('Por favor completa el título y mensaje');
+      return;
     }
 
     if (!user?._id) {
-      toast.error('No se pudo identificar al usuario autenticado')
-      return
+      toast.error('No se pudo identificar al usuario autenticado');
+      return;
     }
 
-    setIsSendingNotification(true)
+    setIsSendingNotification(true);
 
     try {
       const requestBody: any = {
         title: notificationForm.title,
         description: notificationForm.message,
-        profileId: user.profile?._id
-      }
+        profileId: user.profile?._id,
+      };
 
       // Agregar destinatarios individuales si existen
       if (hasIndividualRecipients) {
-        requestBody.recipients = selectedRecipients.map(r => r.id)
+        requestBody.recipients = selectedRecipients.map(r => r.id);
       }
 
       // Agregar configuración de notificaciones masivas
       if (hasMassNotification) {
-        requestBody.massNotification = massNotificationChecks
+        requestBody.massNotification = massNotificationChecks;
       }
 
       const response = await fetch('/api/notification', {
@@ -192,47 +218,47 @@ export function NotificationCard({ userType }: NotificationCardProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        toast.success(result.message)
-        setShowNotificationDialog(false)
+        toast.success(result.message);
+        setShowNotificationDialog(false);
         // Resetear formulario
-        setNotificationForm({ title: '', message: '' })
-        setRecipientSearch("")
-        setSelectedRecipients([])
-        setShowRecipientSuggestions(false)
-        setSearchResults([])
+        setNotificationForm({ title: '', message: '' });
+        setRecipientSearch('');
+        setSelectedRecipients([]);
+        setShowRecipientSuggestions(false);
+        setSearchResults([]);
         setMassNotificationChecks({
           allClients: false,
           allCoaches: false,
-          allUsers: false
-        })
+          allUsers: false,
+        });
       } else {
-        toast.error(`Error: ${result.error}`)
+        toast.error(`Error: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error enviando notificación:', error)
-      toast.error('Error interno del servidor')
+      console.error('Error enviando notificación:', error);
+      toast.error('Error interno del servidor');
     } finally {
-      setIsSendingNotification(false)
+      setIsSendingNotification(false);
     }
-  }
+  };
 
   const resetForm = () => {
-    setNotificationForm({ title: '', message: '' })
-    setRecipientSearch("")
-    setSelectedRecipients([])
-    setShowRecipientSuggestions(false)
-    setSearchResults([])
+    setNotificationForm({ title: '', message: '' });
+    setRecipientSearch('');
+    setSelectedRecipients([]);
+    setShowRecipientSuggestions(false);
+    setSearchResults([]);
     setMassNotificationChecks({
       allClients: false,
       allCoaches: false,
-      allUsers: false
-    })
-  }
+      allUsers: false,
+    });
+  };
 
   return (
     <Card className="flex flex-col">
@@ -242,7 +268,8 @@ export function NotificationCard({ userType }: NotificationCardProps) {
         </div>
         <CardTitle className="mt-4">Notificaciones</CardTitle>
         <CardDescription>
-          Envía notificaciones a tus clientes sobre sesiones, recordatorios o información importante.
+          Envía notificaciones a tus clientes sobre sesiones, recordatorios o
+          información importante.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
@@ -262,7 +289,10 @@ export function NotificationCard({ userType }: NotificationCardProps) {
         </ul>
       </CardContent>
       <CardFooter>
-        <Dialog open={showNotificationDialog} onOpenChange={setShowNotificationDialog}>
+        <Dialog
+          open={showNotificationDialog}
+          onOpenChange={setShowNotificationDialog}
+        >
           <DialogTrigger asChild>
             <Button variant="outlined" className="w-full">
               Crear Notificación
@@ -272,53 +302,72 @@ export function NotificationCard({ userType }: NotificationCardProps) {
             <DialogHeader>
               <DialogTitle>Crear Notificación</DialogTitle>
               <DialogDescription>
-                Envía una notificación a {userType === "coach" ? "tus clientes" : "usuarios del sistema"}.
+                Envía una notificación a{' '}
+                {userType === 'coach' ? 'tus clientes' : 'usuarios del sistema'}
+                .
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               {/* Checkboxes para notificaciones masivas */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Notificaciones Masivas</Label>
-                
+                <Label className="text-sm font-medium">
+                  Notificaciones Masivas
+                </Label>
+
                 {/* Checkbox para coach: notificar a todos sus clientes */}
-                {userType === "coach" && (
+                {userType === 'coach' && (
                   <div className="flex items-center space-x-2">
-                                         <input
-                       type="checkbox"
-                       id="allClients"
-                       checked={massNotificationChecks.allClients}
-                       onChange={(e) => handleMassNotificationChange('allClients', e.target.checked)}
-                       className="h-4 w-4 rounded border-2 border-border"
-                     />
+                    <input
+                      type="checkbox"
+                      id="allClients"
+                      checked={massNotificationChecks.allClients}
+                      onChange={e =>
+                        handleMassNotificationChange(
+                          'allClients',
+                          e.target.checked
+                        )
+                      }
+                      className="h-4 w-4 rounded border-2 border-border"
+                    />
                     <Label htmlFor="allClients" className="text-sm">
                       Notificar a todos mis clientes
                     </Label>
                   </div>
                 )}
-                
+
                 {/* Checkboxes para admin */}
-                {userType === "admin" && (
+                {userType === 'admin' && (
                   <>
-                                         <div className="flex items-center space-x-2">
-                       <input
-                         type="checkbox"
-                         id="allCoaches"
-                         checked={massNotificationChecks.allCoaches}
-                         onChange={(e) => handleMassNotificationChange('allCoaches', e.target.checked)}
-                         className="h-4 w-4 rounded border-2 border-border"
-                       />
-                       <Label htmlFor="allCoaches" className="text-sm">
-                         Notificar a todos los coaches
-                       </Label>
-                     </div>
-                     <div className="flex items-center space-x-2">
-                       <input
-                         type="checkbox"
-                         id="allUsers"
-                         checked={massNotificationChecks.allUsers}
-                         onChange={(e) => handleMassNotificationChange('allUsers', e.target.checked)}
-                         className="h-4 w-4 rounded border-2 border-border"
-                       />
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="allCoaches"
+                        checked={massNotificationChecks.allCoaches}
+                        onChange={e =>
+                          handleMassNotificationChange(
+                            'allCoaches',
+                            e.target.checked
+                          )
+                        }
+                        className="h-4 w-4 rounded border-2 border-border"
+                      />
+                      <Label htmlFor="allCoaches" className="text-sm">
+                        Notificar a todos los coaches
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="allUsers"
+                        checked={massNotificationChecks.allUsers}
+                        onChange={e =>
+                          handleMassNotificationChange(
+                            'allUsers',
+                            e.target.checked
+                          )
+                        }
+                        className="h-4 w-4 rounded border-2 border-border"
+                      />
                       <Label htmlFor="allUsers" className="text-sm">
                         Notificar a todos los usuarios
                       </Label>
@@ -335,58 +384,83 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">O seleccionar individualmente</span>
+                      <span className="bg-background px-2 text-muted-foreground">
+                        O seleccionar individualmente
+                      </span>
                     </div>
                   </div>
 
                   {/* Selección individual de destinatarios */}
                   <div className="grid gap-2 relative">
                     <Label htmlFor="recipient">Destinatarios</Label>
-                    <Input 
-                      id="recipient" 
+                    <Input
+                      id="recipient"
                       placeholder="Escribe 3 letras para empezar a buscar..."
                       value={recipientSearch}
-                      onChange={(e) => handleRecipientInputChange(e.target.value)}
-                      onFocus={() => recipientSearch.length >= 3 && setShowRecipientSuggestions(true)}
+                      onChange={e => handleRecipientInputChange(e.target.value)}
+                      onFocus={() =>
+                        recipientSearch.length >= 3 &&
+                        setShowRecipientSuggestions(true)
+                      }
                     />
                     {isSearching && (
                       <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
-                        <div className="text-sm text-muted-foreground">Buscando usuarios...</div>
+                        <div className="text-sm text-muted-foreground">
+                          Buscando usuarios...
+                        </div>
                       </div>
                     )}
-                    {showRecipientSuggestions && searchResults.length > 0 && !isSearching && (
-                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
-                        {searchResults.map((searchUser) => (
-                          <div
-                            key={searchUser._id}
-                            className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
-                            onClick={() => handleRecipientSelect(searchUser)}
-                          >
-                            <div className="font-medium text-foreground">{searchUser.name} {searchUser.lastName}</div>
-                            <div className="text-sm text-muted-foreground">{searchUser.email}</div>
+                    {showRecipientSuggestions &&
+                      searchResults.length > 0 &&
+                      !isSearching && (
+                        <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                          {searchResults.map(searchUser => (
+                            <div
+                              key={searchUser._id}
+                              className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
+                              onClick={() => handleRecipientSelect(searchUser)}
+                            >
+                              <div className="font-medium text-foreground">
+                                {searchUser.name} {searchUser.lastName}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {searchUser.email}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    {recipientSearch.length >= 3 &&
+                      searchResults.length === 0 &&
+                      showRecipientSuggestions &&
+                      !isSearching && (
+                        <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
+                          <div className="text-sm text-muted-foreground">
+                            No se encontraron usuarios
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    {recipientSearch.length >= 3 && searchResults.length === 0 && showRecipientSuggestions && !isSearching && (
-                      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
-                        <div className="text-sm text-muted-foreground">No se encontraron usuarios</div>
-                      </div>
-                    )}
+                        </div>
+                      )}
                   </div>
 
                   {/* Lista de destinatarios seleccionados */}
                   {selectedRecipients.length > 0 && (
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Destinatarios seleccionados:</Label>
+                      <Label className="text-sm font-medium">
+                        Destinatarios seleccionados:
+                      </Label>
                       <div className="space-y-1">
-                        {selectedRecipients.map((recipient) => (
-                          <div key={recipient.id} className="flex items-center justify-between p-2 bg-accent rounded-md">
+                        {selectedRecipients.map(recipient => (
+                          <div
+                            key={recipient.id}
+                            className="flex items-center justify-between p-2 bg-accent rounded-md"
+                          >
                             <span className="text-sm">{recipient.name}</span>
                             <Button
                               size="small"
                               variant="text"
-                              onClick={() => handleRemoveRecipient(recipient.id)}
+                              onClick={() =>
+                                handleRemoveRecipient(recipient.id)
+                              }
                               className="h-6 w-6 p-0 min-w-0"
                             >
                               <X className="h-3 w-3" />
@@ -401,35 +475,39 @@ export function NotificationCard({ userType }: NotificationCardProps) {
 
               <div className="grid gap-2">
                 <Label htmlFor="title">Título</Label>
-                <Input 
-                  id="title" 
+                <Input
+                  id="title"
                   placeholder="Título de la notificación"
                   value={notificationForm.title}
-                  onChange={(e) => handleNotificationFormChange('title', e.target.value)}
+                  onChange={e =>
+                    handleNotificationFormChange('title', e.target.value)
+                  }
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="message">Mensaje</Label>
-                <Textarea 
-                  id="message" 
+                <Textarea
+                  id="message"
                   placeholder="Escribe tu mensaje aquí..."
                   value={notificationForm.message}
-                  onChange={(e) => handleNotificationFormChange('message', e.target.value)}
+                  onChange={e =>
+                    handleNotificationFormChange('message', e.target.value)
+                  }
                 />
               </div>
             </div>
             <DialogFooter className="flex justify-end gap-2">
-              <Button 
-                variant="outlined" 
+              <Button
+                variant="outlined"
                 onClick={() => {
-                  setShowNotificationDialog(false)
-                  resetForm()
+                  setShowNotificationDialog(false);
+                  resetForm();
                 }}
                 disabled={isSendingNotification}
               >
                 Cancelar
               </Button>
-              <Button 
+              <Button
                 onClick={handleSendNotification}
                 disabled={isSendingNotification}
               >
@@ -440,5 +518,5 @@ export function NotificationCard({ userType }: NotificationCardProps) {
         </Dialog>
       </CardFooter>
     </Card>
-  )
-} 
+  );
+}

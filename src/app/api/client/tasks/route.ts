@@ -12,10 +12,10 @@ import User from '@/models/User';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get('profileId');
-    
+
     if (!profileId) {
       return NextResponse.json(
         { error: 'Profile ID es requerido' },
@@ -24,7 +24,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener el perfil del cliente
-    const clientProfile = await Profile.findOne({ _id: profileId, isDeleted: false });
+    const clientProfile = await Profile.findOne({
+      _id: profileId,
+      isDeleted: false,
+    });
     if (!clientProfile) {
       return NextResponse.json(
         { error: 'Perfil del cliente no encontrado' },
@@ -36,15 +39,15 @@ export async function GET(request: NextRequest) {
     const activeObjective = await Objective.findOne({
       clientId: clientProfile._id,
       active: true,
-      isCompleted: false
+      isCompleted: false,
     }).populate({
       path: 'coachId',
       model: Profile,
       populate: {
         path: 'user',
         model: User,
-        select: 'name lastName'
-      }
+        select: 'name lastName',
+      },
     });
 
     // Si no hay objetivo activo, buscar el último completado
@@ -52,18 +55,18 @@ export async function GET(request: NextRequest) {
     if (!currentObjective) {
       currentObjective = await Objective.findOne({
         clientId: clientProfile._id,
-        isCompleted: true
+        isCompleted: true,
       })
-      .populate({
-        path: 'coachId',
-        model: Profile,
-        populate: {
-          path: 'user',
-          model: User,
-          select: 'name lastName'
-        }
-      })
-      .sort({ updatedAt: -1 });
+        .populate({
+          path: 'coachId',
+          model: Profile,
+          populate: {
+            path: 'user',
+            model: User,
+            select: 'name lastName',
+          },
+        })
+        .sort({ updatedAt: -1 });
     }
 
     if (!currentObjective) {
@@ -74,8 +77,8 @@ export async function GET(request: NextRequest) {
           goals: [],
           notes: [],
           feedback: null,
-          hasData: false
-        }
+          hasData: false,
+        },
       });
     }
 
@@ -83,30 +86,30 @@ export async function GET(request: NextRequest) {
     const goals = await Goal.find({
       objectiveId: currentObjective._id,
       // clientId: clientProfile._id,
-      isDeleted: false
+      isDeleted: false,
     }).sort({ day: 1, createdAt: 1 });
 
     // Obtener las notas relacionadas con este objetivo
     const notes = await Note.find({
       objectiveId: currentObjective._id,
       clientId: clientProfile._id,
-      isDeleted: false
+      isDeleted: false,
     })
-    .populate({
-      path: 'createdBy',
-      model: Profile,
-      populate: {
-        path: 'user',
-        model: User,
-        select: 'email'
-      }
-    })
-    .populate({
-      path: 'sessionId',
-      model: Meet,
-      select: 'date link'
-    })
-    .sort({ createdAt: -1 });
+      .populate({
+        path: 'createdBy',
+        model: Profile,
+        populate: {
+          path: 'user',
+          model: User,
+          select: 'email',
+        },
+      })
+      .populate({
+        path: 'sessionId',
+        model: Meet,
+        select: 'date link',
+      })
+      .sort({ createdAt: -1 });
 
     // Obtener el feedback final si el objetivo está completado
     let feedback = null;
@@ -114,14 +117,14 @@ export async function GET(request: NextRequest) {
       // Buscar feedback relacionado con este objetivo
       const objectiveFeedback = await Feedback.findOne({
         objectiveId: currentObjective._id,
-        clientId: clientProfile._id
+        clientId: clientProfile._id,
       });
 
       if (objectiveFeedback) {
         feedback = {
           _id: objectiveFeedback._id.toString(),
           feedback: objectiveFeedback.feedback,
-          createdAt: objectiveFeedback.createdAt
+          createdAt: objectiveFeedback.createdAt,
         };
       }
     }
@@ -132,21 +135,23 @@ export async function GET(request: NextRequest) {
       description: goal.description,
       day: goal.day,
       isCompleted: goal.isCompleted,
-      createdAt: goal.createdAt
+      createdAt: goal.createdAt,
     }));
 
     const formattedNotes = notes.map(note => ({
       _id: note._id.toString(),
       title: note.title,
       content: note.content,
-      createdBy: note.createdBy ? 
-        `${note.createdBy.name} ${note.createdBy.lastName}` : 
-        'Coach',
+      createdBy: note.createdBy
+        ? `${note.createdBy.name} ${note.createdBy.lastName}`
+        : 'Coach',
       createdAt: note.createdAt,
-      sessionInfo: note.sessionId ? {
-        date: note.sessionId.date,
-        link: note.sessionId.link
-      } : null
+      sessionInfo: note.sessionId
+        ? {
+            date: note.sessionId.date,
+            link: note.sessionId.link,
+          }
+        : null,
     }));
 
     return NextResponse.json({
@@ -158,17 +163,16 @@ export async function GET(request: NextRequest) {
           isCompleted: currentObjective.isCompleted,
           active: currentObjective.active,
           createdAt: currentObjective.createdAt,
-          coach: currentObjective.coachId ? 
-            `${currentObjective.coachId.name} ${currentObjective.coachId.lastName}` : 
-            'Coach no asignado'
+          coach: currentObjective.coachId
+            ? `${currentObjective.coachId.name} ${currentObjective.coachId.lastName}`
+            : 'Coach no asignado',
         },
         goals: formattedGoals,
         notes: formattedNotes,
         feedback,
-        hasData: true
-      }
+        hasData: true,
+      },
     });
-
   } catch (error) {
     console.error('Error al obtener datos de tareas del cliente:', error);
     return NextResponse.json(

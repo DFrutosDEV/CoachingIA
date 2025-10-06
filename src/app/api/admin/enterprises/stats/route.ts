@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
     // Contar nuevas empresas (últimos 30 días)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const newEnterprises = enterprises.filter(enterprise => 
-      new Date(enterprise.createdAt) >= thirtyDaysAgo
+    const newEnterprises = enterprises.filter(
+      enterprise => new Date(enterprise.createdAt) >= thirtyDaysAgo
     ).length;
 
     // Calcular total de empleados y promedio por empresa
@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
       return sum + (enterprise.employees ? enterprise.employees.length : 0);
     }, 0);
 
-    const averageEmployeesPerEnterprise = total > 0 ? Math.round(totalEmployees / total * 100) / 100 : 0;
+    const averageEmployeesPerEnterprise =
+      total > 0 ? Math.round((totalEmployees / total) * 100) / 100 : 0;
 
     const stats = {
       total,
@@ -35,14 +36,13 @@ export async function GET(request: NextRequest) {
       inactive,
       newEnterprises,
       totalEmployees,
-      averageEmployeesPerEnterprise
+      averageEmployeesPerEnterprise,
     };
 
     return NextResponse.json({
       success: true,
-      data: stats
+      data: stats,
     });
-
   } catch (error) {
     console.error('Error al obtener estadísticas de empresas:', error);
     return NextResponse.json(

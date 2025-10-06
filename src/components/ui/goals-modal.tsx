@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +7,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Trash2, Plus } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { toast } from "sonner"
-import { Goal } from "@/types"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Trash2, Plus } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
+import { Goal } from '@/types';
 
 interface GoalsModalProps {
   isOpen: boolean;
@@ -22,7 +22,12 @@ interface GoalsModalProps {
   onSave: (updatedGoals: Goal[]) => void;
 }
 
-export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: GoalsModalProps) {
+export function GoalsModal({
+  isOpen,
+  onClose,
+  goals: initialGoals,
+  onSave,
+}: GoalsModalProps) {
   const [goals, setGoals] = useState<Goal[]>([]);
 
   // Sincronizar el estado interno con las props cuando se abre el modal o cambian los objetivos iniciales
@@ -33,7 +38,11 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
     }
   }, [isOpen, initialGoals]);
 
-  const handleGoalChange = (id: string, field: keyof Goal, value: string | boolean) => {
+  const handleGoalChange = (
+    id: string,
+    field: keyof Goal,
+    value: string | boolean
+  ) => {
     setGoals(currentGoals =>
       currentGoals.map(goal =>
         goal._id === id ? { ...goal, [field]: value } : goal
@@ -44,9 +53,9 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
   const handleAddGoal = () => {
     const newGoal: Goal = {
       _id: Date.now().toString(), // ID simple basado en timestamp
-      description: "Nuevo Objetivo",
+      description: 'Nuevo Objetivo',
       isCompleted: false,
-      day: "Lunes",
+      day: 'Lunes',
       date: new Date().toISOString(),
     };
     setGoals(currentGoals => [...currentGoals, newGoal]);
@@ -54,18 +63,21 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
 
   const handleDeleteGoal = (id: string) => {
     setGoals(currentGoals => currentGoals.filter(goal => goal._id !== id));
-    toast.error("Objetivo eliminado.");
+    toast.error('Objetivo eliminado.');
   };
 
   const handleSaveChanges = () => {
     // Asegurarse de que el progreso es un número
-    const validatedGoals = goals.map(goal => ({ ...goal, isCompleted: Boolean(goal.isCompleted) }));
+    const validatedGoals = goals.map(goal => ({
+      ...goal,
+      isCompleted: Boolean(goal.isCompleted),
+    }));
     onSave(validatedGoals);
-    toast.success("Objetivos guardados correctamente.");
+    toast.success('Objetivos guardados correctamente.');
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Editar Metas</DialogTitle>
@@ -75,8 +87,11 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
         </DialogHeader>
         <ScrollArea className="max-h-[400px] p-1">
           <div className="grid gap-4 py-4 pr-4">
-            {goals.map((goal) => (
-              <div key={goal._id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4">
+            {goals.map(goal => (
+              <div
+                key={goal._id}
+                className="grid grid-cols-[1fr_auto_auto] items-center gap-4"
+              >
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor={`title-${goal._id}`} className="sr-only">
                     Título
@@ -84,7 +99,9 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
                   <Input
                     id={`title-${goal._id}`}
                     value={goal.description}
-                    onChange={(e) => handleGoalChange(goal._id, "description", e.target.value)}
+                    onChange={e =>
+                      handleGoalChange(goal._id, 'description', e.target.value)
+                    }
                     className="col-span-3"
                   />
                 </div>
@@ -93,28 +110,45 @@ export function GoalsModal({ isOpen, onClose, goals: initialGoals, onSave }: Goa
                     id={`completed-${goal._id}`}
                     type="checkbox"
                     checked={goal.isCompleted}
-                    onChange={(e) => handleGoalChange(goal._id, "isCompleted", e.target.checked)}
+                    onChange={e =>
+                      handleGoalChange(
+                        goal._id,
+                        'isCompleted',
+                        e.target.checked
+                      )
+                    }
                     className="h-4 w-4 rounded border-gray-300"
                   />
                   <Label htmlFor={`completed-${goal._id}`} className="text-sm">
                     Completado
                   </Label>
                 </div>
-                <Button variant="outline" size="icon" onClick={() => handleDeleteGoal(goal._id)} aria-label="Eliminar objetivo">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleDeleteGoal(goal._id)}
+                  aria-label="Eliminar objetivo"
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}
           </div>
         </ScrollArea>
-        <Button variant="outline" onClick={handleAddGoal} className="mt-4 w-full">
+        <Button
+          variant="outline"
+          onClick={handleAddGoal}
+          className="mt-4 w-full"
+        >
           <Plus className="mr-2 h-4 w-4" /> Añadir Meta
         </Button>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
           <Button onClick={handleSaveChanges}>Guardar Cambios</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

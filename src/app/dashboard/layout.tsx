@@ -1,9 +1,9 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from 'react';
 
 interface DashboardLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  return <div className="min-h-screen bg-background">{children}</div>
+  return <div className="min-h-screen bg-background">{children}</div>;
 }

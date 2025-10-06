@@ -38,6 +38,7 @@ npm run check:gemini
 ```
 
 Si todo está correcto, verás:
+
 ```
 ✅ Gemini Pro está funcionando correctamente
 🚀 Puedes usar la generación automática de objetivos
@@ -50,7 +51,7 @@ Si todo está correcto, verás:
 1. Ve al dashboard de coach
 2. Selecciona un cliente
 3. Ve a la pestaña "Objetivos"
-4. Haz clic en el botón "IA" 
+4. Haz clic en el botón "IA"
 5. Selecciona el número de objetivos
 6. Haz clic en "Generar objetivos"
 
@@ -64,11 +65,13 @@ Si todo está correcto, verás:
 ## 📊 Límites y Costos
 
 ### Plan Gratuito
+
 - **15 requests por minuto**
 - **Sin costo mensual**
 - **Requiere verificación con tarjeta**
 
 ### Plan de Pago
+
 - **$0.001 por 1K tokens**
 - **Sin límite de requests**
 - **Solo pagas por lo que uses**
@@ -76,6 +79,7 @@ Si todo está correcto, verás:
 ## 🐛 Solución de Problemas
 
 ### Error: "API Key no configurada"
+
 ```bash
 # Verificar configuración
 npm run check:env
@@ -88,16 +92,19 @@ npm run dev
 ```
 
 ### Error: "Cuota excedida" (429)
+
 - **Normal en plan gratuito**: Límite de 15 requests/minuto
 - **Solución**: Espera 1 minuto antes de hacer otra solicitud
 - **Alternativa**: Actualiza a plan de pago para límites más altos
 
 ### Error: "Sin conexión"
+
 - Verifica tu conexión a internet
 - Asegúrate de que no haya firewall bloqueando
 - Verifica que la API Key sea válida
 
 ### Respuestas de baja calidad
+
 - Ajusta el prompt en `src/lib/services/ai-service.ts`
 - Modifica `temperature` para más creatividad
 - Agrega más contexto en el prompt
@@ -105,12 +112,14 @@ npm run dev
 ## 🔒 Seguridad
 
 ### Mejores Prácticas
+
 - **Nunca** subas la API Key al repositorio
 - **Rota** las API Keys regularmente
 - **Monitorea** el uso para evitar costos inesperados
 - **Usa** variables de entorno en producción
 
 ### Configuración de Producción
+
 ```env
 # En producción, usa variables de entorno del servidor
 GOOGLE_AI_API_KEY=tu_api_key_produccion
@@ -120,12 +129,15 @@ NODE_ENV=production
 ## 📈 Monitoreo
 
 ### Logs de la Aplicación
+
 Los logs se guardan en la consola del servidor:
+
 - Tiempo de generación
 - Errores de parsing
 - Fallbacks a objetivos por defecto
 
 ### Métricas de Uso
+
 - Número de objetivos generados
 - Tasa de éxito de generación
 - Tiempo promedio de respuesta
@@ -134,6 +146,7 @@ Los logs se guardan en la consola del servidor:
 ## 🔮 Futuras Mejoras
 
 ### Funcionalidades Planificadas
+
 1. **Análisis de Sentimiento**: Evaluar estado emocional
 2. **Recomendaciones Personalizadas**: Sugerir recursos
 3. **Predicción de Progreso**: Estimar tiempo de completado
@@ -141,6 +154,7 @@ Los logs se guardan en la consola del servidor:
 5. **Análisis de Patrones**: Identificar tendencias
 
 ### Modelos Alternativos Disponibles
+
 - **gemini-1.5-pro**: Modelo actual (recomendado)
 - **gemini-1.5-flash**: Más rápido, menos preciso
 - **gemini-2.0-flash**: Versión más nueva
@@ -149,12 +163,14 @@ Los logs se guardan en la consola del servidor:
 ## 📞 Soporte
 
 ### Recursos Útiles
+
 - [Google AI Studio](https://makersuite.google.com/app/apikey)
 - [Documentación de Gemini](https://ai.google.dev/docs)
 - [Pricing de Google AI](https://ai.google.dev/pricing)
 - [Rate Limits](https://ai.google.dev/gemini-api/docs/rate-limits)
 
 ### Comandos de Verificación
+
 ```bash
 # Verificar configuración
 npm run check:env
@@ -175,6 +191,7 @@ curl http://localhost:3000/api/ai/generate-goals
 ## ✅ Estado Actual
 
 **Configuración Completada:**
+
 - ✅ API Key configurada correctamente
 - ✅ Modelo `gemini-1.5-pro` seleccionado
 - ✅ Servicio de IA actualizado

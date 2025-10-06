@@ -1,23 +1,22 @@
-import { store } from '../redux/store'
-import { logout } from '../redux/slices/authSlice'
+import { store } from '../redux/store';
+import { logout } from '../redux/slices/authSlice';
 
 // Cliente HTTP que incluye automáticamente el token
 export class HttpClient {
-  
   // Obtener headers con token
   private static getHeaders(): Record<string, string> {
-    const state = store.getState()
-    const token = state.auth.token
-    
+    const state = store.getState();
+    const token = state.auth.token;
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-    }
-    
+    };
+
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`
+      headers['Authorization'] = `Bearer ${token}`;
     }
-    
-    return headers
+
+    return headers;
   }
 
   // Manejar respuestas y errores de autenticación
@@ -26,7 +25,7 @@ export class HttpClient {
     if (response.status === 401) {
       store.dispatch(logout());
     }
-    
+
     return response;
   }
 
@@ -36,7 +35,7 @@ export class HttpClient {
       method: 'GET',
       headers: this.getHeaders(),
       credentials: 'include',
-    })
+    });
     return this.handleResponse(response);
   }
 
@@ -47,7 +46,7 @@ export class HttpClient {
       headers: this.getHeaders(),
       credentials: 'include',
       body: data ? JSON.stringify(data) : undefined,
-    })
+    });
     return this.handleResponse(response);
   }
 
@@ -58,7 +57,7 @@ export class HttpClient {
       headers: this.getHeaders(),
       credentials: 'include',
       body: data ? JSON.stringify(data) : undefined,
-    })
+    });
     return this.handleResponse(response);
   }
 
@@ -68,7 +67,7 @@ export class HttpClient {
       method: 'DELETE',
       headers: this.getHeaders(),
       credentials: 'include',
-    })
+    });
     return this.handleResponse(response);
   }
-} 
+}

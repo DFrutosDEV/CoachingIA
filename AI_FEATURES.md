@@ -26,20 +26,24 @@ El sistema utiliza **Google Gemini Pro** para generar objetivos automáticamente
 ## 📁 Archivos Implementados
 
 ### Servicios de IA
+
 - `src/lib/services/ai-service.ts` - Servicio principal de IA con Gemini
 - `src/app/api/ai/generate-goals/route.ts` - API endpoint para generar objetivos
 
 ### Componentes de UI
+
 - `src/components/ui/ai-goals-generator.tsx` - Modal para generar objetivos
 - Integrado en `src/components/client-detail.tsx` - Botón "IA" en la pestaña de objetivos
 
 ### Utilidades
+
 - `scripts/check-gemini.js` - Script para verificar configuración de Gemini
 - `AI_FEATURES.md` - Esta documentación
 
 ## 🔧 Configuración Rápida
 
 ### 1. Obtener API Key de Google AI
+
 ```bash
 # Ve a https://makersuite.google.com/app/apikey
 # Crea una nueva API Key
@@ -47,17 +51,20 @@ El sistema utiliza **Google Gemini Pro** para generar objetivos automáticamente
 ```
 
 ### 2. Configurar Variable de Entorno
+
 ```bash
 # En tu archivo .env.local
 GOOGLE_AI_API_KEY=tu_api_key_aqui
 ```
 
 ### 3. Verificar Configuración
+
 ```bash
 npm run check:gemini
 ```
 
 ### 4. Usar en la Aplicación
+
 1. Ve al detalle de un cliente
 2. Pestaña "Objetivos"
 3. Haz clic en el botón "IA"
@@ -156,6 +163,7 @@ Puedes personalizar el prompt en el método `buildPrompt()` para:
 ## 🐛 Solución de Problemas
 
 ### API Key no configurada
+
 ```bash
 # Verificar configuración
 npm run check:gemini
@@ -165,16 +173,19 @@ GOOGLE_AI_API_KEY=tu_api_key_aqui
 ```
 
 ### Error de cuota excedida (429)
+
 - Verifica tu cuota en Google AI Studio
 - Considera actualizar tu plan si es necesario
 - Implementa rate limiting si es necesario
 
 ### Error de conexión
+
 - Verifica tu conexión a internet
 - Asegúrate de que no haya firewall bloqueando las conexiones
 - Verifica que la API Key sea válida
 
 ### Objetivos de baja calidad
+
 - Ajusta el prompt para ser más específico
 - Aumenta `temperature` para más creatividad
 - Agrega más contexto en el prompt
@@ -182,12 +193,15 @@ GOOGLE_AI_API_KEY=tu_api_key_aqui
 ## 📊 Métricas y Monitoreo
 
 ### Logs de Generación
+
 Los logs se guardan en la consola del servidor:
+
 - Tiempo de generación
 - Errores de parsing
 - Fallbacks a objetivos por defecto
 
 ### Métricas de Uso
+
 - Número de objetivos generados
 - Tasa de éxito de generación
 - Tiempo promedio de respuesta
@@ -211,16 +225,19 @@ Los logs se guardan en la consola del servidor:
 ## 🤝 Contribuir
 
 ### Reportar Bugs
+
 1. Verifica que la API Key esté configurada
 2. Revisa los logs del servidor
 3. Proporciona contexto del error
 
 ### Mejorar Prompts
+
 1. Prueba diferentes enfoques
 2. Documenta los cambios
 3. Comparte resultados
 
 ### Agregar Funcionalidades
+
 1. Prueba las nuevas características
 2. Actualiza la documentación
 3. Ajusta parámetros según sea necesario
@@ -228,6 +245,7 @@ Los logs se guardan en la consola del servidor:
 ## 📞 Soporte
 
 Para problemas técnicos:
+
 1. Revisa esta documentación
 2. Ejecuta `npm run check:gemini`
 3. Consulta los logs de la aplicación
@@ -235,4 +253,4 @@ Para problemas técnicos:
 
 ---
 
-**Nota**: Esta funcionalidad utiliza exclusivamente Google Gemini Pro. Para uso en producción, asegúrate de configurar las cuotas y límites apropiados. 
+**Nota**: Esta funcionalidad utiliza exclusivamente Google Gemini Pro. Para uso en producción, asegúrate de configurar las cuotas y límites apropiados.

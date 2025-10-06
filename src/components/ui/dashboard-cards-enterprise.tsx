@@ -1,12 +1,28 @@
-'use client'
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Users, UserCircle, BarChart3, ArrowRight, FileText } from "lucide-react"
-import Link from "next/link"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Users,
+  UserCircle,
+  BarChart3,
+  ArrowRight,
+  FileText,
+} from 'lucide-react';
+import Link from 'next/link';
 
 // Card 1: Total Clientes
-export function TotalClientsCard({ data }: { data?: { count: number; changeText: string } }) {
+export function TotalClientsCard({
+  data,
+}: {
+  data?: { count: number; changeText: string };
+}) {
   return (
     <Card data-swapy-item="total-clients">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -14,8 +30,12 @@ export function TotalClientsCard({ data }: { data?: { count: number; changeText:
         <Users className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{data?.count?.toLocaleString() || '0'}</div>
-        <p className="text-xs text-muted-foreground">{data?.changeText || 'Sin datos'}</p>
+        <div className="text-2xl font-bold">
+          {data?.count?.toLocaleString() || '0'}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {data?.changeText || 'Sin datos'}
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/enterprise/clients">
             <Button size="sm" variant="outline" className="w-full">
@@ -26,11 +46,15 @@ export function TotalClientsCard({ data }: { data?: { count: number; changeText:
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 2: Coaches Activos
-export function ActiveCoachesCard({ data }: { data?: { count: number; changeText: string } }) {
+export function ActiveCoachesCard({
+  data,
+}: {
+  data?: { count: number; changeText: string };
+}) {
   return (
     <Card data-swapy-item="active-coaches">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -38,8 +62,12 @@ export function ActiveCoachesCard({ data }: { data?: { count: number; changeText
         <UserCircle className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{data?.count?.toLocaleString() || '0'}</div>
-        <p className="text-xs text-muted-foreground">{data?.changeText || 'Sin datos'}</p>
+        <div className="text-2xl font-bold">
+          {data?.count?.toLocaleString() || '0'}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {data?.changeText || 'Sin datos'}
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/enterprise/resources">
             <Button size="sm" variant="outline" className="w-full">
@@ -50,20 +78,30 @@ export function ActiveCoachesCard({ data }: { data?: { count: number; changeText
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 3: Sesiones Realizadas
-export function CompletedSessionsCard({ data }: { data?: { count: number; changeText: string } }) {
+export function CompletedSessionsCard({
+  data,
+}: {
+  data?: { count: number; changeText: string };
+}) {
   return (
     <Card data-swapy-item="completed-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Sesiones Realizadas</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          Sesiones Realizadas
+        </CardTitle>
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{data?.count?.toLocaleString() || '0'}</div>
-        <p className="text-xs text-muted-foreground">{data?.changeText || 'Sin datos'}</p>
+        <div className="text-2xl font-bold">
+          {data?.count?.toLocaleString() || '0'}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {data?.changeText || 'Sin datos'}
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/enterprise/analytics">
             <Button size="sm" variant="outline" className="w-full">
@@ -74,11 +112,15 @@ export function CompletedSessionsCard({ data }: { data?: { count: number; change
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 4: Reportes
-export function ReportsCard({ data }: { data?: { count: number; changeText: string } }) {
+export function ReportsCard({
+  data,
+}: {
+  data?: { count: number; changeText: string };
+}) {
   return (
     <Card data-swapy-item="reports">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -86,8 +128,12 @@ export function ReportsCard({ data }: { data?: { count: number; changeText: stri
         <FileText className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{data?.count?.toLocaleString() || '0'}</div>
-        <p className="text-xs text-muted-foreground">{data?.changeText || 'Sin datos'}</p>
+        <div className="text-2xl font-bold">
+          {data?.count?.toLocaleString() || '0'}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {data?.changeText || 'Sin datos'}
+        </p>
         <div className="mt-4">
           <Link href="/dashboard/enterprise/reports">
             <Button size="sm" variant="outline" className="w-full">
@@ -98,7 +144,7 @@ export function ReportsCard({ data }: { data?: { count: number; changeText: stri
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Interfaces para tipos de datos
@@ -122,7 +168,9 @@ export function NewUsersCard({ data = [] }: { data?: NewUser[] }) {
     <Card data-swapy-item="new-users">
       <CardHeader>
         <CardTitle>Nuevos Usuarios</CardTitle>
-        <CardDescription>Usuarios registrados en los últimos 7 días.</CardDescription>
+        <CardDescription>
+          Usuarios registrados en los últimos 7 días.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -138,12 +186,16 @@ export function NewUsersCard({ data = [] }: { data?: NewUser[] }) {
                   <div className="flex items-center gap-2">
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                        user.type === "Coach" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
+                        user.type === 'Coach'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
                       }`}
                     >
                       {user.type}
                     </span>
-                    <span className="text-xs text-muted-foreground">{user.date}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {user.date}
+                    </span>
                   </div>
                 </div>
                 <Link href="/dashboard/enterprise/clients">
@@ -161,11 +213,15 @@ export function NewUsersCard({ data = [] }: { data?: NewUser[] }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 6: Rendimiento de la Empresa
-export function CompanyPerformanceCard({ data = [] }: { data?: PerformanceStat[] }) {
+export function CompanyPerformanceCard({
+  data = [],
+}: {
+  data?: PerformanceStat[];
+}) {
   return (
     <Card data-swapy-item="company-performance">
       <CardHeader>
@@ -184,7 +240,9 @@ export function CompanyPerformanceCard({ data = [] }: { data?: PerformanceStat[]
                   <p className="text-sm font-medium">{stat.metric}</p>
                   <p className="text-xl font-bold">{stat.value}</p>
                 </div>
-                <div className={`flex items-center ${stat.positive ? "text-green-600" : "text-red-600"}`}>
+                <div
+                  className={`flex items-center ${stat.positive ? 'text-green-600' : 'text-red-600'}`}
+                >
                   <span>{stat.change}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -194,7 +252,7 @@ export function CompanyPerformanceCard({ data = [] }: { data?: PerformanceStat[]
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    className={`ml-1 h-4 w-4 ${stat.positive ? "rotate-0" : "rotate-180"}`}
+                    className={`ml-1 h-4 w-4 ${stat.positive ? 'rotate-0' : 'rotate-180'}`}
                   >
                     <path d="m5 15 7-7 7 7" />
                   </svg>
@@ -217,5 +275,5 @@ export function CompanyPerformanceCard({ data = [] }: { data?: PerformanceStat[]
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

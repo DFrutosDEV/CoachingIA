@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useTheme } from 'next-themes'
-import { Button } from '@mui/material'
-import { Moon, Sun } from 'lucide-react'
-import { useEffect } from 'react'
+import { useTheme } from 'next-themes';
+import { Button } from '@mui/material';
+import { Moon, Sun } from 'lucide-react';
+import { useEffect } from 'react';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   // useEffect(() => {
   //   document.getElementById('miBoton')?.addEventListener('click', () => {
@@ -40,5 +40,5 @@ export function ThemeToggle() {
         <Moon className="h-5 w-5" />
       )}
     </Button>
-  )
+  );
 }

@@ -1,8 +1,15 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@mui/material"
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@mui/material';
 import {
   Dialog,
   DialogContent,
@@ -11,15 +18,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Ticket, ArrowRight } from "lucide-react"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Ticket, ArrowRight } from 'lucide-react';
 
 export function TicketCard() {
-  const [showTicketDialog, setShowTicketDialog] = useState(false)
-  const [ticketPriority, setTicketPriority] = useState("medium")
+  const [showTicketDialog, setShowTicketDialog] = useState(false);
+  const [ticketPriority, setTicketPriority] = useState('medium');
 
   return (
     <Card className="flex flex-col">
@@ -29,7 +36,8 @@ export function TicketCard() {
         </div>
         <CardTitle className="mt-4">Generar Ticket</CardTitle>
         <CardDescription>
-          Crea tickets para reportar problemas, solicitar soporte o enviar sugerencias al equipo técnico.
+          Crea tickets para reportar problemas, solicitar soporte o enviar
+          sugerencias al equipo técnico.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
@@ -58,7 +66,9 @@ export function TicketCard() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Generar Ticket de Soporte</DialogTitle>
-              <DialogDescription>Describe el problema o solicitud para el equipo de soporte.</DialogDescription>
+              <DialogDescription>
+                Describe el problema o solicitud para el equipo de soporte.
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
@@ -91,7 +101,7 @@ export function TicketCard() {
                 <select
                   id="ticket-priority"
                   value={ticketPriority}
-                  onChange={(e) => setTicketPriority(e.target.value)}
+                  onChange={e => setTicketPriority(e.target.value)}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="low">Baja</option>
@@ -102,14 +112,19 @@ export function TicketCard() {
               </div>
             </div>
             <DialogFooter className="flex justify-end gap-2">
-              <Button variant="outlined" onClick={() => setShowTicketDialog(false)}>
+              <Button
+                variant="outlined"
+                onClick={() => setShowTicketDialog(false)}
+              >
                 Cancelar
               </Button>
-              <Button onClick={() => setShowTicketDialog(false)}>Enviar Ticket</Button>
+              <Button onClick={() => setShowTicketDialog(false)}>
+                Enviar Ticket
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </CardFooter>
     </Card>
-  )
-} 
+  );
+}

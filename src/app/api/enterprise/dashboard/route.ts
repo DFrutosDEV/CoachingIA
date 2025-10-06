@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener el enterpriseId del header o query params
     const enterpriseId = request.nextUrl.searchParams.get('enterpriseId');
-    
+
     if (!enterpriseId) {
       return NextResponse.json(
         { error: 'Enterprise ID es requerido' },
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     // Obtener roles para filtrar por tipo
     const [clientRole, coachRole] = await Promise.all([
       Role.findOne({ code: '1' }),
-      Role.findOne({ code: '2' })
+      Role.findOne({ code: '2' }),
     ]);
 
     if (!clientRole || !coachRole) {
@@ -42,92 +42,92 @@ export async function GET(request: NextRequest) {
 
     // 1. Obtener profiles de clientes de la empresa
     const [totalClients, newClientsThisMonth] = await Promise.all([
-      Profile.countDocuments({ 
-        enterprise: enterpriseId, 
-        role: clientRole._id,
-        isDeleted: false 
-      }),
-      Profile.countDocuments({ 
-        enterprise: enterpriseId, 
+      Profile.countDocuments({
+        enterprise: enterpriseId,
         role: clientRole._id,
         isDeleted: false,
-        createdAt: { $gte: startOfMonth }
-      })
+      }),
+      Profile.countDocuments({
+        enterprise: enterpriseId,
+        role: clientRole._id,
+        isDeleted: false,
+        createdAt: { $gte: startOfMonth },
+      }),
     ]);
 
     // 2. Obtener profiles de coaches de la empresa
     const [totalCoaches, newCoachesThisMonth] = await Promise.all([
-      Profile.countDocuments({ 
-        enterprise: enterpriseId, 
-        role: coachRole._id,
-        isDeleted: false 
-      }),
-      Profile.countDocuments({ 
-        enterprise: enterpriseId, 
+      Profile.countDocuments({
+        enterprise: enterpriseId,
         role: coachRole._id,
         isDeleted: false,
-        createdAt: { $gte: startOfMonth }
-      })
+      }),
+      Profile.countDocuments({
+        enterprise: enterpriseId,
+        role: coachRole._id,
+        isDeleted: false,
+        createdAt: { $gte: startOfMonth },
+      }),
     ]);
 
     // 3. Obtener sesiones completadas (meets no cancelados) de coaches/clientes de la empresa
-    const enterpriseProfiles = await Profile.find({ 
+    const enterpriseProfiles = await Profile.find({
       enterprise: enterpriseId,
-      isDeleted: false 
+      isDeleted: false,
     }).select('_id');
-    
+
     const enterpriseProfileIds = enterpriseProfiles.map(profile => profile._id);
 
     const [totalSessions, sessionsThisMonth] = await Promise.all([
       Meet.countDocuments({
         $or: [
           { clientId: { $in: enterpriseProfileIds } },
-          { coachId: { $in: enterpriseProfileIds } }
+          { coachId: { $in: enterpriseProfileIds } },
         ],
         isCancelled: false,
-        date: { $lt: now } // Solo sesiones que ya pasaron
+        date: { $lt: now }, // Solo sesiones que ya pasaron
       }),
       Meet.countDocuments({
         $or: [
           { clientId: { $in: enterpriseProfileIds } },
-          { coachId: { $in: enterpriseProfileIds } }
+          { coachId: { $in: enterpriseProfileIds } },
         ],
         isCancelled: false,
-        date: { $gte: startOfMonth, $lt: now }
-      })
+        date: { $gte: startOfMonth, $lt: now },
+      }),
     ]);
 
     // 4. Obtener reportes/tickets relacionados con usuarios de la empresa
-    const enterpriseUsers = await Profile.find({ 
+    const enterpriseUsers = await Profile.find({
       enterprise: enterpriseId,
-      isDeleted: false 
+      isDeleted: false,
     }).populate('user', '_id');
-    
+
     const enterpriseUserIds = enterpriseUsers
       .filter(profile => profile.user)
       .map(profile => profile.user._id);
 
     const pendingReports = await Ticket.countDocuments({
       reporterUser: { $in: enterpriseUserIds },
-      status: { $in: ['pending', 'in_progress'] }
+      status: { $in: ['pending', 'in_progress'] },
     });
 
     // 5. Obtener nuevos usuarios de la última semana con sus datos
     const newUsersData = await Profile.find({
       enterprise: enterpriseId,
       isDeleted: false,
-      createdAt: { $gte: lastWeek }
+      createdAt: { $gte: lastWeek },
     })
-    .populate('user', 'email')
-    .populate('role', 'code name')
-    .sort({ createdAt: -1 })
-    .limit(5);
+      .populate('user', 'email')
+      .populate('role', 'code name')
+      .sort({ createdAt: -1 })
+      .limit(5);
 
     const formattedNewUsers = newUsersData.map(profile => ({
       name: `${profile.name} ${profile.lastName}`,
       email: profile.user.email,
       type: profile.role.code === '2' ? 'Coach' : 'Cliente',
-      date: formatTimeAgo(profile.createdAt)
+      date: formatTimeAgo(profile.createdAt),
     }));
 
     // 6. Calcular estadísticas de rendimiento
@@ -135,66 +135,70 @@ export async function GET(request: NextRequest) {
     const sessionsLastMonth = await Meet.countDocuments({
       $or: [
         { clientId: { $in: enterpriseProfileIds } },
-        { coachId: { $in: enterpriseProfileIds } }
+        { coachId: { $in: enterpriseProfileIds } },
       ],
       isCancelled: false,
-      date: { $gte: lastMonth, $lt: startOfMonth }
+      date: { $gte: lastMonth, $lt: startOfMonth },
     });
 
     // Clientes del mes pasado para comparar
-    const clientsLastMonth = await Profile.countDocuments({ 
-      enterprise: enterpriseId, 
+    const clientsLastMonth = await Profile.countDocuments({
+      enterprise: enterpriseId,
       role: clientRole._id,
       isDeleted: false,
-      createdAt: { $lt: startOfMonth }
+      createdAt: { $lt: startOfMonth },
     });
 
     // Calcular cambios porcentuales
-    const clientsChange = clientsLastMonth > 0 
-      ? ((newClientsThisMonth / clientsLastMonth) * 100).toFixed(1)
-      : '0';
-    
-    const sessionsChange = sessionsLastMonth > 0 
-      ? (((sessionsThisMonth - sessionsLastMonth) / sessionsLastMonth) * 100).toFixed(1)
-      : '0';
+    const clientsChange =
+      clientsLastMonth > 0
+        ? ((newClientsThisMonth / clientsLastMonth) * 100).toFixed(1)
+        : '0';
+
+    const sessionsChange =
+      sessionsLastMonth > 0
+        ? (
+            ((sessionsThisMonth - sessionsLastMonth) / sessionsLastMonth) *
+            100
+          ).toFixed(1)
+        : '0';
 
     // Calcular estadísticas adicionales
-    const avgSessionsPerClient = totalClients > 0 
-      ? (totalSessions / totalClients).toFixed(1)
-      : '0';
+    const avgSessionsPerClient =
+      totalClients > 0 ? (totalSessions / totalClients).toFixed(1) : '0';
 
     // Estadísticas simuladas (en una implementación real, estas vendrían de datos reales)
     const performanceStats = [
-      { 
-        metric: 'Tasa de Conversión', 
-        value: '8.2%', 
-        change: '+1.2%', 
-        positive: true 
+      {
+        metric: 'Tasa de Conversión',
+        value: '8.2%',
+        change: '+1.2%',
+        positive: true,
       },
-      { 
-        metric: 'Sesiones Promedio por Cliente', 
-        value: avgSessionsPerClient, 
-        change: `+${sessionsChange}%`, 
-        positive: parseFloat(sessionsChange) >= 0 
+      {
+        metric: 'Sesiones Promedio por Cliente',
+        value: avgSessionsPerClient,
+        change: `+${sessionsChange}%`,
+        positive: parseFloat(sessionsChange) >= 0,
       },
-      { 
-        metric: 'Tiempo Promedio de Sesión', 
-        value: '52 min', 
-        change: '+4 min', 
-        positive: true 
+      {
+        metric: 'Tiempo Promedio de Sesión',
+        value: '52 min',
+        change: '+4 min',
+        positive: true,
       },
-      { 
-        metric: 'Tasa de Abandono', 
-        value: '12.8%', 
-        change: '-2.3%', 
-        positive: true 
+      {
+        metric: 'Tasa de Abandono',
+        value: '12.8%',
+        change: '-2.3%',
+        positive: true,
       },
-      { 
-        metric: 'Crecimiento de Clientes', 
-        value: `${newClientsThisMonth}`, 
-        change: `+${clientsChange}%`, 
-        positive: parseFloat(clientsChange) >= 0 
-      }
+      {
+        metric: 'Crecimiento de Clientes',
+        value: `${newClientsThisMonth}`,
+        change: `+${clientsChange}%`,
+        positive: parseFloat(clientsChange) >= 0,
+      },
     ];
 
     const dashboardData = {
@@ -202,30 +206,29 @@ export async function GET(request: NextRequest) {
       totalClients: {
         count: totalClients,
         change: newClientsThisMonth,
-        changeText: `+${newClientsThisMonth} este mes`
+        changeText: `+${newClientsThisMonth} este mes`,
       },
       activeCoaches: {
         count: totalCoaches,
         change: newCoachesThisMonth,
-        changeText: `+${newCoachesThisMonth} este mes`
+        changeText: `+${newCoachesThisMonth} este mes`,
       },
       completedSessions: {
         count: totalSessions,
         change: sessionsThisMonth,
-        changeText: `+${sessionsThisMonth} este mes`
+        changeText: `+${sessionsThisMonth} este mes`,
       },
       reports: {
         count: pendingReports,
-        changeText: 'Pendientes de revisión'
+        changeText: 'Pendientes de revisión',
       },
-      
+
       // Cards grandes
       newUsers: formattedNewUsers,
-      performanceStats
+      performanceStats,
     };
 
     return NextResponse.json(dashboardData);
-
   } catch (error) {
     console.error('Error obteniendo datos del dashboard de enterprise:', error);
     return NextResponse.json(

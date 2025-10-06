@@ -14,26 +14,30 @@ interface UseNotificationsReturn {
   refreshNotifications: () => void;
 }
 
-export const useNotifications = (userType: "client" | "coach" | "admin" | "enterprise"): UseNotificationsReturn => {
-  const [notifications, setNotifications] = useState<(Notification & { read: boolean })[]>([]);
+export const useNotifications = (
+  userType: 'client' | 'coach' | 'admin' | 'enterprise'
+): UseNotificationsReturn => {
+  const [notifications, setNotifications] = useState<
+    (Notification & { read: boolean })[]
+  >([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { user, token } = useSelector((state: RootState) => state.auth);
 
   const fetchNotifications = useCallback(async () => {
     if (!user?._id || !token) return;
-    
+
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const response = await fetch(
         `/api/notification?userId=${user.profile?._id}&userType=${userType}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
@@ -55,53 +59,56 @@ export const useNotifications = (userType: "client" | "coach" | "admin" | "enter
     }
   }, [user?._id, token, userType]);
 
-  const markAsRead = useCallback(async (notificationId: string) => {
-    if (!token || !user?._id) return;
-    
-    try {
-      const response = await fetch('/api/notification', {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ notificationId, userId: user.profile?._id }),
-      });
+  const markAsRead = useCallback(
+    async (notificationId: string) => {
+      if (!token || !user?._id) return;
 
-      if (response.ok) {
-        setNotifications(prev => 
-          prev.map(notification => 
-            notification._id === notificationId 
-              ? { ...notification, read: true }
-              : notification
-          )
-        );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      } else {
-        console.error('Error al marcar como leída');
+      try {
+        const response = await fetch('/api/notification', {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ notificationId, userId: user.profile?._id }),
+        });
+
+        if (response.ok) {
+          setNotifications(prev =>
+            prev.map(notification =>
+              notification._id === notificationId
+                ? { ...notification, read: true }
+                : notification
+            )
+          );
+          setUnreadCount(prev => Math.max(0, prev - 1));
+        } else {
+          console.error('Error al marcar como leída');
+        }
+      } catch (error) {
+        console.error('Error al marcar como leída:', error);
       }
-    } catch (error) {
-      console.error('Error al marcar como leída:', error);
-    }
-  }, [token, user?._id]);
+    },
+    [token, user?._id]
+  );
 
   const markAllAsRead = useCallback(async () => {
     if (!user?._id || !token) return;
-    
+
     try {
       const response = await fetch('/api/notification', {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          userId: user.profile?._id
+        body: JSON.stringify({
+          userId: user.profile?._id,
         }),
       });
 
       if (response.ok) {
-        setNotifications(prev => 
+        setNotifications(prev =>
           prev.map(notification => ({ ...notification, read: true }))
         );
         setUnreadCount(0);

@@ -11,6 +11,7 @@ Este proyecto utiliza **Redux Toolkit** para el manejo de estados globales, reem
 ## 🏗️ Arquitectura
 
 ### 📁 Estructura
+
 ```
 src/lib/redux/
 ├── store.ts              # Store principal con persistencia
@@ -23,6 +24,7 @@ src/lib/redux/
 ```
 
 ### 🔐 Seguridad
+
 - **authSlice**: Datos sensibles solo en memoria (tokens, usuario completo)
 - **sessionSlice**: Solo datos no sensibles persisten (tema, idioma, estado básico)
 - **uiSlice**: Estado temporal de interfaz
@@ -30,93 +32,99 @@ src/lib/redux/
 ## 🚀 Uso Básico
 
 ### 1. En Componentes
+
 ```tsx
-import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks'
-import { login, logout } from '@/lib/redux'
+import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
+import { login, logout } from '@/lib/redux';
 
 function MyComponent() {
-  const dispatch = useAppDispatch()
-  const user = useAppSelector(state => state.auth.user)
-  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
-  
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.auth.user);
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
+
   const handleLogin = async () => {
-    dispatch(login({ user: userData, token: tokenData }))
-  }
-  
+    dispatch(login({ user: userData, token: tokenData }));
+  };
+
   return (
     <div>
       {isAuthenticated ? `Hola ${user?.profile?.name}` : 'No autenticado'}
     </div>
-  )
+  );
 }
 ```
 
 ### 2. Múltiples Estados
+
 ```tsx
 function Dashboard() {
-  const dispatch = useAppDispatch()
-  
+  const dispatch = useAppDispatch();
+
   // Estados de diferentes slices
   const { user, isLoading } = useAppSelector(state => ({
     user: state.auth.user,
-    isLoading: state.auth.isLoading
-  }))
-  
+    isLoading: state.auth.isLoading,
+  }));
+
   const { theme, sidebarOpen } = useAppSelector(state => ({
     theme: state.session.theme,
-    sidebarOpen: state.ui.sidebarOpen
-  }))
-  
+    sidebarOpen: state.ui.sidebarOpen,
+  }));
+
   // Acciones
-  const handleLogout = () => dispatch(logout())
-  const toggleSidebar = () => dispatch(toggleSidebar())
-  
+  const handleLogout = () => dispatch(logout());
+  const toggleSidebar = () => dispatch(toggleSidebar());
+
   return (
     <div className={`theme-${theme} ${sidebarOpen ? 'sidebar-open' : ''}`}>
       {/* UI */}
     </div>
-  )
+  );
 }
 ```
 
 ### 3. Con Servicios
+
 ```tsx
-import { AuthServiceRedux } from '@/lib/redux'
+import { AuthServiceRedux } from '@/lib/redux';
 
 function LoginForm() {
   const handleSubmit = async (email: string, password: string) => {
-    const result = await AuthServiceRedux.login(email, password)
-    
+    const result = await AuthServiceRedux.login(email, password);
+
     if (result.success) {
       // El estado se actualiza automáticamente
-      router.push('/dashboard')
+      router.push('/dashboard');
     }
-  }
-  
-  return <form onSubmit={handleSubmit}>{/* formulario */}</form>
+  };
+
+  return <form onSubmit={handleSubmit}>{/* formulario */}</form>;
 }
 ```
 
 ## 🔄 Migración desde Zustand
 
 ### Antes (Zustand)
+
 ```tsx
-const { user, login, logout } = useAuthStore()
+const { user, login, logout } = useAuthStore();
 ```
 
 ### Después (Redux)
+
 ```tsx
-const dispatch = useAppDispatch()
-const user = useAppSelector(state => state.auth.user)
+const dispatch = useAppDispatch();
+const user = useAppSelector(state => state.auth.user);
 
 // Para acciones
-dispatch(login({ user, token }))
-dispatch(logout())
+dispatch(login({ user, token }));
+dispatch(logout());
 ```
 
 ## 🛠️ Acciones Disponibles
 
 ### Auth Slice
+
 - `login({ user, token })` - Iniciar sesión
 - `logout()` - Cerrar sesión
 - `setAuthLoading(boolean)` - Estado de carga
@@ -128,12 +136,14 @@ dispatch(logout())
 - (Similar para coaches y enterprises)
 
 ### Session Slice
+
 - `setSession({ isLoggedIn, userType })` - Establecer sesión
 - `clearSession()` - Limpiar sesión
 - `setSessionTheme(theme)` - Cambiar tema
 - `setLanguage(lang)` - Cambiar idioma
 
 ### UI Slice
+
 - `toggleSidebar()` - Alternar sidebar
 - `setSidebarOpen(boolean)` - Establecer sidebar
 - `openModal(modalId)` - Abrir modal
@@ -144,6 +154,7 @@ dispatch(logout())
 ## 🔧 Redux DevTools
 
 Para debug en el navegador:
+
 1. Instala Redux DevTools Extension
 2. Los estados se ven en la pestaña Redux
 3. Puedes ver el historial de acciones
@@ -152,13 +163,15 @@ Para debug en el navegador:
 ## 📱 Persistencia
 
 Solo **sessionSlice** persiste datos:
+
 - `theme` - Tema del usuario
-- `language` - Idioma preferido  
+- `language` - Idioma preferido
 - `isLoggedIn` - Estado de login (booleano)
 - `userType` - Tipo de usuario (sin datos sensibles)
 - `lastLoginDate` - Última fecha de login
 
 **Datos NO persistidos** (por seguridad):
+
 - Tokens de autenticación
 - Información completa del usuario
 - Listas de clientes/coaches
@@ -175,6 +188,7 @@ Solo **sessionSlice** persiste datos:
 ## 🔄 Recuperación de Sesión
 
 El hook `useSessionRecoveryRedux` maneja automáticamente:
+
 - Verificación de sesión al recargar
 - Recuperación desde servidor si hay sesión guardada
-- Limpieza de estado si la sesión es inválida 
+- Limpieza de estado si la sesión es inválida

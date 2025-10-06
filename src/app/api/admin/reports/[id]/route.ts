@@ -47,14 +47,13 @@ export async function GET(
       updatedAt: report.updatedAt.toISOString(),
       closedAt: report.closedAt?.toISOString(),
       closedBy: report.closedBy?._id?.toString(),
-      closedByName: report.closedBy?.name
+      closedByName: report.closedBy?.name,
     };
 
     return NextResponse.json({
       success: true,
-      data: formattedReport
+      data: formattedReport,
     });
-
   } catch (error) {
     console.error('Error fetching report:', error);
     return NextResponse.json(
@@ -88,7 +87,7 @@ export async function PUT(
     switch (action) {
       case 'respond':
         const { response, responseBy } = updateData;
-        
+
         if (!response || !responseBy) {
           return NextResponse.json(
             { success: false, error: 'Respuesta y usuario requeridos' },
@@ -112,7 +111,7 @@ export async function PUT(
             responseBy,
             responseDate: new Date(),
             status: 'in_progress',
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           { new: true }
         ).populate('responseBy', 'name email');
@@ -121,7 +120,7 @@ export async function PUT(
 
       case 'close':
         const { closedBy } = updateData;
-        
+
         if (!closedBy) {
           return NextResponse.json(
             { success: false, error: 'Usuario requerido para cerrar' },
@@ -144,7 +143,7 @@ export async function PUT(
             status: 'closed',
             closedBy,
             closedAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           { new: true }
         ).populate('closedBy', 'name email');
@@ -153,7 +152,7 @@ export async function PUT(
 
       case 'resolve':
         const { resolvedBy } = updateData;
-        
+
         if (!resolvedBy) {
           return NextResponse.json(
             { success: false, error: 'Usuario requerido para resolver' },
@@ -174,7 +173,7 @@ export async function PUT(
           id,
           {
             status: 'resolved',
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           { new: true }
         );
@@ -183,7 +182,7 @@ export async function PUT(
 
       case 'assign':
         const { assignedTo } = updateData;
-        
+
         if (assignedTo) {
           // Verificar que el usuario existe
           const assignee = await User.findById(assignedTo);
@@ -199,7 +198,7 @@ export async function PUT(
           id,
           {
             assignedTo: assignedTo || null,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           { new: true }
         ).populate('assignedTo', 'name email');
@@ -208,8 +207,11 @@ export async function PUT(
 
       case 'update_status':
         const { status } = updateData;
-        
-        if (!status || !['pending', 'in_progress', 'resolved', 'closed'].includes(status)) {
+
+        if (
+          !status ||
+          !['pending', 'in_progress', 'resolved', 'closed'].includes(status)
+        ) {
           return NextResponse.json(
             { success: false, error: 'Estado inválido' },
             { status: 400 }
@@ -220,7 +222,7 @@ export async function PUT(
           id,
           {
             status,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           { new: true }
         );
@@ -265,10 +267,9 @@ export async function PUT(
         updatedAt: updatedReport.updatedAt.toISOString(),
         closedAt: updatedReport.closedAt?.toISOString(),
         closedBy: updatedReport.closedBy?.toString(),
-        closedByName: updatedReport.closedBy?.name
-      }
+        closedByName: updatedReport.closedBy?.name,
+      },
     });
-
   } catch (error) {
     console.error('Error updating report:', error);
     return NextResponse.json(
@@ -298,9 +299,8 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'Reporte eliminado correctamente'
+      message: 'Reporte eliminado correctamente',
     });
-
   } catch (error) {
     console.error('Error deleting report:', error);
     return NextResponse.json(

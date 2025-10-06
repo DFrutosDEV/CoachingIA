@@ -7,10 +7,10 @@ import Profile from '@/models/Profile';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const body = await request.json();
     const { title, content, objectiveId, clientId, coachId, sessionId } = body;
-    
+
     // Validaciones
     if (!title || !title.trim()) {
       return NextResponse.json(
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       coachId,
       sessionId: sessionId || undefined,
       createdBy: coachId, // El coach que crea la nota
-      isDeleted: false
+      isDeleted: false,
     });
 
     await newNote.save();
@@ -81,10 +81,9 @@ export async function POST(request: NextRequest) {
         clientId: newNote.clientId,
         coachId: newNote.coachId,
         sessionId: newNote.sessionId,
-        createdAt: newNote.createdAt
-      }
+        createdAt: newNote.createdAt,
+      },
     });
-
   } catch (error) {
     console.error('Error al crear nota:', error);
     return NextResponse.json(
@@ -98,23 +97,23 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const objectiveId = searchParams.get('objectiveId');
     const clientId = searchParams.get('clientId');
     const sessionId = searchParams.get('sessionId');
-    
+
     // Construir filtro
     const filter: any = { isDeleted: false };
-    
+
     if (objectiveId) {
       filter.objectiveId = objectiveId;
     }
-    
+
     if (clientId) {
       filter.clientId = clientId;
     }
-    
+
     if (sessionId) {
       filter.sessionId = sessionId;
     }
@@ -127,8 +126,8 @@ export async function GET(request: NextRequest) {
         populate: {
           path: 'user name lastName',
           model: 'User',
-          select: 'name lastName'
-        }
+          select: 'name lastName',
+        },
       })
       .sort({ createdAt: -1 });
 
@@ -140,17 +139,16 @@ export async function GET(request: NextRequest) {
       clientId: note.clientId?.toString(),
       coachId: note.coachId?.toString(),
       sessionId: note.sessionId?.toString(),
-      createdBy: note.createdBy?.user ? 
-        `${note.createdBy.name} ${note.createdBy.lastName}` : 
-        'Usuario desconocido',
-      createdAt: note.createdAt
+      createdBy: note.createdBy?.user
+        ? `${note.createdBy.name} ${note.createdBy.lastName}`
+        : 'Usuario desconocido',
+      createdAt: note.createdAt,
     }));
 
     return NextResponse.json({
       success: true,
-      notes: formattedNotes
+      notes: formattedNotes,
     });
-
   } catch (error) {
     console.error('Error al obtener notas:', error);
     return NextResponse.json(
@@ -158,4 +156,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

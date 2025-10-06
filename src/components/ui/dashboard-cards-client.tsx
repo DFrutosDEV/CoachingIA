@@ -1,10 +1,16 @@
-'use client'
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Calendar, Clock, BarChart3, ArrowRight } from "lucide-react"
-import Link from "next/link"
-import { formatDate } from "@/utils/validatesInputs"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, BarChart3, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { formatDate } from '@/utils/validatesInputs';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -46,19 +52,23 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">Sin sesiones programadas</div>
-          <p className="text-xs text-muted-foreground">No tienes sesiones próximas</p>
+          <p className="text-xs text-muted-foreground">
+            No tienes sesiones próximas
+          </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const sessionDate = new Date(data.date);
   const isToday = sessionDate.toDateString() === new Date().toDateString();
-  const displayDate = isToday ? 'Hoy' : formatDate(sessionDate, {
-    weekday: 'short', 
-    day: 'numeric', 
-    month: 'short' 
-  });
+  const displayDate = isToday
+    ? 'Hoy'
+    : formatDate(sessionDate, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      });
 
   return (
     <Card data-swapy-item="next-session">
@@ -67,7 +77,9 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{displayDate}, {data.time}</div>
+        <div className="text-2xl font-bold">
+          {displayDate}, {data.time}
+        </div>
         <p className="text-xs text-muted-foreground">Con {data.coach}</p>
         <p className="text-xs text-muted-foreground mb-4">{data.topic}</p>
         <div className="mt-4">
@@ -80,53 +92,61 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 2: Sesiones Completadas
-export function CompletedSessionsCard({ 
-  totalSessions, 
-  sessionsThisMonth 
-}: { 
+export function CompletedSessionsCard({
+  totalSessions,
+  sessionsThisMonth,
+}: {
   totalSessions: number;
   sessionsThisMonth: number;
 }) {
   return (
     <Card data-swapy-item="completed-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Sesiones Completadas</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          Sesiones Completadas
+        </CardTitle>
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{totalSessions}</div>
-        <p className="text-xs text-muted-foreground">+{sessionsThisMonth} este mes</p>
+        <p className="text-xs text-muted-foreground">
+          +{sessionsThisMonth} este mes
+        </p>
         <div className="mt-4">
           <div className="h-2 w-full rounded-full bg-muted">
-            <div 
-              className="h-full rounded-full bg-primary" 
-              style={{ width: `${Math.min((sessionsThisMonth / 4) * 100, 100)}%` }}
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{
+                width: `${Math.min((sessionsThisMonth / 4) * 100, 100)}%`,
+              }}
             ></div>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            {Math.min((sessionsThisMonth / 4) * 100, 100).toFixed(0)}% de tu plan mensual
+            {Math.min((sessionsThisMonth / 4) * 100, 100).toFixed(0)}% de tu
+            plan mensual
           </p>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 3: Objetivos (Goals)
-export function GoalsCard({ 
+export function GoalsCard({
   goals = [],
-  hasGoals = false
-}: { 
+  hasGoals = false,
+}: {
   goals: ClientGoal[];
   hasGoals?: boolean;
 }) {
   const completedGoals = goals.filter(goal => goal.isCompleted).length;
   const totalGoals = goals.length;
-  const completionPercentage = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+  const completionPercentage =
+    totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
 
   return (
     <Card data-swapy-item="goals">
@@ -156,13 +176,15 @@ export function GoalsCard({
           </>
         ) : (
           <>
-            <div className="text-2xl font-bold">{completedGoals}/{totalGoals}</div>
+            <div className="text-2xl font-bold">
+              {completedGoals}/{totalGoals}
+            </div>
             <p className="text-xs text-muted-foreground">Metas completadas</p>
-            
+
             <div className="mt-4">
               <div className="h-2 w-full rounded-full bg-muted">
-                <div 
-                  className="h-full rounded-full bg-primary" 
+                <div
+                  className="h-full rounded-full bg-primary"
                   style={{ width: `${completionPercentage}%` }}
                 ></div>
               </div>
@@ -174,10 +196,14 @@ export function GoalsCard({
             {/* Lista de metas recientes */}
             {goals.length > 0 && (
               <div className="mt-4 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Metas recientes:</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Metas recientes:
+                </p>
                 {goals.slice(0, 3).map((goal, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${goal.isCompleted ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <div
+                      className={`w-2 h-2 rounded-full ${goal.isCompleted ? 'bg-green-500' : 'bg-gray-300'}`}
+                    ></div>
                     <p className="text-xs text-muted-foreground truncate">
                       {goal.description}
                     </p>
@@ -192,20 +218,20 @@ export function GoalsCard({
             )}
           </>
         )}
-        
+
         <Button size="sm" variant="outline" className="w-full mt-4">
           Ver metas
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 4: Próximas Sesiones (Lista)
-export function UpcomingSessionsCard({ 
-  sessions 
-}: { 
+export function UpcomingSessionsCard({
+  sessions,
+}: {
   sessions: Array<{
     date: string;
     coach: string;
@@ -216,7 +242,9 @@ export function UpcomingSessionsCard({
     <Card data-swapy-item="upcoming-sessions">
       <CardHeader>
         <CardTitle>Próximas Sesiones</CardTitle>
-        <CardDescription>Tus sesiones programadas para los próximos días.</CardDescription>
+        <CardDescription>
+          Tus sesiones programadas para los próximos días.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -232,8 +260,12 @@ export function UpcomingSessionsCard({
               >
                 <div className="space-y-1">
                   <p className="text-sm font-medium">{session.date}</p>
-                  <p className="text-sm text-muted-foreground">Con {session.coach}</p>
-                  <p className="text-xs text-muted-foreground">{session.topic}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Con {session.coach}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {session.topic}
+                  </p>
                 </div>
                 <Button size="sm" variant="outline">
                   Detalles
@@ -244,13 +276,13 @@ export function UpcomingSessionsCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Card 5: Tu Progreso (Objectives)
-export function ProgressCard({ 
-  objectives 
-}: { 
+export function ProgressCard({
+  objectives,
+}: {
   objectives: ObjectiveProgress[];
 }) {
   return (
@@ -275,13 +307,14 @@ export function ProgressCard({
                 {objective.hasGoals ? (
                   <>
                     <div className="h-2 w-full rounded-full bg-muted">
-                      <div 
-                        className="h-full rounded-full bg-primary" 
+                      <div
+                        className="h-full rounded-full bg-primary"
                         style={{ width: `${objective.progress}%` }}
                       ></div>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {objective.completedGoals}/{objective.totalGoals} metas completadas
+                      {objective.completedGoals}/{objective.totalGoals} metas
+                      completadas
                     </p>
                   </>
                 ) : (
@@ -303,5 +336,5 @@ export function ProgressCard({
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { createTheme } from '@mui/material/styles'
+import * as React from 'react';
+import { createTheme } from '@mui/material/styles';
 import {
   ThemeProvider as NextThemesProvider,
   type ThemeProviderProps,
-} from 'next-themes'
-import { Inter } from 'next/font/google'
+} from 'next-themes';
+import { Inter } from 'next/font/google';
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
-})
+});
 
 export const lightTheme = createTheme({
   palette: {
@@ -52,7 +52,7 @@ export const lightTheme = createTheme({
       },
     },
   },
-})
+});
 
 export const darkTheme = createTheme({
   palette: {
@@ -86,26 +86,24 @@ export const darkTheme = createTheme({
       },
     },
   },
-})
+});
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  const [mounted, setMounted] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
-    return null
+    return null;
   }
 
   return (
     <NextThemesProvider {...props}>
-      <div className={inter.className}>
-        {children}
-      </div>
+      <div className={inter.className}>{children}</div>
     </NextThemesProvider>
-  )
+  );
 }
 
-export { useTheme } from 'next-themes'
+export { useTheme } from 'next-themes';

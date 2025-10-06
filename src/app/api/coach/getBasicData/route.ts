@@ -11,10 +11,10 @@ import { formatDate } from 'date-fns';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const coachId = searchParams.get('coachId');
-    
+
     if (!coachId) {
       return NextResponse.json(
         { error: 'Coach ID es requerido' },
@@ -32,7 +32,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener el perfil del coach
-    const coachProfile = await Profile.findOne({ user: coachId, isDeleted: false });
+    const coachProfile = await Profile.findOne({
+      user: coachId,
+      isDeleted: false,
+    });
     if (!coachProfile) {
       return NextResponse.json(
         { error: 'Perfil del coach no encontrado' },
@@ -41,38 +44,39 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener clientes del coach con sus datos de usuario
-    const coachProfileWithClients = await Profile.findById(coachProfile._id)
-      .populate({
-        path: 'clients',
-        match: { isDeleted: false },
-        populate: {
-          path: 'user',
-          select: 'name lastName email phone active isDeleted createdAt'
-        }
-      });
+    const coachProfileWithClients = await Profile.findById(
+      coachProfile._id
+    ).populate({
+      path: 'clients',
+      match: { isDeleted: false },
+      populate: {
+        path: 'user',
+        select: 'name lastName email phone active isDeleted createdAt',
+      },
+    });
 
     // Obtener la próxima sesión (próxima Meet no cancelada)
     const nextSession = await Meet.findOne({
       coachId: coachProfile._id, // Usar profileId del coach
       isCancelled: false,
-      date: { $gte: new Date() }
+      date: { $gte: new Date() },
     })
-    .populate({
-      path: 'clientId',
-      model: Profile,
-      populate: {
-        path: 'user',
-        model: User,
-        select: 'name lastName email phone active isDeleted createdAt'
-      }
-    })
-    .populate({
-      path: 'objectiveId',
-      model: Objective,
-      select: 'title'
-    })
-    .sort({ date: 1, time: 1 })
-    .limit(1);
+      .populate({
+        path: 'clientId',
+        model: Profile,
+        populate: {
+          path: 'user',
+          model: User,
+          select: 'name lastName email phone active isDeleted createdAt',
+        },
+      })
+      .populate({
+        path: 'objectiveId',
+        model: Objective,
+        select: 'title',
+      })
+      .sort({ date: 1, time: 1 })
+      .limit(1);
 
     // Contar clientes activos
     const activeClientsCount = coachProfileWithClients.clients.length;
@@ -81,7 +85,7 @@ export async function GET(request: NextRequest) {
     const startOfWeek = new Date();
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
-    
+
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 7);
     endOfWeek.setHours(23, 59, 59, 999);
@@ -89,7 +93,7 @@ export async function GET(request: NextRequest) {
     const scheduledSessionsCount = await Meet.countDocuments({
       coachId: coachProfile._id, // Usar profileId del coach
       isCancelled: false,
-      date: { $gte: startOfWeek, $lt: endOfWeek }
+      date: { $gte: startOfWeek, $lt: endOfWeek },
     });
 
     // Obtener sesiones de hoy
@@ -101,66 +105,73 @@ export async function GET(request: NextRequest) {
     const todaySessions = await Meet.find({
       coachId: coachProfile._id, // Usar profileId del coach
       isCancelled: false,
-      date: { $gte: today, $lt: tomorrow }
+      date: { $gte: today, $lt: tomorrow },
     })
-    .populate({
-      path: 'clientId',
-      populate: {
-        path: 'user',
-        select: 'name lastName'
-      }
-    })
-    .populate('objectiveId', 'title')
-    .sort({ time: 1 });
+      .populate({
+        path: 'clientId',
+        populate: {
+          path: 'user',
+          select: 'name lastName',
+        },
+      })
+      .populate('objectiveId', 'title')
+      .sort({ time: 1 });
 
     // Obtener clientes recientes con su progreso
     const recentClients = await Promise.all(
-      coachProfileWithClients.clients.slice(0, 5).map(async (clientProfile: any) => {    
-        // Contar sesiones del cliente
-        const sessionsCount = await Meet.countDocuments({
-          clientId: clientProfile._id, // Usar profileId del cliente
-          coachId: coachProfile._id, // Usar profileId del coach
-          isCancelled: false
-        });
+      coachProfileWithClients.clients
+        .slice(0, 5)
+        .map(async (clientProfile: any) => {
+          // Contar sesiones del cliente
+          const sessionsCount = await Meet.countDocuments({
+            clientId: clientProfile._id, // Usar profileId del cliente
+            coachId: coachProfile._id, // Usar profileId del coach
+            isCancelled: false,
+          });
 
-        // Calcular progreso basado en objetivos completados
-        const totalObjectives = await Objective.countDocuments({
-          clientId: clientProfile._id, // Usar profileId del cliente
-          coachId: coachProfile._id // Usar profileId del coach
-        });
+          // Calcular progreso basado en objetivos completados
+          const totalObjectives = await Objective.countDocuments({
+            clientId: clientProfile._id, // Usar profileId del cliente
+            coachId: coachProfile._id, // Usar profileId del coach
+          });
 
-        const completedObjectives = await Objective.countDocuments({
-          clientId: clientProfile._id, // Usar profileId del cliente
-          coachId: coachProfile._id, // Usar profileId del coach
-          isCompleted: true
-        });
+          const completedObjectives = await Objective.countDocuments({
+            clientId: clientProfile._id, // Usar profileId del cliente
+            coachId: coachProfile._id, // Usar profileId del coach
+            isCompleted: true,
+          });
 
-        const progress = totalObjectives > 0 ? Math.round((completedObjectives / totalObjectives) * 100) : 0;
+          const progress =
+            totalObjectives > 0
+              ? Math.round((completedObjectives / totalObjectives) * 100)
+              : 0;
 
-        return {
-          id: clientProfile._id.toString(),
-          name: `${clientProfile.name} ${clientProfile.lastName}`,
-          sessions: sessionsCount,
-          progress: progress
-        };
-      })
+          return {
+            id: clientProfile._id.toString(),
+            name: `${clientProfile.name} ${clientProfile.lastName}`,
+            sessions: sessionsCount,
+            progress: progress,
+          };
+        })
     );
 
     // Transformar las sesiones de hoy al formato esperado
     const formattedTodaySessions = todaySessions.map(session => ({
       time: `${formatDate(new Date(session.date), 'dd/MM/yyyy')} - ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
       client: `${session.clientId.name} ${session.clientId.lastName}`,
-      topic: session.objectiveId?.title || 'Sin objetivo definido'
+      topic: session.objectiveId?.title || 'Sin objetivo definido',
     }));
 
     // Formatear la próxima sesión
-    const formattedNextSession = nextSession ? {
-      date: nextSession.date,
-      link: nextSession.link,
-      time: nextSession.time,
-      client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,
-      topic: nextSession.objectiveId?.title || 'Sin objetivo definido'
-    } : null;
+    const formattedNextSession = nextSession
+      ? {
+          date: nextSession.date,
+          link: nextSession.link,
+          time: nextSession.time,
+          client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,
+          topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
+        }
+      : null;
 
     return NextResponse.json({
       success: true,
@@ -170,10 +181,9 @@ export async function GET(request: NextRequest) {
         scheduledSessionsCount,
         todaySessions: formattedTodaySessions,
         recentClients,
-        points: coachProfile.points || 0
-      }
+        points: coachProfile.points || 0,
+      },
     });
-
   } catch (error) {
     console.error('Error al obtener datos básicos del coach:', error);
     return NextResponse.json(
@@ -181,4 +191,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

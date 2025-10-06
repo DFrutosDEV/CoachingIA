@@ -22,86 +22,91 @@ export interface ITicket extends Document {
   closedBy?: mongoose.Types.ObjectId;
 }
 
-const TicketSchema: Schema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 200
+const TicketSchema: Schema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 200,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 2000,
+    },
+    category: {
+      type: String,
+      enum: ['bug', 'suggestion', 'complaint', 'other'],
+      default: 'other',
+      required: true,
+    },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high', 'critical'],
+      default: 'medium',
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'in_progress', 'resolved', 'closed'],
+      default: 'pending',
+      required: true,
+    },
+    reporterUser: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    reporterName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    reporterEmail: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    reporterPhone: {
+      type: String,
+      trim: true,
+    },
+    assignedTo: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    response: {
+      type: String,
+      trim: true,
+      maxlength: 2000,
+    },
+    responseBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    responseDate: {
+      type: Date,
+    },
+    attachments: [
+      {
+        type: String,
+      },
+    ],
+    closedAt: {
+      type: Date,
+    },
+    closedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 2000
-  },
-  category: {
-    type: String,
-    enum: ['bug', 'suggestion', 'complaint', 'other'],
-    default: 'other',
-    required: true
-  },
-  priority: {
-    type: String,
-    enum: ['low', 'medium', 'high', 'critical'],
-    default: 'medium',
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'in_progress', 'resolved', 'closed'],
-    default: 'pending',
-    required: true
-  },
-  reporterUser: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  reporterName: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  reporterEmail: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true
-  },
-  reporterPhone: {
-    type: String,
-    trim: true
-  },
-  assignedTo: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  response: {
-    type: String,
-    trim: true,
-    maxlength: 2000
-  },
-  responseBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  responseDate: {
-    type: Date
-  },
-  attachments: [{
-    type: String
-  }],
-  closedAt: {
-    type: Date
-  },
-  closedBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
 TicketSchema.index({ status: 1, createdAt: -1 });
 TicketSchema.index({ reporterUser: 1 });
@@ -109,4 +114,5 @@ TicketSchema.index({ assignedTo: 1 });
 TicketSchema.index({ category: 1 });
 TicketSchema.index({ priority: 1 });
 
-export default mongoose.models.Ticket || mongoose.model<ITicket>('Ticket', TicketSchema);
+export default mongoose.models.Ticket ||
+  mongoose.model<ITicket>('Ticket', TicketSchema);

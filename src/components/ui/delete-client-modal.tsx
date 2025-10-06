@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { useState } from "react"
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,17 +8,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, Loader2 } from "lucide-react"
-import { toast } from "sonner"
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DeleteClientModalProps {
-  isOpen: boolean
-  onClose: () => void
-  clientId: string
-  clientName: string
-  onClientDeleted: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  clientId: string;
+  clientName: string;
+  onClientDeleted: () => void;
 }
 
 export function DeleteClientModal({
@@ -26,34 +26,34 @@ export function DeleteClientModal({
   onClose,
   clientId,
   clientName,
-  onClientDeleted
+  onClientDeleted,
 }: DeleteClientModalProps) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteClient = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/users/${clientId}/delete`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Error al dar de baja al cliente')
+        throw new Error('Error al dar de baja al cliente');
       }
 
-      toast.success('Cliente dado de baja exitosamente')
-      onClientDeleted()
-      onClose()
+      toast.success('Cliente dado de baja exitosamente');
+      onClientDeleted();
+      onClose();
     } catch (error) {
-      console.error('Error:', error)
-      toast.error('Error al dar de baja al cliente')
+      console.error('Error:', error);
+      toast.error('Error al dar de baja al cliente');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -64,16 +64,13 @@ export function DeleteClientModal({
             Dar de baja cliente
           </DialogTitle>
           <DialogDescription>
-            ¿Estás seguro de que quieres dar de baja a <strong>{clientName}</strong>?
-            Esta acción marcará al cliente como eliminado pero no borrará sus datos permanentemente.
+            ¿Estás seguro de que quieres dar de baja a{' '}
+            <strong>{clientName}</strong>? Esta acción marcará al cliente como
+            eliminado pero no borrará sus datos permanentemente.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancelar
           </Button>
           <Button
@@ -93,5 +90,5 @@ export function DeleteClientModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

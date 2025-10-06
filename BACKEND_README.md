@@ -33,6 +33,7 @@ npm run migrate
 ```
 
 Este comando:
+
 - 🔍 Detecta automáticamente todos los modelos en `src/lib/models/`
 - 🏗️ Crea las colecciones correspondientes en MongoDB
 - 📊 Sincroniza los índices definidos en los esquemas
@@ -47,10 +48,12 @@ npm run dev
 ## 📡 Endpoints Disponibles
 
 ### Health Check
+
 - **GET** `/api/health`
 - Verifica el estado de la conexión a la base de datos
 
 **Respuesta de ejemplo:**
+
 ```json
 {
   "success": true,
@@ -68,9 +71,11 @@ npm run dev
 ### Usuarios
 
 #### Obtener todos los usuarios
+
 - **GET** `/api/users`
 
 **Respuesta de ejemplo:**
+
 ```json
 {
   "success": true,
@@ -91,9 +96,11 @@ npm run dev
 ```
 
 #### Crear un nuevo usuario
+
 - **POST** `/api/users`
 
 **Body de ejemplo:**
+
 ```json
 {
   "nombre": "María García",
@@ -103,6 +110,7 @@ npm run dev
 ```
 
 **Respuesta de ejemplo:**
+
 ```json
 {
   "success": true,
@@ -121,12 +129,15 @@ npm run dev
 ```
 
 #### Obtener un usuario específico
+
 - **GET** `/api/users/[id]`
 
 #### Actualizar un usuario
+
 - **PUT** `/api/users/[id]`
 
 **Body de ejemplo:**
+
 ```json
 {
   "nombre": "María García López",
@@ -135,16 +146,19 @@ npm run dev
 ```
 
 #### Eliminar un usuario (soft delete)
+
 - **DELETE** `/api/users/[id]`
 
 ## 🧪 Ejemplos de Uso con cURL
 
 ### Verificar conexión
+
 ```bash
 curl http://localhost:3000/api/health
 ```
 
 ### Crear un usuario
+
 ```bash
 curl -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
@@ -156,16 +170,19 @@ curl -X POST http://localhost:3000/api/users \
 ```
 
 ### Obtener todos los usuarios
+
 ```bash
 curl http://localhost:3000/api/users
 ```
 
 ### Obtener un usuario específico
+
 ```bash
 curl http://localhost:3000/api/users/507f1f77bcf86cd799439011
 ```
 
 ### Actualizar un usuario
+
 ```bash
 curl -X PUT http://localhost:3000/api/users/507f1f77bcf86cd799439011 \
   -H "Content-Type: application/json" \
@@ -175,6 +192,7 @@ curl -X PUT http://localhost:3000/api/users/507f1f77bcf86cd799439011 \
 ```
 
 ### Eliminar un usuario
+
 ```bash
 curl -X DELETE http://localhost:3000/api/users/507f1f77bcf86cd799439011
 ```
@@ -216,12 +234,14 @@ scripts/
 El comando `npm run migrate` es una herramienta poderosa que:
 
 ### ¿Qué hace?
+
 - 🔍 **Detecta automáticamente** todos los archivos `.ts` y `.js` en `src/lib/models/`
 - 🏗️ **Crea las colecciones** correspondientes en MongoDB si no existen
 - 📊 **Sincroniza los índices** definidos en los esquemas de Mongoose
 - 📋 **Muestra un resumen detallado** del proceso con colores
 
 ### Ejemplo de salida:
+
 ```bash
 🚀 Iniciando migración de modelos...
 
@@ -250,6 +270,7 @@ El comando `npm run migrate` es una herramienta poderosa que:
 ```
 
 ### Cuándo usar:
+
 - 🆕 **Primera vez** configurando el proyecto
 - 📝 **Después de agregar** nuevos modelos
 - 🔄 **Después de modificar** índices en los esquemas
@@ -272,6 +293,7 @@ El comando `npm run migrate` es una herramienta poderosa que:
 ### Configuración adicional
 
 El archivo `src/lib/mongodb.ts` puede ser modificado para:
+
 - Agregar opciones de conexión adicionales
 - Configurar pools de conexión
 - Agregar middleware de Mongoose
@@ -279,10 +301,11 @@ El archivo `src/lib/mongodb.ts` puede ser modificado para:
 ## 🚨 Manejo de Errores
 
 El backend incluye manejo de errores para:
+
 - Errores de validación de Mongoose
 - IDs de MongoDB inválidos
 - Usuarios duplicados
 - Errores de conexión a la base de datos
 - Errores internos del servidor
 
-Todos los errores devuelven respuestas JSON consistentes con códigos de estado HTTP apropiados. 
+Todos los errores devuelven respuestas JSON consistentes con códigos de estado HTTP apropiados.

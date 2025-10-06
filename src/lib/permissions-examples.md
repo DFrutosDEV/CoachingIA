@@ -16,31 +16,34 @@ dashboardRoutePermissions.push({
   path: '/dashboard/reports',
   allowedRoles: ['admin', 'coach'],
   requiresAuth: true,
-  description: 'Panel de reportes - Solo admin y coaches'
-})
+  description: 'Panel de reportes - Solo admin y coaches',
+});
 
 // Para agregar una nueva ruta de API
 apiRoutePermissions.push({
   path: '/api/reports',
   allowedRoles: ['admin'],
   requiresAuth: true,
-  description: 'API de reportes - Solo administradores'
-})
+  description: 'API de reportes - Solo administradores',
+});
 ```
 
 #### Modificar Permisos Existentes
 
 ```typescript
 // Encontrar y modificar una ruta existente
-const clientRoute = dashboardRoutePermissions.find(r => r.path === '/dashboard/client')
+const clientRoute = dashboardRoutePermissions.find(
+  r => r.path === '/dashboard/client'
+);
 if (clientRoute) {
-  clientRoute.allowedRoles = ['admin', 'coach', 'client', 'enterprise'] // Agregar más roles
+  clientRoute.allowedRoles = ['admin', 'coach', 'client', 'enterprise']; // Agregar más roles
 }
 ```
 
 ## Uso en el Middleware
 
 El middleware se ejecuta automáticamente y verifica:
+
 1. Si la ruta requiere autenticación
 2. Si el usuario tiene un token válido
 3. Si el rol del usuario tiene permisos para la ruta
@@ -97,14 +100,14 @@ function MyPage() {
   return (
     <div>
       <h1>Dashboard</h1>
-      
+
       {/* Solo admins pueden ver esto */}
       <PermissionGuard requiredRoles={['admin']}>
         <AdminPanel />
       </PermissionGuard>
 
       {/* Admins y coaches pueden ver esto */}
-      <PermissionGuard 
+      <PermissionGuard
         requiredRoles={['admin', 'coach']}
         fallback={<div>No tienes permisos para ver este panel</div>}
       >
@@ -124,15 +127,15 @@ function Navigation() {
   return (
     <nav>
       <a href="/dashboard">Dashboard</a>
-      
+
       {/* Solo mostrar si es admin */}
       <PermissionWrapper requiredRoles={['admin']}>
         <a href="/dashboard/admin">Administración</a>
       </PermissionWrapper>
 
       {/* Mostrar deshabilitado si no tiene permisos */}
-      <PermissionWrapper 
-        requiredRoles={['enterprise']} 
+      <PermissionWrapper
+        requiredRoles={['enterprise']}
         hideIfNoAccess={false}
       >
         <a href="/dashboard/enterprise">Empresas</a>
@@ -180,8 +183,8 @@ const hierarchicalPermissions = {
   admin: ['admin', 'coach', 'client', 'enterprise'], // Admin puede acceder a todo
   coach: ['coach', 'client'], // Coach puede acceder a coach y client
   enterprise: ['enterprise'], // Enterprise solo a enterprise
-  client: ['client'] // Client solo a client
-}
+  client: ['client'], // Client solo a client
+};
 ```
 
 ## Funciones Utilitarias
@@ -189,36 +192,42 @@ const hierarchicalPermissions = {
 ### Verificar Permisos Programáticamente
 
 ```typescript
-import { hasRoutePermission, getAllowedRoutesForRole } from '@/lib/permissions'
+import { hasRoutePermission, getAllowedRoutesForRole } from '@/lib/permissions';
 
 // Verificar si un rol puede acceder a una ruta
-const canAccess = hasRoutePermission('/dashboard/admin', 'admin') // true
+const canAccess = hasRoutePermission('/dashboard/admin', 'admin'); // true
 
 // Obtener todas las rutas permitidas para un rol
-const allowedRoutes = getAllowedRoutesForRole('coach')
-console.log(allowedRoutes) // ['/dashboard/coach', '/dashboard/client', ...]
+const allowedRoutes = getAllowedRoutesForRole('coach');
+console.log(allowedRoutes); // ['/dashboard/coach', '/dashboard/client', ...]
 ```
 
 ### Agregar Rutas Dinámicamente
 
 ```typescript
-import { addRoutePermission } from '@/lib/permissions'
+import { addRoutePermission } from '@/lib/permissions';
 
 // Agregar nueva ruta de dashboard
-addRoutePermission({
-  path: '/dashboard/analytics',
-  allowedRoles: ['admin', 'coach'],
-  requiresAuth: true,
-  description: 'Panel de analíticas'
-}, false) // false = dashboard route
+addRoutePermission(
+  {
+    path: '/dashboard/analytics',
+    allowedRoles: ['admin', 'coach'],
+    requiresAuth: true,
+    description: 'Panel de analíticas',
+  },
+  false
+); // false = dashboard route
 
 // Agregar nueva ruta de API
-addRoutePermission({
-  path: '/api/analytics',
-  allowedRoles: ['admin'],
-  requiresAuth: true,
-  description: 'API de analíticas'
-}, true) // true = API route
+addRoutePermission(
+  {
+    path: '/api/analytics',
+    allowedRoles: ['admin'],
+    requiresAuth: true,
+    description: 'API de analíticas',
+  },
+  true
+); // true = API route
 ```
 
 ## Manejo de Errores
@@ -256,15 +265,18 @@ addRoutePermission({
 ## Troubleshooting
 
 ### Problema: "No tienes permisos" pero debería tener acceso
+
 - Verifica que el rol esté en `allowedRoles` de la ruta en `permissions.ts`
 - Confirma que el token JWT contiene el rol correcto
 - Revisa que la ruta coincida exactamente (incluyendo `/` al final)
 
 ### Problema: Redirección infinita
+
 - Asegúrate de que `/login` y `/dashboard/unauthorized` estén en `publicRoutes`
 - Verifica que el middleware no esté aplicándose a rutas públicas
 
 ### Problema: Hook no funciona en componente
+
 - Confirma que el componente tenga `'use client'` al inicio
 - Verifica que el token esté guardado en localStorage
 - Asegúrate de que el rol esté en el formato correcto en el token

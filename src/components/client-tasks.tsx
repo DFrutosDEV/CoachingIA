@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
@@ -58,12 +58,14 @@ const ClientTasks: React.FC = () => {
   // Cargar datos de tareas
   const loadTasksData = async () => {
     if (!user?._id) return;
-    
+
     try {
       setLoading(true);
-      const response = await fetch(`/api/client/tasks?profileId=${user.profile._id}`);
+      const response = await fetch(
+        `/api/client/tasks?profileId=${user.profile._id}`
+      );
       const result = await response.json();
-      
+
       if (result.success) {
         setTasksData(result.data);
       } else {
@@ -90,18 +92,16 @@ const ClientTasks: React.FC = () => {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         // Actualizar el estado local
         setTasksData(prev => {
           if (!prev) return prev;
           return {
             ...prev,
-            goals: prev.goals.map(goal => 
-              goal._id === goalId 
-                ? { ...goal, isCompleted } 
-                : goal
-            )
+            goals: prev.goals.map(goal =>
+              goal._id === goalId ? { ...goal, isCompleted } : goal
+            ),
           };
         });
 
@@ -123,53 +123,76 @@ const ClientTasks: React.FC = () => {
   }, [user?._id]);
 
   // Separar tareas completadas e incompletas
-  const completedGoals = tasksData?.goals.filter(goal => goal.isCompleted) || [];
-  const incompleteGoals = tasksData?.goals.filter(goal => !goal.isCompleted) || [];
+  const completedGoals =
+    tasksData?.goals.filter(goal => goal.isCompleted) || [];
+  const incompleteGoals =
+    tasksData?.goals.filter(goal => !goal.isCompleted) || [];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: theme.palette.primary.main }}></div>
-          <p style={{ color: theme.palette.text.secondary }}>Cargando tareas...</p>
+          <div
+            className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4"
+            style={{ borderColor: theme.palette.primary.main }}
+          ></div>
+          <p style={{ color: theme.palette.text.secondary }}>
+            Cargando tareas...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full" style={{
-      backgroundColor: theme.palette.background.default
-    }}>
+    <div
+      className="flex flex-col h-full"
+      style={{
+        backgroundColor: theme.palette.background.default,
+      }}
+    >
       {/* Fila superior */}
       <div className="flex flex-1 mb-4">
         {/* Sección Tareas (Superior Izquierda) */}
-        <div className="flex-1 rounded-lg p-6 mr-4" style={{
-          border: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper,
-          boxShadow: theme.shadows[1]
-        }}>
-          <h2 className="text-center mt-0 mb-4" style={{
-            color: theme.palette.text.primary
-          }}>
+        <div
+          className="flex-1 rounded-lg p-6 mr-4"
+          style={{
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: theme.shadows[1],
+          }}
+        >
+          <h2
+            className="text-center mt-0 mb-4"
+            style={{
+              color: theme.palette.text.primary,
+            }}
+          >
             Tareas Diarias y Pasadas
           </h2>
-          
+
           {tasksData?.currentObjective && (
-            <div className="mb-4 p-3 rounded" style={{
-              backgroundColor: theme.palette.info.light,
-              color: theme.palette.info.contrastText
-            }}>
-              <h3 className="text-sm font-semibold mb-1">Objetivo Actual: {tasksData.currentObjective.title}</h3>
-              <p className="text-xs">Coach: {tasksData.currentObjective.coach}</p>
+            <div
+              className="mb-4 p-3 rounded"
+              style={{
+                backgroundColor: theme.palette.info.light,
+                color: theme.palette.info.contrastText,
+              }}
+            >
+              <h3 className="text-sm font-semibold mb-1">
+                Objetivo Actual: {tasksData.currentObjective.title}
+              </h3>
+              <p className="text-xs">
+                Coach: {tasksData.currentObjective.coach}
+              </p>
             </div>
           )}
 
           {/* Sección Tareas por Día */}
           {tasksData?.goals && tasksData.goals.length > 0 ? (
             <div className="space-y-3 max-h-76 overflow-y-auto pr-2 scrollbar-thin">
-              {tasksData.goals.map((goal) => (
-                <div 
+              {tasksData.goals.map(goal => (
+                <div
                   key={goal._id}
                   onClick={() => updateGoalStatus(goal._id, !goal.isCompleted)}
                   className={`p-3 rounded cursor-pointer transition-all duration-200 hover:opacity-90 ${
@@ -177,36 +200,50 @@ const ClientTasks: React.FC = () => {
                   }`}
                   style={{
                     border: `1px dashed ${theme.palette.divider}`,
-                    backgroundColor: goal.isCompleted 
-                      ? theme.palette.success.light 
-                      : theme.palette.action.hover
+                    backgroundColor: goal.isCompleted
+                      ? theme.palette.success.light
+                      : theme.palette.action.hover,
                   }}
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex-1">
-                      <h3 className="text-sm font-medium mb-1" style={{ color: theme.palette.text.primary }}>
+                      <h3
+                        className="text-sm font-medium mb-1"
+                        style={{ color: theme.palette.text.primary }}
+                      >
                         Día {goal.day}
                       </h3>
-                      <p className="text-xs" style={{ color: theme.palette.text.secondary }}>
+                      <p
+                        className="text-xs"
+                        style={{ color: theme.palette.text.secondary }}
+                      >
                         {goal.description}
                       </p>
                     </div>
                     <div className="flex items-center ml-2">
                       {updatingGoal === goal._id ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: theme.palette.primary.main }}></div>
+                        <div
+                          className="animate-spin rounded-full h-4 w-4 border-b-2"
+                          style={{ borderColor: theme.palette.primary.main }}
+                        ></div>
                       ) : (
                         <>
                           {goal.isCompleted && (
-                            <span className="text-green-500 text-sm mr-2">✓</span>
+                            <span className="text-green-500 text-sm mr-2">
+                              ✓
+                            </span>
                           )}
-                          <span className="text-xs px-2 py-1 rounded-full" style={{
-                            backgroundColor: goal.isCompleted 
-                              ? theme.palette.success.main 
-                              : theme.palette.warning.main,
-                            color: goal.isCompleted 
-                              ? theme.palette.success.contrastText 
-                              : theme.palette.warning.contrastText
-                          }}>
+                          <span
+                            className="text-xs px-2 py-1 rounded-full"
+                            style={{
+                              backgroundColor: goal.isCompleted
+                                ? theme.palette.success.main
+                                : theme.palette.warning.main,
+                              color: goal.isCompleted
+                                ? theme.palette.success.contrastText
+                                : theme.palette.warning.contrastText,
+                            }}
+                          >
                             {goal.isCompleted ? 'Completada' : 'Pendiente'}
                           </span>
                         </>
@@ -217,18 +254,27 @@ const ClientTasks: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8" style={{ color: theme.palette.text.secondary }}>
+            <div
+              className="text-center py-8"
+              style={{ color: theme.palette.text.secondary }}
+            >
               <p>No hay tareas asignadas</p>
             </div>
           )}
 
           {/* Resumen de tareas */}
           {tasksData?.goals && tasksData.goals.length > 0 && (
-            <div className="mt-4 p-3 rounded" style={{
-              backgroundColor: theme.palette.background.default,
-              border: `1px solid ${theme.palette.divider}`
-            }}>
-              <h4 className="text-sm font-semibold mb-2" style={{ color: theme.palette.text.primary }}>
+            <div
+              className="mt-4 p-3 rounded"
+              style={{
+                backgroundColor: theme.palette.background.default,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+            >
+              <h4
+                className="text-sm font-semibold mb-2"
+                style={{ color: theme.palette.text.primary }}
+              >
                 Resumen
               </h4>
               <div className="flex gap-4 text-xs">
@@ -247,49 +293,82 @@ const ClientTasks: React.FC = () => {
         </div>
 
         {/* Sección Notas (Derecha) */}
-        <div className="flex-1 rounded-lg p-6" style={{
-          border: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper,
-          boxShadow: theme.shadows[1]
-        }}>
-          <h2 className="text-center mt-0 mb-4" style={{
-            color: theme.palette.text.primary
-          }}>
+        <div
+          className="flex-1 rounded-lg p-6"
+          style={{
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: theme.shadows[1],
+          }}
+        >
+          <h2
+            className="text-center mt-0 mb-4"
+            style={{
+              color: theme.palette.text.primary,
+            }}
+          >
             Notas del Coach
           </h2>
           <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100%-4rem)]">
             {tasksData?.notes && tasksData.notes.length > 0 ? (
-              tasksData.notes.map((note) => (
-                <div key={note._id} className="rounded-lg p-4" style={{
-                  border: `1px solid ${theme.palette.divider}`,
-                  backgroundColor: theme.palette.background.default
-                }}>
+              tasksData.notes.map(note => (
+                <div
+                  key={note._id}
+                  className="rounded-lg p-4"
+                  style={{
+                    border: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: theme.palette.background.default,
+                  }}
+                >
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs px-2 py-1 rounded-full" style={{
-                      backgroundColor: theme.palette.info.main,
-                      color: theme.palette.info.contrastText
-                    }}>
+                    <span
+                      className="text-xs px-2 py-1 rounded-full"
+                      style={{
+                        backgroundColor: theme.palette.info.main,
+                        color: theme.palette.info.contrastText,
+                      }}
+                    >
                       {note.title || 'Nota'}
                     </span>
-                    <h3 className="text-sm font-semibold" style={{ color: theme.palette.text.primary }}>
+                    <h3
+                      className="text-sm font-semibold"
+                      style={{ color: theme.palette.text.primary }}
+                    >
                       {new Date(note.createdAt).toLocaleDateString('es-ES')}
                     </h3>
                   </div>
-                  <p className="text-sm mb-2" style={{ color: theme.palette.text.secondary }}>
+                  <p
+                    className="text-sm mb-2"
+                    style={{ color: theme.palette.text.secondary }}
+                  >
                     {note.content}
                   </p>
                   {note.sessionInfo && (
-                    <div className="text-xs" style={{ color: theme.palette.text.secondary }}>
-                      <p>Sesión: {new Date(note.sessionInfo.date).toLocaleDateString('es-ES')}</p>
+                    <div
+                      className="text-xs"
+                      style={{ color: theme.palette.text.secondary }}
+                    >
+                      <p>
+                        Sesión:{' '}
+                        {new Date(note.sessionInfo.date).toLocaleDateString(
+                          'es-ES'
+                        )}
+                      </p>
                     </div>
                   )}
-                  <p className="text-xs mt-1" style={{ color: theme.palette.text.secondary }}>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: theme.palette.text.secondary }}
+                  >
                     Por: {note.createdBy}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8" style={{ color: theme.palette.text.secondary }}>
+              <div
+                className="text-center py-8"
+                style={{ color: theme.palette.text.secondary }}
+              >
                 <p>No hay notas disponibles</p>
               </div>
             )}
@@ -300,35 +379,55 @@ const ClientTasks: React.FC = () => {
       {/* Fila inferior */}
       <div className="flex flex-1">
         {/* Sección Feedback (Inferior Izquierda) */}
-        <div className="flex-1 rounded-lg p-6" style={{
-          border: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper,
-          boxShadow: theme.shadows[1]
-        }}>
-          <h2 className="text-center mt-0 mb-4" style={{
-            color: theme.palette.text.primary
-          }}>
+        <div
+          className="flex-1 rounded-lg p-6"
+          style={{
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: theme.shadows[1],
+          }}
+        >
+          <h2
+            className="text-center mt-0 mb-4"
+            style={{
+              color: theme.palette.text.primary,
+            }}
+          >
             Feedback
           </h2>
           {tasksData?.feedback ? (
-            <div className="p-4 rounded" style={{
-              backgroundColor: theme.palette.background.default,
-              border: `1px solid ${theme.palette.divider}`
-            }}>
+            <div
+              className="p-4 rounded"
+              style={{
+                backgroundColor: theme.palette.background.default,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+            >
               <div className="mb-2">
-                <span className="text-xs px-2 py-1 rounded-full" style={{
-                  backgroundColor: theme.palette.success.main,
-                  color: theme.palette.success.contrastText
-                }}>
-                  {new Date(tasksData.feedback.createdAt).toLocaleDateString('es-ES')}
+                <span
+                  className="text-xs px-2 py-1 rounded-full"
+                  style={{
+                    backgroundColor: theme.palette.success.main,
+                    color: theme.palette.success.contrastText,
+                  }}
+                >
+                  {new Date(tasksData.feedback.createdAt).toLocaleDateString(
+                    'es-ES'
+                  )}
                 </span>
               </div>
-              <p className="text-sm" style={{ color: theme.palette.text.secondary }}>
+              <p
+                className="text-sm"
+                style={{ color: theme.palette.text.secondary }}
+              >
                 {tasksData.feedback.feedback}
               </p>
             </div>
           ) : (
-            <div className="text-center py-8" style={{ color: theme.palette.text.secondary }}>
+            <div
+              className="text-center py-8"
+              style={{ color: theme.palette.text.secondary }}
+            >
               <p>No hay feedback disponible</p>
             </div>
           )}

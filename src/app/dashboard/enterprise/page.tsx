@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { useEffect, useRef, useState } from "react"
-import { createSwapy } from "swapy"
+import { DashboardHeader } from '@/components/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { useEffect, useRef, useState } from 'react';
+import { createSwapy } from 'swapy';
 import {
   TotalClientsCard,
   ActiveCoachesCard,
   CompletedSessionsCard,
   ReportsCard,
   NewUsersCard,
-  CompanyPerformanceCard
-} from "@/components/ui/dashboard-cards-enterprise"
-import { useAppSelector } from '@/lib/redux/hooks'
+  CompanyPerformanceCard,
+} from '@/components/ui/dashboard-cards-enterprise';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 // Interfaces para los tipos de datos
 interface DashboardData {
@@ -47,73 +47,77 @@ interface DashboardData {
 }
 
 export default function EnterpriseDashboard() {
-  const [isReady, setIsReady] = useState(false)
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  
+  const [isReady, setIsReady] = useState(false);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   // Funciones para manejar el sidebar móvil
   const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen)
-  }
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
 
   const closeMobileSidebar = () => {
-    setIsMobileSidebarOpen(false)
-  }
-  
+    setIsMobileSidebarOpen(false);
+  };
+
   // Redux para obtener el usuario logueado
-  const user = useAppSelector(state => state.auth.user)
-  
+  const user = useAppSelector(state => state.auth.user);
+
   // Referencias para los contenedores
-  const smallCardsRef = useRef<HTMLDivElement>(null)
-  const largeCardsRef = useRef<HTMLDivElement>(null)
-  const swapySmallRef = useRef<any>(null)
-  const swapyLargeRef = useRef<any>(null)
+  const smallCardsRef = useRef<HTMLDivElement>(null);
+  const largeCardsRef = useRef<HTMLDivElement>(null);
+  const swapySmallRef = useRef<any>(null);
+  const swapyLargeRef = useRef<any>(null);
 
   // Función para cargar datos del dashboard
   const fetchDashboardData = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`/api/enterprise/dashboard?enterpriseId=${user?.enterprise?._id}`)
-      
+      setLoading(true);
+      const response = await fetch(
+        `/api/enterprise/dashboard?enterpriseId=${user?.enterprise?._id}`
+      );
+
       if (!response.ok) {
-        throw new Error('Error al cargar los datos del dashboard')
+        throw new Error('Error al cargar los datos del dashboard');
       }
-      
-      const data = await response.json()
-      setDashboardData(data)
-      setError(null)
+
+      const data = await response.json();
+      setDashboardData(data);
+      setError(null);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
-      setError('Error al cargar los datos del dashboard')
+      console.error('Error fetching dashboard data:', error);
+      setError('Error al cargar los datos del dashboard');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     // Marcar como listo después de que el componente se monte
     const timer = setTimeout(() => {
-      setIsReady(true)
-    }, 100)
+      setIsReady(true);
+    }, 100);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Cargar datos cuando el usuario esté disponible
     if (user?.enterprise?._id) {
-      fetchDashboardData()
+      fetchDashboardData();
     } else {
-      setError('No se encontró información de la empresa')
-      setLoading(false)
+      setError('No se encontró información de la empresa');
+      setLoading(false);
     }
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
     // Solo inicializar swapy cuando esté listo
-    if (!isReady) return
+    if (!isReady) return;
 
     // Configurar swapy después de que el DOM esté listo
     const timer = setTimeout(() => {
@@ -121,15 +125,21 @@ export default function EnterpriseDashboard() {
       if (smallCardsRef.current && !swapySmallRef.current) {
         try {
           swapySmallRef.current = createSwapy(smallCardsRef.current, {
-            animation: 'dynamic'
-          })
-          
+            animation: 'dynamic',
+          });
+
           swapySmallRef.current.onSwap((event: any) => {
-            console.log('Enterprise small cards swapped:', event.newSlotItemMap.asObject)
-            localStorage.setItem('enterpriseSmallCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
-          })
+            console.log(
+              'Enterprise small cards swapped:',
+              event.newSlotItemMap.asObject
+            );
+            localStorage.setItem(
+              'enterpriseSmallCardsLayout',
+              JSON.stringify(event.newSlotItemMap.asObject)
+            );
+          });
         } catch (error) {
-          console.warn('Error inicializando swapy para cards pequeñas:', error)
+          console.warn('Error inicializando swapy para cards pequeñas:', error);
         }
       }
 
@@ -137,40 +147,46 @@ export default function EnterpriseDashboard() {
       if (largeCardsRef.current && !swapyLargeRef.current) {
         try {
           swapyLargeRef.current = createSwapy(largeCardsRef.current, {
-            animation: 'dynamic'
-          })
-          
+            animation: 'dynamic',
+          });
+
           swapyLargeRef.current.onSwap((event: any) => {
-            console.log('Enterprise large cards swapped:', event.newSlotItemMap.asObject)
-            localStorage.setItem('enterpriseLargeCardsLayout', JSON.stringify(event.newSlotItemMap.asObject))
-          })
+            console.log(
+              'Enterprise large cards swapped:',
+              event.newSlotItemMap.asObject
+            );
+            localStorage.setItem(
+              'enterpriseLargeCardsLayout',
+              JSON.stringify(event.newSlotItemMap.asObject)
+            );
+          });
         } catch (error) {
-          console.warn('Error inicializando swapy para cards grandes:', error)
+          console.warn('Error inicializando swapy para cards grandes:', error);
         }
       }
-    }, 100)
+    }, 100);
 
     return () => {
-      clearTimeout(timer)
+      clearTimeout(timer);
       // Limpiar swapy al desmontar
       if (swapySmallRef.current) {
         try {
-          swapySmallRef.current.destroy?.()
+          swapySmallRef.current.destroy?.();
         } catch (error) {
-          console.warn('Error destruyendo swapy pequeño:', error)
+          console.warn('Error destruyendo swapy pequeño:', error);
         }
-        swapySmallRef.current = null
+        swapySmallRef.current = null;
       }
       if (swapyLargeRef.current) {
         try {
-          swapyLargeRef.current.destroy?.()
+          swapyLargeRef.current.destroy?.();
         } catch (error) {
-          console.warn('Error destruyendo swapy grande:', error)
+          console.warn('Error destruyendo swapy grande:', error);
         }
-        swapyLargeRef.current = null
+        swapyLargeRef.current = null;
       }
-    }
-  }, [isReady])
+    };
+  }, [isReady]);
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
@@ -178,37 +194,43 @@ export default function EnterpriseDashboard() {
       <div className="hidden border-r bg-muted/40 md:block">
         <DashboardSidebar userType="enterprise" className="h-full" />
       </div>
-      
+
       {/* Sidebar móvil */}
-      <DashboardSidebar 
-        userType="enterprise" 
-        className="h-full" 
+      <DashboardSidebar
+        userType="enterprise"
+        className="h-full"
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={closeMobileSidebar}
       />
-      
+
       <div className="flex flex-col overflow-hidden">
-        <DashboardHeader userType="enterprise" onToggleSidebar={toggleMobileSidebar} />
+        <DashboardHeader
+          userType="enterprise"
+          onToggleSidebar={toggleMobileSidebar}
+        />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl font-bold">Panel de Empresa</h1>
               <p className="text-muted-foreground">
-                Gestiona usuarios, coaches y analiza el rendimiento de tu Empresa.
+                Gestiona usuarios, coaches y analiza el rendimiento de tu
+                Empresa.
               </p>
             </div>
 
             {/* Mostrar loading o error */}
             {loading && (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">Cargando datos del dashboard...</p>
+                <p className="text-muted-foreground">
+                  Cargando datos del dashboard...
+                </p>
               </div>
             )}
-            
+
             {error && (
               <div className="text-center py-8">
                 <p className="text-red-600">{error}</p>
-                <button 
+                <button
                   onClick={fetchDashboardData}
                   className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
                 >
@@ -220,7 +242,10 @@ export default function EnterpriseDashboard() {
             {/* Zona de drag and drop para cards pequeñas (4 cards arriba - 25% cada una) */}
             {dashboardData && !loading && !error && (
               <>
-                <div ref={smallCardsRef} className="small-cards-container grid gap-6 md:grid-cols-4">
+                <div
+                  ref={smallCardsRef}
+                  className="small-cards-container grid gap-6 md:grid-cols-4"
+                >
                   <div data-swapy-slot="1" className="w-full">
                     <TotalClientsCard data={dashboardData.totalClients} />
                   </div>
@@ -228,7 +253,9 @@ export default function EnterpriseDashboard() {
                     <ActiveCoachesCard data={dashboardData.activeCoaches} />
                   </div>
                   <div data-swapy-slot="3" className="w-full">
-                    <CompletedSessionsCard data={dashboardData.completedSessions} />
+                    <CompletedSessionsCard
+                      data={dashboardData.completedSessions}
+                    />
                   </div>
                   <div data-swapy-slot="4" className="w-full">
                     <ReportsCard data={dashboardData.reports} />
@@ -236,12 +263,17 @@ export default function EnterpriseDashboard() {
                 </div>
 
                 {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
-                <div ref={largeCardsRef} className="large-cards-container grid gap-6 md:grid-cols-2">
+                <div
+                  ref={largeCardsRef}
+                  className="large-cards-container grid gap-6 md:grid-cols-2"
+                >
                   <div data-swapy-slot="5" className="w-full">
                     <NewUsersCard data={dashboardData.newUsers} />
                   </div>
                   <div data-swapy-slot="6" className="w-full">
-                    <CompanyPerformanceCard data={dashboardData.performanceStats} />
+                    <CompanyPerformanceCard
+                      data={dashboardData.performanceStats}
+                    />
                   </div>
                 </div>
               </>
@@ -250,5 +282,5 @@ export default function EnterpriseDashboard() {
         </main>
       </div>
     </div>
-  )
+  );
 }

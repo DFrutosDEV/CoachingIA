@@ -7,9 +7,9 @@ import Profile from '@/models/Profile';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { coachId, clientId } = await request.json();
-    
+
     if (!coachId || !clientId) {
       return NextResponse.json(
         { error: 'Coach ID y Client ID son requeridos' },
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Verificar que ambos usuarios existen
     const coachUser = await User.findById(coachId);
     const clientUser = await User.findById(clientId);
-    
+
     if (!coachUser || !clientUser) {
       return NextResponse.json(
         { error: 'Coach o cliente no encontrado' },
@@ -29,8 +29,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar los perfiles correspondientes
-    const coachProfile = await Profile.findOne({ user: coachId, isDeleted: false });
-    const clientProfile = await Profile.findOne({ user: clientId, isDeleted: false });
+    const coachProfile = await Profile.findOne({
+      user: coachId,
+      isDeleted: false,
+    });
+    const clientProfile = await Profile.findOne({
+      user: clientId,
+      isDeleted: false,
+    });
 
     if (!coachProfile || !clientProfile) {
       return NextResponse.json(
@@ -47,9 +53,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Cliente asignado al coach correctamente'
+      message: 'Cliente asignado al coach correctamente',
     });
-
   } catch (error) {
     console.error('Error al asignar cliente al coach:', error);
     return NextResponse.json(

@@ -6,10 +6,10 @@ import Goal from '@/models/Goal';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const body = await request.json();
     const { clientId, coachId, objectiveId, goals, description, day } = body;
-    
+
     // Si se proporciona description y day, crear una meta individual
     if (description && day) {
       if (!clientId || !coachId || !objectiveId) {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         day,
         date: new Date().toISOString(),
         isCompleted: false,
-        isDeleted: false
+        isDeleted: false,
       });
 
       const createdGoal = await newGoal.save();
@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Meta creada correctamente',
-        goal: createdGoal
+        goal: createdGoal,
       });
     }
-    
+
     // Si se proporciona goals array, crear múltiples metas
     if (goals && Array.isArray(goals)) {
       if (!clientId || !coachId || !objectiveId) {
@@ -55,9 +55,11 @@ export async function POST(request: NextRequest) {
         createdBy: coachId,
         clientId,
         day: goal.day || 'Lunes',
-        date: new Date(new Date().setDate(new Date().getDate() + index)).toISOString(),
+        date: new Date(
+          new Date().setDate(new Date().getDate() + index)
+        ).toISOString(),
         isCompleted: false,
-        isDeleted: false
+        isDeleted: false,
       }));
 
       const createdGoals = await Goal.insertMany(goalsToCreate);
@@ -65,15 +67,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: `${createdGoals.length} metas creadas correctamente`,
-        goals: createdGoals
+        goals: createdGoals,
       });
     }
 
     return NextResponse.json(
-      { error: 'Se requiere description y day para meta individual, o goals array para múltiples metas' },
+      {
+        error:
+          'Se requiere description y day para meta individual, o goals array para múltiples metas',
+      },
       { status: 400 }
     );
-
   } catch (error) {
     console.error('Error al crear goals:', error);
     return NextResponse.json(
@@ -87,7 +91,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const objectiveId = searchParams.get('objectiveId');
 
@@ -97,9 +101,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      goals
+      goals,
     });
-
   } catch (error) {
     console.error('Error al obtener goals:', error);
     return NextResponse.json(
@@ -107,4 +110,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

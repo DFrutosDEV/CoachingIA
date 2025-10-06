@@ -1,16 +1,18 @@
-import { SettingsClient } from "./settings-client";
+import { SettingsClient } from './settings-client';
 
 type ParamsObject = {
-  userType: "client" | "coach" | "admin" | "enterprise";
+  userType: 'client' | 'coach' | 'admin' | 'enterprise';
 };
 
 interface SettingsPageProps {
-  params: Promise<ParamsObject>; 
+  params: Promise<ParamsObject>;
 }
 
-export default async function SettingsPage({ params: paramsPromise }: SettingsPageProps) {
-  const params = await paramsPromise; 
+export default async function SettingsPage({
+  params: paramsPromise,
+}: SettingsPageProps) {
+  const params = await paramsPromise;
   const { userType } = params;
 
   return <SettingsClient userType={userType} />;
-} 
+}

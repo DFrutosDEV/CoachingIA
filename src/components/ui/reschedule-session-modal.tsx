@@ -1,18 +1,18 @@
-"use client"
+'use client';
 
-import { useState } from "react"
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Calendar, Clock, Save, X } from "lucide-react"
-import { toast } from "sonner"
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Calendar, Clock, Save, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface RescheduleSessionModalProps {
   isOpen: boolean;
@@ -29,27 +29,27 @@ export function RescheduleSessionModal({
   sessionId,
   currentDate,
   currentTime,
-  onSessionRescheduled
+  onSessionRescheduled,
 }: RescheduleSessionModalProps) {
-  const [newDate, setNewDate] = useState(currentDate)
-  const [newTime, setNewTime] = useState(currentTime)
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [newDate, setNewDate] = useState(currentDate);
+  const [newTime, setNewTime] = useState(currentTime);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleReschedule = async () => {
     if (!newDate.trim() || !newTime.trim()) {
-      toast.error("Por favor completa todos los campos")
-      return
+      toast.error('Por favor completa todos los campos');
+      return;
     }
 
     // Validar que la nueva fecha no sea en el pasado
-    const newDateTime = new Date(`${newDate}T${newTime}`)
+    const newDateTime = new Date(`${newDate}T${newTime}`);
     if (newDateTime <= new Date()) {
-      toast.error("La nueva fecha y hora deben ser en el futuro")
-      return
+      toast.error('La nueva fecha y hora deben ser en el futuro');
+      return;
     }
 
-    setIsUpdating(true)
-    
+    setIsUpdating(true);
+
     try {
       const response = await fetch(`/api/meets/${sessionId}`, {
         method: 'PATCH',
@@ -60,39 +60,39 @@ export function RescheduleSessionModal({
           date: newDate,
           time: newTime,
         }),
-      })
+      });
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         if (data.success) {
-          toast.success('Sesión reprogramada exitosamente')
-          onSessionRescheduled()
-          onClose()
+          toast.success('Sesión reprogramada exitosamente');
+          onSessionRescheduled();
+          onClose();
         } else {
-          toast.error(data.error || 'Error al reprogramar la sesión')
+          toast.error(data.error || 'Error al reprogramar la sesión');
         }
       } else {
-        const errorData = await response.json()
-        toast.error(errorData.error || 'Error al reprogramar la sesión')
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Error al reprogramar la sesión');
       }
     } catch (error) {
-      console.error('Error al reprogramar sesión:', error)
-      toast.error('Error al reprogramar la sesión')
+      console.error('Error al reprogramar sesión:', error);
+      toast.error('Error al reprogramar la sesión');
     } finally {
-      setIsUpdating(false)
+      setIsUpdating(false);
     }
-  }
+  };
 
   const formatCurrentDateTime = () => {
-    const date = new Date(currentDate)
-    const time = currentTime
+    const date = new Date(currentDate);
+    const time = currentTime;
     return `${date.toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
-    })} a las ${time}`
-  }
+      day: 'numeric',
+    })} a las ${time}`;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -126,17 +126,17 @@ export function RescheduleSessionModal({
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
                   value={newDate}
-                  onChange={(e) => setNewDate(e.target.value)}
+                  onChange={e => setNewDate(e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="newTime">Nueva hora</Label>
                 <Input
                   id="newTime"
                   type="time"
                   value={newTime}
-                  onChange={(e) => setNewTime(e.target.value)}
+                  onChange={e => setNewTime(e.target.value)}
                 />
               </div>
             </div>
@@ -144,14 +144,20 @@ export function RescheduleSessionModal({
             {/* Información de la nueva fecha */}
             {newDate && newTime && (
               <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
-                <h4 className="text-sm font-medium mb-1">Nueva sesión programada para:</h4>
+                <h4 className="text-sm font-medium mb-1">
+                  Nueva sesión programada para:
+                </h4>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(`${newDate}T${newTime}`).toLocaleDateString('es-ES', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })} a las {newTime}
+                  {new Date(`${newDate}T${newTime}`).toLocaleDateString(
+                    'es-ES',
+                    {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    }
+                  )}{' '}
+                  a las {newTime}
                 </p>
               </div>
             )}
@@ -159,7 +165,7 @@ export function RescheduleSessionModal({
 
           {/* Botones de acción */}
           <div className="flex gap-3">
-            <Button 
+            <Button
               onClick={handleReschedule}
               disabled={isUpdating || !newDate || !newTime}
               className="flex-1"
@@ -176,11 +182,7 @@ export function RescheduleSessionModal({
                 </>
               )}
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={onClose}
-              disabled={isUpdating}
-            >
+            <Button variant="outline" onClick={onClose} disabled={isUpdating}>
               <X className="h-4 w-4 mr-2" />
               Cancelar
             </Button>
@@ -188,5 +190,5 @@ export function RescheduleSessionModal({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

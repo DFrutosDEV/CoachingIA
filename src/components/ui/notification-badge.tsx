@@ -9,16 +9,16 @@ interface NotificationBadgeProps {
   className?: string;
 }
 
-export function NotificationBadge({ 
-  unreadCount, 
-  onClick, 
-  className 
+export function NotificationBadge({
+  unreadCount,
+  onClick,
+  className,
 }: NotificationBadgeProps) {
   return (
-    <Button 
-      variant="text" 
+    <Button
+      variant="text"
       onClick={onClick}
-      className={cn("relative", className)}
+      className={cn('relative', className)}
     >
       <Bell className="h-5 w-5" />
       {unreadCount > 0 && (

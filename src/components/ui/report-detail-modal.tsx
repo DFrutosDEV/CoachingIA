@@ -1,24 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Report } from '@/types';
-import { 
-  FileText, 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  MessageSquare, 
-  CheckCircle, 
+import {
+  FileText,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MessageSquare,
+  CheckCircle,
   XCircle,
   Clock,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 
 interface ReportDetailModalProps {
@@ -33,30 +38,44 @@ interface ReportDetailModalProps {
 
 const getPriorityColor = (priority: string) => {
   switch (priority) {
-    case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
-    case 'high': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300';
-    case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
-    case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
-    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    case 'critical':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
+    case 'high':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300';
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
+    case 'low':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   }
 };
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
-    case 'in_progress': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
-    case 'resolved': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
-    case 'closed': return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
+    case 'in_progress':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+    case 'resolved':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
+    case 'closed':
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   }
 };
 
 const getCategoryIcon = (category: string) => {
   switch (category) {
-    case 'bug': return <AlertTriangle className="h-4 w-4" />;
-    case 'suggestion': return <MessageSquare className="h-4 w-4" />;
-    case 'complaint': return <XCircle className="h-4 w-4" />;
-    default: return <FileText className="h-4 w-4" />;
+    case 'bug':
+      return <AlertTriangle className="h-4 w-4" />;
+    case 'suggestion':
+      return <MessageSquare className="h-4 w-4" />;
+    case 'complaint':
+      return <XCircle className="h-4 w-4" />;
+    default:
+      return <FileText className="h-4 w-4" />;
   }
 };
 
@@ -66,18 +85,18 @@ const formatDate = (dateString: string) => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 };
 
-export function ReportDetailModal({ 
-  report, 
-  isOpen, 
-  onClose, 
-  onRespond, 
-  onCloseReport, 
-  onResolve, 
-  currentUserId 
+export function ReportDetailModal({
+  report,
+  isOpen,
+  onClose,
+  onRespond,
+  onCloseReport,
+  onResolve,
+  currentUserId,
 }: ReportDetailModalProps) {
   const [response, setResponse] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +105,7 @@ export function ReportDetailModal({
 
   const handleRespond = async () => {
     if (!response.trim()) return;
-    
+
     setIsSubmitting(true);
     try {
       await onRespond(report._id, response);
@@ -120,7 +139,8 @@ export function ReportDetailModal({
     }
   };
 
-  const canTakeActions = report.status !== 'closed' && report.status !== 'resolved';
+  const canTakeActions =
+    report.status !== 'closed' && report.status !== 'resolved';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -170,14 +190,20 @@ export function ReportDetailModal({
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <a href={`mailto:${report.reporterEmail}`} className="text-blue-600 hover:underline">
+                <a
+                  href={`mailto:${report.reporterEmail}`}
+                  className="text-blue-600 hover:underline"
+                >
                   {report.reporterEmail}
                 </a>
               </div>
               {report.reporterPhone && (
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <a href={`tel:${report.reporterPhone}`} className="text-blue-600 hover:underline">
+                  <a
+                    href={`tel:${report.reporterPhone}`}
+                    className="text-blue-600 hover:underline"
+                  >
                     {report.reporterPhone}
                   </a>
                 </div>
@@ -217,7 +243,8 @@ export function ReportDetailModal({
                 <p className="whitespace-pre-wrap">{report.response}</p>
                 {report.responseByName && report.responseDate && (
                   <div className="text-sm text-muted-foreground">
-                    Respondido por {report.responseByName} el {formatDate(report.responseDate)}
+                    Respondido por {report.responseByName} el{' '}
+                    {formatDate(report.responseDate)}
                   </div>
                 )}
               </CardContent>
@@ -237,11 +264,11 @@ export function ReportDetailModal({
                 <Textarea
                   placeholder="Escribe tu respuesta aquí..."
                   value={response}
-                  onChange={(e) => setResponse(e.target.value)}
+                  onChange={e => setResponse(e.target.value)}
                   rows={4}
                 />
-                <Button 
-                  onClick={handleRespond} 
+                <Button
+                  onClick={handleRespond}
                   disabled={!response.trim() || isSubmitting}
                   className="w-full"
                 >
@@ -258,8 +285,8 @@ export function ReportDetailModal({
             {canTakeActions && (
               <>
                 {report.status !== 'resolved' && (
-                  <Button 
-                    onClick={handleResolve} 
+                  <Button
+                    onClick={handleResolve}
                     disabled={isSubmitting}
                     variant="default"
                     className="flex items-center gap-2"
@@ -268,8 +295,8 @@ export function ReportDetailModal({
                     {isSubmitting ? 'Procesando...' : 'Marcar como Resuelto'}
                   </Button>
                 )}
-                <Button 
-                  onClick={handleClose} 
+                <Button
+                  onClick={handleClose}
                   disabled={isSubmitting}
                   variant="outline"
                   className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"

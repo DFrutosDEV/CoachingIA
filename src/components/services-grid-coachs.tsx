@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react";
-import { CoachCard } from "./coach-card";
-import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { CoachCard } from './coach-card';
+import { Button } from '@/components/ui/button';
+import { Loader2, RefreshCw } from 'lucide-react';
 
 interface CoachResponse {
   id: string;
@@ -104,7 +104,7 @@ export function ServicesGrid() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {coaches.map((coach) => (
+        {coaches.map(coach => (
           <CoachCard
             key={coach.id}
             id={coach.id}

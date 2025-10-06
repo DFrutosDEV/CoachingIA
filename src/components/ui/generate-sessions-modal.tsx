@@ -1,20 +1,26 @@
-"use client"
+'use client';
 
-import { useState } from "react"
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, Plus, Edit, X, Save } from "lucide-react"
-import { toast } from "sonner"
-import { Session } from "@/types"
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Calendar, Clock, Plus, Edit, X, Save } from 'lucide-react';
+import { toast } from 'sonner';
+import { Session } from '@/types';
 
 interface GeneratedSession {
   _id: string;
@@ -38,111 +44,117 @@ export function GenerateSessionsModal({
   objectiveId,
   onSessionsGenerated,
   clientId,
-  coachId
+  coachId,
 }: GenerateSessionsModalProps) {
-  const [startDate, setStartDate] = useState("")
-  const [startTime, setStartTime] = useState("")
-  const [periodicity, setPeriodicity] = useState("weekly")
-  const [sessionCount, setSessionCount] = useState("4")
-  const [generatedSessions, setGeneratedSessions] = useState<GeneratedSession[]>([])
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-  const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
-  const [editingDate, setEditingDate] = useState("")
-  const [editingTime, setEditingTime] = useState("")
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [periodicity, setPeriodicity] = useState('weekly');
+  const [sessionCount, setSessionCount] = useState('4');
+  const [generatedSessions, setGeneratedSessions] = useState<
+    GeneratedSession[]
+  >([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editingDate, setEditingDate] = useState('');
+  const [editingTime, setEditingTime] = useState('');
 
   const generateSessions = () => {
     if (!startDate || !startTime || !sessionCount) {
-      toast.error("Por favor completa todos los campos")
-      return
+      toast.error('Por favor completa todos los campos');
+      return;
     }
 
-    const count = parseInt(sessionCount)
+    const count = parseInt(sessionCount);
     if (count <= 0 || count > 52) {
-      toast.error("La cantidad de sesiones debe estar entre 1 y 52")
-      return
+      toast.error('La cantidad de sesiones debe estar entre 1 y 52');
+      return;
     }
 
-    setIsGenerating(true)
-    
+    setIsGenerating(true);
+
     try {
-      const sessions: GeneratedSession[] = []
-      const start = new Date(startDate)
-      
+      const sessions: GeneratedSession[] = [];
+      const start = new Date(startDate);
+
       for (let i = 0; i < count; i++) {
-        const sessionDate = new Date(start)
-        
+        const sessionDate = new Date(start);
+
         // Calcular la fecha según la periodicidad
         switch (periodicity) {
-          case "daily":
-            sessionDate.setDate(start.getDate() + i)
-            break
-          case "weekly":
-            sessionDate.setDate(start.getDate() + (i * 7))
-            break
-          case "biweekly":
-            sessionDate.setDate(start.getDate() + (i * 14))
-            break
-          case "monthly":
-            sessionDate.setMonth(start.getMonth() + i)
-            break
+          case 'daily':
+            sessionDate.setDate(start.getDate() + i);
+            break;
+          case 'weekly':
+            sessionDate.setDate(start.getDate() + i * 7);
+            break;
+          case 'biweekly':
+            sessionDate.setDate(start.getDate() + i * 14);
+            break;
+          case 'monthly':
+            sessionDate.setMonth(start.getMonth() + i);
+            break;
           default:
-            sessionDate.setDate(start.getDate() + (i * 7))
+            sessionDate.setDate(start.getDate() + i * 7);
         }
 
         sessions.push({
           _id: `temp-${i}`,
           date: sessionDate.toISOString().split('T')[0],
           time: startTime,
-          isEditable: true
-        } as GeneratedSession)
+          isEditable: true,
+        } as GeneratedSession);
       }
 
-      setGeneratedSessions(sessions)
-      toast.success(`${count} sesiones generadas`)
+      setGeneratedSessions(sessions);
+      toast.success(`${count} sesiones generadas`);
     } catch (error) {
-      console.error("Error al generar sesiones:", error)
-      toast.error("Error al generar las sesiones")
+      console.error('Error al generar sesiones:', error);
+      toast.error('Error al generar las sesiones');
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
-  const handleEditSession = (sessionId: string, currentDate: string, currentTime: string) => {
-    setEditingSessionId(sessionId)
-    setEditingDate(currentDate)
-    setEditingTime(currentTime)
-  }
+  const handleEditSession = (
+    sessionId: string,
+    currentDate: string,
+    currentTime: string
+  ) => {
+    setEditingSessionId(sessionId);
+    setEditingDate(currentDate);
+    setEditingTime(currentTime);
+  };
 
   const handleSaveEdit = (sessionId: string) => {
     if (!editingDate || !editingTime) {
-      toast.error("Por favor ingresa una fecha y hora válidas")
-      return
+      toast.error('Por favor ingresa una fecha y hora válidas');
+      return;
     }
 
-    setGeneratedSessions(prev => 
-      prev.map(session => 
-        session._id === sessionId 
+    setGeneratedSessions(prev =>
+      prev.map(session =>
+        session._id === sessionId
           ? { ...session, date: editingDate, time: editingTime }
           : session
       )
-    )
-    setEditingSessionId(null)
-    setEditingDate("")
-    setEditingTime("")
-    toast.success("Sesión actualizada")
-  }
+    );
+    setEditingSessionId(null);
+    setEditingDate('');
+    setEditingTime('');
+    toast.success('Sesión actualizada');
+  };
 
   const handleCreateSessions = async () => {
     if (generatedSessions.length === 0) {
-      toast.error("No hay sesiones para crear")
-      return
+      toast.error('No hay sesiones para crear');
+      return;
     }
 
-    setIsCreating(true)
-    
+    setIsCreating(true);
+
     try {
-      console.log("objectiveId", objectiveId)
+      console.log('objectiveId', objectiveId);
       const response = await fetch('/api/meets', {
         method: 'POST',
         headers: {
@@ -152,54 +164,54 @@ export function GenerateSessionsModal({
           objectiveId,
           meets: generatedSessions.map(session => ({
             date: session.date,
-            time: session.time
+            time: session.time,
           })),
           clientId: clientId,
-          coachId: coachId
+          coachId: coachId,
         }),
-      })
+      });
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         if (data.success) {
-          onSessionsGenerated(data.meets)
-          onClose()
-          toast.success(`${data.meets.length} sesiones creadas exitosamente`)
-          
+          onSessionsGenerated(data.meets);
+          onClose();
+          toast.success(`${data.meets.length} sesiones creadas exitosamente`);
+
           // Resetear el formulario
-          setStartDate("")
-          setStartTime("")
-          setPeriodicity("weekly")
-          setSessionCount("4")
-          setGeneratedSessions([])
+          setStartDate('');
+          setStartTime('');
+          setPeriodicity('weekly');
+          setSessionCount('4');
+          setGeneratedSessions([]);
         } else {
-          toast.error(data.error || "Error al crear las sesiones")
+          toast.error(data.error || 'Error al crear las sesiones');
         }
       } else {
-        const errorData = await response.json()
-        toast.error(errorData.error || "Error al crear las sesiones")
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Error al crear las sesiones');
       }
     } catch (error) {
-      console.error("Error al crear sesiones:", error)
-      toast.error("Error al crear las sesiones")
+      console.error('Error al crear sesiones:', error);
+      toast.error('Error al crear las sesiones');
     } finally {
-      setIsCreating(false)
+      setIsCreating(false);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
-    })
-  }
+      day: 'numeric',
+    });
+  };
 
   const formatTime = (timeString: string) => {
-    return timeString
-  }
+    return timeString;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -225,17 +237,17 @@ export function GenerateSessionsModal({
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={e => setStartDate(e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="startTime">Hora de inicio</Label>
                 <Input
                   id="startTime"
                   type="time"
                   value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
+                  onChange={e => setStartTime(e.target.value)}
                 />
               </div>
             </div>
@@ -249,7 +261,7 @@ export function GenerateSessionsModal({
                   min="1"
                   max="30"
                   value={sessionCount}
-                  onChange={(e) => setSessionCount(e.target.value)}
+                  onChange={e => setSessionCount(e.target.value)}
                   placeholder="Ej: 4"
                 />
               </div>
@@ -261,18 +273,31 @@ export function GenerateSessionsModal({
                     <SelectValue placeholder="Selecciona la periodicidad" />
                   </SelectTrigger>
                   <SelectContent className="bg-background">
-                    <SelectItem className="bg-background-hover" value="daily">Diaria</SelectItem>
-                    <SelectItem className="bg-background-hover" value="weekly">Semanal</SelectItem>
-                    <SelectItem className="bg-background-hover" value="biweekly">Quincenal</SelectItem>
-                    <SelectItem className="bg-background-hover" value="monthly">Mensual</SelectItem>
+                    <SelectItem className="bg-background-hover" value="daily">
+                      Diaria
+                    </SelectItem>
+                    <SelectItem className="bg-background-hover" value="weekly">
+                      Semanal
+                    </SelectItem>
+                    <SelectItem
+                      className="bg-background-hover"
+                      value="biweekly"
+                    >
+                      Quincenal
+                    </SelectItem>
+                    <SelectItem className="bg-background-hover" value="monthly">
+                      Mensual
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            <Button 
-              onClick={generateSessions} 
-              disabled={isGenerating || !startDate || !startTime || !sessionCount}
+            <Button
+              onClick={generateSessions}
+              disabled={
+                isGenerating || !startDate || !startTime || !sessionCount
+              }
               className="w-full"
             >
               {isGenerating ? (
@@ -293,8 +318,10 @@ export function GenerateSessionsModal({
           {generatedSessions.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">Sesiones Generadas ({generatedSessions.length})</h3>
-                <Button 
+                <h3 className="text-lg font-medium">
+                  Sesiones Generadas ({generatedSessions.length})
+                </h3>
+                <Button
                   onClick={handleCreateSessions}
                   disabled={isCreating}
                   className="gap-2"
@@ -315,40 +342,45 @@ export function GenerateSessionsModal({
 
               <div className="space-y-2 max-h-[300px] overflow-y-auto">
                 {generatedSessions.map((session, index) => (
-                  <div key={session._id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={session._id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Sesión {index + 1}</span>
+                        <span className="text-sm font-medium">
+                          Sesión {index + 1}
+                        </span>
                       </div>
-                      
+
                       {editingSessionId === session._id ? (
                         <div className="flex items-center gap-2">
                           <Input
                             type="date"
                             value={editingDate}
-                            onChange={(e) => setEditingDate(e.target.value)}
+                            onChange={e => setEditingDate(e.target.value)}
                             className="w-auto"
                           />
                           <Input
                             type="time"
                             value={editingTime}
-                            onChange={(e) => setEditingTime(e.target.value)}
+                            onChange={e => setEditingTime(e.target.value)}
                             className="w-auto"
                           />
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             onClick={() => handleSaveEdit(session._id)}
                           >
                             <Save className="h-3 w-3" />
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => {
-                              setEditingSessionId(null)
-                              setEditingDate("")
-                              setEditingTime("")
+                              setEditingSessionId(null);
+                              setEditingDate('');
+                              setEditingTime('');
                             }}
                           >
                             <X className="h-3 w-3" />
@@ -365,12 +397,18 @@ export function GenerateSessionsModal({
                         </div>
                       )}
                     </div>
-                    
+
                     {editingSessionId !== session._id && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEditSession(session._id, session.date, session.time)}
+                        onClick={() =>
+                          handleEditSession(
+                            session._id,
+                            session.date,
+                            session.time
+                          )
+                        }
                       >
                         <Edit className="h-3 w-3" />
                       </Button>
@@ -383,5 +421,5 @@ export function GenerateSessionsModal({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

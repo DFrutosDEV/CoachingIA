@@ -7,10 +7,16 @@ import { generateJitsiLink } from '@/utils/generateJitsiLinks';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { clientId, coachId, objectiveId, meets } = await request.json();
-    
-    if (!clientId || !coachId || !objectiveId || !meets || !Array.isArray(meets)) {
+
+    if (
+      !clientId ||
+      !coachId ||
+      !objectiveId ||
+      !meets ||
+      !Array.isArray(meets)
+    ) {
       return NextResponse.json(
         { error: 'clientId, coachId, objectiveId y meets son requeridos' },
         { status: 400 }
@@ -35,7 +41,7 @@ export async function POST(request: NextRequest) {
         clientId,
         coachId,
         objectiveId,
-        isCancelled: false
+        isCancelled: false,
       };
     });
 
@@ -44,9 +50,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `${createdMeets.length} reuniones creadas correctamente`,
-      meets: createdMeets
+      meets: createdMeets,
     });
-
   } catch (error) {
     console.error('Error al crear meets:', error);
     return NextResponse.json(
@@ -60,30 +65,29 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const objectiveId = searchParams.get('objectiveId');
     const clientId = searchParams.get('clientId');
     const coachId = searchParams.get('coachId');
-    
+
     // Construir filtro
     const filter: any = {};
-    
+
     if (objectiveId) {
       filter.objectiveId = objectiveId;
     }
-    
+
     if (clientId) {
       filter.clientId = clientId;
     }
-    
+
     if (coachId) {
       filter.coachId = coachId;
     }
 
     // Obtener sesiones ordenadas por fecha
-    const meets = await Meet.find(filter)
-      .sort({ date: -1 });
+    const meets = await Meet.find(filter).sort({ date: -1 });
 
     const formattedMeets = meets.map(meet => ({
       _id: meet._id.toString(),
@@ -93,14 +97,13 @@ export async function GET(request: NextRequest) {
       clientId: meet.clientId?.toString(),
       coachId: meet.coachId?.toString(),
       isCancelled: meet.isCancelled,
-      createdAt: meet.createdAt
+      createdAt: meet.createdAt,
     }));
 
     return NextResponse.json({
       success: true,
-      meets: formattedMeets
+      meets: formattedMeets,
     });
-
   } catch (error) {
     console.error('Error al obtener sesiones:', error);
     return NextResponse.json(
@@ -108,4 +111,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

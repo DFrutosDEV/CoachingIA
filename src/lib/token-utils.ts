@@ -5,8 +5,8 @@ export interface TokenPayload {
   userId: string;
   email: string;
   role?: string;
-  iat?: number;  // issued at
-  exp?: number;  // expires at
+  iat?: number; // issued at
+  exp?: number; // expires at
 }
 
 // ✅ Función SEGURA para extraer datos del token
@@ -19,7 +19,7 @@ export function getTokenData(token: string): TokenPayload | null {
 
     // ✅ Verificar token con la librería JWT (incluye validación de firma y expiración)
     const decoded = verifyToken(token);
-    
+
     if (!decoded) {
       console.warn('⚠️ Token inválido o expirado');
       return null;
@@ -42,7 +42,7 @@ export function getUserRoleFromToken(token: string): string | null {
 
   const role = tokenData.role;
   console.log('🔍 Rol extraído del token:', role);
-  
+
   return role || null;
 }
 
@@ -53,9 +53,12 @@ export function getUserIdFromToken(token: string): string | null {
 }
 
 // ✅ Función para verificar si el token está por expirar (útil para refresh)
-export function isTokenExpiringSoon(token: string, minutesBeforeExpiry: number = 5): boolean {
+export function isTokenExpiringSoon(
+  token: string,
+  minutesBeforeExpiry: number = 5
+): boolean {
   const tokenData = getTokenData(token);
-  
+
   if (!tokenData || !tokenData.exp) {
     return true; // Considerar como expirado si no hay fecha de expiración
   }
@@ -71,7 +74,9 @@ export function isTokenExpiringSoon(token: string, minutesBeforeExpiry: number =
 // ❌ Función INSEGURA (solo para debugging - NO USAR EN PRODUCCIÓN)
 export function decodeTokenUnsafe(token: string): any {
   try {
-    console.warn('⚠️ ADVERTENCIA: Usando decodificación insegura - solo para debugging');
+    console.warn(
+      '⚠️ ADVERTENCIA: Usando decodificación insegura - solo para debugging'
+    );
     const payload = JSON.parse(atob(token.split('.')[1]));
     return payload;
   } catch (error) {
@@ -87,28 +92,28 @@ export function decodeTokenUnsafe(token: string): any {
 export function getStoredToken(): string | null {
   try {
     // Intentar obtener del Redux Persist primero
-    const persistAuth = localStorage.getItem('persist:auth')
+    const persistAuth = localStorage.getItem('persist:auth');
     if (persistAuth) {
-      const authData = JSON.parse(persistAuth)
+      const authData = JSON.parse(persistAuth);
       if (authData.token) {
         // El token está serializado como string por Redux Persist
-        const token = JSON.parse(authData.token)
+        const token = JSON.parse(authData.token);
         if (token && token !== 'null') {
-          return token
+          return token;
         }
       }
     }
-    
+
     // Si no está en Redux Persist, intentar localStorage directo
-    const directToken = localStorage.getItem('token')
+    const directToken = localStorage.getItem('token');
     if (directToken && directToken !== 'null') {
-      return directToken
+      return directToken;
     }
-    
-    return null
+
+    return null;
   } catch (error) {
-    console.error('❌ Error obteniendo token almacenado:', error)
-    return null
+    console.error('❌ Error obteniendo token almacenado:', error);
+    return null;
   }
 }
 
@@ -118,9 +123,9 @@ export function getStoredToken(): string | null {
  */
 export function storeToken(token: string): void {
   try {
-    localStorage.setItem('token', token)
+    localStorage.setItem('token', token);
   } catch (error) {
-    console.error('❌ Error guardando token:', error)
+    console.error('❌ Error guardando token:', error);
   }
 }
 
@@ -129,9 +134,9 @@ export function storeToken(token: string): void {
  */
 export function clearStoredToken(): void {
   try {
-    localStorage.removeItem('token')
-    localStorage.removeItem('userRole')
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
   } catch (error) {
-    console.error('❌ Error limpiando token:', error)
+    console.error('❌ Error limpiando token:', error);
   }
 }

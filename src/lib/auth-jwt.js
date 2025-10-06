@@ -42,10 +42,10 @@ export function generateToken(payload, expiresIn = '6h') {
  */
 export function extractTokenFromRequest(request) {
   const authHeader = request.headers.get('authorization');
-  
+
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.slice(7);
   }
-  
+
   return null;
 }

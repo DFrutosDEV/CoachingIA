@@ -12,21 +12,24 @@ dotenv.config({ path: '.env.local' });
 export async function GET() {
   try {
     const aiStatus = await aiService.checkAIStatus();
-    
+
     return NextResponse.json({
       provider: aiStatus.provider,
       available: aiStatus.available,
       message: aiStatus.message,
-      environment: aiStatus.environment
+      environment: aiStatus.environment,
     });
   } catch (error) {
     console.error('Error verificando estado de AI:', error);
-    return NextResponse.json({
-      provider: 'AI Service',
-      available: false,
-      message: 'Error verificando estado de AI',
-      environment: process.env.NODE_ENV || 'unknown'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        provider: 'AI Service',
+        available: false,
+        message: 'Error verificando estado de AI',
+        environment: process.env.NODE_ENV || 'unknown',
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -68,23 +71,27 @@ export async function POST(request: NextRequest) {
     const metrics = {
       clientBio: client.bio,
       configFile: objective.configFile,
-      coachNotes: []
+      coachNotes: [],
     };
 
     // Verificar si AI está disponible
     const aiStatus = await aiService.checkAIStatus();
     if (!aiStatus.available) {
       return NextResponse.json(
-        { 
+        {
           error: `${aiStatus.provider} no está disponible. ${aiStatus.message}`,
-          fallback: true 
+          fallback: true,
         },
         { status: 503 }
       );
     }
 
     // Generar objetivos con AI
-    const generatedGoals = await aiService.generateGoalsForObjective(objective, metrics, numberOfGoals);
+    const generatedGoals = await aiService.generateGoalsForObjective(
+      objective,
+      metrics,
+      numberOfGoals
+    );
 
     // Convertir a formato Goal
     const goals = generatedGoals.map((goal, index) => ({
@@ -97,20 +104,22 @@ export async function POST(request: NextRequest) {
       objectiveId: objective._id,
       createdAt: new Date(),
       updatedAt: new Date(),
-      isDeleted: false
+      isDeleted: false,
     }));
 
     return NextResponse.json({
       goals,
       provider: aiStatus.provider,
-      message: `Objetivos generados exitosamente con ${aiStatus.provider}`
+      message: `Objetivos generados exitosamente con ${aiStatus.provider}`,
     });
-
   } catch (error) {
     console.error('Error en generate-goals:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Error interno del servidor' },
+      {
+        error:
+          error instanceof Error ? error.message : 'Error interno del servidor',
+      },
       { status: 500 }
     );
   }
-} 
+}

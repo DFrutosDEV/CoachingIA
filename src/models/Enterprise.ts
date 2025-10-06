@@ -14,68 +14,72 @@ export interface IEnterprise extends Document {
   isDeleted: boolean;
 }
 
-const EnterpriseSchema: Schema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: [100, 'The name cannot exceed 100 characters'],
+const EnterpriseSchema: Schema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: [100, 'The name cannot exceed 100 characters'],
+    },
+    logo: {
+      type: String,
+      default: '',
+    },
+    address: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'The address cannot exceed 100 characters'],
+      default: '',
+    },
+    phone: {
+      type: String,
+      trim: true,
+      maxlength: [10, 'The phone cannot exceed 10 characters'],
+      default: '',
+    },
+    email: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'The email cannot exceed 100 characters'],
+      default: '',
+    },
+    website: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'The website cannot exceed 100 characters'],
+      default: '',
+    },
+    socialMedia: {
+      type: [String],
+      default: [],
+    },
+    coaches: {
+      type: [String],
+      default: [],
+    },
+    employees: {
+      type: [String],
+      default: [],
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  logo: {
-    type: String,
-    default: ''
-  },  
-  address: {
-    type: String,
-    trim: true,
-    maxlength: [100, 'The address cannot exceed 100 characters'],
-    default: ''
-  },
-  phone: {
-    type: String,
-    trim: true,
-    maxlength: [10, 'The phone cannot exceed 10 characters'],
-    default: ''
-  },
-  email: {
-    type: String,
-    trim: true,
-    maxlength: [100, 'The email cannot exceed 100 characters'],
-    default: ''
-  },
-  website: {
-    type: String,
-    trim: true,
-    maxlength: [100, 'The website cannot exceed 100 characters'],
-    default: ''
-  },
-  socialMedia: {
-    type: [String],
-    default: []
-  },
-  coaches: {
-    type: [String],
-    default: []
-  },
-  employees: {
-    type: [String],
-    default: []
-  },
-  active: {
-    type: Boolean,
-    default: true
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
 EnterpriseSchema.index({ name: 1 });
 EnterpriseSchema.index({ isDeleted: 1 });
 EnterpriseSchema.index({ coaches: 1 });
 EnterpriseSchema.index({ employees: 1 });
 
-export default mongoose.models.Enterprise || mongoose.model<IEnterprise>('Enterprise', EnterpriseSchema); 
+export default mongoose.models.Enterprise ||
+  mongoose.model<IEnterprise>('Enterprise', EnterpriseSchema);

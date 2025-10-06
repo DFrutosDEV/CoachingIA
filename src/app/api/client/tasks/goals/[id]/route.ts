@@ -9,10 +9,10 @@ export async function PUT(
 ) {
   try {
     await connectDB();
-    
+
     const { id: goalId } = await params;
     const { isCompleted } = await request.json();
-    
+
     if (typeof isCompleted !== 'boolean') {
       return NextResponse.json(
         { error: 'isCompleted debe ser un valor booleano' },
@@ -38,16 +38,17 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      message: isCompleted ? 'Tarea marcada como completada' : 'Tarea marcada como incompleta',
+      message: isCompleted
+        ? 'Tarea marcada como completada'
+        : 'Tarea marcada como incompleta',
       goal: {
         _id: updatedGoal._id.toString(),
         description: updatedGoal.description,
         day: updatedGoal.day,
         isCompleted: updatedGoal.isCompleted,
-        createdAt: updatedGoal.createdAt
-      }
+        createdAt: updatedGoal.createdAt,
+      },
     });
-
   } catch (error) {
     console.error('Error al actualizar tarea:', error);
     return NextResponse.json(

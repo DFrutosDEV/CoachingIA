@@ -6,10 +6,10 @@ import Objective from '@/models/Objective';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('clientId');
-    
+
     if (!clientId) {
       return NextResponse.json(
         { error: 'Client ID es requerido' },
@@ -18,21 +18,22 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar si el cliente tiene un objetivo activo
-    const activeObjective = await Objective.findOne({ 
-      clientId, 
+    const activeObjective = await Objective.findOne({
+      clientId,
       active: true,
-      isCompleted: false 
+      isCompleted: false,
     });
 
     return NextResponse.json({
       success: true,
       hasActiveObjective: !!activeObjective,
-      activeObjective: activeObjective ? {
-        id: activeObjective._id,
-        title: activeObjective.title
-      } : null
+      activeObjective: activeObjective
+        ? {
+            id: activeObjective._id,
+            title: activeObjective.title,
+          }
+        : null,
     });
-
   } catch (error) {
     console.error('Error al verificar objetivo activo:', error);
     return NextResponse.json(
@@ -40,4 +41,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
