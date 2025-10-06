@@ -37,7 +37,7 @@ export function ResourcesGrid({
       {userType === 'client' && <PdaCard />}
 
       {/* Gestionar Formularios de Configuración */}
-      {userType === 'admin' && <ConfigFormsManagerCard />}
+      {/* {userType === 'admin' && <ConfigFormsManagerCard />} */}
 
       {/* Gestionar puntos */}
       {userType === 'admin' && <PointsManagerCard />}
