@@ -39,7 +39,7 @@
     --tab-inactive: 0 0% 100%;
     --scrollbar-thumb: 0 0% 0% / 0.2;
     --scrollbar-thumb-hover: 0 0% 0% / 0.3;
-    --background-hover: 0 0% 100% / 0.1;
+    --background-hover: 0 0% 90% / 1;
     --badge-active: 120 58.9% 75%;
     --badge-inactive: 0 77% 75%;
     --badge-pending: 236 70% 75%;
