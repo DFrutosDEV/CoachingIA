@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production builds
+.next/
+out/
+dist/
+build/
+
+# Environment variables
+.env*
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Migration files
+migrate/
+scripts/
+
+# Public assets
+public/
