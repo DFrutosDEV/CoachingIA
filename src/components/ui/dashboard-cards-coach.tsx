@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate } from '@/utils/validatesInputs';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -44,22 +46,24 @@ interface RecentClient {
 
 // Card 1: Próxima Sesión
 export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
+  const t = useTranslations('common.dashboard.coach.nextSession');
+
   if (!data) {
     return (
       <Card data-swapy-item="next-session">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Próxima Sesión</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
           <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">Sin sesiones programadas</div>
+          <div className="text-2xl font-bold">{t('noSessions')}</div>
           <p className="text-xs text-muted-foreground">
-            No hay sesiones próximas
+            {t('noSessionsDescription')}
           </p>
           <div className="mt-4">
             <Button variant="outlined" className="w-full" disabled>
               <Clock className="mr-2 h-4 w-4" />
-              Sin sesiones
+              {t('noSessionsButton')}
             </Button>
           </div>
         </CardContent>
@@ -70,24 +74,24 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
   const sessionDate = new Date(data.date);
   const isToday = sessionDate.toDateString() === new Date().toDateString();
   const displayDate = isToday
-    ? 'Hoy'
+    ? t('today')
     : formatDate(sessionDate, {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      });
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
 
   return (
     <Card data-swapy-item="next-session">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Próxima Sesión</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
           {displayDate}, {data.time}
         </div>
-        <p className="text-xs text-muted-foreground">Con {data.client}</p>
+        <p className="text-xs text-muted-foreground">{t('withClient', { client: data.client })}</p>
         <p className="text-xs text-muted-foreground mt-1">{data.topic}</p>
         <div className="mt-4">
           <Button
@@ -96,7 +100,7 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
             onClick={() => window.open(data.link, '_blank')}
           >
             <Clock className="mr-2 h-4 w-4" />
-            Iniciar videollamada
+            {t('startVideoCall')}
           </Button>
         </div>
       </CardContent>
@@ -106,19 +110,23 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
 
 // Card 2: Clientes Activos
 export function ActiveClientsCard({ count }: { count: number }) {
+  const t = useTranslations('common.dashboard.coach.activeClients');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="active-clients">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <Users className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{count}</div>
-        <p className="text-xs text-muted-foreground">Clientes asignados</p>
+        <p className="text-xs text-muted-foreground">{t('assignedClients')}</p>
         <div className="mt-4">
-          <Link href="/dashboard/coach/clients">
+          <Link href={`/${locale}/dashboard/coach/clients`}>
             <Button variant="outlined" className="w-full">
-              Ver clientes
+              {t('viewClients')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
@@ -130,21 +138,25 @@ export function ActiveClientsCard({ count }: { count: number }) {
 
 // Card 3: Sesiones Programadas
 export function ScheduledSessionsCard({ count }: { count: number }) {
+  const t = useTranslations('common.dashboard.coach.scheduledSessions');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="scheduled-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">
-          Sesiones Programadas
+          {t('title')}
         </CardTitle>
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{count}</div>
-        <p className="text-xs text-muted-foreground">Para esta semana</p>
+        <p className="text-xs text-muted-foreground">{t('thisWeek')}</p>
         <div className="mt-4">
-          <Link href="/dashboard/coach/calendar">
+          <Link href={`/${locale}/dashboard/coach/calendar`}>
             <Button variant="outlined" className="w-full">
-              Ver calendario
+              {t('viewCalendar')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
@@ -156,19 +168,21 @@ export function ScheduledSessionsCard({ count }: { count: number }) {
 
 // Card 4: Sesiones de Hoy
 export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
+  const t = useTranslations('common.dashboard.coach.todaySessions');
+
   if (sessions.length === 0) {
     return (
       <Card data-swapy-item="today-sessions" className="flex flex-col h-full">
         <CardHeader>
-          <CardTitle>Sesiones de Hoy</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
           <CardDescription>
-            No tienes sesiones programadas para hoy.
+            {t('noSessionsToday')}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Sin sesiones programadas</p>
+            <p>{t('noSessionsScheduled')}</p>
           </div>
         </CardContent>
       </Card>
@@ -178,8 +192,8 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
   return (
     <Card data-swapy-item="today-sessions" className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle>Sesiones de Hoy</CardTitle>
-        <CardDescription>Tus sesiones programadas para hoy.</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('todaySessionsDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto scrollbar-thin">
         <div className="space-y-4 pr-2">
@@ -197,11 +211,11 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
               </div>
               <div className="flex gap-2">
                 <Button variant="outlined" size="small">
-                  Notas
+                  {t('notes')}
                 </Button>
                 <Button variant="outlined" size="small">
                   <Video className="mr-1 h-3 w-3" />
-                  Jitsi
+                  {t('jitsi')}
                 </Button>
               </div>
             </div>
@@ -214,17 +228,21 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
 
 // Card 5: Clientes Recientes
 export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
+  const t = useTranslations('common.dashboard.coach.recentClients');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   if (clients.length === 0) {
     return (
       <Card data-swapy-item="recent-clients" className="flex flex-col">
         <CardHeader>
-          <CardTitle>Clientes Recientes</CardTitle>
-          <CardDescription>No tienes clientes asignados.</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('noClientsAssigned')}</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Sin clientes asignados</p>
+            <p>{t('noClientsMessage')}</p>
           </div>
         </CardContent>
       </Card>
@@ -234,9 +252,9 @@ export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
   return (
     <Card data-swapy-item="recent-clients" className="flex flex-col">
       <CardHeader>
-        <CardTitle>Clientes Recientes</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Tus clientes más recientes y su progreso.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent
@@ -252,7 +270,7 @@ export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
               <div className="space-y-1">
                 <p className="text-sm font-medium">{client.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {client.sessions} sesiones
+                  {t('sessionsCount', { sessions: client.sessions })}
                 </p>
                 <div className="h-2 w-32 rounded-full bg-muted">
                   <div
@@ -262,16 +280,16 @@ export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
                 </div>
               </div>
               <Button variant="outlined" size="small">
-                Perfil
+                {t('profile')}
               </Button>
             </div>
           ))}
         </div>
       </CardContent>
       <CardFooter className="p-4">
-        <Link href="/dashboard/coach/clients">
+        <Link href={`/${locale}/dashboard/coach/clients`}>
           <Button className="w-full">
-            Ver todos los clientes
+            {t('viewAllClients')}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>

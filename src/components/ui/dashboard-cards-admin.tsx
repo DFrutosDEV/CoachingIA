@@ -16,6 +16,8 @@ import {
   FileText,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 // Interfaces para los tipos de datos
 interface RecentUser {
@@ -41,21 +43,25 @@ interface PlatformStats {
 
 // Card 1: Total Usuarios
 export function TotalUsersCard({ totalUsers = 0, newUsersThisMonth = 0 }) {
+  const t = useTranslations('common.dashboard.adminCards.totalUsers');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="total-users">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Total Usuarios</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <Users className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{totalUsers.toLocaleString()}</div>
         <p className="text-xs text-muted-foreground">
-          +{newUsersThisMonth} este mes
+          {t('thisMonth', { count: newUsersThisMonth })}
         </p>
         <div className="mt-4">
-          <Link href="/dashboard/admin/users">
+          <Link href={`/${locale}/dashboard/admin/users`}>
             <Button size="sm" variant="outline" className="w-full">
-              Ver usuarios
+              {t('viewUsers')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
@@ -70,21 +76,25 @@ export function ActiveCoachesCard({
   activeCoaches = 0,
   newCoachesThisMonth = 0,
 }) {
+  const t = useTranslations('common.dashboard.adminCards.activeCoaches');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="active-coaches">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Coaches Activos</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <UserCircle className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{activeCoaches}</div>
         <p className="text-xs text-muted-foreground">
-          +{newCoachesThisMonth} este mes
+          {t('thisMonth', { count: newCoachesThisMonth })}
         </p>
         <div className="mt-4">
-          <Link href="/dashboard/admin/coaches">
+          <Link href={`/${locale}/dashboard/admin/coaches`}>
             <Button size="sm" variant="outline" className="w-full">
-              Ver coaches
+              {t('viewCoaches')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
@@ -99,11 +109,15 @@ export function CompletedSessionsCard({
   completedSessions = 0,
   completedSessionsThisMonth = 0,
 }) {
+  const t = useTranslations('common.dashboard.adminCards.completedSessions');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="completed-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">
-          Sesiones Realizadas
+          {t('title')}
         </CardTitle>
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
@@ -112,12 +126,12 @@ export function CompletedSessionsCard({
           {completedSessions.toLocaleString()}
         </div>
         <p className="text-xs text-muted-foreground">
-          +{completedSessionsThisMonth} este mes
+          {t('thisMonth', { count: completedSessionsThisMonth })}
         </p>
         <div className="mt-4">
-          <Link href="/dashboard/admin/analytics">
+          <Link href={`/${locale}/dashboard/admin/analytics`}>
             <Button size="sm" variant="outline" className="w-full">
-              Ver analíticas
+              {t('viewAnalytics')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
@@ -129,19 +143,23 @@ export function CompletedSessionsCard({
 
 // Card 4: Reportes
 export function ReportsCard({ pendingReports = 0 }) {
+  const t = useTranslations('common.dashboard.adminCards.reports');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="reports">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Reportes</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <FileText className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{pendingReports}</div>
-        <p className="text-xs text-muted-foreground">Pendientes de revisión</p>
+        <p className="text-xs text-muted-foreground">{t('pendingReview')}</p>
         <div className="mt-4">
-          <Link href="/dashboard/admin/reports">
+          <Link href={`/${locale}/dashboard/admin/reports`}>
             <Button size="sm" variant="outline" className="w-full">
-              Ver reportes
+              {t('viewReports')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
@@ -157,12 +175,16 @@ export function NewUsersCard({
 }: {
   recentUsers?: RecentUser[];
 }) {
+  const t = useTranslations('common.dashboard.adminCards.newUsers');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="new-users">
       <CardHeader>
-        <CardTitle>Nuevos Usuarios</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Usuarios registrados en los últimos 7 días.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -178,11 +200,10 @@ export function NewUsersCard({
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                        user.type === 'Coach'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}
+                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${user.type === 'Coach'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-green-100 text-green-800'
+                        }`}
                     >
                       {user.type}
                     </span>
@@ -191,9 +212,9 @@ export function NewUsersCard({
                     </span>
                   </div>
                 </div>
-                <Link href="/dashboard/admin/clients">
+                <Link href={`/${locale}/dashboard/admin/clients`}>
                   <Button size="sm" variant="outline">
-                    Ver perfil
+                    {t('viewProfile')}
                   </Button>
                 </Link>
               </div>
@@ -201,7 +222,7 @@ export function NewUsersCard({
           ) : (
             <div className="text-center py-4">
               <p className="text-sm text-muted-foreground">
-                No hay nuevos usuarios
+                {t('noNewUsers')}
               </p>
             </div>
           )}
@@ -217,22 +238,26 @@ export function PlatformPerformanceCard({
 }: {
   platformStats?: PlatformStats;
 }) {
+  const t = useTranslations('common.dashboard.adminCards.platformPerformance');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   const stats = [
-    { metric: 'Tasa de Conversión', ...platformStats?.conversionRate },
+    { metric: t('metrics.conversionRate'), ...platformStats?.conversionRate },
     {
-      metric: 'Sesiones Promedio por Usuario',
+      metric: t('metrics.avgSessionsPerUser'),
       ...platformStats?.avgSessionsPerUser,
     },
-    { metric: 'Tiempo Promedio de Sesión', ...platformStats?.avgSessionTime },
-    { metric: 'Tasa de Abandono', ...platformStats?.churnRate },
-    { metric: 'Ingresos Mensuales', ...platformStats?.monthlyRevenue },
+    { metric: t('metrics.avgSessionTime'), ...platformStats?.avgSessionTime },
+    { metric: t('metrics.churnRate'), ...platformStats?.churnRate },
+    { metric: t('metrics.monthlyRevenue'), ...platformStats?.monthlyRevenue },
   ];
 
   return (
     <Card data-swapy-item="platform-performance">
       <CardHeader>
-        <CardTitle>Rendimiento de la Plataforma</CardTitle>
-        <CardDescription>Estadísticas de uso y crecimiento.</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -266,9 +291,9 @@ export function PlatformPerformanceCard({
           ))}
         </div>
         <div className="mt-6">
-          <Link href="/dashboard/admin/analytics">
+          <Link href={`/${locale}/dashboard/admin/analytics`}>
             <Button className="w-full">
-              Ver informe completo
+              {t('viewFullReport')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

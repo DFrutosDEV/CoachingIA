@@ -5,6 +5,7 @@ import { Button } from '@mui/material';
 import { Menu, UserCircle } from 'lucide-react';
 import { NotificationsModal } from '@/components/ui/notifications-modal';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface HeaderProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -12,6 +13,9 @@ interface HeaderProps {
 }
 
 export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <div className="md:hidden">
@@ -22,7 +26,7 @@ export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
       </div>
       <div className="flex items-center gap-2 ml-auto">
         <NotificationsModal userType={userType} />
-        <Link href={`/dashboard/${userType}/profile`}>
+        <Link href={`/${locale}/dashboard/${userType}/profile`}>
           <Button variant="text" className="rounded-full">
             <UserCircle className="h-6 w-6" />
             <span className="sr-only">Perfil</span>

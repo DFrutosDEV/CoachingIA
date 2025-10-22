@@ -34,7 +34,8 @@ export function ResourcesGrid({
       {userType === 'coach' && <TicketCard />}
 
       {/* Visualiza PDA */}
-      {userType === 'client' && <PdaCard />}
+      {/* //! TODO: Implementar el PDA en la pantalla de objetivos y tareas del cliente. */}
+      {/* {userType === 'client' && <PdaCard />} */}
 
       {/* Gestionar Formularios de Configuración */}
       {/* {userType === 'admin' && <ConfigFormsManagerCard />} */}

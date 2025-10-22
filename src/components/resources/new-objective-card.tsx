@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Target, ArrowRight, User, Mail, Phone, Calendar } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { isValidEmail } from '@/utils/validatesInputs';
 
@@ -41,6 +42,8 @@ interface ExistingClient {
 }
 
 export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
+  const t = useTranslations('common.dashboard.newObjectiveCard');
+
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showExistingUserDialog, setShowExistingUserDialog] = useState(false);
   const [existingClient, setExistingClient] = useState<ExistingClient | null>(
@@ -79,7 +82,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
     // Si el email no es valido, mostrar un toast de error
     if (!isValidEmail(email)) {
-      toast.error('Ingrese un email válido');
+      toast.error(t('errors.validEmail'));
       return;
     }
 
@@ -109,7 +112,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       }
     } catch (error) {
       console.error('Error verificando email:', error);
-      toast.error('Error al verificar el email');
+      toast.error(t('errors.checkEmail'));
     } finally {
       setIsCheckingEmail(false);
     }
@@ -124,15 +127,13 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       const result = await response.json();
 
       if (result.success && result.hasActiveObjective) {
-        toast.error(
-          'Este cliente ya tiene un objetivo activo. Debe completar el objetivo actual antes de crear uno nuevo.'
-        );
+        toast.error(t('errors.activeObjective'));
         return false;
       }
       return true;
     } catch (error) {
       console.error('Error verificando objetivo activo:', error);
-      toast.error('Error al verificar el objetivo activo');
+      toast.error(t('errors.checkActiveObjective'));
       return false;
     }
   };
@@ -173,7 +174,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       // Los campos quedan deshabilitados para solo lectura
       setFieldsEnabled(false);
       setShowExistingUserDialog(false);
-      toast.success('Datos del cliente cargados automáticamente');
+      toast.success(t('success.clientDataLoaded'));
     }
   };
 
@@ -184,7 +185,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
     setFieldsEnabled(false);
     // Limpiar solo el email para que pueda ingresar uno nuevo
     handleClientFormChange('email', '');
-    toast.info('Por favor ingresa un email diferente');
+    toast.info(t('success.differentEmail'));
   };
 
   const handleCreateClient = async () => {
@@ -196,13 +197,13 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       !clientForm.startDate ||
       !clientForm.startTime
     ) {
-      toast.error('Por favor completa todos los campos requeridos');
+      toast.error(t('errors.completeFields'));
       return;
     }
 
     //! UNA VEZ QUE SE HAGA EL MIDDLEWARE DE AUTH, SE DEBE REMOVER ESTA VALIDACIÓN
     if (!user?._id) {
-      toast.error('No se pudo identificar al usuario autenticado');
+      toast.error(t('errors.userNotIdentified'));
       return;
     }
 
@@ -250,9 +251,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       const result = await response.json();
 
       if (result.success) {
-        toast.success(
-          'Cliente creado exitosamente con objetivo y reunión programada'
-        );
+        toast.success(t('success.clientCreated'));
         setShowClientDialog(false);
         // Resetear formulario
         setClientForm({
@@ -272,7 +271,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       }
     } catch (error) {
       console.error('Error creando cliente:', error);
-      toast.error('Error interno del servidor');
+      toast.error(t('errors.serverError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -284,25 +283,24 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
           <Target className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="mt-4">Crear nuevo Objetivo</CardTitle>
+        <CardTitle className="mt-4">{t('title')}</CardTitle>
         <CardDescription>
-          Añade nuevos objetivos a tu lista y configura sus perfiles, objetivos
-          y planes de coaching.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <ul className="space-y-2 text-sm">
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Crea un nuevo objetivo</span>
+            <span>{t('features.createObjective')}</span>
           </li>
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Establece objetivos iniciales</span>
+            <span>{t('features.setInitialGoals')}</span>
           </li>
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Programa primeras sesiones</span>
+            <span>{t('features.scheduleFirstSessions')}</span>
           </li>
         </ul>
       </CardContent>
@@ -310,25 +308,25 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
         <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
           <DialogTrigger asChild>
             <Button variant="outlined" className="w-full">
-              Añadir Objetivo
+              {t('addObjective')}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Añadir Nuevo Objetivo</DialogTitle>
+              <DialogTitle>{t('modal.title')}</DialogTitle>
               <DialogDescription>
-                Completa la información para crear un nuevo perfil de objetivo.
+                {t('modal.description')}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">{t('modal.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="email@ejemplo.com"
+                    placeholder={t('modal.emailPlaceholder')}
                     value={clientForm.email}
                     onChange={e => handleEmailChange(e.target.value)}
                     className="pl-10"
@@ -336,24 +334,24 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                 </div>
                 {isCheckingEmail && (
                   <small className="text-sm text-muted-foreground">
-                    Verificando email...
+                    {t('modal.checkingEmail')}
                   </small>
                 )}
                 {existingClient && (
                   <small className="text-sm text-green-600 font-medium">
-                    ✓ Cliente existente
+                    {t('modal.existingClient')}
                   </small>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="first-name">Nombre</Label>
+                  <Label htmlFor="first-name">{t('modal.firstName')}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="first-name"
-                      placeholder="Nombre"
+                      placeholder={t('modal.firstName')}
                       value={clientForm.firstName}
                       onChange={e =>
                         handleClientFormChange('firstName', e.target.value)
@@ -364,12 +362,12 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="last-name">Apellidos</Label>
+                  <Label htmlFor="last-name">{t('modal.lastName')}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="last-name"
-                      placeholder="Apellidos"
+                      placeholder={t('modal.lastName')}
                       value={clientForm.lastName}
                       onChange={e =>
                         handleClientFormChange('lastName', e.target.value)
@@ -397,10 +395,10 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
               </div> */}
 
               <div className="grid gap-2">
-                <Label htmlFor="focus">Enfoque principal</Label>
+                <Label htmlFor="focus">{t('modal.focus')}</Label>
                 <Input
                   id="focus"
-                  placeholder="Ej: Desarrollo personal, Liderazgo, etc."
+                  placeholder={t('modal.focusPlaceholder')}
                   value={clientForm.focus}
                   onChange={e =>
                     handleClientFormChange('focus', e.target.value)
@@ -410,7 +408,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="start-date">Fecha Inicio</Label>
+                  <Label htmlFor="start-date">{t('modal.startDate')}</Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -426,7 +424,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="start-time">Hora Inicio</Label>
+                  <Label htmlFor="start-time">{t('modal.startTime')}</Label>
                   <Input
                     id="start-time"
                     type="time"
@@ -442,17 +440,17 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
               {userType === 'admin' && (
                 <div className="grid gap-2">
-                  <Label htmlFor="coach">Coach asignado</Label>
+                  <Label htmlFor="coach">{t('modal.assignedCoach')}</Label>
                   <Input
                     id="coach"
-                    placeholder="ID del coach (opcional - se asignará automáticamente si se deja vacío)"
+                    placeholder={t('modal.coachPlaceholder')}
                     value={clientForm.coachId}
                     onChange={e =>
                       handleClientFormChange('coachId', e.target.value)
                     }
                   />
                   <small className="text-sm text-muted-foreground">
-                    Deja vacío para auto-asignar al usuario actual
+                    {t('modal.coachHelper')}
                   </small>
                 </div>
               )}
@@ -477,13 +475,13 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                 }}
                 disabled={isSubmitting}
               >
-                Cancelar
+                {t('modal.cancel')}
               </Button>
               <Button
                 onClick={handleCreateClient}
                 disabled={isSubmitting || (!fieldsEnabled && !existingClient)}
               >
-                {isSubmitting ? 'Creando...' : 'Crear Objetivo'}
+                {isSubmitting ? t('modal.creating') : t('modal.create')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -496,10 +494,9 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
         >
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Usuario encontrado</DialogTitle>
+              <DialogTitle>{t('existingUserModal.title')}</DialogTitle>
               <DialogDescription>
-                Ya existe un usuario con el email{' '}
-                <strong>{existingClient?.email}</strong>:
+                {t('existingUserModal.description', { email: existingClient?.email || '' })}
               </DialogDescription>
             </DialogHeader>
             <div className="my-4 p-4 bg-muted rounded-lg">
@@ -524,16 +521,16 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
               {existingClient?.age && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span>{existingClient.age} años</span>
+                  <span>{existingClient.age} {t('existingUserModal.years')}</span>
                 </div>
               )}
             </div>
             <DialogFooter className="flex justify-end gap-2">
               <Button variant="outlined" onClick={handleRejectExistingUser}>
-                No, es otro usuario
+                {t('existingUserModal.noOtherUser')}
               </Button>
               <Button onClick={handleConfirmExistingUser}>
-                Sí, es este usuario
+                {t('existingUserModal.yesThisUser')}
               </Button>
             </DialogFooter>
           </DialogContent>

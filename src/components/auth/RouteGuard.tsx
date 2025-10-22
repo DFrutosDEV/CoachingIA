@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 import { axiosClient } from '@/lib/services/axios-client';
 import { getStoredToken } from '@/lib/token-utils';
 
@@ -14,6 +15,12 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isVerifying, setIsVerifying] = useState(true);
 
+  // Función para obtener el locale actual de la URL
+  const getCurrentLocale = () => {
+    const locale = pathname.split('/')[1];
+    return routing.locales.includes(locale as any) ? locale : routing.defaultLocale;
+  };
+
   useEffect(() => {
     const verifyAccess = async () => {
       const timestamp = new Date().toISOString();
@@ -21,11 +28,12 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
         `🔐 [${timestamp}] ROUTE GUARD CLIENTE: Verificando ruta ${pathname}`
       );
 
-      // Rutas públicas
+      // Rutas públicas (remover locale de la comparación)
+      const cleanPath = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
       const publicRoutes = ['/', '/login', '/register', '/debug-middleware'];
       const isPublicRoute = publicRoutes.some(route => {
-        if (route === '/') return pathname === '/'; // Solo la raíz exacta
-        return pathname.startsWith(route);
+        if (route === '/') return cleanPath === '/'; // Solo la raíz exacta
+        return cleanPath.startsWith(route);
       });
 
       if (isPublicRoute) {
@@ -37,7 +45,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
       }
 
       // Verificar autenticación para rutas protegidas
-      if (pathname.startsWith('/dashboard')) {
+      if (cleanPath.startsWith('/dashboard')) {
         console.log(
           `🔒 [${timestamp}] ROUTE GUARD CLIENTE: Ruta protegida ${pathname}`
         );
@@ -50,7 +58,8 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
           console.log(
             `❌ [${timestamp}] ROUTE GUARD CLIENTE: Sin token, redirigiendo a /login`
           );
-          router.push('/login');
+          const locale = getCurrentLocale();
+          router.push(`/${locale}/login`);
           return;
         }
 
@@ -78,13 +87,14 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
           );
 
           // Verificar si tiene permisos para esta ruta
-          const hasPermission = checkRoutePermission(pathname, userRole);
+          const hasPermission = checkRoutePermission(cleanPath, userRole);
 
           if (!hasPermission) {
             console.log(
               `🚫 [${timestamp}] ROUTE GUARD CLIENTE: Usuario '${userRole}' sin permisos para ${pathname}`
             );
-            router.push('/dashboard/unauthorized');
+            const locale = getCurrentLocale();
+            router.push(`/${locale}/dashboard/unauthorized`);
             return;
           }
 
@@ -104,7 +114,8 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
             console.log(
               `🚫 [${timestamp}] ROUTE GUARD CLIENTE: Token inválido o sin permisos, redirigiendo a /login`
             );
-            router.push('/login');
+            const locale = getCurrentLocale();
+            router.push(`/${locale}/login`);
             return;
           }
         }

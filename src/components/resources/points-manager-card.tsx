@@ -12,13 +12,14 @@ import {
 import { Button } from '@mui/material';
 import {
   Dialog,
-  DialogContent,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ArrowRight, Coins } from 'lucide-react';
 import { PointsManagerModal } from '@/components/ui/points-manager-modal';
+import { useTranslations } from 'next-intl';
 
 export function PointsManagerCard() {
+  const t = useTranslations('common.dashboard.pointsManager.card');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -27,24 +28,24 @@ export function PointsManagerCard() {
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
           <Coins className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="mt-4">Gestión de Puntos</CardTitle>
+        <CardTitle className="mt-4">{t('title')}</CardTitle>
         <CardDescription>
-          Administra los puntos de los coaches para la generación de objetivos
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <ul className="space-y-2 text-sm">
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Asigna puntos a los coaches</span>
+            <span>{t('features.assignPoints')}</span>
           </li>
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Saca puntos a los coaches</span>
+            <span>{t('features.removePoints')}</span>
           </li>
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Visualiza los puntos de los coaches</span>
+            <span>{t('features.viewPoints')}</span>
           </li>
         </ul>
       </CardContent>
@@ -55,7 +56,7 @@ export function PointsManagerCard() {
         >
           <DialogTrigger asChild>
             <Button variant="outlined" className="w-full">
-              Gestionar Puntos
+              {t('managePoints')}
             </Button>
           </DialogTrigger>
           <PointsManagerModal

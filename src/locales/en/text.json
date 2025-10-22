@@ -1,0 +1,382 @@
+{
+  "home": {
+    "navigation": {
+      "features": "Features",
+      "benefits": "Benefits",
+      "process": "Process",
+      "login": "Log In"
+    },
+    "hero": {
+      "title": "Transform your life with personalized coaching",
+      "description": "Connect with professional coaches who will help you achieve your personal and professional goals.",
+      "startButton": "Start now",
+      "learnMoreButton": "Learn more"
+    },
+    "features": {
+      "title": "Main Features",
+      "description": "Our platform offers everything you need for an effective coaching experience.",
+      "expertCoaches": {
+        "title": "Expert Coaches",
+        "description": "Connect with certified coaches specialized in different areas."
+      },
+      "flexibleSessions": {
+        "title": "Flexible Sessions",
+        "description": "Schedule sessions according to your availability and needs."
+      },
+      "progressTracking": {
+        "title": "Progress Tracking",
+        "description": "Visualize your progress and keep track of your achievements."
+      }
+    },
+    "benefits": {
+      "title": "Why choose CoachingIA?",
+      "description": "Discover the unique advantages that make our platform the perfect choice for your personal growth.",
+      "quickResults": {
+        "title": "Quick Results",
+        "description": "Our proven method helps you see meaningful changes within the first weeks of coaching."
+      },
+      "confidentiality": {
+        "title": "Full Confidentiality",
+        "description": "Your sessions and personal data are protected with the highest security standards."
+      },
+      "personalized": {
+        "title": "Personalized Approach",
+        "description": "Each session is tailored to your specific goals and unique learning style."
+      },
+      "quality": {
+        "title": "Guaranteed Quality",
+        "description": "All our coaches go through a rigorous selection and certification process."
+      }
+    },
+    "process": {
+      "title": "Your path to success",
+      "description": "A simple and effective process to reach your personal and professional goals.",
+      "step1": {
+        "title": "Personalize your profile",
+        "description": "Enter your session details and complete your personal profile."
+      },
+      "step2": {
+        "title": "Find your Coach",
+        "description": "Stay connected with your coach and receive personalized guidance."
+      },
+      "step3": {
+        "title": "Schedule your session",
+        "description": "Book your first session at the time that suits you best."
+      },
+      "step4": {
+        "title": "Transform your life",
+        "description": "Begin your personal transformation journey and achieve your goals."
+      }
+    },
+    "cta": {
+      "title": "Ready to transform your life?",
+      "description": "Join thousands of people who have already changed their lives with CoachingIA."
+    },
+    "footer": {
+      "description": "Transforming lives through personalized coaching.",
+      "platform": "Platform",
+      "company": "Company",
+      "aboutUs": "About Us",
+      "blog": "Blog",
+      "contact": "Contact",
+      "legal": "Legal",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "cookies": "Cookies",
+      "copyright": "All rights reserved."
+    }
+  },
+  "login": {
+    "title": "Log In",
+    "subtitle": "Enter your credentials to access your account",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Log In",
+    "backToHome": "Back",
+    "rememberMe": "Remember me",
+    "loading": "Logging in...",
+    "error": "Login error",
+    "sessionExpired": "Your session has expired. Please log in again."
+  },
+  "dashboardAdmin": {
+    "welcome": "Welcome",
+    "subtitle": "Manage users, coaches, and analyze platform performance.",
+    "loading": "Loading dashboard data...",
+    "error": "Error",
+    "retry": "Retry",
+    "dragMode": {
+      "activate": "Activate Drag",
+      "deactivate": "Deactivate Drag",
+      "message": "✨ Reorganization mode activated - You can drag cards to rearrange them"
+    },
+    "resourcesPage": {
+      "title": "Resources",
+      "subtitle": "Tools and resources to manage the platform."
+    },
+    "reportsPage": {
+      "title": "Reports Management",
+      "subtitle": "Review and manage reports submitted by users and coaches.",
+      "filters": "Filters",
+      "status": "Status",
+      "category": "Category",
+      "priority": "Priority",
+      "selectStatus": "Select status",
+      "selectCategory": "Select category",
+      "selectPriority": "Select priority",
+      "all": "All",
+      "allCategories": "All",
+      "allPriorities": "All",
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed",
+      "bug": "Bug",
+      "suggestion": "Suggestion",
+      "complaint": "Complaint",
+      "other": "Other",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "reports": "Reports",
+      "loadingReports": "Loading reports...",
+      "showingReports": "Showing",
+      "of": "of",
+      "reportsCount": "reports",
+      "errorLoadingReports": "Error loading reports",
+      "connectionError": "Connection error loading reports",
+      "errorResponding": "Error responding to report",
+      "errorClosing": "Error closing report",
+      "errorResolving": "Error resolving report"
+    },
+    "enterprisesPage": {
+      "title": "Enterprises",
+      "subtitle": "Manage and monitor registered enterprises on the platform.",
+      "totalEnterprises": "Total Enterprises",
+      "activeEnterprises": "Active Enterprises",
+      "inactiveEnterprises": "Inactive Enterprises",
+      "newEnterprises": "New Enterprises",
+      "totalEmployees": "Total Employees",
+      "registeredEnterprises": "Registered enterprises",
+      "activeInPlatform": "Active on the platform",
+      "temporarilyInactive": "Temporarily inactive",
+      "recentlyRegistered": "Recently registered",
+      "averagePerEnterprise": "Average:",
+      "perEnterprise": "per enterprise"
+    },
+    "coachesPage": {
+      "title": "Coaches",
+      "subtitle": "Manage and monitor registered coaches on the platform.",
+      "totalCoaches": "Total Coaches",
+      "activeCoaches": "Active Coaches",
+      "inactiveCoaches": "Inactive Coaches",
+      "newCoaches": "New Coaches",
+      "totalClients": "Total Clients",
+      "registeredCoaches": "Registered coaches",
+      "activeInPlatform": "Active on the platform",
+      "temporarilyInactive": "Temporarily inactive",
+      "recentlyRegistered": "Recently registered",
+      "averagePerCoach": "Average:",
+      "perCoach": "per coach"
+    },
+    "clientsPage": {
+      "title": "Clients",
+      "subtitle": "Manage and monitor all clients registered on the platform.",
+      "loading": "Loading clients...",
+      "errorLoading": "Error fetching clients",
+      "unknownError": "Unknown error",
+      "errorToast": "An error occurred while loading clients",
+      "notAuthenticated": "User not authenticated",
+      "noAdminPermissions": "User does not have admin permissions",
+      "retry": "Retry"
+    },
+    "analyticsPage": {
+      "title": "Platform Analytics",
+      "subtitle": "View key metrics on the platform’s performance, usage, and growth.",
+      "temporaryContent": "Temporary analytics content"
+    }
+  },
+  "dashboardCoach": {
+    "welcome": "Welcome",
+    "subtitle": "Here’s an overview of your sessions and clients.",
+    "loading": "Loading dashboard data...",
+    "error": "Error",
+    "retry": "Retry",
+    "dragMode": {
+      "activate": "Activate Drag",
+      "deactivate": "Deactivate Drag",
+      "message": "✨ Reorganization mode activated - You can drag cards to rearrange them"
+    },
+    "resourcesPage": {
+      "title": "Resources",
+      "subtitle": "Tools and resources to manage your coaching practice."
+    },
+    "clientsPage": {
+      "title": "My Clients",
+      "subtitle": "Manage your clients and their progress within the coaching program.",
+      "loading": "Loading clients...",
+      "errorLoading": "Error fetching clients",
+      "unknownError": "Unknown error",
+      "errorToast": "An error occurred while loading clients"
+    },
+    "calendarPage": {
+      "title": "Calendar"
+    }
+  },
+  "dashboardClient": {
+    "welcome": "Welcome",
+    "subtitle": "Here’s an overview of your progress and upcoming sessions.",
+    "loading": "Loading dashboard data...",
+    "error": "Error",
+    "retry": "Retry",
+    "dragMode": {
+      "activate": "Activate Drag",
+      "deactivate": "Deactivate Drag",
+      "message": "✨ Reorganization mode activated - You can drag cards to rearrange them"
+    },
+    "tasksPage": {
+      "title": "Tasks to complete",
+      "subtitle": "Here you’ll find the tasks you have pending."
+    },
+    "servicesPage": {
+      "title": "Services",
+      "subtitle": "Here you’ll find the services you have subscribed to."
+    },
+    "resourcesPage": {
+      "title": "Resources",
+      "subtitle": "Tools and resources to manage your client experience."
+    },
+    "calendarPage": {
+      "title": "Calendar"
+    },
+    "progressPage": {
+      "title": "Progress",
+      "subtitle": "Progress of your goals and objectives.",
+      "loading": "Loading goals...",
+      "errorLoading": "Error fetching goals",
+      "errorDetails": "Error fetching goal details",
+      "unknownError": "Unknown error",
+      "retry": "Retry",
+      "noObjectives": "You don’t have any assigned objectives yet",
+      "coachWillAssign": "Your coach will assign you specific goals",
+      "active": "Active",
+      "completed": "Completed",
+      "progress": "Progress",
+      "goals": "Goals",
+      "notes": "Notes",
+      "noGoals": "No goals assigned to this objective",
+      "noNotes": "No notes for this objective",
+      "completedGoals": "of",
+      "goalsCompleted": "goals completed",
+      "noGoalsAssigned": "No goals assigned yet",
+      "day": "Day:",
+      "by": "By:"
+    }
+  },
+  "dashboardEnterprise": {
+    "title": "Enterprise Dashboard",
+    "subtitle": "Manage users, coaches, and analyze your company’s performance.",
+    "loading": "Loading dashboard data...",
+    "error": "Error",
+    "retry": "Retry",
+    "resourcesPage": {
+      "title": "Resources",
+      "subtitle": "Tools and resources to manage your company."
+    },
+    "reportsPage": {
+      "title": "Reports Management",
+      "subtitle": "Review and manage reports submitted by users and coaches."
+    },
+    "coachesPage": {
+      "title": "Coaches",
+      "subtitle": "Manage and monitor the coaches registered on the platform."
+    },
+    "clientsPage": {
+      "title": "Clients",
+      "subtitle": "Manage and monitor the clients registered on the platform."
+    },
+    "analyticsPage": {
+      "title": "Platform Analytics",
+      "subtitle": "View key metrics on performance, usage, and growth of the platform.",
+      "userCount": "Number of users",
+      "coachCount": "Number of coaches",
+      "activeUsers": "Number of active users",
+      "activeCoaches": "Number of active coaches",
+      "weeklySessions": "Weekly sessions count",
+      "yesterday": "Yesterday"
+    }
+  },
+  "unauthorized": {
+    "title": "Access Denied",
+    "subtitle": "You do not have permission to access this page",
+    "description": "Your current role does not have the necessary permissions to view this content. If you believe this is an error, contact the system administrator.",
+    "goBack": "Go Back",
+    "goToLogin": "Go to Login"
+  },
+  "profile": {
+    "loading": "Loading user information...",
+    "title": "My Profile",
+    "subtitle": "Manage your personal information and settings.",
+    "buttons": {
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "editProfile": "Edit Profile",
+      "changePassword": "Change Password",
+      "changing": "Changing...",
+      "changePasswordButton": "Change Password"
+    },
+    "passwordDialog": {
+      "title": "Change Password",
+      "description": "Enter your current password and the new password you want to use.",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Confirm your new password"
+    },
+    "personalInfo": {
+      "title": "Personal Information",
+      "description": "Your basic and contact information.",
+      "fields": {
+        "name": "Name",
+        "lastName": "Last Name",
+        "age": "Age",
+        "email": "Email",
+        "phone": "Phone",
+        "bio": "Biography",
+        "address": "Address"
+      },
+      "phoneComponents": {
+        "country": "Country",
+        "area": "Area",
+        "number": "Number"
+      },
+      "phoneFormat": "Format: +[country] [area] [number] (e.g.: +54 11 40317700, +1 415 5552671)",
+      "bioPlaceholder": "Tell us a little about yourself...",
+      "addressPlaceholder": "Add address"
+    },
+    "profilePicture": {
+      "title": "Profile Picture",
+      "formats": "Formats: JPG, PNG, WebP",
+      "maxSize": "Maximum: 10MB",
+      "clearPhoto": "Clear Photo"
+    },
+    "errors": {
+      "allFieldsRequired": "All fields are required",
+      "imageTooLarge": "The image cannot be larger than 10MB",
+      "invalidImageType": "Only JPG, PNG and WebP files are allowed",
+      "passwordsDoNotMatch": "New passwords do not match",
+      "passwordTooShort": "The new password must be at least 6 characters long",
+      "profileUpdateError": "Error updating profile",
+      "passwordChangeError": "Error changing password",
+      "profilePictureDeleteError": "Error deleting profile picture"
+    },
+    "success": {
+      "profileUpdated": "Profile updated successfully",
+      "passwordChanged": "Password updated successfully",
+      "profilePictureDeleted": "Profile picture deleted successfully"
+    }
+  }
+}

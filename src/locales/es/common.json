@@ -1,0 +1,591 @@
+{
+  "dashboard": {
+    "title": "CoachingIA",
+    "navigation": {
+      "home": "Inicio",
+      "myServices": "Mis Servicios",
+      "upcomingSessions": "Próximas Sesiones",
+      "whatIAmWorkingOn": "En qué estoy trabajando",
+      "tasksToDo": "Tareas a realizar",
+      "resources": "Recursos",
+      "myClients": "Mis Clientes",
+      "sessions": "Sesiones",
+      "clients": "Clientes",
+      "coaches": "Coaches",
+      "enterprises": "Empresas",
+      "analytics": "Analíticas",
+      "reports": "Reportes",
+      "myCoaches": "Mis Coaches",
+      "settings": "Configuración",
+      "logout": "Cerrar Sesión"
+    },
+    "logout": {
+      "confirmTitle": "Confirmar cierre de sesión",
+      "confirmMessage": "¿Estás seguro de que quieres cerrar sesión? Tendrás que volver a iniciar sesión para acceder a tu cuenta.",
+      "cancel": "Cancelar",
+      "confirm": "Cerrar Sesión"
+    },
+    "coach": {
+      "nextSession": {
+        "title": "Próxima Sesión",
+        "noSessions": "Sin sesiones programadas",
+        "noSessionsDescription": "No hay sesiones próximas",
+        "noSessionsButton": "Sin sesiones",
+        "today": "Hoy",
+        "withClient": "Con {client}",
+        "startVideoCall": "Iniciar videollamada"
+      },
+      "activeClients": {
+        "title": "Clientes Activos",
+        "assignedClients": "Clientes asignados",
+        "viewClients": "Ver clientes"
+      },
+      "scheduledSessions": {
+        "title": "Sesiones Programadas",
+        "thisWeek": "Para esta semana",
+        "viewCalendar": "Ver calendario"
+      },
+      "todaySessions": {
+        "title": "Sesiones de Hoy",
+        "noSessionsToday": "No tienes sesiones programadas para hoy.",
+        "noSessionsScheduled": "Sin sesiones programadas",
+        "todaySessionsDescription": "Tus sesiones programadas para hoy.",
+        "notes": "Notas",
+        "jitsi": "Jitsi"
+      },
+      "recentClients": {
+        "title": "Clientes Recientes",
+        "noClientsAssigned": "No tienes clientes asignados.",
+        "noClientsMessage": "Sin clientes asignados",
+        "description": "Tus clientes más recientes y su progreso.",
+        "sessionsCount": "{sessions} sesiones",
+        "profile": "Perfil",
+        "viewAllClients": "Ver todos los clientes"
+      }
+    },
+    "points": {
+      "title": "Mis Puntos",
+      "availablePoints": "Puntos disponibles",
+      "messages": {
+        "empty": "Necesitas puntos para generar objetivos. Contacta al administrador.",
+        "low": "Tienes pocos puntos. Considera solicitar más al administrador.",
+        "good": "Tienes suficientes puntos para generar objetivos."
+      }
+    },
+    "clientsList": {
+      "title": "Lista de Clientes",
+      "description": "Gestiona tus clientes y su información",
+      "search": {
+        "placeholder": "Buscar por nombre, email o enfoque...",
+        "filter": "Filtrar",
+        "status": "Estado",
+        "all": "Todos",
+        "active": "Activos",
+        "pending": "Pendientes",
+        "inactive": "Inactivos"
+      },
+      "table": {
+        "client": "Cliente",
+        "status": "Estado",
+        "nextSession": "Próxima Sesión",
+        "actions": "Acciones",
+        "openMenu": "Abrir menú",
+        "quickActions": "Acciones Rápidas",
+        "deactivate": "Dar de baja",
+        "message": "Mensaje",
+        "viewPDA": "Ver PDA",
+        "noClientsFound": "No se encontraron clientes.",
+        "showingResults": "Mostrando {start} a {end} de {total} clientes",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "toSchedule": "Por programar"
+      },
+      "status": {
+        "active": "Activo",
+        "pending": "Pendiente",
+        "inactive": "Inactivo"
+      }
+    },
+    "clientDetail": {
+      "title": "Detalle del Cliente",
+      "actions": {
+        "message": "Mensaje",
+        "viewPDA": "Ver PDA"
+      },
+      "tabs": {
+        "info": "Info",
+        "objectives": "Objetivos"
+      },
+      "info": {
+        "noEmail": "Sin correo",
+        "noPhone": "Sin teléfono",
+        "clientSince": "Cliente desde {date}",
+        "sessionsCompleted": "{sessions} sesiones completadas",
+        "nextSession": "Próxima Sesión",
+        "scheduled": "Programada",
+        "reschedule": "Reprogramar",
+        "start": "Iniciar",
+        "noSessionsScheduled": "No existen sesiones programadas",
+        "lastSession": "Última Sesión",
+        "noPreviousSessions": "No existen sesiones previas",
+        "biography": "Biografía",
+        "noBiography": "Sin biografía"
+      },
+      "objectives": {
+        "title": "Objetivos del Cliente",
+        "loading": "Cargando objetivos...",
+        "active": "Activo",
+        "completed": "Completado",
+        "inProgress": "En Progreso",
+        "progress": "Progreso: {progress}%",
+        "goals": "de {total} metas",
+        "created": "Creado: {date}",
+        "coach": "Coach: {coach}",
+        "noObjectives": "No hay objetivos definidos para este cliente"
+      },
+      "notes": {
+        "title": "Notas de Sesiones",
+        "newNote": "Nueva Nota",
+        "noNotes": "No hay notas registradas."
+      },
+      "status": {
+        "active": "Activo",
+        "pending": "Pendiente",
+        "inactive": "Inactivo"
+      }
+    },
+    "deleteClientModal": {
+      "title": "Dar de baja cliente",
+      "description": "¿Estás seguro de que quieres dar de baja a {clientName}? Esta acción marcará al cliente como eliminado pero no borrará sus datos permanentemente.",
+      "cancel": "Cancelar",
+      "processing": "Procesando...",
+      "delete": "Dar de baja",
+      "success": "Cliente dado de baja exitosamente",
+      "error": "Error al dar de baja al cliente"
+    },
+    "calendar": {
+      "title": "Calendario de Sesiones",
+      "loading": "Cargando sesiones...",
+      "retry": "Reintentar",
+      "update": "Actualizar",
+      "month": "Mes",
+      "noDescription": "Sin descripción adicional.",
+      "sessionDetails": {
+        "client": "Cliente:",
+        "coach": "Coach:",
+        "objective": "Objetivo:",
+        "time": "Hora:",
+        "date": "Fecha:",
+        "link": "Enlace:",
+        "joinSession": "Unirse a la sesión"
+      },
+      "actions": {
+        "close": "Cerrar",
+        "reschedule": "Reprogramar"
+      },
+      "messages": {
+        "next": "Siguiente",
+        "previous": "Anterior",
+        "today": "Hoy",
+        "month": "Mes",
+        "week": "Semana",
+        "day": "Día",
+        "agenda": "Agenda",
+        "date": "Fecha",
+        "time": "Hora",
+        "event": "Sesión",
+        "noEventsInRange": "No hay sesiones en este rango.",
+        "showMore": "Ver más ({total})"
+      }
+    },
+    "notificationCard": {
+      "title": "Notificaciones",
+      "description": "Envía notificaciones a tus clientes sobre sesiones, recordatorios o información importante.",
+      "features": {
+        "sessionReminders": "Envía recordatorios de sesiones",
+        "scheduleChanges": "Notifica cambios de horario",
+        "shareResources": "Comparte recursos y materiales"
+      },
+      "createNotification": "Crear Notificación",
+      "modal": {
+        "title": "Crear Notificación",
+        "description": "Envía una notificación a {userType} usuarios del sistema",
+        "massNotifications": "Notificaciones Masivas",
+        "notifyAllClients": "Notificar a todos mis clientes",
+        "notifyAllCoaches": "Notificar a todos los coaches",
+        "notifyAllUsers": "Notificar a todos los usuarios",
+        "orSelectIndividually": "O seleccionar individualmente",
+        "recipients": "Destinatarios",
+        "searchPlaceholder": "Escribe 3 letras para empezar a buscar...",
+        "searching": "Buscando usuarios...",
+        "noUsersFound": "No se encontraron usuarios",
+        "selectedRecipients": "Destinatarios seleccionados:",
+        "titleLabel": "Título",
+        "titlePlaceholder": "Título de la notificación",
+        "messageLabel": "Mensaje",
+        "messagePlaceholder": "Escribe tu mensaje aquí...",
+        "cancel": "Cancelar",
+        "sending": "Enviando...",
+        "send": "Enviar Notificación"
+      },
+      "errors": {
+        "selectRecipients": "Por favor selecciona al menos un destinatario o una opción de notificación masiva",
+        "completeFields": "Por favor completa el título y mensaje",
+        "userNotIdentified": "No se pudo identificar al usuario autenticado",
+        "serverError": "Error interno del servidor"
+      }
+    },
+    "newObjectiveCard": {
+      "title": "Crear nuevo Objetivo",
+      "description": "Añade nuevos objetivos a tu lista y configura sus perfiles, objetivos y planes de coaching.",
+      "features": {
+        "createObjective": "Crea un nuevo objetivo",
+        "setInitialGoals": "Establece objetivos iniciales",
+        "scheduleFirstSessions": "Programa primeras sesiones"
+      },
+      "addObjective": "Añadir Objetivo",
+      "modal": {
+        "title": "Añadir Nuevo Objetivo",
+        "description": "Completa la información para crear un nuevo perfil de objetivo.",
+        "email": "Email *",
+        "emailPlaceholder": "email@ejemplo.com",
+        "checkingEmail": "Verificando email...",
+        "existingClient": "✓ Cliente existente",
+        "firstName": "Nombre",
+        "lastName": "Apellidos",
+        "focus": "Enfoque principal",
+        "focusPlaceholder": "Ej: Desarrollo personal, Liderazgo, etc.",
+        "startDate": "Fecha Inicio",
+        "startTime": "Hora Inicio",
+        "assignedCoach": "Coach asignado",
+        "coachPlaceholder": "ID del coach (opcional - se asignará automáticamente si se deja vacío)",
+        "coachHelper": "Deja vacío para auto-asignar al usuario actual",
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "create": "Crear Objetivo"
+      },
+      "existingUserModal": {
+        "title": "Usuario encontrado",
+        "description": "Ya existe un usuario con el email {email}:",
+        "noOtherUser": "No, es otro usuario",
+        "yesThisUser": "Sí, es este usuario",
+        "years": "años"
+      },
+      "errors": {
+        "validEmail": "Ingrese un email válido",
+        "completeFields": "Por favor completa todos los campos requeridos",
+        "userNotIdentified": "No se pudo identificar al usuario autenticado",
+        "activeObjective": "Este cliente ya tiene un objetivo activo. Debe completar el objetivo actual antes de crear uno nuevo.",
+        "checkActiveObjective": "Error al verificar el objetivo activo",
+        "checkEmail": "Error al verificar el email",
+        "serverError": "Error interno del servidor"
+      },
+      "success": {
+        "clientDataLoaded": "Datos del cliente cargados automáticamente",
+        "differentEmail": "Por favor ingresa un email diferente",
+        "clientCreated": "Cliente creado exitosamente con objetivo y reunión programada"
+      }
+    },
+    "ticketCard": {
+      "title": "Generar Ticket",
+      "description": "Crea tickets para reportar problemas, solicitar soporte o enviar sugerencias al equipo técnico.",
+      "features": {
+        "reportTechnicalIssues": "Reporta problemas técnicos",
+        "requestNewFeatures": "Solicita nuevas funciones",
+        "receivePersonalizedSupport": "Recibe soporte personalizado"
+      },
+      "createTicket": "Crear Ticket",
+      "modal": {
+        "title": "Generar Ticket de Soporte",
+        "description": "Describe el problema o solicitud para el equipo de soporte.",
+        "ticketType": "Tipo de Ticket",
+        "selectType": "Seleccionar tipo",
+        "types": {
+          "technical": "Problema técnico",
+          "billing": "Facturación",
+          "feature": "Solicitud de función",
+          "other": "Otro"
+        },
+        "subject": "Asunto",
+        "subjectPlaceholder": "Asunto del ticket",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Describe el problema o solicitud en detalle...",
+        "priority": "Prioridad",
+        "priorities": {
+          "low": "Baja",
+          "medium": "Media",
+          "high": "Alta",
+          "urgent": "Urgente"
+        },
+        "cancel": "Cancelar",
+        "send": "Enviar Ticket"
+      }
+    },
+    "settings": {
+      "title": "Configuración",
+      "description": "Ajusta la configuración de tu cuenta para el perfil de {userType}.",
+      "theme": {
+        "title": "Tema",
+        "description": "Selecciona el tema visual de la aplicación.",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      },
+      "language": {
+        "title": "Idioma",
+        "description": "Selecciona el idioma de la aplicación.",
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano"
+      }
+    },
+    "languageSwitcher": {
+      "languages": {
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano"
+      }
+    },
+    "clientCards": {
+      "nextSession": {
+        "title": "Próxima Sesión",
+        "noSessions": "Sin sesiones programadas",
+        "noSessionsDescription": "No tienes sesiones próximas",
+        "today": "Hoy",
+        "withCoach": "Con {coach}",
+        "joinSession": "Unirse a la sesión"
+      },
+      "completedSessions": {
+        "title": "Sesiones Completadas",
+        "thisMonth": "+{sessionsThisMonth} este mes",
+        "monthlyPlan": "{percentage}% de tu plan mensual"
+      },
+      "goals": {
+        "title": "Metas",
+        "noGoals": "Sin metas asignadas",
+        "noGoalsDescription": "Tu coach te asignará metas específicas",
+        "completed": "Metas completadas",
+        "completionPercentage": "{percentage}% completado",
+        "recentGoals": "Metas recientes:",
+        "moreGoals": "+{count} más metas",
+        "viewGoals": "Ver metas"
+      },
+      "upcomingSessions": {
+        "title": "Próximas Sesiones",
+        "description": "Tus sesiones programadas para los próximos días.",
+        "noSessions": "No tienes sesiones programadas",
+        "withCoach": "Con {coach}",
+        "details": "Detalles"
+      },
+      "progress": {
+        "title": "Tu Progreso",
+        "description": "Seguimiento de tus objetivos y metas.",
+        "noObjectives": "No tienes objetivos asignados",
+        "goalsCompleted": "{completedGoals}/{totalGoals} metas completadas",
+        "noGoalsAssigned": "Sin metas asignadas aún",
+        "viewFullReport": "Ver informe completo"
+      }
+    },
+    "servicesGrid": {
+      "loading": "Cargando coaches...",
+      "error": {
+        "loadCoaches": "Error al cargar coaches",
+        "unknown": "Error desconocido",
+        "message": "Error: {error}"
+      },
+      "retry": "Reintentar",
+      "noCoaches": "No hay coaches registrados",
+      "update": "Actualizar",
+      "title": "Coaches Registrados",
+      "total": "Total: {count} coach{plural}",
+      "plural": "es",
+      "singular": ""
+    },
+    "coachCard": {
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "age": "{age} años",
+      "registered": "Registrado: {date}",
+      "sendMessage": "Enviar Mensaje"
+    },
+    "clientTasks": {
+      "loading": "Cargando tareas...",
+      "errors": {
+        "loadTasks": "Error al cargar las tareas",
+        "updateTask": "Error al actualizar la tarea"
+      },
+      "title": "Tareas Diarias y Pasadas",
+      "currentObjective": "Objetivo Actual: {title}",
+      "coach": "Coach: {coach}",
+      "day": "Día {day}",
+      "status": {
+        "completed": "Completada",
+        "pending": "Pendiente"
+      },
+      "noTasks": "No hay tareas asignadas",
+      "summary": "Resumen",
+      "completed": "Completadas: {count}",
+      "pending": "Pendientes: {count}",
+      "total": "Total: {count}",
+      "coachNotes": "Notas del Coach",
+      "note": "Nota",
+      "session": "Sesión: {date}",
+      "by": "Por: {createdBy}",
+      "noNotes": "No hay notas disponibles",
+      "feedback": "Feedback",
+      "noFeedback": "No hay feedback disponible"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "markAllAsRead": "Leer todas",
+      "noNotifications": "No tienes notificaciones",
+      "new": "Nuevo",
+      "timeAgo": {
+        "minutesAgo": "Hace unos minutos",
+        "hoursAgo": "Hace {hours} hora{plural}",
+        "daysAgo": "Hace {days} día{plural}",
+        "hoursPlural": "s",
+        "daysPlural": "s",
+        "hoursSingular": "",
+        "daysSingular": ""
+      }
+    },
+    "adminCards": {
+      "totalUsers": {
+        "title": "Total Usuarios",
+        "thisMonth": "+{count} este mes",
+        "viewUsers": "Ver usuarios"
+      },
+      "activeCoaches": {
+        "title": "Coaches Activos",
+        "thisMonth": "+{count} este mes",
+        "viewCoaches": "Ver coaches"
+      },
+      "completedSessions": {
+        "title": "Sesiones Realizadas",
+        "thisMonth": "+{count} este mes",
+        "viewAnalytics": "Ver analíticas"
+      },
+      "reports": {
+        "title": "Reportes",
+        "pendingReview": "Pendientes de revisión",
+        "viewReports": "Ver reportes"
+      },
+      "newUsers": {
+        "title": "Nuevos Usuarios",
+        "description": "Usuarios registrados en los últimos 7 días.",
+        "viewProfile": "Ver perfil",
+        "noNewUsers": "No hay nuevos usuarios"
+      },
+      "platformPerformance": {
+        "title": "Rendimiento de la Plataforma",
+        "description": "Estadísticas de uso y crecimiento.",
+        "metrics": {
+          "conversionRate": "Tasa de Conversión",
+          "avgSessionsPerUser": "Sesiones Promedio por Usuario",
+          "avgSessionTime": "Tiempo Promedio de Sesión",
+          "churnRate": "Tasa de Abandono",
+          "monthlyRevenue": "Ingresos Mensuales"
+        },
+        "viewFullReport": "Ver informe completo"
+      }
+    },
+    "enterprisesGrid": {
+      "loading": "Cargando empresas...",
+      "error": {
+        "loadEnterprises": "Error al cargar empresas",
+        "unknown": "Error desconocido",
+        "message": "Error: {error}"
+      },
+      "retry": "Reintentar",
+      "noEnterprises": "No hay empresas registradas",
+      "update": "Actualizar",
+      "title": "Empresas Registradas",
+      "total": "Total: {count} empresa{plural}",
+      "plural": "s",
+      "singular": ""
+    },
+    "addUserCard": {
+      "title": "Agregar nuevo usuario",
+      "description": "Añade nuevos usuarios a tu lista y configura sus perfiles, objetivos y planes de coaching.",
+      "features": {
+        "createProfiles": "Crea perfiles de usuarios",
+        "startScheduling": "Empieza a programar sesiones",
+        "scheduleWithClients": "Programa sesiones con tus clientes"
+      },
+      "addUser": "Añadir Usuario",
+      "modal": {
+        "title": "Añadir Nuevo Usuario",
+        "description": "Completa la información para crear un nuevo usuario.",
+        "fields": {
+          "name": "Nombre",
+          "lastName": "Apellidos",
+          "email": "Email",
+          "emailPlaceholder": "email@ejemplo.com",
+          "profile": "Perfil",
+          "profilePlaceholder": "Selecciona el perfil"
+        },
+        "profiles": {
+          "admin": "Admin",
+          "coach": "Coach",
+          "client": "Cliente",
+          "enterprise": "Empresa"
+        },
+        "buttons": {
+          "cancel": "Cancelar",
+          "creating": "Creando...",
+          "create": "Crear Usuario"
+        }
+      },
+      "errors": {
+        "completeFields": "Por favor completa todos los campos requeridos",
+        "createUser": "Error al crear usuario"
+      },
+      "success": {
+        "userCreated": "Usuario creado exitosamente"
+      }
+    },
+    "pointsManager": {
+      "card": {
+        "title": "Gestión de Puntos",
+        "description": "Administra los puntos de los coaches para la generación de objetivos",
+        "features": {
+          "assignPoints": "Asigna puntos a los coaches",
+          "removePoints": "Saca puntos a los coaches",
+          "viewPoints": "Visualiza los puntos de los coaches"
+        },
+        "managePoints": "Gestionar Puntos"
+      },
+      "modal": {
+        "title": "Gestión de Puntos de Coaches",
+        "description": "Busca un coach y gestiona sus puntos para la generación de objetivos.",
+        "search": {
+          "label": "Buscar Coach",
+          "placeholder": "Buscar por nombre, apellido o email...",
+          "searching": "Buscando coaches...",
+          "results": "Resultados:",
+          "noResults": "No se encontraron coaches"
+        },
+        "coach": {
+          "currentPoints": "puntos actuales",
+          "newPoints": "Nuevos Puntos",
+          "points": "puntos"
+        },
+        "buttons": {
+          "cancel": "Cancelar",
+          "updating": "Actualizando...",
+          "confirm": "Confirmar Cambios"
+        },
+        "errors": {
+          "searchCoaches": "Error al buscar coaches",
+          "updatePoints": "Error al actualizar puntos"
+        },
+        "success": {
+          "pointsUpdated": "Puntos actualizados exitosamente"
+        }
+      }
+    }
+  }
+}

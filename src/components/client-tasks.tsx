@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 interface Goal {
   _id: string;
@@ -51,6 +53,9 @@ interface TasksData {
 const ClientTasks: React.FC = () => {
   const theme = useTheme();
   const { user } = useAuth();
+  const t = useTranslations('common.dashboard.clientTasks');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
   const [tasksData, setTasksData] = useState<TasksData | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingGoal, setUpdatingGoal] = useState<string | null>(null);
@@ -69,11 +74,11 @@ const ClientTasks: React.FC = () => {
       if (result.success) {
         setTasksData(result.data);
       } else {
-        toast.error('Error al cargar las tareas');
+        toast.error(t('errors.loadTasks'));
       }
     } catch (error) {
       console.error('Error al cargar tareas:', error);
-      toast.error('Error al cargar las tareas');
+      toast.error(t('errors.loadTasks'));
     } finally {
       setLoading(false);
     }
@@ -107,11 +112,11 @@ const ClientTasks: React.FC = () => {
 
         toast.success(result.message);
       } else {
-        toast.error('Error al actualizar la tarea');
+        toast.error(t('errors.updateTask'));
       }
     } catch (error) {
       console.error('Error al actualizar tarea:', error);
-      toast.error('Error al actualizar la tarea');
+      toast.error(t('errors.updateTask'));
     } finally {
       setUpdatingGoal(null);
     }
@@ -137,7 +142,7 @@ const ClientTasks: React.FC = () => {
             style={{ borderColor: theme.palette.primary.main }}
           ></div>
           <p style={{ color: theme.palette.text.secondary }}>
-            Cargando tareas...
+            {t('loading')}
           </p>
         </div>
       </div>
@@ -168,7 +173,7 @@ const ClientTasks: React.FC = () => {
               color: theme.palette.text.primary,
             }}
           >
-            Tareas Diarias y Pasadas
+            {t('title')}
           </h2>
 
           {tasksData?.currentObjective && (
@@ -180,10 +185,10 @@ const ClientTasks: React.FC = () => {
               }}
             >
               <h3 className="text-sm font-semibold mb-1">
-                Objetivo Actual: {tasksData.currentObjective.title}
+                {t('currentObjective', { title: tasksData.currentObjective.title })}
               </h3>
               <p className="text-xs">
-                Coach: {tasksData.currentObjective.coach}
+                {t('coach', { coach: tasksData.currentObjective.coach })}
               </p>
             </div>
           )}
@@ -195,9 +200,8 @@ const ClientTasks: React.FC = () => {
                 <div
                   key={goal._id}
                   onClick={() => updateGoalStatus(goal._id, !goal.isCompleted)}
-                  className={`p-3 rounded cursor-pointer transition-all duration-200 hover:opacity-90 ${
-                    goal.isCompleted ? 'ring-2 ring-green-500' : ''
-                  }`}
+                  className={`p-3 rounded cursor-pointer transition-all duration-200 hover:opacity-90 ${goal.isCompleted ? 'ring-2 ring-green-500' : ''
+                    }`}
                   style={{
                     border: `1px dashed ${theme.palette.divider}`,
                     backgroundColor: goal.isCompleted
@@ -211,7 +215,7 @@ const ClientTasks: React.FC = () => {
                         className="text-sm font-medium mb-1"
                         style={{ color: theme.palette.text.primary }}
                       >
-                        Día {goal.day}
+                        {t('day', { day: goal.day })}
                       </h3>
                       <p
                         className="text-xs"
@@ -244,7 +248,7 @@ const ClientTasks: React.FC = () => {
                                 : theme.palette.warning.contrastText,
                             }}
                           >
-                            {goal.isCompleted ? 'Completada' : 'Pendiente'}
+                            {goal.isCompleted ? t('status.completed') : t('status.pending')}
                           </span>
                         </>
                       )}
@@ -258,7 +262,7 @@ const ClientTasks: React.FC = () => {
               className="text-center py-8"
               style={{ color: theme.palette.text.secondary }}
             >
-              <p>No hay tareas asignadas</p>
+              <p>{t('noTasks')}</p>
             </div>
           )}
 
@@ -275,17 +279,17 @@ const ClientTasks: React.FC = () => {
                 className="text-sm font-semibold mb-2"
                 style={{ color: theme.palette.text.primary }}
               >
-                Resumen
+                {t('summary')}
               </h4>
               <div className="flex gap-4 text-xs">
                 <span style={{ color: theme.palette.success.main }}>
-                  Completadas: {completedGoals.length}
+                  {t('completed', { count: completedGoals.length })}
                 </span>
                 <span style={{ color: theme.palette.warning.main }}>
-                  Pendientes: {incompleteGoals.length}
+                  {t('pending', { count: incompleteGoals.length })}
                 </span>
                 <span style={{ color: theme.palette.text.secondary }}>
-                  Total: {tasksData?.goals?.length || 0}
+                  {t('total', { count: tasksData?.goals?.length || 0 })}
                 </span>
               </div>
             </div>
@@ -307,7 +311,7 @@ const ClientTasks: React.FC = () => {
               color: theme.palette.text.primary,
             }}
           >
-            Notas del Coach
+            {t('coachNotes')}
           </h2>
           <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(100%-4rem)]">
             {tasksData?.notes && tasksData.notes.length > 0 ? (
@@ -328,13 +332,14 @@ const ClientTasks: React.FC = () => {
                         color: theme.palette.info.contrastText,
                       }}
                     >
-                      {note.title || 'Nota'}
+                      {note.title || t('note')}
                     </span>
                     <h3
                       className="text-sm font-semibold"
                       style={{ color: theme.palette.text.primary }}
                     >
-                      {new Date(note.createdAt).toLocaleDateString('es-ES')}
+                      {/* //! TODO: Implementar una solucion mas general llevando esta logica a un hook/archivo de utilidades. */}
+                      {new Date(note.createdAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US')}
                     </h3>
                   </div>
                   <p
@@ -349,10 +354,7 @@ const ClientTasks: React.FC = () => {
                       style={{ color: theme.palette.text.secondary }}
                     >
                       <p>
-                        Sesión:{' '}
-                        {new Date(note.sessionInfo.date).toLocaleDateString(
-                          'es-ES'
-                        )}
+                        {t('session', { date: new Date(note.sessionInfo.date).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US') })}
                       </p>
                     </div>
                   )}
@@ -360,7 +362,7 @@ const ClientTasks: React.FC = () => {
                     className="text-xs mt-1"
                     style={{ color: theme.palette.text.secondary }}
                   >
-                    Por: {note.createdBy}
+                    {t('by', { createdBy: note.createdBy })}
                   </p>
                 </div>
               ))
@@ -369,7 +371,7 @@ const ClientTasks: React.FC = () => {
                 className="text-center py-8"
                 style={{ color: theme.palette.text.secondary }}
               >
-                <p>No hay notas disponibles</p>
+                <p>{t('noNotes')}</p>
               </div>
             )}
           </div>
@@ -393,7 +395,7 @@ const ClientTasks: React.FC = () => {
               color: theme.palette.text.primary,
             }}
           >
-            Feedback
+            {t('feedback')}
           </h2>
           {tasksData?.feedback ? (
             <div
@@ -412,7 +414,7 @@ const ClientTasks: React.FC = () => {
                   }}
                 >
                   {new Date(tasksData.feedback.createdAt).toLocaleDateString(
-                    'es-ES'
+                    locale === 'es' ? 'es-ES' : 'en-US'
                   )}
                 </span>
               </div>
@@ -428,7 +430,7 @@ const ClientTasks: React.FC = () => {
               className="text-center py-8"
               style={{ color: theme.palette.text.secondary }}
             >
-              <p>No hay feedback disponible</p>
+              <p>{t('noFeedback')}</p>
             </div>
           )}
         </div>

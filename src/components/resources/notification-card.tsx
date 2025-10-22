@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 // Usar input checkbox nativo en lugar de componente personalizado
 import { Bell, ArrowRight, X } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { useTranslations } from 'next-intl';
 
 import { toast } from 'sonner';
 
@@ -33,6 +34,8 @@ interface NotificationCardProps {
 }
 
 export function NotificationCard({ userType }: NotificationCardProps) {
+  const t = useTranslations('common.dashboard.notificationCard');
+
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
 
   // Estados para el autocompletado de notificaciones
@@ -177,19 +180,17 @@ export function NotificationCard({ userType }: NotificationCardProps) {
     );
 
     if (!hasIndividualRecipients && !hasMassNotification) {
-      toast.error(
-        'Por favor selecciona al menos un destinatario o una opción de notificación masiva'
-      );
+      toast.error(t('errors.selectRecipients'));
       return;
     }
 
     if (!notificationForm.title || !notificationForm.message) {
-      toast.error('Por favor completa el título y mensaje');
+      toast.error(t('errors.completeFields'));
       return;
     }
 
     if (!user?._id) {
-      toast.error('No se pudo identificar al usuario autenticado');
+      toast.error(t('errors.userNotIdentified'));
       return;
     }
 
@@ -241,7 +242,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
       }
     } catch (error) {
       console.error('Error enviando notificación:', error);
-      toast.error('Error interno del servidor');
+      toast.error(t('errors.serverError'));
     } finally {
       setIsSendingNotification(false);
     }
@@ -266,25 +267,24 @@ export function NotificationCard({ userType }: NotificationCardProps) {
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
           <Bell className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="mt-4">Notificaciones</CardTitle>
+        <CardTitle className="mt-4">{t('title')}</CardTitle>
         <CardDescription>
-          Envía notificaciones a tus clientes sobre sesiones, recordatorios o
-          información importante.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <ul className="space-y-2 text-sm">
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Envía recordatorios de sesiones</span>
+            <span>{t('features.sessionReminders')}</span>
           </li>
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Notifica cambios de horario</span>
+            <span>{t('features.scheduleChanges')}</span>
           </li>
           <li className="flex items-center gap-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <span>Comparte recursos y materiales</span>
+            <span>{t('features.shareResources')}</span>
           </li>
         </ul>
       </CardContent>
@@ -295,23 +295,23 @@ export function NotificationCard({ userType }: NotificationCardProps) {
         >
           <DialogTrigger asChild>
             <Button variant="outlined" className="w-full">
-              Crear Notificación
+              {t('createNotification')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Crear Notificación</DialogTitle>
+              <DialogTitle>{t('modal.title')}</DialogTitle>
               <DialogDescription>
-                Envía una notificación a{' '}
-                {userType === 'coach' ? 'tus clientes' : 'usuarios del sistema'}
-                .
+                {t('modal.description', {
+                  userType: userType === 'coach' ? 'tus clientes' : 'usuarios del sistema'
+                })}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               {/* Checkboxes para notificaciones masivas */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">
-                  Notificaciones Masivas
+                  {t('modal.massNotifications')}
                 </Label>
 
                 {/* Checkbox para coach: notificar a todos sus clientes */}
@@ -330,7 +330,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                       className="h-4 w-4 rounded border-2 border-border"
                     />
                     <Label htmlFor="allClients" className="text-sm">
-                      Notificar a todos mis clientes
+                      {t('modal.notifyAllClients')}
                     </Label>
                   </div>
                 )}
@@ -352,7 +352,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                         className="h-4 w-4 rounded border-2 border-border"
                       />
                       <Label htmlFor="allCoaches" className="text-sm">
-                        Notificar a todos los coaches
+                        {t('modal.notifyAllCoaches')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -369,7 +369,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                         className="h-4 w-4 rounded border-2 border-border"
                       />
                       <Label htmlFor="allUsers" className="text-sm">
-                        Notificar a todos los usuarios
+                        {t('modal.notifyAllUsers')}
                       </Label>
                     </div>
                   </>
@@ -385,17 +385,17 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background px-2 text-muted-foreground">
-                        O seleccionar individualmente
+                        {t('modal.orSelectIndividually')}
                       </span>
                     </div>
                   </div>
 
                   {/* Selección individual de destinatarios */}
                   <div className="grid gap-2 relative">
-                    <Label htmlFor="recipient">Destinatarios</Label>
+                    <Label htmlFor="recipient">{t('modal.recipients')}</Label>
                     <Input
                       id="recipient"
-                      placeholder="Escribe 3 letras para empezar a buscar..."
+                      placeholder={t('modal.searchPlaceholder')}
                       value={recipientSearch}
                       onChange={e => handleRecipientInputChange(e.target.value)}
                       onFocus={() =>
@@ -406,7 +406,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                     {isSearching && (
                       <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
                         <div className="text-sm text-muted-foreground">
-                          Buscando usuarios...
+                          {t('modal.searching')}
                         </div>
                       </div>
                     )}
@@ -436,7 +436,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                       !isSearching && (
                         <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 p-3">
                           <div className="text-sm text-muted-foreground">
-                            No se encontraron usuarios
+                            {t('modal.noUsersFound')}
                           </div>
                         </div>
                       )}
@@ -446,7 +446,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                   {selectedRecipients.length > 0 && (
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">
-                        Destinatarios seleccionados:
+                        {t('modal.selectedRecipients')}
                       </Label>
                       <div className="space-y-1">
                         {selectedRecipients.map(recipient => (
@@ -474,10 +474,10 @@ export function NotificationCard({ userType }: NotificationCardProps) {
               )}
 
               <div className="grid gap-2">
-                <Label htmlFor="title">Título</Label>
+                <Label htmlFor="title">{t('modal.titleLabel')}</Label>
                 <Input
                   id="title"
-                  placeholder="Título de la notificación"
+                  placeholder={t('modal.titlePlaceholder')}
                   value={notificationForm.title}
                   onChange={e =>
                     handleNotificationFormChange('title', e.target.value)
@@ -485,10 +485,10 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">Mensaje</Label>
+                <Label htmlFor="message">{t('modal.messageLabel')}</Label>
                 <Textarea
                   id="message"
-                  placeholder="Escribe tu mensaje aquí..."
+                  placeholder={t('modal.messagePlaceholder')}
                   value={notificationForm.message}
                   onChange={e =>
                     handleNotificationFormChange('message', e.target.value)
@@ -505,13 +505,13 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                 }}
                 disabled={isSendingNotification}
               >
-                Cancelar
+                {t('modal.cancel')}
               </Button>
               <Button
                 onClick={handleSendNotification}
                 disabled={isSendingNotification}
               >
-                {isSendingNotification ? 'Enviando...' : 'Enviar Notificación'}
+                {isSendingNotification ? t('modal.sending') : t('modal.send')}
               </Button>
             </DialogFooter>
           </DialogContent>

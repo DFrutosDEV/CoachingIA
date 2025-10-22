@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mail, Phone, Building2, Calendar } from 'lucide-react';
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 interface CoachCardProps {
   id: string;
@@ -39,12 +41,23 @@ export function CoachCard({
   enterprise,
   createdAt,
 }: CoachCardProps) {
+  const t = useTranslations('common.dashboard.coachCard');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    //! TODO: Implementar una solucion mas general llevando esta logica a un hook/archivo de utilidades.
+    const localeMap = {
+      'es': 'es-ES',
+      'en': 'en-US',
+      'it': 'it-IT'
+    };
+
+    return new Date(dateString).toLocaleDateString(localeMap[locale as keyof typeof localeMap] || 'es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -80,11 +93,11 @@ export function CoachCard({
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-semibold">{`${name} ${lastName}`}</h3>
                 <Badge variant={active ? 'active' : 'inactive'}>
-                  {active ? 'Activo' : 'Inactivo'}
+                  {active ? t('status.active') : t('status.inactive')}
                 </Badge>
               </div>
               {age && (
-                <p className="text-sm text-muted-foreground">{age} años</p>
+                <p className="text-sm text-muted-foreground">{t('age', { age })}</p>
               )}
             </div>
           </div>
@@ -117,7 +130,7 @@ export function CoachCard({
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>Registrado: {formatDate(createdAt)}</span>
+              <span>{t('registered', { date: formatDate(createdAt) })}</span>
             </div>
           </div>
           <div className="flex gap-2 ">
@@ -127,7 +140,7 @@ export function CoachCard({
               className="flex-1"
               onClick={handleSendMessage}
             >
-              Enviar Mensaje
+              {t('sendMessage')}
             </Button>
           </div>
         </CardContent>

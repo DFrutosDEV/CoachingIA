@@ -39,6 +39,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { formatDate, formatTime } from '@/utils/validatesInputs';
 import { DeleteClientModal } from '@/components/ui/delete-client-modal';
+import { useTranslations } from 'next-intl';
 
 import { ClientResponse, NextSession } from '@/types';
 import { sendMessage } from '@/utils/wpp-methods';
@@ -58,6 +59,8 @@ export function ClientsList({
   isAdmin,
   onClientDeleted,
 }: ClientsListProps) {
+  const t = useTranslations('common.dashboard.clientsList');
+
   // Recibir props
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -100,16 +103,16 @@ export function ClientsList({
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
-        <CardTitle>Lista de Clientes</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Gestiona tus clientes y su información
+          {t('description')}
         </CardDescription>
         <div className="flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Buscar por nombre, email o enfoque..."
+              placeholder={t('search.placeholder')}
               className="pl-8"
               value={searchQuery}
               onChange={e => {
@@ -122,11 +125,11 @@ export function ClientsList({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-1">
                 <Filter className="h-4 w-4" />
-                Filtrar
+                {t('search.filter')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-accent" align="end">
-              <DropdownMenuLabel>Estado</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('search.status')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="bg-accent-hover"
@@ -135,7 +138,7 @@ export function ClientsList({
                   setCurrentPage(0);
                 }}
               >
-                Todos
+                {t('search.all')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-accent-hover"
@@ -144,7 +147,7 @@ export function ClientsList({
                   setCurrentPage(0);
                 }}
               >
-                Activos
+                {t('search.active')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-accent-hover"
@@ -153,7 +156,7 @@ export function ClientsList({
                   setCurrentPage(0);
                 }}
               >
-                Pendientes
+                {t('search.pending')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-accent-hover"
@@ -162,7 +165,7 @@ export function ClientsList({
                   setCurrentPage(0);
                 }}
               >
-                Inactivos
+                {t('search.inactive')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -173,11 +176,11 @@ export function ClientsList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Próxima Sesión</TableHead>
+                <TableHead>{t('table.client')}</TableHead>
+                <TableHead>{t('table.status')}</TableHead>
+                <TableHead>{t('table.nextSession')}</TableHead>
                 <TableHead></TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead className="text-right">{t('table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -220,16 +223,16 @@ export function ClientsList({
                           }
                         >
                           {client.status === 'active'
-                            ? 'Activo'
+                            ? t('status.active')
                             : client.status === 'pending'
-                              ? 'Pendiente'
-                              : 'Inactivo'}
+                              ? t('status.pending')
+                              : t('status.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         {Object.keys(client.nextSession).length > 0
                           ? `${formatDate(new Date((client.nextSession as NextSession).date))} - ${formatTime(new Date((client.nextSession as NextSession).date), { hour: '2-digit', minute: '2-digit' })}`
-                          : 'Por programar'}
+                          : t('table.toSchedule')}
                       </TableCell>
                       <TableCell></TableCell>
                       <TableCell className="text-right">
@@ -241,7 +244,7 @@ export function ClientsList({
                               onClick={e => e.stopPropagation()}
                             >
                               <MoreVertical className="h-4 w-4" />
-                              <span className="sr-only">Abrir menú</span>
+                              <span className="sr-only">{t('table.openMenu')}</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
@@ -249,7 +252,7 @@ export function ClientsList({
                             align="end"
                           >
                             <DropdownMenuLabel>
-                              Acciones Rápidas
+                              {t('table.quickActions')}
                             </DropdownMenuLabel>
                             {isAdmin && (
                               <DropdownMenuItem
@@ -260,7 +263,7 @@ export function ClientsList({
                                 }}
                               >
                                 <Ban className="mr-2 h-4 w-4" />
-                                <span>Dar de baja</span>
+                                <span>{t('table.deactivate')}</span>
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
@@ -279,7 +282,7 @@ export function ClientsList({
                                 }
                               >
                                 <MessageSquare className="h-4 w-4" />
-                                Mensaje
+                                {t('table.message')}
                               </div>
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -290,7 +293,7 @@ export function ClientsList({
                               }}
                             >
                               <FileText className="mr-2 h-4 w-4" />
-                              <span>Ver PDA</span>
+                              <span>{t('table.viewPDA')}</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -300,7 +303,7 @@ export function ClientsList({
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center">
-                    No se encontraron clientes.
+                    {t('table.noClientsFound')}
                   </TableCell>
                 </TableRow>
               )}
@@ -310,9 +313,11 @@ export function ClientsList({
         {filteredClients.length > 5 && (
           <div className="mt-4 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Mostrando {currentPage * 5 + 1} a{' '}
-              {Math.min((currentPage + 1) * 5, filteredClients.length)} de{' '}
-              {filteredClients.length} clientes
+              {t('table.showingResults', {
+                start: currentPage * 5 + 1,
+                end: Math.min((currentPage + 1) * 5, filteredClients.length),
+                total: filteredClients.length
+              })}
             </p>
             <div className="flex gap-2">
               <Button
@@ -321,7 +326,7 @@ export function ClientsList({
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                Anterior
+                {t('table.previous')}
               </Button>
               <Button
                 variant="outline"
@@ -329,7 +334,7 @@ export function ClientsList({
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={(currentPage + 1) * 5 >= filteredClients.length}
               >
-                Siguiente
+                {t('table.next')}
               </Button>
             </div>
           </div>

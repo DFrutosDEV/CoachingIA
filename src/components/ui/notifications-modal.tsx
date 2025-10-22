@@ -13,6 +13,7 @@ import { cn } from '@/utils/cn';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationBadge } from '@/components/ui/notification-badge';
 import { Notification } from '@/types/notification';
+import { useTranslations } from 'next-intl';
 
 interface NotificationsModalProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -21,6 +22,7 @@ interface NotificationsModalProps {
 type NotificationWithRead = Notification & { read: boolean };
 
 export function NotificationsModal({ userType }: NotificationsModalProps) {
+  const t = useTranslations('common.dashboard.notifications');
   const [isOpen, setIsOpen] = useState(false);
   const {
     notifications,
@@ -47,12 +49,14 @@ export function NotificationsModal({ userType }: NotificationsModalProps) {
     );
 
     if (diffInHours < 1) {
-      return 'Hace unos minutos';
+      return t('timeAgo.minutesAgo');
     } else if (diffInHours < 24) {
-      return `Hace ${diffInHours} hora${diffInHours > 1 ? 's' : ''}`;
+      const plural = diffInHours > 1 ? t('timeAgo.hoursPlural') : t('timeAgo.hoursSingular');
+      return t('timeAgo.hoursAgo', { hours: diffInHours, plural });
     } else {
       const diffInDays = Math.floor(diffInHours / 24);
-      return `Hace ${diffInDays} día${diffInDays > 1 ? 's' : ''}`;
+      const plural = diffInDays > 1 ? t('timeAgo.daysPlural') : t('timeAgo.daysSingular');
+      return t('timeAgo.daysAgo', { days: diffInDays, plural });
     }
   };
 
@@ -67,7 +71,7 @@ export function NotificationsModal({ userType }: NotificationsModalProps) {
         <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex mt-4 items-center justify-between">
-              <span>Notificaciones</span>
+              <span>{t('title')}</span>
               {unreadCount > 0 && (
                 <Button
                   variant="outline"
@@ -76,7 +80,7 @@ export function NotificationsModal({ userType }: NotificationsModalProps) {
                   className="text-xs"
                 >
                   <Check className="h-3 w-3 mr-1" />
-                  Leer todas
+                  {t('markAllAsRead')}
                 </Button>
               )}
             </DialogTitle>
@@ -90,7 +94,7 @@ export function NotificationsModal({ userType }: NotificationsModalProps) {
             ) : notifications.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No tienes notificaciones</p>
+                <p>{t('noNotifications')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -143,7 +147,7 @@ export function NotificationsModal({ userType }: NotificationsModalProps) {
                           </span>
                           {!notification.read && (
                             <span className="text-xs text-primary font-medium">
-                              Nuevo
+                              {t('new')}
                             </span>
                           )}
                         </div>

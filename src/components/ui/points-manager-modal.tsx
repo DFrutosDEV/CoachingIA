@@ -27,6 +27,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface Coach {
   id: string;
@@ -45,6 +46,7 @@ export function PointsManagerModal({
   isOpen,
   onClose,
 }: PointsManagerModalProps) {
+  const t = useTranslations('common.dashboard.pointsManager.modal');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Coach[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -78,7 +80,7 @@ export function PointsManagerModal({
     } catch (error) {
       console.error('Error al buscar coaches:', error);
       setSearchResults([]);
-      toast.error('Error al buscar coaches');
+      toast.error(t('errors.searchCoaches'));
     } finally {
       setIsSearching(false);
     }
@@ -125,7 +127,7 @@ export function PointsManagerModal({
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          toast.success('Puntos actualizados exitosamente');
+          toast.success(t('success.pointsUpdated'));
           // Actualizar el coach seleccionado con los nuevos puntos
           setSelectedCoach(prev =>
             prev ? { ...prev, points: newPoints } : null
@@ -133,15 +135,15 @@ export function PointsManagerModal({
           // Cerrar el modal
           handleClose();
         } else {
-          toast.error(result.error || 'Error al actualizar puntos');
+          toast.error(result.error || t('errors.updatePoints'));
         }
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Error al actualizar puntos');
+        toast.error(error.error || t('errors.updatePoints'));
       }
     } catch (error) {
       console.error('Error al actualizar puntos:', error);
-      toast.error('Error al actualizar puntos');
+      toast.error(t('errors.updatePoints'));
     } finally {
       setIsUpdating(false);
     }
@@ -168,11 +170,10 @@ export function PointsManagerModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Coins className="h-5 w-5" />
-            Gestión de Puntos de Coaches
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            Busca un coach y gestiona sus puntos para la generación de
-            objetivos.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -181,12 +182,12 @@ export function PointsManagerModal({
           {!selectedCoach && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="search">Buscar Coach</Label>
+                <Label htmlFor="search">{t('search.label')}</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="search"
-                    placeholder="Buscar por nombre, apellido o email..."
+                    placeholder={t('search.placeholder')}
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -198,13 +199,13 @@ export function PointsManagerModal({
               {isSearching && (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="h-6 w-6 animate-spin" />
-                  <span className="ml-2">Buscando coaches...</span>
+                  <span className="ml-2">{t('search.searching')}</span>
                 </div>
               )}
 
               {!isSearching && searchResults.length > 0 && (
                 <div className="space-y-2">
-                  <Label>Resultados:</Label>
+                  <Label>{t('search.results')}</Label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {searchResults.map(coach => (
                       <Card
@@ -233,7 +234,7 @@ export function PointsManagerModal({
                               className="flex items-center gap-1"
                             >
                               <Coins className="h-3 w-3" />
-                              {coach.points} puntos
+                              {coach.points} {t('coach.points')}
                             </Badge>
                           </div>
                         </CardContent>
@@ -248,7 +249,7 @@ export function PointsManagerModal({
                 searchResults.length === 0 && (
                   <div className="flex items-center justify-center py-4 text-muted-foreground">
                     <AlertCircle className="h-5 w-5 mr-2" />
-                    No se encontraron coaches
+                    {t('search.noResults')}
                   </div>
                 )}
             </div>
@@ -273,13 +274,13 @@ export function PointsManagerModal({
                       className="flex items-center gap-1"
                     >
                       <Coins className="h-3 w-3" />
-                      {selectedCoach.points} puntos actuales
+                      {selectedCoach.points} {t('coach.currentPoints')}
                     </Badge>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="newPoints">Nuevos Puntos</Label>
+                      <Label htmlFor="newPoints">{t('coach.newPoints')}</Label>
                       <div className="flex items-center gap-2 mt-2">
                         <Button
                           variant="outline"
@@ -314,11 +315,10 @@ export function PointsManagerModal({
                     {/* Diferencia de puntos */}
                     {newPoints !== selectedCoach.points && (
                       <div
-                        className={`p-3 rounded-lg ${
-                          newPoints > selectedCoach.points
-                            ? 'bg-green-50 border border-green-200'
-                            : 'bg-red-50 border border-red-200'
-                        }`}
+                        className={`p-3 rounded-lg ${newPoints > selectedCoach.points
+                          ? 'bg-green-50 border border-green-200'
+                          : 'bg-red-50 border border-red-200'
+                          }`}
                       >
                         <div className="flex items-center gap-2">
                           {newPoints > selectedCoach.points ? (
@@ -327,14 +327,13 @@ export function PointsManagerModal({
                             <Minus className="h-4 w-4 text-red-600" />
                           )}
                           <span
-                            className={`font-medium ${
-                              newPoints > selectedCoach.points
-                                ? 'text-green-700'
-                                : 'text-red-700'
-                            }`}
+                            className={`font-medium ${newPoints > selectedCoach.points
+                              ? 'text-green-700'
+                              : 'text-red-700'
+                              }`}
                           >
                             {newPoints > selectedCoach.points ? '+' : ''}
-                            {newPoints - selectedCoach.points} puntos
+                            {newPoints - selectedCoach.points} {t('coach.points')}
                           </span>
                         </div>
                       </div>
@@ -348,7 +347,7 @@ export function PointsManagerModal({
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={handleClose} disabled={isUpdating}>
-            Cancelar
+            {t('buttons.cancel')}
           </Button>
           {selectedCoach && (
             <Button
@@ -359,12 +358,12 @@ export function PointsManagerModal({
               {isUpdating ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Actualizando...
+                  {t('buttons.updating')}
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4" />
-                  Confirmar Cambios
+                  {t('buttons.confirm')}
                 </>
               )}
             </Button>

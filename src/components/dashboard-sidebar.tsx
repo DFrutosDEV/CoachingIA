@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,6 +28,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuthService } from '@/lib/services/auth-service';
+import { useTranslations } from 'next-intl';
 
 interface SidebarProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -43,8 +44,13 @@ export function DashboardSidebar({
   onMobileClose,
 }: SidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { logout } = useAuthService();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const t = useTranslations('common.dashboard');
+
+  // Obtener el locale actual de la ruta
+  const locale = pathname.split('/')[1] || 'es';
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -54,7 +60,7 @@ export function DashboardSidebar({
     try {
       await logout();
       setShowLogoutModal(false);
-      router.push('/login');
+      router.push(`/${locale}/login`);
     } catch (error) {
       console.error('Error durante logout:', error);
     }
@@ -76,10 +82,10 @@ export function DashboardSidebar({
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 min-h-15 justify-between">
           <Link
-            href={`/dashboard/${userType}`}
+            href={`/${locale}/dashboard/${userType}`}
             className="flex items-center gap-2 font-semibold"
           >
-            <span className="text-primary font-bold">CoachingIA</span>
+            <span className="text-primary font-bold">{t('title')}</span>
           </Link>
           {/* Botón de cerrar para móvil */}
           {onMobileClose && (
@@ -96,66 +102,66 @@ export function DashboardSidebar({
         <ScrollArea className="flex-1 px-2">
           <div className="flex flex-col gap-1 py-2">
             <Link
-              href={`/dashboard/${userType}`}
+              href={`/${locale}/dashboard/${userType}`}
               passHref
               onClick={handleLinkClick}
             >
               <Button variant="text" className="w-full justify-start gap-2">
                 <Home className="h-4 w-4" />
-                Inicio
+                {t('navigation.home')}
               </Button>
             </Link>
 
             {userType === 'client' && (
               <>
                 <Link
-                  href={`/dashboard/${userType}/services`}
+                  href={`/${locale}/dashboard/${userType}/services`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
-                    Mis Servicios
+                    {t('navigation.myServices')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/calendar`}
+                  href={`/${locale}/dashboard/${userType}/calendar`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Calendar className="h-4 w-4" />
-                    Próximas Sesiones
+                    {t('navigation.upcomingSessions')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/progress`}
+                  href={`/${locale}/dashboard/${userType}/progress`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
-                    En qué estoy trabajando
+                    {t('navigation.whatIAmWorkingOn')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/tasks`}
+                  href={`/${locale}/dashboard/${userType}/tasks`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <BookOpenCheck className="h-4 w-4" />
-                    Tareas a realizar
+                    {t('navigation.tasksToDo')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/resources`}
+                  href={`/${locale}/dashboard/${userType}/resources`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
-                    Recursos
+                    {t('navigation.resources')}
                   </Button>
                 </Link>
               </>
@@ -164,33 +170,33 @@ export function DashboardSidebar({
             {userType === 'coach' && (
               <>
                 <Link
-                  href={`/dashboard/${userType}/clients`}
+                  href={`/${locale}/dashboard/${userType}/clients`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
-                    Mis Clientes
+                    {t('navigation.myClients')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/calendar`}
+                  href={`/${locale}/dashboard/${userType}/calendar`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Calendar className="h-4 w-4" />
-                    Sesiones
+                    {t('navigation.sessions')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/resources`}
+                  href={`/${locale}/dashboard/${userType}/resources`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
-                    Recursos
+                    {t('navigation.resources')}
                   </Button>
                 </Link>
               </>
@@ -199,63 +205,63 @@ export function DashboardSidebar({
             {userType === 'admin' && (
               <>
                 <Link
-                  href={`/dashboard/${userType}/clients`}
+                  href={`/${locale}/dashboard/${userType}/clients`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
-                    Clientes
+                    {t('navigation.clients')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/coaches`}
+                  href={`/${locale}/dashboard/${userType}/coaches`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <UserCircle className="h-4 w-4" />
-                    Coaches
+                    {t('navigation.coaches')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/enterprises`}
+                  href={`/${locale}/dashboard/${userType}/enterprises`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Building className="h-4 w-4" />
-                    Empresas
+                    {t('navigation.enterprises')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/analytics`}
+                  href={`/${locale}/dashboard/${userType}/analytics`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
-                    Analíticas
+                    {t('navigation.analytics')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/reports`}
+                  href={`/${locale}/dashboard/${userType}/reports`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <File className="h-4 w-4" />
-                    Reportes
+                    {t('navigation.reports')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/resources`}
+                  href={`/${locale}/dashboard/${userType}/resources`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
-                    Recursos
+                    {t('navigation.resources')}
                   </Button>
                 </Link>
               </>
@@ -264,66 +270,66 @@ export function DashboardSidebar({
             {userType === 'enterprise' && (
               <>
                 <Link
-                  href={`/dashboard/${userType}/clients`}
+                  href={`/${locale}/dashboard/${userType}/clients`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4" />
-                    Mis Clientes
+                    {t('navigation.myClients')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/coaches`}
+                  href={`/${locale}/dashboard/${userType}/coaches`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <UserCircle className="h-4 w-4" />
-                    Mis Coaches
+                    {t('navigation.myCoaches')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/analytics`}
+                  href={`/${locale}/dashboard/${userType}/analytics`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <BarChart className="h-4 w-4" />
-                    Analíticas
+                    {t('navigation.analytics')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/reports`}
+                  href={`/${locale}/dashboard/${userType}/reports`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <File className="h-4 w-4" />
-                    Reportes
+                    {t('navigation.reports')}
                   </Button>
                 </Link>
                 <Link
-                  href={`/dashboard/${userType}/resources`}
+                  href={`/${locale}/dashboard/${userType}/resources`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4" />
-                    Recursos
+                    {t('navigation.resources')}
                   </Button>
                 </Link>
               </>
             )}
 
             <Link
-              href={`/dashboard/${userType}/settings`}
+              href={`/${locale}/dashboard/${userType}/settings`}
               passHref
               onClick={handleLinkClick}
             >
               <Button variant="text" className="w-full justify-start gap-2">
                 <Settings className="h-4 w-4" />
-                Configuración
+                {t('navigation.settings')}
               </Button>
             </Link>
           </div>
@@ -335,7 +341,7 @@ export function DashboardSidebar({
             onClick={handleLogoutClick}
           >
             <LogOut className="h-4 w-4" />
-            Cerrar Sesión
+            {t('navigation.logout')}
           </Button>
         </div>
       </div>
@@ -344,18 +350,17 @@ export function DashboardSidebar({
       <Dialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar cierre de sesión</DialogTitle>
+            <DialogTitle>{t('logout.confirmTitle')}</DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres cerrar sesión? Tendrás que volver a
-              iniciar sesión para acceder a tu cuenta.
+              {t('logout.confirmMessage')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2">
             <Button variant="outline" onClick={handleCancelLogout}>
-              Cancelar
+              {t('logout.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
-              Cerrar Sesión
+              {t('logout.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -378,9 +383,8 @@ export function DashboardSidebar({
 
         {/* Sidebar móvil */}
         <div
-          className={`fixed left-0 top-0 z-50 h-full w-64 transform transition-transform duration-300 ease-in-out md:hidden ${
-            isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+          className={`fixed left-0 top-0 z-50 h-full w-64 transform transition-transform duration-300 ease-in-out md:hidden ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
         >
           {sidebarContent}
         </div>

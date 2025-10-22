@@ -23,16 +23,26 @@ import { Button } from '@/components/ui/button';
 import { CalendarService } from '@/lib/services/calendar-service';
 import RescheduleModal from './reschedule-modal';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
-// Extiende dayjs con el plugin y configura el locale
+// Extiende dayjs con el plugin
 dayjs.extend(localizedFormat);
-dayjs.locale('es');
 
 // Crea el localizador usando dayjs
 const localizer = dayjsLocalizer(dayjs);
 
 // Toolbar simplificado que funciona correctamente
 const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
+  const t = useTranslations('common.dashboard.calendar');
+  const pathname = usePathname();
+
+  // Extraer el locale del path
+  const locale = pathname.split('/')[1] || 'es';
+
+  // Configurar dayjs con el locale del path
+  dayjs.locale(locale);
+
   const label = () => {
     const date = dayjs(toolbar.date);
     const month = date.format('MMMM');
@@ -53,7 +63,7 @@ const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
           className={toolbar.view === 'month' ? 'rbc-active' : ''}
           onClick={() => toolbar.onView('month')}
         >
-          Mes
+          {t('month')}
         </button>
       </span>
     </div>
@@ -75,6 +85,15 @@ interface SessionEvent {
 }
 
 export default function SessionsPage() {
+  const t = useTranslations('common.dashboard.calendar');
+  const pathname = usePathname();
+
+  // Extraer el locale del path
+  const locale = pathname.split('/')[1] || 'es';
+
+  // Configurar dayjs con el locale del path
+  dayjs.locale(locale);
+
   const [sessions, setSessions] = useState<SessionEvent[]>([]);
   const [selectedSession, setSelectedSession] = useState<SessionEvent | null>(
     null
@@ -166,7 +185,7 @@ export default function SessionsPage() {
       >
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
-          <p>Cargando sesiones...</p>
+          <p>{t('loading')}</p>
         </div>
       </div>
     );
@@ -181,7 +200,7 @@ export default function SessionsPage() {
         <div className="text-center">
           <p className="text-red-600 mb-4">Error: {error}</p>
           <Button onClick={handleRefresh} variant="outline">
-            Reintentar
+            {t('retry')}
           </Button>
         </div>
       </div>
@@ -191,9 +210,9 @@ export default function SessionsPage() {
   return (
     <div className="p-2">
       <div className="mb-4 flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Calendario de Sesiones</h2>
+        <h2 className="text-xl font-semibold">{t('title')}</h2>
         <Button onClick={handleRefresh} variant="outline" size="sm">
-          Actualizar
+          {t('update')}
         </Button>
       </div>
 
@@ -216,18 +235,18 @@ export default function SessionsPage() {
           onSelectSlot={handleSelectSlot}
           selectable
           messages={{
-            next: 'Siguiente',
-            previous: 'Anterior',
-            today: 'Hoy',
-            month: 'Mes',
-            week: 'Semana',
-            day: 'Día',
-            agenda: 'Agenda',
-            date: 'Fecha',
-            time: 'Hora',
-            event: 'Sesión',
-            noEventsInRange: 'No hay sesiones en este rango.',
-            showMore: total => `+ Ver más (${total})`,
+            next: t('messages.next'),
+            previous: t('messages.previous'),
+            today: t('messages.today'),
+            month: t('messages.month'),
+            week: t('messages.week'),
+            day: t('messages.day'),
+            agenda: t('messages.agenda'),
+            date: t('messages.date'),
+            time: t('messages.time'),
+            event: t('messages.event'),
+            noEventsInRange: t('messages.noEventsInRange'),
+            showMore: total => `+ ${t('messages.showMore', { total })}`,
           }}
         />
       </div>
@@ -253,7 +272,7 @@ export default function SessionsPage() {
                 )}
                 {!selectedSession.description && (
                   <DialogDescription className="italic text-gray-500">
-                    Sin descripción adicional.
+                    {t('noDescription')}
                   </DialogDescription>
                 )}
               </DialogHeader>
@@ -261,21 +280,21 @@ export default function SessionsPage() {
                 {/* Cliente */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="text-right font-medium col-span-1">
-                    Cliente:
+                    {t('sessionDetails.client')}
                   </span>
                   <span className="col-span-3">{selectedSession.client}</span>
                 </div>
                 {/* Coach */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="text-right font-medium col-span-1">
-                    Coach:
+                    {t('sessionDetails.coach')}
                   </span>
                   <span className="col-span-3">{selectedSession.coach}</span>
                 </div>
                 {/* Objetivo */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="text-right font-medium col-span-1">
-                    Objetivo:
+                    {t('sessionDetails.objective')}
                   </span>
                   <span className="col-span-3">
                     {selectedSession.objectiveTitle}
@@ -284,14 +303,14 @@ export default function SessionsPage() {
                 {/* Hora */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="text-right font-medium col-span-1">
-                    Hora:
+                    {t('sessionDetails.time')}
                   </span>
                   <span className="col-span-3">{selectedSession.time}</span>
                 </div>
                 {/* Fecha */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="text-right font-medium col-span-1">
-                    Fecha:
+                    {t('sessionDetails.date')}
                   </span>
                   <span className="col-span-3">
                     {dayjs(selectedSession.start).format('LLLL')}
@@ -301,7 +320,7 @@ export default function SessionsPage() {
                 {selectedSession.link && (
                   <div className="grid grid-cols-4 items-center gap-4">
                     <span className="text-right font-medium col-span-1">
-                      Enlace:
+                      {t('sessionDetails.link')}
                     </span>
                     <span className="col-span-3">
                       <a
@@ -310,7 +329,7 @@ export default function SessionsPage() {
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
                       >
-                        Unirse a la sesión
+                        {t('sessionDetails.joinSession')}
                       </a>
                     </span>
                   </div>
@@ -318,7 +337,7 @@ export default function SessionsPage() {
               </div>
               <DialogFooter className="flex gap-2">
                 <Button variant="outline" onClick={handleCloseModal}>
-                  Cerrar
+                  {t('actions.close')}
                 </Button>
 
                 {user?.role.name === 'coach' && (
@@ -327,7 +346,7 @@ export default function SessionsPage() {
                     onClick={handleReschedule}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Reprogramar
+                    {t('actions.reschedule')}
                   </Button>
                 )}
               </DialogFooter>

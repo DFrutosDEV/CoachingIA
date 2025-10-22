@@ -9,12 +9,15 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Coins, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface PointsCardProps {
   count: number;
 }
 
 export function PointsCard({ count }: PointsCardProps) {
+  const t = useTranslations('common.dashboard.points');
+
   // Determinar el estado de los puntos
   const getPointsStatus = () => {
     if (count <= 9) {
@@ -24,8 +27,7 @@ export function PointsCard({ count }: PointsCardProps) {
         bgColor: 'bg-red-50',
         borderColor: 'border-red-200',
         icon: Minus,
-        message:
-          'Necesitas puntos para generar objetivos. Contacta al administrador.',
+        message: t('messages.empty'),
       };
     } else if (count <= 19) {
       return {
@@ -34,8 +36,7 @@ export function PointsCard({ count }: PointsCardProps) {
         bgColor: 'bg-orange-50',
         borderColor: 'border-orange-200',
         icon: TrendingDown,
-        message:
-          'Tienes pocos puntos. Considera solicitar más al administrador.',
+        message: t('messages.low'),
       };
     } else {
       return {
@@ -44,7 +45,7 @@ export function PointsCard({ count }: PointsCardProps) {
         bgColor: 'bg-green-50',
         borderColor: 'border-green-200',
         icon: TrendingUp,
-        message: 'Tienes suficientes puntos para generar objetivos.',
+        message: t('messages.good'),
       };
     }
   };
@@ -55,13 +56,13 @@ export function PointsCard({ count }: PointsCardProps) {
   return (
     <Card data-swapy-item="scheduled-sessions" className="h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Mis Puntos</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <Coins className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         <div className="flex flex-col">
           <div className="text-2xl font-bold">{count}</div>
-          <p className="text-xs text-muted-foreground">Puntos disponibles</p>
+          <p className="text-xs text-muted-foreground">{t('availablePoints')}</p>
         </div>
         <Badge
           variant="outline"

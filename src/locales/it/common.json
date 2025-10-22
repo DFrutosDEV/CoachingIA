@@ -1,0 +1,89 @@
+{
+  "homePage": {
+    "navigation": {
+      "features": "Caratteristiche",
+      "benefits": "Benefici",
+      "process": "Processo",
+      "login": "Accedi"
+    },
+    "hero": {
+      "title": "Trasforma la tua vita con coaching personalizzato",
+      "description": "Connettiti con coach professionisti che ti aiuteranno a raggiungere i tuoi obiettivi personali e professionali.",
+      "startButton": "Inizia Ora",
+      "learnMoreButton": "Scopri di Più"
+    },
+    "features": {
+      "title": "Caratteristiche Principali",
+      "description": "La nostra piattaforma offre tutto ciò di cui hai bisogno per un'esperienza di coaching efficace.",
+      "expertCoaches": {
+        "title": "Coach Esperti",
+        "description": "Connettiti con coach certificati specializzati in diverse aree."
+      },
+      "flexibleSessions": {
+        "title": "Sessioni Flessibili",
+        "description": "Programma le sessioni secondo la tua disponibilità e necessità."
+      },
+      "progressTracking": {
+        "title": "Monitoraggio dei Progressi",
+        "description": "Visualizza i tuoi progressi e tieni traccia dei tuoi successi."
+      }
+    },
+    "benefits": {
+      "title": "Perché scegliere CoachingIA?",
+      "description": "Scopri i vantaggi unici che rendono la nostra piattaforma la scelta perfetta per il tuo sviluppo personale.",
+      "quickResults": {
+        "title": "Risultati Rapidi",
+        "description": "Il nostro metodo provato ti aiuta a vedere cambiamenti significativi nelle prime settimane di coaching."
+      },
+      "confidentiality": {
+        "title": "Riservatezza Totale",
+        "description": "Le tue sessioni e i tuoi dati personali sono protetti con i più alti standard di sicurezza."
+      },
+      "personalized": {
+        "title": "Approccio Personalizzato",
+        "description": "Ogni sessione si adatta ai tuoi obiettivi specifici e al tuo stile di apprendimento unico."
+      },
+      "quality": {
+        "title": "Qualità Garantita",
+        "description": "Tutti i nostri coach superano un rigoroso processo di selezione e certificazione."
+      }
+    },
+    "process": {
+      "title": "Il tuo percorso verso il successo",
+      "description": "Un processo semplice ed efficace per raggiungere i tuoi obiettivi personali e professionali.",
+      "step1": {
+        "title": "Personalizza il tuo profilo",
+        "description": "Inserisci i tuoi dati di sessione e completa il tuo profilo personale."
+      },
+      "step2": {
+        "title": "Trova il tuo Coach",
+        "description": "Rimani connesso con il tuo coach e ricevi consulenza personalizzata."
+      },
+      "step3": {
+        "title": "Prenota la tua sessione",
+        "description": "Prenota la tua prima sessione nell'orario che ti conviene di più."
+      },
+      "step4": {
+        "title": "Trasforma la tua vita",
+        "description": "Inizia il tuo viaggio di trasformazione personale e raggiungi i tuoi obiettivi."
+      }
+    },
+    "cta": {
+      "title": "Pronto a trasformare la tua vita?",
+      "description": "Unisciti a migliaia di persone che hanno già cambiato le loro vite con CoachingIA."
+    },
+    "footer": {
+      "description": "Trasformare vite attraverso il coaching personalizzato.",
+      "platform": "Piattaforma",
+      "company": "Azienda",
+      "aboutUs": "Chi Siamo",
+      "blog": "Blog",
+      "contact": "Contatto",
+      "legal": "Legale",
+      "terms": "Termini",
+      "privacy": "Privacy",
+      "cookies": "Cookie",
+      "copyright": "Tutti i diritti riservati."
+    }
+  }
+}

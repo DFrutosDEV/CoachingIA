@@ -1,0 +1,591 @@
+{
+  "dashboard": {
+    "title": "CoachingIA",
+    "navigation": {
+      "home": "Home",
+      "myServices": "My Services",
+      "upcomingSessions": "Upcoming Sessions",
+      "whatIAmWorkingOn": "What I'm Working On",
+      "tasksToDo": "Tasks to Do",
+      "resources": "Resources",
+      "myClients": "My Clients",
+      "sessions": "Sessions",
+      "clients": "Clients",
+      "coaches": "Coaches",
+      "enterprises": "Enterprises",
+      "analytics": "Analytics",
+      "reports": "Reports",
+      "myCoaches": "My Coaches",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "logout": {
+      "confirmTitle": "Confirm logout",
+      "confirmMessage": "Are you sure you want to logout? You will need to log in again to access your account.",
+      "cancel": "Cancel",
+      "confirm": "Logout"
+    },
+    "coach": {
+      "nextSession": {
+        "title": "Next Session",
+        "noSessions": "No scheduled sessions",
+        "noSessionsDescription": "No upcoming sessions",
+        "noSessionsButton": "No sessions",
+        "today": "Today",
+        "withClient": "With {client}",
+        "startVideoCall": "Start video call"
+      },
+      "activeClients": {
+        "title": "Active Clients",
+        "assignedClients": "Assigned clients",
+        "viewClients": "View clients"
+      },
+      "scheduledSessions": {
+        "title": "Scheduled Sessions",
+        "thisWeek": "For this week",
+        "viewCalendar": "View calendar"
+      },
+      "todaySessions": {
+        "title": "Today's Sessions",
+        "noSessionsToday": "You don't have sessions scheduled for today.",
+        "noSessionsScheduled": "No scheduled sessions",
+        "todaySessionsDescription": "Your sessions scheduled for today.",
+        "notes": "Notes",
+        "jitsi": "Jitsi"
+      },
+      "recentClients": {
+        "title": "Recent Clients",
+        "noClientsAssigned": "You don't have clients assigned.",
+        "noClientsMessage": "No clients assigned",
+        "description": "Your most recent clients and their progress.",
+        "sessionsCount": "{sessions} sessions",
+        "profile": "Profile",
+        "viewAllClients": "View all clients"
+      }
+    },
+    "points": {
+      "title": "My Points",
+      "availablePoints": "Available points",
+      "messages": {
+        "empty": "You need points to generate objectives. Contact the administrator.",
+        "low": "You have few points. Consider requesting more from the administrator.",
+        "good": "You have enough points to generate objectives."
+      }
+    },
+    "clientsList": {
+      "title": "Clients List",
+      "description": "Manage your clients and their information",
+      "search": {
+        "placeholder": "Search by name, email or focus...",
+        "filter": "Filter",
+        "status": "Status",
+        "all": "All",
+        "active": "Active",
+        "pending": "Pending",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "client": "Client",
+        "status": "Status",
+        "nextSession": "Next Session",
+        "actions": "Actions",
+        "openMenu": "Open menu",
+        "quickActions": "Quick Actions",
+        "deactivate": "Deactivate",
+        "message": "Message",
+        "viewPDA": "View PDA",
+        "noClientsFound": "No clients found.",
+        "showingResults": "Showing {start} to {end} of {total} clients",
+        "previous": "Previous",
+        "next": "Next",
+        "toSchedule": "To schedule"
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "inactive": "Inactive"
+      }
+    },
+    "clientDetail": {
+      "title": "Client Detail",
+      "actions": {
+        "message": "Message",
+        "viewPDA": "View PDA"
+      },
+      "tabs": {
+        "info": "Info",
+        "objectives": "Objectives"
+      },
+      "info": {
+        "noEmail": "No email",
+        "noPhone": "No phone",
+        "clientSince": "Client since {date}",
+        "sessionsCompleted": "{sessions} sessions completed",
+        "nextSession": "Next Session",
+        "scheduled": "Scheduled",
+        "reschedule": "Reschedule",
+        "start": "Start",
+        "noSessionsScheduled": "No sessions scheduled",
+        "lastSession": "Last Session",
+        "noPreviousSessions": "No previous sessions",
+        "biography": "Biography",
+        "noBiography": "No biography"
+      },
+      "objectives": {
+        "title": "Client Objectives",
+        "loading": "Loading objectives...",
+        "active": "Active",
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "progress": "Progress: {progress}%",
+        "goals": "of {total} goals",
+        "created": "Created: {date}",
+        "coach": "Coach: {coach}",
+        "noObjectives": "No objectives defined for this client"
+      },
+      "notes": {
+        "title": "Session Notes",
+        "newNote": "New Note",
+        "noNotes": "No notes registered."
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "inactive": "Inactive"
+      }
+    },
+    "deleteClientModal": {
+      "title": "Deactivate client",
+      "description": "Are you sure you want to deactivate {clientName}? This action will mark the client as deleted but will not permanently delete their data.",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "delete": "Deactivate",
+      "success": "Client deactivated successfully",
+      "error": "Error deactivating client"
+    },
+    "calendar": {
+      "title": "Sessions Calendar",
+      "loading": "Loading sessions...",
+      "retry": "Retry",
+      "update": "Update",
+      "month": "Month",
+      "noDescription": "No additional description.",
+      "sessionDetails": {
+        "client": "Client:",
+        "coach": "Coach:",
+        "objective": "Objective:",
+        "time": "Time:",
+        "date": "Date:",
+        "link": "Link:",
+        "joinSession": "Join session"
+      },
+      "actions": {
+        "close": "Close",
+        "reschedule": "Reschedule"
+      },
+      "messages": {
+        "next": "Next",
+        "previous": "Previous",
+        "today": "Today",
+        "month": "Month",
+        "week": "Week",
+        "day": "Day",
+        "agenda": "Agenda",
+        "date": "Date",
+        "time": "Time",
+        "event": "Session",
+        "noEventsInRange": "No sessions in this range.",
+        "showMore": "Show more ({total})"
+      }
+    },
+    "notificationCard": {
+      "title": "Notifications",
+      "description": "Send notifications to your clients about sessions, reminders or important information.",
+      "features": {
+        "sessionReminders": "Send session reminders",
+        "scheduleChanges": "Notify schedule changes",
+        "shareResources": "Share resources and materials"
+      },
+      "createNotification": "Create Notification",
+      "modal": {
+        "title": "Create Notification",
+        "description": "Send a notification to {userType} system users",
+        "massNotifications": "Mass Notifications",
+        "notifyAllClients": "Notify all my clients",
+        "notifyAllCoaches": "Notify all coaches",
+        "notifyAllUsers": "Notify all users",
+        "orSelectIndividually": "Or select individually",
+        "recipients": "Recipients",
+        "searchPlaceholder": "Type 3 letters to start searching...",
+        "searching": "Searching users...",
+        "noUsersFound": "No users found",
+        "selectedRecipients": "Selected recipients:",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Notification title",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Write your message here...",
+        "cancel": "Cancel",
+        "sending": "Sending...",
+        "send": "Send Notification"
+      },
+      "errors": {
+        "selectRecipients": "Please select at least one recipient or a mass notification option",
+        "completeFields": "Please complete the title and message",
+        "userNotIdentified": "Could not identify the authenticated user",
+        "serverError": "Internal server error"
+      }
+    },
+    "newObjectiveCard": {
+      "title": "Create New Objective",
+      "description": "Add new objectives to your list and configure their profiles, objectives and coaching plans.",
+      "features": {
+        "createObjective": "Create a new objective",
+        "setInitialGoals": "Set initial objectives",
+        "scheduleFirstSessions": "Schedule first sessions"
+      },
+      "addObjective": "Add Objective",
+      "modal": {
+        "title": "Add New Objective",
+        "description": "Complete the information to create a new objective profile.",
+        "email": "Email *",
+        "emailPlaceholder": "email@example.com",
+        "checkingEmail": "Checking email...",
+        "existingClient": "✓ Existing client",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "focus": "Main Focus",
+        "focusPlaceholder": "Ex: Personal development, Leadership, etc.",
+        "startDate": "Start Date",
+        "startTime": "Start Time",
+        "assignedCoach": "Assigned Coach",
+        "coachPlaceholder": "Coach ID (optional - will be assigned automatically if left empty)",
+        "coachHelper": "Leave empty to auto-assign to current user",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "create": "Create Objective"
+      },
+      "existingUserModal": {
+        "title": "User Found",
+        "description": "A user with email {email} already exists:",
+        "noOtherUser": "No, it's another user",
+        "yesThisUser": "Yes, it's this user",
+        "years": "years"
+      },
+      "errors": {
+        "validEmail": "Enter a valid email",
+        "completeFields": "Please complete all required fields",
+        "userNotIdentified": "Could not identify the authenticated user",
+        "activeObjective": "This client already has an active objective. They must complete the current objective before creating a new one.",
+        "checkActiveObjective": "Error checking active objective",
+        "checkEmail": "Error checking email",
+        "serverError": "Internal server error"
+      },
+      "success": {
+        "clientDataLoaded": "Client data loaded automatically",
+        "differentEmail": "Please enter a different email",
+        "clientCreated": "Client created successfully with objective and scheduled meeting"
+      }
+    },
+    "ticketCard": {
+      "title": "Generate Ticket",
+      "description": "Create tickets to report problems, request support or send suggestions to the technical team.",
+      "features": {
+        "reportTechnicalIssues": "Report technical issues",
+        "requestNewFeatures": "Request new features",
+        "receivePersonalizedSupport": "Receive personalized support"
+      },
+      "createTicket": "Create Ticket",
+      "modal": {
+        "title": "Generate Support Ticket",
+        "description": "Describe the problem or request for the support team.",
+        "ticketType": "Ticket Type",
+        "selectType": "Select type",
+        "types": {
+          "technical": "Technical issue",
+          "billing": "Billing",
+          "feature": "Feature request",
+          "other": "Other"
+        },
+        "subject": "Subject",
+        "subjectPlaceholder": "Ticket subject",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Describe the problem or request in detail...",
+        "priority": "Priority",
+        "priorities": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "urgent": "Urgent"
+        },
+        "cancel": "Cancel",
+        "send": "Send Ticket"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Adjust your account settings for the {userType} profile.",
+      "theme": {
+        "title": "Theme",
+        "description": "Select the visual theme of the application.",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "language": {
+        "title": "Language",
+        "description": "Select the application language.",
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano"
+      }
+    },
+    "languageSwitcher": {
+      "languages": {
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano"
+      }
+    },
+    "clientCards": {
+      "nextSession": {
+        "title": "Next Session",
+        "noSessions": "No scheduled sessions",
+        "noSessionsDescription": "No upcoming sessions",
+        "today": "Today",
+        "withCoach": "With {coach}",
+        "joinSession": "Join session"
+      },
+      "completedSessions": {
+        "title": "Completed Sessions",
+        "thisMonth": "+{sessionsThisMonth} this month",
+        "monthlyPlan": "{percentage}% of your monthly plan"
+      },
+      "goals": {
+        "title": "Goals",
+        "noGoals": "No goals assigned",
+        "noGoalsDescription": "Your coach will assign you specific goals",
+        "completed": "Goals completed",
+        "completionPercentage": "{percentage}% completed",
+        "recentGoals": "Recent goals:",
+        "moreGoals": "+{count} more goals",
+        "viewGoals": "View goals"
+      },
+      "upcomingSessions": {
+        "title": "Upcoming Sessions",
+        "description": "Your sessions scheduled for the next few days.",
+        "noSessions": "No sessions scheduled",
+        "withCoach": "With {coach}",
+        "details": "Details"
+      },
+      "progress": {
+        "title": "Your Progress",
+        "description": "Tracking your objectives and goals.",
+        "noObjectives": "No objectives assigned",
+        "goalsCompleted": "{completedGoals}/{totalGoals} goals completed",
+        "noGoalsAssigned": "No goals assigned yet",
+        "viewFullReport": "View full report"
+      }
+    },
+    "servicesGrid": {
+      "loading": "Loading coaches...",
+      "error": {
+        "loadCoaches": "Error loading coaches",
+        "unknown": "Unknown error",
+        "message": "Error: {error}"
+      },
+      "retry": "Retry",
+      "noCoaches": "No coaches registered",
+      "update": "Update",
+      "title": "Registered Coaches",
+      "total": "Total: {count} coach{plural}",
+      "plural": "es",
+      "singular": ""
+    },
+    "coachCard": {
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "age": "{age} years old",
+      "registered": "Registered: {date}",
+      "sendMessage": "Send Message"
+    },
+    "clientTasks": {
+      "loading": "Loading tasks...",
+      "errors": {
+        "loadTasks": "Error loading tasks",
+        "updateTask": "Error updating task"
+      },
+      "title": "Daily and Past Tasks",
+      "currentObjective": "Current Objective: {title}",
+      "coach": "Coach: {coach}",
+      "day": "Day {day}",
+      "status": {
+        "completed": "Completed",
+        "pending": "Pending"
+      },
+      "noTasks": "No tasks assigned",
+      "summary": "Summary",
+      "completed": "Completed: {count}",
+      "pending": "Pending: {count}",
+      "total": "Total: {count}",
+      "coachNotes": "Coach Notes",
+      "note": "Note",
+      "session": "Session: {date}",
+      "by": "By: {createdBy}",
+      "noNotes": "No notes available",
+      "feedback": "Feedback",
+      "noFeedback": "No feedback available"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllAsRead": "Mark all as read",
+      "noNotifications": "You have no notifications",
+      "new": "New",
+      "timeAgo": {
+        "minutesAgo": "A few minutes ago",
+        "hoursAgo": "{hours} hour{plural} ago",
+        "daysAgo": "{days} day{plural} ago",
+        "hoursPlural": "s",
+        "daysPlural": "s",
+        "hoursSingular": "",
+        "daysSingular": ""
+      }
+    },
+    "adminCards": {
+      "totalUsers": {
+        "title": "Total Users",
+        "thisMonth": "+{count} this month",
+        "viewUsers": "View users"
+      },
+      "activeCoaches": {
+        "title": "Active Coaches",
+        "thisMonth": "+{count} this month",
+        "viewCoaches": "View coaches"
+      },
+      "completedSessions": {
+        "title": "Completed Sessions",
+        "thisMonth": "+{count} this month",
+        "viewAnalytics": "View analytics"
+      },
+      "reports": {
+        "title": "Reports",
+        "pendingReview": "Pending review",
+        "viewReports": "View reports"
+      },
+      "newUsers": {
+        "title": "New Users",
+        "description": "Users registered in the last 7 days.",
+        "viewProfile": "View profile",
+        "noNewUsers": "No new users"
+      },
+      "platformPerformance": {
+        "title": "Platform Performance",
+        "description": "Usage and growth statistics.",
+        "metrics": {
+          "conversionRate": "Conversion Rate",
+          "avgSessionsPerUser": "Average Sessions per User",
+          "avgSessionTime": "Average Session Time",
+          "churnRate": "Churn Rate",
+          "monthlyRevenue": "Monthly Revenue"
+        },
+        "viewFullReport": "View full report"
+      }
+    },
+    "enterprisesGrid": {
+      "loading": "Loading enterprises...",
+      "error": {
+        "loadEnterprises": "Error loading enterprises",
+        "unknown": "Unknown error",
+        "message": "Error: {error}"
+      },
+      "retry": "Retry",
+      "noEnterprises": "No enterprises registered",
+      "update": "Update",
+      "title": "Registered Enterprises",
+      "total": "Total: {count} enterprise{plural}",
+      "plural": "s",
+      "singular": ""
+    },
+    "addUserCard": {
+      "title": "Add new user",
+      "description": "Add new users to your list and configure their profiles, objectives and coaching plans.",
+      "features": {
+        "createProfiles": "Create user profiles",
+        "startScheduling": "Start scheduling sessions",
+        "scheduleWithClients": "Schedule sessions with your clients"
+      },
+      "addUser": "Add User",
+      "modal": {
+        "title": "Add New User",
+        "description": "Complete the information to create a new user.",
+        "fields": {
+          "name": "Name",
+          "lastName": "Last Name",
+          "email": "Email",
+          "emailPlaceholder": "email@example.com",
+          "profile": "Profile",
+          "profilePlaceholder": "Select profile"
+        },
+        "profiles": {
+          "admin": "Admin",
+          "coach": "Coach",
+          "client": "Client",
+          "enterprise": "Enterprise"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "creating": "Creating...",
+          "create": "Create User"
+        }
+      },
+      "errors": {
+        "completeFields": "Please complete all required fields",
+        "createUser": "Error creating user"
+      },
+      "success": {
+        "userCreated": "User created successfully"
+      }
+    },
+    "pointsManager": {
+      "card": {
+        "title": "Points Management",
+        "description": "Manage coaches' points for objective generation",
+        "features": {
+          "assignPoints": "Assign points to coaches",
+          "removePoints": "Remove points from coaches",
+          "viewPoints": "View coaches' points"
+        },
+        "managePoints": "Manage Points"
+      },
+      "modal": {
+        "title": "Coaches Points Management",
+        "description": "Search for a coach and manage their points for objective generation.",
+        "search": {
+          "label": "Search Coach",
+          "placeholder": "Search by name, last name or email...",
+          "searching": "Searching coaches...",
+          "results": "Results:",
+          "noResults": "No coaches found"
+        },
+        "coach": {
+          "currentPoints": "current points",
+          "newPoints": "New Points",
+          "points": "points"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "updating": "Updating...",
+          "confirm": "Confirm Changes"
+        },
+        "errors": {
+          "searchCoaches": "Error searching coaches",
+          "updatePoints": "Error updating points"
+        },
+        "success": {
+          "pointsUpdated": "Points updated successfully"
+        }
+      }
+    }
+  }
+}

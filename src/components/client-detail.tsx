@@ -33,6 +33,7 @@ import { toast } from 'sonner';
 import { Goal, ClientDetailProps, Objective } from '@/types';
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
+import { useTranslations } from 'next-intl';
 
 export function ClientDetail({
   client,
@@ -41,6 +42,8 @@ export function ClientDetail({
   onUpdateClient,
   isAdmin,
 }: ClientDetailProps) {
+  const t = useTranslations('common.dashboard.clientDetail');
+
   const [activeTab, setActiveTab] = useState('info');
   const [isGoalsModalOpen, setIsGoalsModalOpen] = useState(false);
   const [objectives, setObjectives] = useState<Objective[]>([]);
@@ -151,7 +154,7 @@ export function ClientDetail({
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0 gap-0">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle className="text-2xl">Detalle del Cliente</DialogTitle>
+            <DialogTitle className="text-2xl">{t('title')}</DialogTitle>
           </DialogHeader>
 
           <div className="flex-1 overflow-auto p-6">
@@ -179,10 +182,10 @@ export function ClientDetail({
                 }
               >
                 {client.status === 'active'
-                  ? 'Activo'
+                  ? t('status.active')
                   : client.status === 'pending'
-                    ? 'Pendiente'
-                    : 'Inactivo'}
+                    ? t('status.pending')
+                    : t('status.inactive')}
               </Badge>
             </div>
 
@@ -198,11 +201,11 @@ export function ClientDetail({
                 }
               >
                 <MessageSquare className="h-4 w-4" />
-                Mensaje
+                {t('actions.message')}
               </Button>
               <Button variant="outline" size="sm" className="gap-1">
                 <FileText className="h-4 w-4" />
-                Ver PDA
+                {t('actions.viewPDA')}
               </Button>
             </div>
 
@@ -217,13 +220,13 @@ export function ClientDetail({
                   value="info"
                   className="data-[state=active]:bg-accent"
                 >
-                  Info
+                  {t('tabs.info')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="objectives"
                   className="data-[state=active]:bg-accent"
                 >
-                  Objetivos
+                  {t('tabs.objectives')}
                 </TabsTrigger>
               </TabsList>
 
@@ -231,31 +234,31 @@ export function ClientDetail({
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{client.email || 'Sin correo'}</span>
+                    <span>{client.email || t('info.noEmail')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{client.phone || 'Sin teléfono'}</span>
+                    <span>{client.phone || t('info.noPhone')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                    <span>Cliente desde {client.startDate || 'Sin fecha'}</span>
+                    <span>{t('info.clientSince', { date: client.startDate || 'Sin fecha' })}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <BarChart className="h-4 w-4 text-muted-foreground" />
-                    <span>{client.sessions || 0} sesiones completadas</span>
+                    <span>{t('info.sessionsCompleted', { sessions: client.sessions || 0 })}</span>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="mb-2 text-sm font-medium">Próxima Sesión</h4>
+                  <h4 className="mb-2 text-sm font-medium">{t('info.nextSession')}</h4>
                   {client.nextSession.date ? (
                     <div className="rounded-lg border p-3">
                       <div className="flex justify-between">
                         <div className="font-medium">
                           {`${formatDate(new Date(client.nextSession.date))} - ${client.nextSession.objective.title}`}
                         </div>
-                        <Badge variant="outline">Programada</Badge>
+                        <Badge variant="outline">{t('info.scheduled')}</Badge>
                       </div>
                       <div className="mt-3 flex gap-2">
                         <Button
@@ -267,7 +270,7 @@ export function ClientDetail({
                           }
                         >
                           <Clock className="h-3 w-3" />
-                          Reprogramar
+                          {t('info.reschedule')}
                         </Button>
                         <Button
                           size="sm"
@@ -277,39 +280,39 @@ export function ClientDetail({
                           }}
                         >
                           <Calendar className="h-3 w-3" />
-                          Iniciar
+                          {t('info.start')}
                         </Button>
                       </div>
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      No existen sesiones programadas
+                      {t('info.noSessionsScheduled')}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <h4 className="mb-2 text-sm font-medium">Última Sesión</h4>
+                  <h4 className="mb-2 text-sm font-medium">{t('info.lastSession')}</h4>
                   {client.lastSession.date ? (
                     <div className="rounded-lg border p-3">
                       <div className="flex justify-between">
                         <div className="font-medium">
                           {`${formatDate(new Date(client.lastSession.date))} - ${client.lastSession.objective.title}`}
                         </div>
-                        <Badge variant="outline">Programada</Badge>
+                        <Badge variant="outline">{t('info.scheduled')}</Badge>
                       </div>
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      No existen sesiones previas
+                      {t('info.noPreviousSessions')}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <h4 className="mb-2 text-sm font-medium">Biografía</h4>
+                  <h4 className="mb-2 text-sm font-medium">{t('info.biography')}</h4>
                   <p className="text-sm text-muted-foreground">
-                    {client.bio || 'Sin biografía'}
+                    {client.bio || t('info.noBiography')}
                   </p>
                 </div>
               </TabsContent>
@@ -318,7 +321,7 @@ export function ClientDetail({
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-medium">
-                      Objetivos del Cliente
+                      {t('objectives.title')}
                     </h4>
                   </div>
 
@@ -327,7 +330,7 @@ export function ClientDetail({
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                         <p className="text-sm text-muted-foreground">
-                          Cargando objetivos...
+                          {t('objectives.loading')}
                         </p>
                       </div>
                     </div>
@@ -351,7 +354,7 @@ export function ClientDetail({
                             </div>
                             <div className="flex items-center gap-2">
                               {objective.active && (
-                                <Badge variant="active">Activo</Badge>
+                                <Badge variant="active">{t('objectives.active')}</Badge>
                               )}
                               <Badge
                                 variant={
@@ -359,8 +362,8 @@ export function ClientDetail({
                                 }
                               >
                                 {objective.isCompleted
-                                  ? 'Completado'
-                                  : 'En Progreso'}
+                                  ? t('objectives.completed')
+                                  : t('objectives.inProgress')}
                               </Badge>
                               <div className="flex items-center gap-1">
                                 <Button size="sm" variant="outline">
@@ -382,10 +385,9 @@ export function ClientDetail({
                             onClick={() => handleObjectiveSelect(objective._id)}
                           >
                             <div className="flex justify-between text-sm">
-                              <span>Progreso: {objective.progress}%</span>
+                              <span>{t('objectives.progress', { progress: objective.progress })}</span>
                               <span>
-                                {objective.completedGoals} de{' '}
-                                {objective.totalGoals} metas
+                                {objective.completedGoals} {t('objectives.goals', { total: objective.totalGoals })}
                               </span>
                             </div>
                             <div className="h-2 w-full rounded-full bg-muted">
@@ -396,10 +398,9 @@ export function ClientDetail({
                             </div>
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span>
-                                Creado:{' '}
-                                {formatDate(new Date(objective.createdAt))}
+                                {t('objectives.created', { date: formatDate(new Date(objective.createdAt)) })}
                               </span>
-                              <span>Coach: {objective.coach}</span>
+                              <span>{t('objectives.coach', { coach: objective.coach })}</span>
                             </div>
                           </div>
                         </div>
@@ -409,7 +410,7 @@ export function ClientDetail({
                     <div className="text-center py-8">
                       <Target className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-muted-foreground">
-                        No hay objetivos definidos para este cliente
+                        {t('objectives.noObjectives')}
                       </p>
                     </div>
                   )}
@@ -418,10 +419,10 @@ export function ClientDetail({
 
               <TabsContent value="notes" className="space-y-4 mt-4">
                 <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-sm font-medium">Notas de Sesiones</h4>
+                  <h4 className="text-sm font-medium">{t('notes.title')}</h4>
                   <Button variant="outline" size="sm" className="gap-1">
                     <FileText className="h-4 w-4" />
-                    Nueva Nota
+                    {t('notes.newNote')}
                   </Button>
                 </div>
                 <div className="space-y-3">
@@ -436,7 +437,7 @@ export function ClientDetail({
                     ))
                   ) : (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      No hay notas registradas.
+                      {t('notes.noNotes')}
                     </p>
                   )}
                 </div>

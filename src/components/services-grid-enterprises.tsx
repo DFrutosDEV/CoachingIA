@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { EnterpriseCard } from './enterprise-card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface Enterprise {
   _id: string;
@@ -23,6 +24,7 @@ interface Enterprise {
 }
 
 export function ServicesGrid() {
+  const t = useTranslations('common.dashboard.enterprisesGrid');
   const [enterprises, setEnterprises] = useState<Enterprise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,13 +38,13 @@ export function ServicesGrid() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al cargar empresas');
+        throw new Error(data.error || t('error.loadEnterprises'));
       }
 
       setEnterprises(data.data || []);
     } catch (err) {
       console.error('Error fetching enterprises:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      setError(err instanceof Error ? err.message : t('error.unknown'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export function ServicesGrid() {
       <div className="flex items-center justify-center py-12">
         <div className="flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin" />
-          <span>Cargando empresas...</span>
+          <span>{t('loading')}</span>
         </div>
       </div>
     );
@@ -66,10 +68,10 @@ export function ServicesGrid() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <p className="text-destructive">Error: {error}</p>
+        <p className="text-destructive">{t('error.message', { error })}</p>
         <Button onClick={fetchEnterprises} variant="outline">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Reintentar
+          {t('retry')}
         </Button>
       </div>
     );
@@ -78,10 +80,10 @@ export function ServicesGrid() {
   if (enterprises.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <p className="text-muted-foreground">No hay empresas registradas</p>
+        <p className="text-muted-foreground">{t('noEnterprises')}</p>
         <Button onClick={fetchEnterprises} variant="outline">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Actualizar
+          {t('update')}
         </Button>
       </div>
     );
@@ -91,15 +93,17 @@ export function ServicesGrid() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold">Empresas Registradas</h2>
+          <h2 className="text-lg font-semibold">{t('title')}</h2>
           <p className="text-sm text-muted-foreground">
-            Total: {enterprises.length} empresa
-            {enterprises.length !== 1 ? 's' : ''}
+            {t('total', {
+              count: enterprises.length,
+              plural: enterprises.length !== 1 ? t('plural') : t('singular')
+            })}
           </p>
         </div>
         <Button onClick={fetchEnterprises} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Actualizar
+          {t('update')}
         </Button>
       </div>
 
@@ -110,7 +114,7 @@ export function ServicesGrid() {
             name={enterprise.name}
             VAT={enterprise.email} // Usando email como VAT temporalmente
             codigoFiscal={enterprise.phone} // Usando phone como código fiscal temporalmente
-            status={enterprise.active ? 'Activo' : 'Inactivo'}
+            status={enterprise.active ? t('status.active') : t('status.inactive')}
             cantidadCoaches={enterprise.coaches.length}
             cantidadClientes={enterprise.employees.length}
           />

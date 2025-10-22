@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface DeleteClientModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export function DeleteClientModal({
   clientName,
   onClientDeleted,
 }: DeleteClientModalProps) {
+  const t = useTranslations('common.dashboard.deleteClientModal');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteClient = async () => {
@@ -41,15 +43,15 @@ export function DeleteClientModal({
       });
 
       if (!response.ok) {
-        throw new Error('Error al dar de baja al cliente');
+        throw new Error(t('error'));
       }
 
-      toast.success('Cliente dado de baja exitosamente');
+      toast.success(t('success'));
       onClientDeleted();
       onClose();
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al dar de baja al cliente');
+      toast.error(t('error'));
     } finally {
       setIsLoading(false);
     }
@@ -61,17 +63,15 @@ export function DeleteClientModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            Dar de baja cliente
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            ¿Estás seguro de que quieres dar de baja a{' '}
-            <strong>{clientName}</strong>? Esta acción marcará al cliente como
-            eliminado pero no borrará sus datos permanentemente.
+            {t('description', { clientName })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancelar
+            {t('cancel')}
           </Button>
           <Button
             variant="destructive"
@@ -81,10 +81,10 @@ export function DeleteClientModal({
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Procesando...
+                {t('processing')}
               </>
             ) : (
-              'Dar de baja'
+              t('delete')
             )}
           </Button>
         </DialogFooter>

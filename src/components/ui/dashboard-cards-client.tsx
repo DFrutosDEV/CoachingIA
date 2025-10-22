@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Clock, BarChart3, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate } from '@/utils/validatesInputs';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -43,17 +45,19 @@ interface ObjectiveProgress {
 
 // Card 1: Próxima Sesión
 export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
+  const t = useTranslations('common.dashboard.clientCards.nextSession');
+
   if (!data) {
     return (
       <Card data-swapy-item="next-session">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Próxima Sesión</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
           <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">Sin sesiones programadas</div>
+          <div className="text-2xl font-bold">{t('noSessions')}</div>
           <p className="text-xs text-muted-foreground">
-            No tienes sesiones próximas
+            {t('noSessionsDescription')}
           </p>
         </CardContent>
       </Card>
@@ -63,30 +67,30 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
   const sessionDate = new Date(data.date);
   const isToday = sessionDate.toDateString() === new Date().toDateString();
   const displayDate = isToday
-    ? 'Hoy'
+    ? t('today')
     : formatDate(sessionDate, {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-      });
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
 
   return (
     <Card data-swapy-item="next-session">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Próxima Sesión</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <Calendar className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
           {displayDate}, {data.time}
         </div>
-        <p className="text-xs text-muted-foreground">Con {data.coach}</p>
+        <p className="text-xs text-muted-foreground">{t('withCoach', { coach: data.coach })}</p>
         <p className="text-xs text-muted-foreground mb-4">{data.topic}</p>
         <div className="mt-4">
           <Button size="sm" className="w-full" asChild>
             <a href={data.link} target="_blank" rel="noopener noreferrer">
               <Clock className="mr-2 h-4 w-4" />
-              Unirse a la sesión
+              {t('joinSession')}
             </a>
           </Button>
         </div>
@@ -103,18 +107,20 @@ export function CompletedSessionsCard({
   totalSessions: number;
   sessionsThisMonth: number;
 }) {
+  const t = useTranslations('common.dashboard.clientCards.completedSessions');
+
   return (
     <Card data-swapy-item="completed-sessions">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">
-          Sesiones Completadas
+          {t('title')}
         </CardTitle>
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{totalSessions}</div>
         <p className="text-xs text-muted-foreground">
-          +{sessionsThisMonth} este mes
+          {t('thisMonth', { sessionsThisMonth })}
         </p>
         <div className="mt-4">
           <div className="h-2 w-full rounded-full bg-muted">
@@ -126,8 +132,7 @@ export function CompletedSessionsCard({
             ></div>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            {Math.min((sessionsThisMonth / 4) * 100, 100).toFixed(0)}% de tu
-            plan mensual
+            {t('monthlyPlan', { percentage: Math.min((sessionsThisMonth / 4) * 100, 100).toFixed(0) })}
           </p>
         </div>
       </CardContent>
@@ -143,6 +148,8 @@ export function GoalsCard({
   goals: ClientGoal[];
   hasGoals?: boolean;
 }) {
+  const t = useTranslations('common.dashboard.clientCards.goals');
+
   const completedGoals = goals.filter(goal => goal.isCompleted).length;
   const totalGoals = goals.length;
   const completionPercentage =
@@ -151,7 +158,7 @@ export function GoalsCard({
   return (
     <Card data-swapy-item="goals">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">Metas</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -169,9 +176,9 @@ export function GoalsCard({
         {!hasGoals ? (
           <>
             <div className="text-2xl font-bold">0/0</div>
-            <p className="text-xs text-muted-foreground">Sin metas asignadas</p>
+            <p className="text-xs text-muted-foreground">{t('noGoals')}</p>
             <p className="text-xs text-muted-foreground mt-2">
-              Tu coach te asignará metas específicas
+              {t('noGoalsDescription')}
             </p>
           </>
         ) : (
@@ -179,7 +186,7 @@ export function GoalsCard({
             <div className="text-2xl font-bold">
               {completedGoals}/{totalGoals}
             </div>
-            <p className="text-xs text-muted-foreground">Metas completadas</p>
+            <p className="text-xs text-muted-foreground">{t('completed')}</p>
 
             <div className="mt-4">
               <div className="h-2 w-full rounded-full bg-muted">
@@ -189,7 +196,7 @@ export function GoalsCard({
                 ></div>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                {completionPercentage.toFixed(0)}% completado
+                {t('completionPercentage', { percentage: completionPercentage.toFixed(0) })}
               </p>
             </div>
 
@@ -197,7 +204,7 @@ export function GoalsCard({
             {goals.length > 0 && (
               <div className="mt-4 space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Metas recientes:
+                  {t('recentGoals')}
                 </p>
                 {goals.slice(0, 3).map((goal, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -211,7 +218,7 @@ export function GoalsCard({
                 ))}
                 {goals.length > 3 && (
                   <p className="text-xs text-muted-foreground">
-                    +{goals.length - 3} más metas
+                    {t('moreGoals', { count: goals.length - 3 })}
                   </p>
                 )}
               </div>
@@ -220,7 +227,7 @@ export function GoalsCard({
         )}
 
         <Button size="sm" variant="outline" className="w-full mt-4">
-          Ver metas
+          {t('viewGoals')}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </CardContent>
@@ -238,19 +245,21 @@ export function UpcomingSessionsCard({
     topic: string;
   }>;
 }) {
+  const t = useTranslations('common.dashboard.clientCards.upcomingSessions');
+
   return (
     <Card data-swapy-item="upcoming-sessions">
       <CardHeader>
-        <CardTitle>Próximas Sesiones</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Tus sesiones programadas para los próximos días.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {sessions.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No tienes sesiones programadas
+              {t('noSessions')}
             </p>
           ) : (
             sessions.map((session, index) => (
@@ -261,14 +270,14 @@ export function UpcomingSessionsCard({
                 <div className="space-y-1">
                   <p className="text-sm font-medium">{session.date}</p>
                   <p className="text-sm text-muted-foreground">
-                    Con {session.coach}
+                    {t('withCoach', { coach: session.coach })}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {session.topic}
                   </p>
                 </div>
                 <Button size="sm" variant="outline">
-                  Detalles
+                  {t('details')}
                 </Button>
               </div>
             ))
@@ -285,17 +294,21 @@ export function ProgressCard({
 }: {
   objectives: ObjectiveProgress[];
 }) {
+  const t = useTranslations('common.dashboard.clientCards.progress');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
+
   return (
     <Card data-swapy-item="progress">
       <CardHeader>
-        <CardTitle>Tu Progreso</CardTitle>
-        <CardDescription>Seguimiento de tus objetivos y metas.</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {objectives.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No tienes objetivos asignados
+              {t('noObjectives')}
             </p>
           ) : (
             objectives.map((objective, index) => (
@@ -313,13 +326,12 @@ export function ProgressCard({
                       ></div>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {objective.completedGoals}/{objective.totalGoals} metas
-                      completadas
+                      {t('goalsCompleted', { completedGoals: objective.completedGoals, totalGoals: objective.totalGoals })}
                     </p>
                   </>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    Sin metas asignadas aún
+                    {t('noGoalsAssigned')}
                   </p>
                 )}
               </div>
@@ -327,9 +339,9 @@ export function ProgressCard({
           )}
         </div>
         <div className="mt-6">
-          <Link href="/dashboard/client/progress">
+          <Link href={`/${locale}/dashboard/client/progress`}>
             <Button className="w-full">
-              Ver informe completo
+              {t('viewFullReport')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
