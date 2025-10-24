@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 
 export default function ResourcesEnterprisePage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const t = useTranslations('dashboardEnterprise.resourcesPage');
+  const t = useTranslations('text.dashboardEnterprise.resourcesPage');
 
   const toggleMobileSidebar = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -17,6 +17,7 @@ export default function ResourcesEnterprisePage() {
   const closeMobileSidebar = () => {
     setIsMobileSidebarOpen(false);
   };
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[auto_1fr]">
       <div className="hidden md:block">
@@ -41,8 +42,9 @@ export default function ResourcesEnterprisePage() {
                 {t('subtitle')}
               </p>
             </div>
-
-            <ResourcesGrid userType="enterprise" />
+            <div className="h-[calc(100vh-200px)] overflow-hidden">
+              <ResourcesGrid userType="enterprise" />
+            </div>
           </div>
         </main>
       </div>

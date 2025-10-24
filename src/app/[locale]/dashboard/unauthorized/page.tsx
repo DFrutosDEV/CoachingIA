@@ -10,11 +10,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { AlertTriangle, ArrowLeft, Home } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function UnauthorizedPage() {
   const router = useRouter();
-  const t = useTranslations('unauthorized');
+  const locale = useLocale();
+  const t = useTranslations('text.unauthorized');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -45,7 +46,7 @@ export default function UnauthorizedPage() {
               {t('goBack')}
             </Button>
 
-            <Button onClick={() => router.push('/login')} className="w-full">
+            <Button onClick={() => router.push(`/${locale}/login`)} className="w-full">
               <Home className="mr-2 h-4 w-4" />
               {t('goToLogin')}
             </Button>

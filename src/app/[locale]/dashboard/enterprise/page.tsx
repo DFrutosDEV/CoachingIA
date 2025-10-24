@@ -2,59 +2,52 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useRef, useState } from 'react';
 import { createSwapy } from 'swapy';
 import { useTranslations } from 'next-intl';
 import {
-  TotalClientsCard,
+  TotalUsersCard,
   ActiveCoachesCard,
   CompletedSessionsCard,
   ReportsCard,
   NewUsersCard,
-  CompanyPerformanceCard,
+  PlatformPerformanceCard,
 } from '@/components/ui/dashboard-cards-enterprise';
-import { useAppSelector } from '@/lib/redux/hooks';
+import { HttpClient } from '@/lib/utils/http-client';
 
-// Interfaces para los tipos de datos
-interface DashboardData {
-  totalClients: {
-    count: number;
-    changeText: string;
-  };
-  activeCoaches: {
-    count: number;
-    changeText: string;
-  };
-  completedSessions: {
-    count: number;
-    changeText: string;
-  };
-  reports: {
-    count: number;
-    changeText: string;
-  };
-  newUsers: {
+// Interfaces para los datos
+interface EnterpriseBasicData {
+  totalUsers: number;
+  newUsersThisMonth: number;
+  activeCoaches: number;
+  newCoachesThisMonth: number;
+  completedSessions: number;
+  completedSessionsThisMonth: number;
+  recentUsers: Array<{
     name: string;
     email: string;
     type: string;
     date: string;
-  }[];
-  performanceStats: {
-    metric: string;
-    value: string;
-    change: string;
-    positive: boolean;
-  }[];
+  }>;
+  platformStats: {
+    conversionRate: { value: string; change: string; positive: boolean };
+    avgSessionsPerUser: { value: string; change: string; positive: boolean };
+    avgSessionTime: { value: string; change: string; positive: boolean };
+    churnRate: { value: string; change: string; positive: boolean };
+    monthlyRevenue: { value: string; change: string; positive: boolean };
+  };
+  pendingReports: number;
 }
 
 export default function EnterpriseDashboard() {
-  const t = useTranslations('text.dashboardEnterprise');
-  const [isReady, setIsReady] = useState(false);
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
-    null
-  );
+  const user = useAppSelector(state => state.auth.user);
+  const t = useTranslations('text.dashboardAdmin');
+  const [basicData, setBasicData] = useState<EnterpriseBasicData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [dragEnabled, setDragEnabled] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Funciones para manejar el sidebar móvil
@@ -66,37 +59,41 @@ export default function EnterpriseDashboard() {
     setIsMobileSidebarOpen(false);
   };
 
-  // Redux para obtener el usuario logueado
-  const user = useAppSelector(state => state.auth.user);
-
   // Referencias para los contenedores
   const smallCardsRef = useRef<HTMLDivElement>(null);
   const largeCardsRef = useRef<HTMLDivElement>(null);
   const swapySmallRef = useRef<any>(null);
   const swapyLargeRef = useRef<any>(null);
 
-  // Función para cargar datos del dashboard
-  const fetchDashboardData = async () => {
+  // Función para obtener los datos básicos
+  const fetchBasicData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/enterprise/dashboard?enterpriseId=${user?.enterprise?._id}`
+      setError(null);
+
+      const response = await HttpClient.get(
+        `/api/enterprise/getBasicData?enterpriseId=${user?._id}`
       );
 
-      if (!response.ok) {
-        throw new Error('Error al cargar los datos del dashboard');
-      }
-
       const data = await response.json();
-      setDashboardData(data);
+      setBasicData(data);
       setError(null);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      setError('Error al cargar los datos del dashboard');
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user?._id) {
+      fetchBasicData();
+    } else {
+      setError('No se encontró información del usuario');
+      setLoading(false);
+    }
+  }, [user?._id]);
 
   useEffect(() => {
     // Marcar como listo después de que el componente se monte
@@ -108,18 +105,22 @@ export default function EnterpriseDashboard() {
   }, []);
 
   useEffect(() => {
-    // Cargar datos cuando el usuario esté disponible
-    if (user?.enterprise?._id) {
-      fetchDashboardData();
-    } else {
-      setError('No se encontró información de la empresa');
-      setLoading(false);
-    }
-  }, [user]);
+    // Marcar como listo después de que el componente se monte
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Función para alternar el estado del drag-and-drop
+  const toggleDragMode = () => {
+    setDragEnabled(!dragEnabled);
+  };
 
   useEffect(() => {
-    // Solo inicializar swapy cuando esté listo
-    if (!isReady) return;
+    // Solo inicializar swapy cuando esté listo y el drag esté habilitado
+    if (!isReady || !dragEnabled) return;
 
     // Configurar swapy después de que el DOM esté listo
     const timer = setTimeout(() => {
@@ -188,7 +189,56 @@ export default function EnterpriseDashboard() {
         swapyLargeRef.current = null;
       }
     };
-  }, [isReady]);
+  }, [isReady, dragEnabled]);
+
+  if (loading) {
+    return (
+      <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+        <div className="hidden border-r bg-muted/40 md:block">
+          <DashboardSidebar userType="enterprise" className="h-full" />
+        </div>
+        <div className="flex flex-col overflow-hidden">
+          <DashboardHeader userType="enterprise" />
+          <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">
+                  {t('loading')}
+                </p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
+        <div className="hidden border-r bg-muted/40 md:block">
+          <DashboardSidebar userType="enterprise" className="h-full" />
+        </div>
+        <div className="flex flex-col overflow-hidden">
+          <DashboardHeader userType="enterprise" />
+          <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <p className="text-red-500 mb-4">{t('error')}: {error}</p>
+                <button
+                  onClick={fetchBasicData}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                >
+                  {t('retry')}
+                </button>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid h-screen w-full md:grid-cols-[auto_1fr]">
@@ -213,72 +263,87 @@ export default function EnterpriseDashboard() {
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto">
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="text-3xl font-bold">{t('title')}</h1>
-              <p className="text-muted-foreground">
-                {t('subtitle')}
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl font-bold">
+                    {t('welcome')}, {user?.profile?.name} {user?.profile?.lastName}
+                  </h1>
+                  <p className="text-muted-foreground pt-2">
+                    {t('subtitle')}
+                  </p>
+                </div>
+                {/* <Button
+                  onClick={toggleDragMode}
+                  variant={dragEnabled ? "secondary" : "outline"}
+                  size="sm"
+                  className={`flex items-center gap-2 ${dragEnabled ? 'bg-red-500 hover:bg-red-600 text-white' : ''}`}
+                >
+                  {dragEnabled ? (
+                    <>
+                      <X className="h-4 w-4" />
+                      Desactivar Drag
+                    </>
+                  ) : (
+                    <>
+                      <Move className="h-4 w-4" />
+                      Activar Drag
+                    </>
+                  )}
+                </Button> */}
+              </div>
+              {dragEnabled && (
+                <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    {t('dragMode.message')}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Mostrar loading o error */}
-            {loading && (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">
-                  {t('loading')}
-                </p>
-              </div>
-            )}
-
-            {error && (
-              <div className="text-center py-8">
-                <p className="text-red-600">{error}</p>
-                <button
-                  onClick={fetchDashboardData}
-                  className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                >
-                  {t('retry')}
-                </button>
-              </div>
-            )}
-
             {/* Zona de drag and drop para cards pequeñas (4 cards arriba - 25% cada una) */}
-            {dashboardData && !loading && !error && (
-              <>
-                <div
-                  ref={smallCardsRef}
-                  className="small-cards-container grid gap-6 md:grid-cols-4"
-                >
-                  <div data-swapy-slot="1" className="w-full">
-                    <TotalClientsCard data={dashboardData.totalClients} />
-                  </div>
-                  <div data-swapy-slot="2" className="w-full">
-                    <ActiveCoachesCard data={dashboardData.activeCoaches} />
-                  </div>
-                  <div data-swapy-slot="3" className="w-full">
-                    <CompletedSessionsCard
-                      data={dashboardData.completedSessions}
-                    />
-                  </div>
-                  <div data-swapy-slot="4" className="w-full">
-                    <ReportsCard data={dashboardData.reports} />
-                  </div>
-                </div>
+            <div
+              ref={smallCardsRef}
+              className="small-cards-container grid gap-6 md:grid-cols-4"
+            >
+              <div data-swapy-slot="1" className="w-full">
+                <TotalUsersCard
+                  totalUsers={basicData?.totalUsers || 0}
+                  newUsersThisMonth={basicData?.newUsersThisMonth || 0}
+                />
+              </div>
+              <div data-swapy-slot="2" className="w-full">
+                <ActiveCoachesCard
+                  activeCoaches={basicData?.activeCoaches || 0}
+                  newCoachesThisMonth={basicData?.newCoachesThisMonth || 0}
+                />
+              </div>
+              <div data-swapy-slot="3" className="w-full">
+                <CompletedSessionsCard
+                  completedSessions={basicData?.completedSessions || 0}
+                  completedSessionsThisMonth={
+                    basicData?.completedSessionsThisMonth || 0
+                  }
+                />
+              </div>
+              <div data-swapy-slot="4" className="w-full">
+                <ReportsCard pendingReports={basicData?.pendingReports || 0} />
+              </div>
+            </div>
 
-                {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
-                <div
-                  ref={largeCardsRef}
-                  className="large-cards-container grid gap-6 md:grid-cols-2"
-                >
-                  <div data-swapy-slot="5" className="w-full">
-                    <NewUsersCard data={dashboardData.newUsers} />
-                  </div>
-                  <div data-swapy-slot="6" className="w-full">
-                    <CompanyPerformanceCard
-                      data={dashboardData.performanceStats}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
+            {/* Zona de drag and drop para cards grandes (2 cards abajo - 50% cada una) */}
+            <div
+              ref={largeCardsRef}
+              className="large-cards-container grid gap-6 md:grid-cols-2"
+            >
+              <div data-swapy-slot="5" className="w-full">
+                <NewUsersCard recentUsers={basicData?.recentUsers || []} />
+              </div>
+              {/* <div data-swapy-slot="6" className="w-full">
+                <PlatformPerformanceCard 
+                  platformStats={basicData?.platformStats}
+                />
+              </div> */}
+            </div>
           </div>
         </main>
       </div>

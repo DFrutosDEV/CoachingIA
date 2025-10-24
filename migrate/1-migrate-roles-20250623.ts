@@ -15,7 +15,8 @@ const colors = {
 const rolesToCreate = [
   { name: 'Admin', code: '1', active: true },
   { name: 'Coach', code: '2', active: true },
-  { name: 'Client', code: '3', active: true }
+  { name: 'Client', code: '3', active: true },
+  { name: 'Enterprise', code: '4', active: true }
 ];
 
 export const migrateName = 'migrate-roles-20250623';

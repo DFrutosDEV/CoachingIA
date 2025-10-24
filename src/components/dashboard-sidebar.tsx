@@ -18,6 +18,7 @@ import {
   Users,
   Calendar,
   Building,
+  Building2,
   FileText,
   Settings,
   BarChart,
@@ -234,7 +235,7 @@ export function DashboardSidebar({
                     {t('navigation.enterprises')}
                   </Button>
                 </Link>
-                <Link
+                {/* <Link
                   href={`/${locale}/dashboard/${userType}/analytics`}
                   passHref
                   onClick={handleLinkClick}
@@ -243,7 +244,7 @@ export function DashboardSidebar({
                     <BarChart className="h-4 w-4" />
                     {t('navigation.analytics')}
                   </Button>
-                </Link>
+                </Link> */}
                 <Link
                   href={`/${locale}/dashboard/${userType}/reports`}
                   passHref
@@ -289,7 +290,7 @@ export function DashboardSidebar({
                     {t('navigation.myCoaches')}
                   </Button>
                 </Link>
-                <Link
+                {/* <Link
                   href={`/${locale}/dashboard/${userType}/analytics`}
                   passHref
                   onClick={handleLinkClick}
@@ -298,7 +299,7 @@ export function DashboardSidebar({
                     <BarChart className="h-4 w-4" />
                     {t('navigation.analytics')}
                   </Button>
-                </Link>
+                </Link> */}
                 <Link
                   href={`/${locale}/dashboard/${userType}/reports`}
                   passHref

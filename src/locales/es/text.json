@@ -377,6 +377,42 @@
       "profileUpdated": "Perfil actualizado exitosamente",
       "passwordChanged": "Contraseña actualizada exitosamente",
       "profilePictureDeleted": "Foto de perfil eliminada exitosamente"
+    },
+    "enterpriseSettings": {
+      "title": "Configuración de Empresa",
+      "subtitle": "Gestiona la información de tu empresa",
+      "loading": "Cargando datos de la empresa...",
+      "fields": {
+        "name": "Nombre de la Empresa",
+        "email": "Email",
+        "phone": "Teléfono",
+        "website": "Sitio Web",
+        "address": "Dirección",
+        "logo": "Logo de la Empresa",
+        "socialMedia": "Redes Sociales"
+      },
+      "placeholders": {
+        "name": "Nombre de la empresa",
+        "email": "email@empresa.com",
+        "phone": "+1 234 567 8900",
+        "website": "https://www.empresa.com",
+        "address": "Dirección completa de la empresa",
+        "socialMedia": "https://www.facebook.com/empresa"
+      },
+      "logoPreview": "Vista previa:",
+      "socialMediaAdded": "Redes sociales agregadas:",
+      "addSocialMedia": "Agregar",
+      "removeSocialMedia": "Eliminar",
+      "saveChanges": "Guardar Cambios",
+      "saving": "Guardando...",
+      "success": {
+        "enterpriseUpdated": "Empresa actualizada correctamente"
+      },
+      "errors": {
+        "loadingError": "Error cargando datos de la empresa",
+        "connectionError": "Error de conexión",
+        "updateError": "Error actualizando empresa"
+      }
     }
   }
 }

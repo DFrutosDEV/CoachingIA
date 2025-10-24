@@ -4,6 +4,7 @@ import User from '@/models/User';
 import Profile from '@/models/Profile';
 import Role from '@/models/Role';
 import { sendWelcomeEmail } from '@/lib/services/email-service';
+import Enterprise from '@/models/Enterprise';
 
 // GET /api/users - Obtener usuarios (con búsqueda opcional)
 export async function GET(request: NextRequest) {
@@ -107,6 +108,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Si el perfil es empresa, crear una nueva empresa y guardar el ID de la empresa
+    let empresaId: string | undefined;
+    if (profile === '4') {
+      const nuevaEmpresa = new Enterprise({
+        name: name,
+        email: email,
+      });
+
+      const empresaGuardada = await nuevaEmpresa.save();
+      empresaId = empresaGuardada._id.toString();
+    }
+
     // Usar contraseña por defecto
     const defaultPassword = '!Password1';
 
@@ -132,6 +145,7 @@ export async function POST(request: NextRequest) {
       indexDashboard: [],
       clients: [],
       points: 0,
+      ...(profile === '4' && empresaId && { enterprise: empresaId }),
     });
 
     const perfilGuardado = await nuevoPerfil.save();

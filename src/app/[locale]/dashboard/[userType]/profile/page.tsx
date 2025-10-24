@@ -22,10 +22,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { User, Edit, Save, Camera, X, Trash2, Lock } from 'lucide-react';
+import { User, Edit, Save, Camera, X, Trash2, Lock, Building2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
 import { updateUser } from '@/lib/redux/slices/authSlice';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -66,6 +66,21 @@ export default function ProfilePage() {
     address: user?.profile?.address || '',
   });
 
+  // Estados para configuración de empresa
+  const [enterpriseData, setEnterpriseData] = useState({
+    name: '',
+    logo: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    socialMedia: [] as string[],
+  });
+  const [isLoadingEnterprise, setIsLoadingEnterprise] = useState(false);
+  const [isSavingEnterprise, setIsSavingEnterprise] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [socialMediaInput, setSocialMediaInput] = useState('');
+
   // Función para parsear el teléfono existente en sus componentes
   const parsePhone = (phone: string) => {
     if (!phone) return { countryCode: '', area: '', number: '' };
@@ -80,6 +95,7 @@ export default function ProfilePage() {
       let remainingNumber = '';
 
       // Códigos de país más comunes
+      //TODO: MOVER A UN ARCHIVO DE CONFIGURACIÓN.
       const countryCodes = [
         '1',
         '7',
@@ -203,6 +219,36 @@ export default function ProfilePage() {
       });
     }
   }, [user]);
+
+  // Cargar datos de la empresa
+  const fetchEnterpriseData = useCallback(async () => {
+    if (!user?.enterprise?._id) return;
+
+    try {
+      setIsLoadingEnterprise(true);
+      const response = await fetch(`/api/enterprise/update?enterpriseId=${user.enterprise._id}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setEnterpriseData(data.data);
+        setLogoPreview(data.data.logo || '');
+      } else {
+        toast.error(data.error || t('enterpriseSettings.errors.loadingError'));
+      }
+    } catch (error) {
+      console.error('Error fetching enterprise data:', error);
+      toast.error(t('enterpriseSettings.errors.connectionError'));
+    } finally {
+      setIsLoadingEnterprise(false);
+    }
+  }, [user?.enterprise?._id, t]);
+
+  // Cargar datos de empresa al montar el componente
+  useEffect(() => {
+    if (user?.enterprise?._id) {
+      fetchEnterpriseData();
+    }
+  }, [user?.enterprise?._id, fetchEnterpriseData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -373,6 +419,79 @@ export default function ProfilePage() {
       toast.error(t('errors.passwordChangeError'));
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  // Funciones para manejar configuración de empresa
+  const handleEnterpriseInputChange = (field: string, value: string) => {
+    setEnterpriseData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEnterpriseLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setLogoPreview(result);
+        setEnterpriseData(prev => ({ ...prev, logo: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addSocialMedia = () => {
+    if (socialMediaInput.trim()) {
+      setEnterpriseData(prev => ({
+        ...prev,
+        socialMedia: [...prev.socialMedia, socialMediaInput.trim()]
+      }));
+      setSocialMediaInput('');
+    }
+  };
+
+  const removeSocialMedia = (index: number) => {
+    setEnterpriseData(prev => ({
+      ...prev,
+      socialMedia: prev.socialMedia.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSaveEnterprise = async () => {
+    if (!user?.enterprise?._id) return;
+
+    try {
+      setIsSavingEnterprise(true);
+      const response = await fetch('/api/enterprise/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          enterpriseId: user.enterprise._id,
+          name: enterpriseData.name,
+          logo: enterpriseData.logo,
+          address: enterpriseData.address,
+          phone: enterpriseData.phone,
+          email: enterpriseData.email,
+          website: enterpriseData.website,
+          socialMedia: enterpriseData.socialMedia,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(t('enterpriseSettings.success.enterpriseUpdated'));
+        setEnterpriseData(data.data);
+      } else {
+        toast.error(data.error || t('enterpriseSettings.errors.updateError'));
+      }
+    } catch (error) {
+      console.error('Error saving enterprise data:', error);
+      toast.error(t('enterpriseSettings.errors.connectionError'));
+    } finally {
+      setIsSavingEnterprise(false);
     }
   };
 
@@ -790,6 +909,156 @@ export default function ProfilePage() {
                     </div> */}
                   </CardContent>
                 </Card>
+
+                {/* Configuración de Empresa - Solo para admins con empresa */}
+                {userType === 'enterprise' && user?.enterprise?._id && (
+                  <Card className="mt-4">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Building2 className="h-5 w-5" />
+                        {t('enterpriseSettings.title')}
+                      </CardTitle>
+                      <CardDescription>
+                        {t('enterpriseSettings.subtitle')}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {isLoadingEnterprise ? (
+                        <div className="text-center py-4">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                          <p className="mt-2 text-sm text-muted-foreground">{t('enterpriseSettings.loading')}</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label htmlFor="enterpriseName">{t('enterpriseSettings.fields.name')}</Label>
+                              <Input
+                                id="enterpriseName"
+                                value={enterpriseData.name}
+                                onChange={(e) => handleEnterpriseInputChange('name', e.target.value)}
+                                placeholder={t('enterpriseSettings.placeholders.name')}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="enterpriseEmail">{t('enterpriseSettings.fields.email')}</Label>
+                              <Input
+                                id="enterpriseEmail"
+                                type="email"
+                                value={enterpriseData.email}
+                                onChange={(e) => handleEnterpriseInputChange('email', e.target.value)}
+                                placeholder={t('enterpriseSettings.placeholders.email')}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label htmlFor="enterprisePhone">{t('enterpriseSettings.fields.phone')}</Label>
+                              <Input
+                                id="enterprisePhone"
+                                value={enterpriseData.phone}
+                                onChange={(e) => handleEnterpriseInputChange('phone', e.target.value)}
+                                placeholder={t('enterpriseSettings.placeholders.phone')}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="enterpriseWebsite">{t('enterpriseSettings.fields.website')}</Label>
+                              <Input
+                                id="enterpriseWebsite"
+                                value={enterpriseData.website}
+                                onChange={(e) => handleEnterpriseInputChange('website', e.target.value)}
+                                placeholder={t('enterpriseSettings.placeholders.website')}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="enterpriseAddress">{t('enterpriseSettings.fields.address')}</Label>
+                            <Textarea
+                              id="enterpriseAddress"
+                              value={enterpriseData.address}
+                              onChange={(e) => handleEnterpriseInputChange('address', e.target.value)}
+                              placeholder={t('enterpriseSettings.placeholders.address')}
+                              rows={3}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="enterpriseLogo">{t('enterpriseSettings.fields.logo')}</Label>
+                            <Input
+                              id="enterpriseLogo"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleEnterpriseLogoChange}
+                              className="cursor-pointer"
+                            />
+
+                            {logoPreview && (
+                              <div className="mt-2 p-4 border rounded-lg">
+                                <Label>{t('enterpriseSettings.logoPreview')}</Label>
+                                <div className="mt-2">
+                                  <img
+                                    src={logoPreview}
+                                    alt="Logo preview"
+                                    className="max-h-32 max-w-32 object-contain"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label>{t('enterpriseSettings.fields.socialMedia')}</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                value={socialMediaInput}
+                                onChange={(e) => setSocialMediaInput(e.target.value)}
+                                placeholder={t('enterpriseSettings.placeholders.socialMedia')}
+                                onKeyPress={(e) => e.key === 'Enter' && addSocialMedia()}
+                              />
+                              <Button onClick={addSocialMedia} type="button">
+                                {t('enterpriseSettings.addSocialMedia')}
+                              </Button>
+                            </div>
+
+                            {enterpriseData.socialMedia.length > 0 && (
+                              <div className="space-y-2">
+                                <Label>{t('enterpriseSettings.socialMediaAdded')}</Label>
+                                <div className="space-y-2">
+                                  {enterpriseData.socialMedia.map((social, index) => (
+                                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                                      <span className="text-sm">{social}</span>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => removeSocialMedia(index)}
+                                        className="text-red-500 hover:text-red-700"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex justify-end">
+                            <Button
+                              onClick={handleSaveEnterprise}
+                              disabled={isSavingEnterprise}
+                              className="flex items-center gap-2"
+                            >
+                              <Save className="h-4 w-4" />
+                              {isSavingEnterprise ? t('enterpriseSettings.saving') : t('enterpriseSettings.saveChanges')}
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
 
               {/* Panel lateral con información adicional */}

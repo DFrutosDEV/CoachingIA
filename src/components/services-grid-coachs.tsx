@@ -5,6 +5,7 @@ import { CoachCard } from './coach-card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 interface CoachResponse {
   id: string;
@@ -24,18 +25,19 @@ interface CoachResponse {
   createdAt: string;
 }
 
-export function ServicesGrid() {
+export function ServicesGrid({ isEnterprise }: { isEnterprise?: boolean }) {
   const t = useTranslations('common.dashboard.servicesGrid');
   const [coaches, setCoaches] = useState<CoachResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const user = useAppSelector(state => state.auth.user);
 
   const fetchCoaches = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/admin/coaches');
+      const response = await fetch(isEnterprise ? `/api/enterprise/coaches?enterpriseId=${user?.enterprise?._id}` : '/api/admin/coaches');
       const data = await response.json();
 
       if (!response.ok) {

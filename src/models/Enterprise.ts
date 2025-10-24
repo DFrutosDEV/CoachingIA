@@ -8,8 +8,6 @@ export interface IEnterprise extends Document {
   email: string;
   website: string;
   socialMedia: string[];
-  coaches: string[];
-  employees: string[];
   active: boolean;
   isDeleted: boolean;
 }
@@ -18,7 +16,6 @@ const EnterpriseSchema: Schema = new Schema(
   {
     name: {
       type: String,
-      required: true,
       trim: true,
       maxlength: [100, 'The name cannot exceed 100 characters'],
     },
@@ -54,14 +51,6 @@ const EnterpriseSchema: Schema = new Schema(
       type: [String],
       default: [],
     },
-    coaches: {
-      type: [String],
-      default: [],
-    },
-    employees: {
-      type: [String],
-      default: [],
-    },
     active: {
       type: Boolean,
       default: true,
@@ -78,8 +67,6 @@ const EnterpriseSchema: Schema = new Schema(
 
 EnterpriseSchema.index({ name: 1 });
 EnterpriseSchema.index({ isDeleted: 1 });
-EnterpriseSchema.index({ coaches: 1 });
-EnterpriseSchema.index({ employees: 1 });
 
 export default mongoose.models.Enterprise ||
   mongoose.model<IEnterprise>('Enterprise', EnterpriseSchema);

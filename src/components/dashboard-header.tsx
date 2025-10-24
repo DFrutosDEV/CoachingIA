@@ -6,6 +6,8 @@ import { Menu, UserCircle } from 'lucide-react';
 import { NotificationsModal } from '@/components/ui/notifications-modal';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 interface HeaderProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -15,6 +17,7 @@ interface HeaderProps {
 export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'es';
+  const user = useAppSelector(state => state.auth.user);
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -33,6 +36,11 @@ export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
           </Button>
         </Link>
       </div>
+      {user?.enterprise?.logo && (
+        <div className="flex items-center gap-2">
+          <Image src={user?.enterprise?.logo} alt="Logo" width={32} height={32} className="rounded-full" />
+        </div>
+      )}
     </header>
   );
 }

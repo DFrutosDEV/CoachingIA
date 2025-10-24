@@ -88,3 +88,21 @@ IMPORTANTES
 - ARCHIVO DE TEXTOS PARA TRADUCIR
 
 ------------------------------------------------------------------------------------------------------------
+
+FORMATO DE RESPUESTA (JSON):
+    [
+      {
+        "description": "Descripción del objetivo específico y medible",
+        "day": "lunes",
+        "aforism": "Aforismo del objetivo",
+        "tiempoEstimado": "Tiempo estimado para completar el objetivo",
+        "ejemplo": "Ejemplo de como completar el objetivo",
+        "indicadordeExito": "Indicador de éxito para el objetivo",
+        "isCompleted": false
+      }
+    ]
+
+
+--------------------------------------------------------------------------------------------------------------
+
+await HttpClient.get CAMBIAR POR FETCH

@@ -20,7 +20,7 @@ export function ResourcesGrid({
   return (
     <div className="grid gap-6 sm:grid-cols-2 h-full overflow-y-auto pr-2">
       {/* Notificaciones */}
-      {(userType === 'coach' || userType === 'admin') && (
+      {(userType === 'coach' || userType === 'admin' || userType === 'enterprise') && (
         <NotificationCard userType={userType} />
       )}
 
@@ -28,7 +28,7 @@ export function ResourcesGrid({
       {userType === 'coach' && <NewObjectiveCard userType={userType} />}
 
       {/* Agregar Usuario */}
-      {userType === 'admin' && <AddUserCard />}
+      {userType === 'admin' || userType === 'enterprise' && <AddUserCard />}
 
       {/* Generar Ticket */}
       {userType === 'coach' && <TicketCard />}
@@ -41,7 +41,7 @@ export function ResourcesGrid({
       {/* {userType === 'admin' && <ConfigFormsManagerCard />} */}
 
       {/* Gestionar puntos */}
-      {userType === 'admin' && <PointsManagerCard />}
+      {userType === 'admin' || userType === 'enterprise' && <PointsManagerCard />}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 
 export default function EnterpriseCoachesPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const t = useTranslations('dashboardEnterprise.coachesPage');
+  const t = useTranslations('text.dashboardEnterprise.coachesPage');
 
   const toggleMobileSidebar = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -42,7 +42,7 @@ export default function EnterpriseCoachesPage() {
           <p className="text-sm text-muted-foreground">
             {t('subtitle')}
           </p>
-          <ServicesGrid />
+          <ServicesGrid isEnterprise={true} />
         </main>
       </div>
     </div>
