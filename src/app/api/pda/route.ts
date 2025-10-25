@@ -98,15 +98,23 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const objectiveId = formData.get('objectiveId') as string;
+    const profileId = formData.get('profile') as string;
 
     if (!file) {
       return NextResponse.json({ error: 'Archivo requerido' }, { status: 400 });
     }
 
-    // Validar que sea un PDF
-    if (file.type !== 'application/pdf') {
+    // Validar tipos de archivo permitidos
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Solo se permiten archivos PDF' },
+        { error: 'Solo se permiten archivos PDF, DOC y DOCX' },
         { status: 400 }
       );
     }
@@ -122,11 +130,28 @@ export async function POST(request: NextRequest) {
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-    // Verificar si ya existe un PDA para este perfil
-    const existingPda = await Pda.findOne({
-      profile: profile._id,
-      isDeleted: false,
-    });
+    // Determinar el perfil a usar (puede ser el del usuario autenticado o el especificado)
+    let targetProfileId = profile._id;
+    if (profileId) {
+      // Si se especifica un profileId, usarlo (para casos donde se carga desde el generador de IA)
+      targetProfileId = profileId;
+    }
+
+    // Verificar si ya existe un PDA para este perfil y objetivo
+    let existingPda;
+    if (objectiveId) {
+      existingPda = await Pda.findOne({
+        profile: targetProfileId,
+        objectiveId: objectiveId,
+        isDeleted: false,
+      });
+    } else {
+      existingPda = await Pda.findOne({
+        profile: targetProfileId,
+        objectiveId: { $exists: false },
+        isDeleted: false,
+      });
+    }
 
     let pda;
 
@@ -137,35 +162,85 @@ export async function POST(request: NextRequest) {
       existingPda.fileSize = file.size;
       existingPda.mimeType = file.type;
       existingPda.uploadedAt = new Date();
+      if (objectiveId) {
+        existingPda.objectiveId = objectiveId;
+      }
 
       pda = await existingPda.save();
     } else {
       // Crear nuevo PDA
-      pda = new Pda({
-        profile: profile._id,
+      const pdaData: any = {
+        profile: targetProfileId,
         fileName: file.name,
         fileData: fileBuffer,
         fileSize: file.size,
         mimeType: file.type,
-      });
+      };
 
+      if (objectiveId) {
+        pdaData.objectiveId = objectiveId;
+      }
+
+      pda = new Pda(pdaData);
       pda = await pda.save();
     }
 
     return NextResponse.json({
+      success: true,
       message: existingPda
         ? 'PDA actualizado exitosamente'
         : 'PDA creado exitosamente',
+      pdaId: pda._id,
       data: {
         id: pda._id,
         fileName: pda.fileName,
         fileSize: pda.fileSize,
         mimeType: pda.mimeType,
         uploadedAt: pda.uploadedAt,
+        objectiveId: pda.objectiveId,
       },
     });
   } catch (error) {
     console.error('Error al crear/actualizar PDA:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Descargar PDA por ID
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { pdaId } = body;
+
+    if (!pdaId) {
+      return NextResponse.json({ error: 'PDA ID requerido' }, { status: 400 });
+    }
+
+    await connectDB();
+
+    // Buscar el PDA
+    const pda = await Pda.findById(pdaId);
+    if (!pda || pda.isDeleted) {
+      return NextResponse.json({ error: 'PDA no encontrado' }, { status: 404 });
+    }
+
+    // Convertir el Buffer a base64 para enviarlo al frontend
+    const fileBase64 = pda.fileData.toString('base64');
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        fileName: pda.fileName,
+        fileData: fileBase64,
+        mimeType: pda.mimeType,
+        fileSize: pda.fileSize,
+      },
+    });
+  } catch (error) {
+    console.error('Error al descargar PDA:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

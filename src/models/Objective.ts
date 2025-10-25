@@ -11,6 +11,13 @@ export interface IObjective extends Document {
     question: string;
     answer: string;
   }[];
+  aiConfig?: {
+    voiceTone: string;
+    difficultyLevel: string;
+    challengeTypes: string;
+    includeWeekends: boolean;
+    pdaFileId?: ObjectId;
+  };
 }
 
 const ObjectiveSchema: Schema = new Schema(
@@ -52,6 +59,32 @@ const ObjectiveSchema: Schema = new Schema(
         },
       ],
       default: [],
+    },
+    aiConfig: {
+      voiceTone: {
+        type: String,
+        enum: ['formal', 'casual', 'motivational', 'supportive'],
+        default: 'supportive',
+      },
+      difficultyLevel: {
+        type: String,
+        enum: ['beginner', 'intermediate', 'advanced', 'expert'],
+        default: 'intermediate',
+      },
+      challengeTypes: {
+        type: String,
+        enum: ['physical', 'mental', 'emotional', 'social', 'mixed'],
+        default: 'mixed',
+      },
+      includeWeekends: {
+        type: Boolean,
+        default: false,
+      },
+      pdaFileId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Pda',
+        required: false,
+      },
     },
   },
   {

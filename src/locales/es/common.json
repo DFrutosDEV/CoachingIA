@@ -586,6 +586,284 @@
           "pointsUpdated": "Puntos actualizados exitosamente"
         }
       }
+    },
+    "finalizeObjective": {
+      "button": "Finalizar Objetivo",
+      "modal": {
+        "title": "Finalizar Objetivo",
+        "description": "Proporciona un feedback final para el objetivo:",
+        "fields": {
+          "feedback": "Feedback Final *",
+          "feedbackPlaceholder": "Describe el progreso del cliente, logros alcanzados, áreas de mejora y recomendaciones para el futuro...",
+          "characterCount": "{count}/500 caracteres"
+        },
+        "buttons": {
+          "cancel": "Cancelar",
+          "finalizing": "Finalizando...",
+          "finalize": "Finalizar Objetivo"
+        }
+      },
+      "errors": {
+        "feedbackRequired": "Por favor ingresa un feedback antes de finalizar el objetivo",
+        "serverError": "Error interno del servidor",
+        "errorWithMessage": "Error: {error}"
+      },
+      "success": {
+        "objectiveFinalized": "Objetivo finalizado exitosamente"
+      }
+    },
+    "objectiveDetail": {
+      "header": {
+        "title": "Información del Objetivo",
+        "status": {
+          "active": "Activo",
+          "inactive": "Inactivo",
+          "completed": "Completado",
+          "inProgress": "En Progreso"
+        },
+        "created": "Creado:",
+        "progress": "Progreso:",
+        "generalProgress": "Progreso general",
+        "goalsCompleted": "metas completadas"
+      },
+      "tabs": {
+        "details": "Detalles",
+        "config": "Configuración",
+        "notes": "Notas",
+        "sessions": "Sesiones"
+      },
+      "goals": {
+        "title": "Metas ({count})",
+        "newGoal": "Nueva Meta",
+        "form": {
+          "description": "Descripción de la meta",
+          "day": "Día (ej: Lunes, Martes, etc.)"
+        },
+        "buttons": {
+          "save": "Guardar",
+          "cancel": "Cancelar"
+        },
+        "loading": "Cargando metas...",
+        "empty": "No hay metas definidas para este objetivo",
+        "configWarning": "Completa el formulario de configuración en la pestaña \"Configuración\" para generar metas con IA",
+        "aiGenerate": "Generar con IA",
+        "createManually": "Crear Manualmente",
+        "configRequired": "Completa el formulario de configuración primero"
+      },
+      "notes": {
+        "title": "Notas ({count})",
+        "newNote": "Nueva Nota",
+        "createFirst": "Crear Primera Nota",
+        "loading": "Cargando notas...",
+        "empty": "No hay notas registradas para este objetivo"
+      },
+      "sessions": {
+        "title": "Sesiones ({count})",
+        "generate": "Generar Sesiones",
+        "generateFirst": "Generar Primera Sesión",
+        "loading": "Cargando sesiones...",
+        "empty": "No hay sesiones registradas para este objetivo",
+        "link": "Link:",
+        "joinSession": "Ingresar a la sesión",
+        "editSession": "Editar sesión",
+        "deleteSession": "Eliminar sesión",
+        "confirmDelete": {
+          "title": "¿Estás seguro?",
+          "message": "Esta acción eliminará la sesión programada para el",
+          "yes": "SÍ",
+          "no": "NO"
+        }
+      },
+      "buttons": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "yes": "SÍ",
+        "no": "NO"
+      },
+      "errors": {
+        "missingData": "Faltan datos necesarios para crear las metas",
+        "saveGoals": "Error al guardar las metas generadas",
+        "completeFields": "Por favor completa todos los campos",
+        "createGoal": "Error al crear la meta",
+        "updateGoal": "Error al actualizar la meta",
+        "deleteGoal": "Error al eliminar la meta",
+        "updateGoalStatus": "Error al actualizar el estado de la meta",
+        "updateSession": "Error al actualizar la sesión",
+        "deleteSession": "Error al eliminar la sesión",
+        "updateSessionStatus": "Error al actualizar el estado de la sesión",
+        "configRequired": "Debes completar el formulario de configuración antes de generar metas con IA"
+      },
+      "success": {
+        "goalCreated": "Meta creada exitosamente",
+        "goalUpdated": "Meta actualizada exitosamente",
+        "goalDeleted": "Meta eliminada exitosamente",
+        "goalMarkedPending": "Meta marcada como pendiente",
+        "goalMarkedCompleted": "Meta marcada como completada",
+        "sessionUpdated": "Sesión actualizada exitosamente",
+        "sessionDeleted": "Sesión eliminada exitosamente",
+        "sessionMarkedActive": "Sesión marcada como activa",
+        "sessionMarkedCancelled": "Sesión marcada como cancelada"
+      },
+      "confirmations": {
+        "deleteGoal": "¿Estás seguro de que quieres eliminar esta meta?"
+      }
+    },
+    "objectiveConfig": {
+      "title": "Formulario de Configuración",
+      "status": {
+        "completed": "Completado"
+      },
+      "tabs": {
+        "view": "Ver Respuestas",
+        "edit": "Editar"
+      },
+      "form": {
+        "loading": "Cargando formulario...",
+        "placeholder": "Escribe tu respuesta aquí...",
+        "question": "Pregunta {number}",
+        "answer": "Respuesta",
+        "buttons": {
+          "saving": "Guardando...",
+          "save": "Guardar Formulario"
+        },
+        "messages": {
+          "alreadyCompleted": "El formulario ya ha sido completado y no se puede modificar"
+        }
+      },
+      "errors": {
+        "loadQuestions": "Error al cargar las preguntas de configuración",
+        "loadExisting": "Error al cargar configuración existente:",
+        "requiredFields": "Por favor responde todas las preguntas obligatorias",
+        "saveForm": "Error al guardar el formulario"
+      },
+      "success": {
+        "formSaved": "Formulario de configuración guardado correctamente"
+      }
+    },
+    "createNote": {
+      "title": "Crear Nueva Nota",
+      "form": {
+        "title": "Título *",
+        "titlePlaceholder": "Ingresa el título de la nota...",
+        "content": "Contenido *",
+        "contentPlaceholder": "Escribe el contenido de la nota...",
+        "session": "Sesión (opcional)",
+        "sessionPlaceholder": "Selecciona una sesión (opcional)",
+        "noSession": "Sin sesión",
+        "loadingSessions": "Cargando sesiones...",
+        "noSessionsAvailable": "No hay sesiones disponibles",
+        "selectedSession": "Sesión seleccionada:",
+        "characters": "caracteres"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "create": "Crear Nota"
+      },
+      "errors": {
+        "titleRequired": "El título es requerido",
+        "contentRequired": "El contenido es requerido",
+        "createNote": "Error al crear la nota"
+      },
+      "success": {
+        "noteCreated": "Nota creada correctamente"
+      }
+    },
+    "aiGoalsGenerator": {
+      "title": "Generar Objetivos con IA",
+      "description": "Configura los parámetros para generar objetivos personalizados con IA",
+      "form": {
+        "aiConfig": {
+          "title": "Configuración de IA",
+          "voiceTone": "Tono de voz",
+          "voiceTonePlaceholder": "Selecciona el tono de voz",
+          "voiceToneOptions": {
+            "formal": "Formal",
+            "casual": "Casual",
+            "motivational": "Motivacional",
+            "supportive": "Apoyador"
+          },
+          "difficultyLevel": "Nivel de dificultad",
+          "difficultyLevelPlaceholder": "Selecciona el nivel de dificultad",
+          "difficultyLevelOptions": {
+            "beginner": "Principiante",
+            "intermediate": "Intermedio",
+            "advanced": "Avanzado",
+            "expert": "Experto"
+          },
+          "challengeTypes": "Tipos de desafíos",
+          "challengeTypesPlaceholder": "Selecciona los tipos de desafíos",
+          "challengeTypesOptions": {
+            "physical": "Físicos",
+            "mental": "Mentales",
+            "emotional": "Emocionales",
+            "social": "Sociales",
+            "mixed": "Mixtos"
+          },
+          "includeWeekends": "Incluir fines de semana",
+          "includeWeekendsPlaceholder": "¿Incluir fines de semana?",
+          "includeWeekendsOptions": {
+            "yes": "Sí",
+            "no": "No"
+          },
+          "pdaFile": "Archivo PDA",
+          "pdaFilePlaceholder": "Selecciona un archivo PDA",
+          "pdaFileButton": "Seleccionar archivo"
+        }
+      },
+      "buttons": {
+        "generating": "Generando objetivos con IA...",
+        "generate": "Generar 30 objetivos"
+      },
+      "errors": {
+        "generateGoals": "Error al generar objetivos",
+        "uploadPda": "Error al cargar archivo PDA"
+      },
+      "success": {
+        "goalsGenerated": "30 objetivos generados exitosamente",
+        "pdaUploaded": "Archivo PDA cargado exitosamente"
+      }
+    },
+    "generateSessions": {
+      "title": "Generar Sesiones",
+      "description": "Configura los parámetros para generar las sesiones del objetivo",
+      "form": {
+        "startDate": "Fecha de inicio",
+        "startTime": "Hora de inicio",
+        "sessionCount": "Cantidad de sesiones",
+        "sessionCountPlaceholder": "Ej: 4",
+        "periodicity": "Periodicidad",
+        "periodicityPlaceholder": "Selecciona la periodicidad",
+        "periodicityOptions": {
+          "daily": "Diaria",
+          "weekly": "Semanal",
+          "biweekly": "Quincenal",
+          "monthly": "Mensual"
+        }
+      },
+      "sessions": {
+        "generated": "Sesiones Generadas ({count})",
+        "session": "Sesión {number}"
+      },
+      "buttons": {
+        "generating": "Generando...",
+        "generate": "Generar Sesiones",
+        "creating": "Creando...",
+        "create": "Crear Sesiones"
+      },
+      "errors": {
+        "completeFields": "Por favor completa todos los campos",
+        "sessionCountRange": "La cantidad de sesiones debe estar entre 1 y 52",
+        "generateSessions": "Error al generar las sesiones",
+        "validDateTime": "Por favor ingresa una fecha y hora válidas",
+        "noSessionsToCreate": "No hay sesiones para crear",
+        "createSessions": "Error al crear las sesiones"
+      },
+      "success": {
+        "sessionsGenerated": "{count} sesiones generadas",
+        "sessionUpdated": "Sesión actualizada",
+        "sessionsCreated": "{count} sesiones creadas exitosamente"
+      }
     }
   }
 }

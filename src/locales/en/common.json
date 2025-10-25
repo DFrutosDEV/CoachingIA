@@ -586,6 +586,319 @@
           "pointsUpdated": "Points updated successfully"
         }
       }
+    },
+    "finalizeObjective": {
+      "button": "Finalize Objective",
+      "modal": {
+        "title": "Finalize Objective",
+        "description": "Provide final feedback for the objective:",
+        "fields": {
+          "feedback": "Final Feedback *",
+          "feedbackPlaceholder": "Describe the client's progress, achievements, areas for improvement and recommendations for the future...",
+          "characterCount": "{count}/500 characters"
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "finalizing": "Finalizing...",
+          "finalize": "Finalize Objective"
+        }
+      },
+      "errors": {
+        "feedbackRequired": "Please enter feedback before finalizing the objective",
+        "serverError": "Internal server error",
+        "errorWithMessage": "Error: {error}"
+      },
+      "success": {
+        "objectiveFinalized": "Objective finalized successfully"
+      }
+    },
+    "objectiveDetail": {
+      "header": {
+        "title": "Objective Information",
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive",
+          "completed": "Completed",
+          "inProgress": "In Progress"
+        },
+        "created": "Created:",
+        "progress": "Progress:",
+        "generalProgress": "General progress",
+        "goalsCompleted": "goals completed"
+      },
+      "tabs": {
+        "details": "Details",
+        "config": "Configuration",
+        "notes": "Notes",
+        "sessions": "Sessions"
+      },
+      "goals": {
+        "title": "Goals ({count})",
+        "newGoal": "New Goal",
+        "form": {
+          "description": "Goal description",
+          "day": "Day (e.g: Monday, Tuesday, etc.)"
+        },
+        "buttons": {
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "loading": "Loading goals...",
+        "empty": "No goals defined for this objective",
+        "configWarning": "Complete the configuration form in the \"Configuration\" tab to generate goals with AI",
+        "aiGenerate": "Generate with AI",
+        "createManually": "Create Manually",
+        "configRequired": "Complete the configuration form first"
+      },
+      "notes": {
+        "title": "Notes ({count})",
+        "newNote": "New Note",
+        "createFirst": "Create First Note",
+        "loading": "Loading notes...",
+        "empty": "No notes registered for this objective"
+      },
+      "sessions": {
+        "title": "Sessions ({count})",
+        "generate": "Generate Sessions",
+        "generateFirst": "Generate First Session",
+        "loading": "Loading sessions...",
+        "empty": "No sessions registered for this objective",
+        "link": "Link:",
+        "joinSession": "Join session",
+        "editSession": "Edit session",
+        "deleteSession": "Delete session",
+        "confirmDelete": {
+          "title": "Are you sure?",
+          "message": "This action will delete the scheduled session for",
+          "yes": "YES",
+          "no": "NO"
+        }
+      },
+      "buttons": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "yes": "YES",
+        "no": "NO"
+      },
+      "errors": {
+        "missingData": "Missing necessary data to create goals",
+        "saveGoals": "Error saving generated goals",
+        "completeFields": "Please complete all fields",
+        "createGoal": "Error creating goal",
+        "updateGoal": "Error updating goal",
+        "deleteGoal": "Error deleting goal",
+        "updateGoalStatus": "Error updating goal status",
+        "updateSession": "Error updating session",
+        "deleteSession": "Error deleting session",
+        "updateSessionStatus": "Error updating session status",
+        "configRequired": "You must complete the configuration form before generating goals with AI"
+      },
+      "success": {
+        "goalCreated": "Goal created successfully",
+        "goalUpdated": "Goal updated successfully",
+        "goalDeleted": "Goal deleted successfully",
+        "goalMarkedPending": "Goal marked as pending",
+        "goalMarkedCompleted": "Goal marked as completed",
+        "sessionUpdated": "Session updated successfully",
+        "sessionDeleted": "Session deleted successfully",
+        "sessionMarkedActive": "Session marked as active",
+        "sessionMarkedCancelled": "Session marked as cancelled"
+      },
+      "confirmations": {
+        "deleteGoal": "Are you sure you want to delete this goal?"
+      }
+    },
+    "objectiveConfig": {
+      "title": "Configuration Form",
+      "status": {
+        "completed": "Completed"
+      },
+      "tabs": {
+        "view": "View Answers",
+        "edit": "Edit"
+      },
+      "form": {
+        "loading": "Loading form...",
+        "placeholder": "Write your answer here...",
+        "question": "Question {number}",
+        "answer": "Answer",
+        "buttons": {
+          "saving": "Saving...",
+          "save": "Save Form"
+        },
+        "messages": {
+          "alreadyCompleted": "The form has already been completed and cannot be modified"
+        }
+      },
+      "errors": {
+        "loadQuestions": "Error loading configuration questions",
+        "loadExisting": "Error loading existing configuration:",
+        "requiredFields": "Please answer all required questions",
+        "saveForm": "Error saving the form"
+      },
+      "success": {
+        "formSaved": "Configuration form saved successfully"
+      }
+    },
+    "createNote": {
+      "title": "Create New Note",
+      "form": {
+        "title": "Title *",
+        "titlePlaceholder": "Enter the note title...",
+        "content": "Content *",
+        "contentPlaceholder": "Write the note content...",
+        "session": "Session (optional)",
+        "sessionPlaceholder": "Select a session (optional)",
+        "noSession": "No session",
+        "loadingSessions": "Loading sessions...",
+        "noSessionsAvailable": "No sessions available",
+        "selectedSession": "Selected session:",
+        "characters": "characters"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "create": "Create Note"
+      },
+      "errors": {
+        "titleRequired": "Title is required",
+        "contentRequired": "Content is required",
+        "createNote": "Error creating the note"
+      },
+      "success": {
+        "noteCreated": "Note created successfully"
+      }
+    },
+    "aiGoalsGenerator": {
+      "title": "Generate Goals with AI",
+      "description": "Configure parameters to generate personalized goals with AI",
+      "form": {
+        "aiConfig": {
+          "title": "AI Configuration",
+          "voiceTone": "Voice tone",
+          "voiceTonePlaceholder": "Select voice tone",
+          "voiceToneOptions": {
+            "formal": "Formal",
+            "casual": "Casual",
+            "motivational": "Motivational",
+            "supportive": "Supportive"
+          },
+          "difficultyLevel": "Difficulty level",
+          "difficultyLevelPlaceholder": "Select difficulty level",
+          "difficultyLevelOptions": {
+            "beginner": "Beginner",
+            "intermediate": "Intermediate",
+            "advanced": "Advanced",
+            "expert": "Expert"
+          },
+          "challengeTypes": "Challenge types",
+          "challengeTypesPlaceholder": "Select challenge types",
+          "challengeTypesOptions": {
+            "physical": "Physical",
+            "mental": "Mental",
+            "emotional": "Emotional",
+            "social": "Social",
+            "mixed": "Mixed"
+          },
+          "includeWeekends": "Include weekends",
+          "includeWeekendsPlaceholder": "Include weekends?",
+          "includeWeekendsOptions": {
+            "yes": "Yes",
+            "no": "No"
+          },
+          "pdaFile": "PDA File",
+          "pdaFilePlaceholder": "Select a PDA file",
+          "pdaFileButton": "Select file"
+        }
+      },
+      "buttons": {
+        "generating": "Generating goals with AI...",
+        "generate": "Generate 30 goals"
+      },
+      "errors": {
+        "generateGoals": "Error generating goals",
+        "uploadPda": "Error uploading PDA file"
+      },
+      "success": {
+        "goalsGenerated": "30 goals generated successfully",
+        "pdaUploaded": "PDA file uploaded successfully"
+      }
+    },
+    "generateSessions": {
+      "title": "Generate Sessions",
+      "description": "Configure the parameters to generate the objective sessions",
+      "form": {
+        "startDate": "Start date",
+        "startTime": "Start time",
+        "periodicity": "Periodicity",
+        "periodicityPlaceholder": "Select periodicity",
+        "periodicityOptions": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "biweekly": "Biweekly",
+          "monthly": "Monthly"
+        },
+        "aiConfig": {
+          "title": "AI Configuration",
+          "voiceTone": "Voice tone",
+          "voiceTonePlaceholder": "Select voice tone",
+          "voiceToneOptions": {
+            "formal": "Formal",
+            "casual": "Casual",
+            "motivational": "Motivational",
+            "supportive": "Supportive"
+          },
+          "difficultyLevel": "Difficulty level",
+          "difficultyLevelPlaceholder": "Select difficulty level",
+          "difficultyLevelOptions": {
+            "beginner": "Beginner",
+            "intermediate": "Intermediate",
+            "advanced": "Advanced",
+            "expert": "Expert"
+          },
+          "challengeTypes": "Challenge types",
+          "challengeTypesPlaceholder": "Select challenge types",
+          "challengeTypesOptions": {
+            "physical": "Physical",
+            "mental": "Mental",
+            "emotional": "Emotional",
+            "social": "Social",
+            "mixed": "Mixed"
+          },
+          "includeWeekends": "Include weekends",
+          "includeWeekendsPlaceholder": "Include weekends?",
+          "includeWeekendsOptions": {
+            "yes": "Yes",
+            "no": "No"
+          },
+          "pdaFile": "PDA File",
+          "pdaFilePlaceholder": "Select a PDA file",
+          "pdaFileButton": "Select file"
+        }
+      },
+      "sessions": {
+        "generated": "Generated Sessions ({count})",
+        "session": "Session {number}"
+      },
+      "buttons": {
+        "generating": "Generating...",
+        "generate": "Generate Sessions",
+        "creating": "Creating...",
+        "create": "Create Sessions"
+      },
+      "errors": {
+        "completeFields": "Please complete all fields",
+        "sessionCountRange": "Number of sessions must be between 1 and 52",
+        "generateSessions": "Error generating sessions",
+        "validDateTime": "Please enter a valid date and time",
+        "noSessionsToCreate": "No sessions to create",
+        "createSessions": "Error creating sessions"
+      },
+      "success": {
+        "sessionsGenerated": "{count} sessions generated",
+        "sessionUpdated": "Session updated",
+        "sessionsCreated": "{count} sessions created successfully"
+      }
     }
   }
 }

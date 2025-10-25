@@ -270,7 +270,12 @@
       "goalsCompleted": "metas completadas",
       "noGoalsAssigned": "Sin metas asignadas aún",
       "day": "Día:",
-      "by": "Por:"
+      "by": "Por:",
+      "pdaDocument": "Documento PDA",
+      "fileSize": "Tamaño",
+      "uploadedOn": "Subido el",
+      "download": "Descargar",
+      "downloading": "Descargando..."
     }
   },
   "dashboardEnterprise": {

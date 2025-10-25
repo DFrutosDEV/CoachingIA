@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Calendar,
   CheckCircle,
@@ -30,7 +29,6 @@ import {
   Save,
   X,
 } from 'lucide-react';
-import { formatDate } from '@/utils/validatesInputs';
 import { ObjectiveConfigForm } from './objective-config-form';
 import { CreateNoteModal } from './create-note-modal';
 import { AIGoalsGenerator } from './ai-goals-generator';
@@ -38,6 +36,8 @@ import { toast } from 'sonner';
 import { FinalizeObjectiveModal } from './finalize-objective-modal';
 import { GenerateSessionsModal } from './generate-sessions-modal';
 import { Goal, Note, Objective, Session } from '@/types';
+import { useTranslations } from 'next-intl';
+import { useDateFormatter } from '@/utils/date-formatter';
 
 interface ObjectiveDetailData {
   objective: Objective;
@@ -61,6 +61,8 @@ export function ObjectiveDetailModal({
   clientId,
   coachId,
 }: ObjectiveDetailModalProps) {
+  const t = useTranslations('common.dashboard.objectiveDetail');
+  const { formatDate: formatDateWithLocale, formatTime: formatTimeWithLocale } = useDateFormatter();
   const [isCreateNoteModalOpen, setIsCreateNoteModalOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isGenerateSessionsModalOpen, setIsGenerateSessionsModalOpen] =
@@ -170,7 +172,7 @@ export function ObjectiveDetailModal({
 
   const handleAIGoalsGenerated = async (generatedGoals: any[]) => {
     if (!objectiveData?.objective._id || !clientId || !coachId) {
-      toast.error('Faltan datos necesarios para crear las metas');
+      toast.error(t('errors.missingData'));
       return;
     }
 
@@ -204,15 +206,15 @@ export function ObjectiveDetailModal({
             `${data.goals.length} metas generadas con IA exitosamente`
           );
         } else {
-          toast.error('Error al guardar las metas generadas');
+          toast.error(t('errors.saveGoals'));
         }
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Error al guardar las metas generadas');
+        toast.error(errorData.error || t('errors.saveGoals'));
       }
     } catch (error) {
       console.error('Error al crear metas generadas por IA:', error);
-      toast.error('Error al guardar las metas generadas');
+      toast.error(t('errors.saveGoals'));
     }
   };
 
@@ -225,7 +227,7 @@ export function ObjectiveDetailModal({
   // Funciones para gestión de metas
   const handleCreateGoal = async () => {
     if (!newGoal.description.trim() || !newGoal.day.trim()) {
-      toast.error('Por favor completa todos los campos');
+      toast.error(t('errors.completeFields'));
       return;
     }
 
@@ -250,18 +252,18 @@ export function ObjectiveDetailModal({
           setGoals(prevGoals => [...prevGoals, data.goal]);
           setNewGoal({ description: '', day: '' });
           setIsCreatingGoal(false);
-          toast.success('Meta creada exitosamente');
+          toast.success(t('success.goalCreated'));
         }
       }
     } catch (error) {
       console.error('Error al crear meta:', error);
-      toast.error('Error al crear la meta');
+      toast.error(t('errors.createGoal'));
     }
   };
 
   const handleUpdateGoal = async (goalId: string) => {
     if (!editingGoal.description.trim() || !editingGoal.day.trim()) {
-      toast.error('Por favor completa todos los campos');
+      toast.error(t('errors.completeFields'));
       return;
     }
 
@@ -284,26 +286,26 @@ export function ObjectiveDetailModal({
             prevGoals.map(goal =>
               goal._id === goalId
                 ? {
-                    ...goal,
-                    description: editingGoal.description,
-                    day: editingGoal.day,
-                  }
+                  ...goal,
+                  description: editingGoal.description,
+                  day: editingGoal.day,
+                }
                 : goal
             )
           );
           setEditingGoalId(null);
           setEditingGoal({ description: '', day: '' });
-          toast.success('Meta actualizada exitosamente');
+          toast.success(t('success.goalUpdated'));
         }
       }
     } catch (error) {
       console.error('Error al actualizar meta:', error);
-      toast.error('Error al actualizar la meta');
+      toast.error(t('errors.updateGoal'));
     }
   };
 
   const handleDeleteGoal = async (goalId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta meta?')) return;
+    if (!confirm(t('confirmations.deleteGoal'))) return;
 
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
@@ -314,12 +316,12 @@ export function ObjectiveDetailModal({
         const data = await response.json();
         if (data.success) {
           setGoals(prevGoals => prevGoals.filter(goal => goal._id !== goalId));
-          toast.success('Meta eliminada exitosamente');
+          toast.success(t('success.goalDeleted'));
         }
       }
     } catch (error) {
       console.error('Error al eliminar meta:', error);
-      toast.error('Error al eliminar la meta');
+      toast.error(t('errors.deleteGoal'));
     }
   };
 
@@ -350,14 +352,14 @@ export function ObjectiveDetailModal({
           );
           toast.success(
             currentStatus
-              ? 'Meta marcada como pendiente'
-              : 'Meta marcada como completada'
+              ? t('success.goalMarkedPending')
+              : t('success.goalMarkedCompleted')
           );
         }
       }
     } catch (error) {
       console.error('Error al actualizar estado de meta:', error);
-      toast.error('Error al actualizar el estado de la meta');
+      toast.error(t('errors.updateGoalStatus'));
     }
   };
 
@@ -383,7 +385,7 @@ export function ObjectiveDetailModal({
 
   const handleUpdateSession = async (sessionId: string) => {
     if (!editingSession.date.trim() || !editingSession.time.trim()) {
-      toast.error('Por favor completa todos los campos');
+      toast.error(t('errors.completeFields'));
       return;
     }
 
@@ -406,12 +408,12 @@ export function ObjectiveDetailModal({
           loadSessions();
           setEditingSessionId(null);
           setEditingSession({ date: '', time: '' });
-          toast.success('Sesión actualizada exitosamente');
+          toast.success(t('success.sessionUpdated'));
         }
       }
     } catch (error) {
       console.error('Error al actualizar sesión:', error);
-      toast.error('Error al actualizar la sesión');
+      toast.error(t('errors.updateSession'));
     }
   };
 
@@ -427,12 +429,12 @@ export function ObjectiveDetailModal({
           setSessions(prevSessions =>
             prevSessions.filter(session => session._id !== sessionId)
           );
-          toast.success('Sesión eliminada exitosamente');
+          toast.success(t('success.sessionDeleted'));
         }
       }
     } catch (error) {
       console.error('Error al eliminar sesión:', error);
-      toast.error('Error al eliminar la sesión');
+      toast.error(t('errors.deleteSession'));
     } finally {
       setDeletingSessionId(null);
     }
@@ -468,14 +470,14 @@ export function ObjectiveDetailModal({
           loadSessions();
           toast.success(
             currentStatus
-              ? 'Sesión marcada como activa'
-              : 'Sesión marcada como cancelada'
+              ? t('success.sessionMarkedActive')
+              : t('success.sessionMarkedCancelled')
           );
         }
       }
     } catch (error) {
       console.error('Error al actualizar estado de sesión:', error);
-      toast.error('Error al actualizar el estado de la sesión');
+      toast.error(t('errors.updateSessionStatus'));
     }
   };
 
@@ -496,9 +498,7 @@ export function ObjectiveDetailModal({
   // Función para manejar el clic en "Generar con IA"
   const handleAIGeneratorClick = () => {
     if (!isConfigFormCompleted()) {
-      toast.error(
-        'Debes completar el formulario de configuración antes de generar metas con IA'
-      );
+      toast.error(t('errors.configRequired'));
       return;
     }
     setIsAIGeneratorOpen(true);
@@ -535,14 +535,14 @@ export function ObjectiveDetailModal({
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">
-                  Información del Objetivo
+                  {t('header.title')}
                 </CardTitle>
                 <div className="flex gap-2">
                   <Badge variant={objective.active ? 'active' : 'inactive'}>
-                    {objective.active ? 'Activo' : 'Inactivo'}
+                    {objective.active ? t('header.status.active') : t('header.status.inactive')}
                   </Badge>
                   <Badge variant={objective.isCompleted ? 'active' : 'outline'}>
-                    {objective.isCompleted ? 'Completado' : 'En Progreso'}
+                    {objective.isCompleted ? t('header.status.completed') : t('header.status.inProgress')}
                   </Badge>
                 </div>
               </div>
@@ -552,13 +552,13 @@ export function ObjectiveDetailModal({
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    Creado: {formatDate(new Date(objective.createdAt))}
+                    {t('header.created')} {formatDateWithLocale(new Date(objective.createdAt), 'long')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    Progreso: {Math.round(progress)}%
+                    {t('header.progress')} {Math.round(progress)}%
                   </span>
                 </div>
               </div>
@@ -566,9 +566,9 @@ export function ObjectiveDetailModal({
               {/* Barra de progreso */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Progreso general</span>
+                  <span>{t('header.generalProgress')}</span>
                   <span>
-                    {completedGoals} de {totalGoals} metas completadas
+                    {completedGoals} de {totalGoals} {t('header.goalsCompleted')}
                   </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted">
@@ -587,25 +587,25 @@ export function ObjectiveDetailModal({
                 value="details"
                 className="data-[state=active]:bg-accent"
               >
-                Detalles
+                {t('tabs.details')}
               </TabsTrigger>
               <TabsTrigger
                 value="config"
                 className="data-[state=active]:bg-accent"
               >
-                Configuración
+                {t('tabs.config')}
               </TabsTrigger>
               <TabsTrigger
                 value="notes"
                 className="data-[state=active]:bg-accent"
               >
-                Notas
+                {t('tabs.notes')}
               </TabsTrigger>
               <TabsTrigger
                 value="sessions"
                 className="data-[state=active]:bg-accent"
               >
-                Sesiones
+                {t('tabs.sessions')}
               </TabsTrigger>
             </TabsList>
 
@@ -617,7 +617,7 @@ export function ObjectiveDetailModal({
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Target className="h-5 w-5" />
-                        Metas ({totalGoals})
+                        {t('goals.title', { count: totalGoals })}
                       </CardTitle>
                       <div className="flex gap-2">
                         <Button
@@ -627,7 +627,7 @@ export function ObjectiveDetailModal({
                           onClick={() => setIsCreatingGoal(true)}
                         >
                           <Plus className="h-4 w-4" />
-                          Nueva Meta
+                          {t('goals.newGoal')}
                         </Button>
                       </div>
                     </div>
@@ -639,7 +639,7 @@ export function ObjectiveDetailModal({
                         <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
                           <div className="space-y-3">
                             <Input
-                              placeholder="Descripción de la meta"
+                              placeholder={t('goals.form.description')}
                               value={newGoal.description}
                               onChange={e =>
                                 setNewGoal(prev => ({
@@ -649,7 +649,7 @@ export function ObjectiveDetailModal({
                               }
                             />
                             <Input
-                              placeholder="Día (ej: Lunes, Martes, etc.)"
+                              placeholder={t('goals.form.day')}
                               value={newGoal.day}
                               onChange={e =>
                                 setNewGoal(prev => ({
@@ -661,7 +661,7 @@ export function ObjectiveDetailModal({
                             <div className="flex gap-2">
                               <Button size="sm" onClick={handleCreateGoal}>
                                 <Save className="h-3 w-3 mr-1" />
-                                Guardar
+                                {t('goals.buttons.save')}
                               </Button>
                               <Button
                                 size="sm"
@@ -672,7 +672,7 @@ export function ObjectiveDetailModal({
                                 }}
                               >
                                 <X className="h-3 w-3 mr-1" />
-                                Cancelar
+                                {t('goals.buttons.cancel')}
                               </Button>
                             </div>
                           </div>
@@ -684,7 +684,7 @@ export function ObjectiveDetailModal({
                           <div className="text-center">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                             <p className="text-sm text-muted-foreground">
-                              Cargando metas...
+                              {t('goals.loading')}
                             </p>
                           </div>
                         </div>
@@ -737,7 +737,7 @@ export function ObjectiveDetailModal({
                                       onClick={() => handleUpdateGoal(goal._id)}
                                     >
                                       <Save className="h-3 w-3 mr-1" />
-                                      Guardar
+                                      {t('goals.buttons.save')}
                                     </Button>
                                     <Button
                                       size="sm"
@@ -745,7 +745,7 @@ export function ObjectiveDetailModal({
                                       onClick={cancelEditing}
                                     >
                                       <X className="h-3 w-3 mr-1" />
-                                      Cancelar
+                                      {t('goals.buttons.cancel')}
                                     </Button>
                                   </div>
                                 </div>
@@ -761,7 +761,7 @@ export function ObjectiveDetailModal({
                                       <Clock className="h-3 w-3 text-muted-foreground" />
                                       <span className="text-xs text-muted-foreground">
                                         {goal.day} •{' '}
-                                        {formatDate(new Date(goal.date))}
+                                        {formatDateWithLocale(new Date(goal.date), 'short')}
                                       </span>
                                     </div>
                                     <div className="flex gap-1">
@@ -792,16 +792,14 @@ export function ObjectiveDetailModal({
                         <div className="text-center py-8">
                           <Target className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                           <p className="text-sm text-muted-foreground">
-                            No hay metas definidas para este objetivo
+                            {t('goals.empty')}
                           </p>
 
                           {/* Mensaje de configuración requerida */}
                           {!isConfigFormCompleted() && (
                             <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
                               <p className="text-xs text-yellow-700">
-                                ⚠️ Completa el formulario de configuración en la
-                                pestaña "Configuración" para generar metas con
-                                IA
+                                ⚠️ {t('goals.configWarning')}
                               </p>
                             </div>
                           )}
@@ -816,12 +814,12 @@ export function ObjectiveDetailModal({
                               }
                               title={
                                 !isConfigFormCompleted()
-                                  ? 'Completa el formulario de configuración primero'
-                                  : 'Generar metas con IA'
+                                  ? t('goals.configRequired')
+                                  : t('goals.aiGenerate')
                               }
                             >
                               <Sparkles className="h-3 w-3 mr-1" />
-                              Generar con IA
+                              {t('goals.aiGenerate')}
                               {!isConfigFormCompleted() && (
                                 <span className="ml-1 text-xs bg-yellow-100 text-yellow-800 px-1 rounded">
                                   ⚠️
@@ -833,7 +831,7 @@ export function ObjectiveDetailModal({
                               onClick={() => setIsCreatingGoal(true)}
                             >
                               <Plus className="h-3 w-3 mr-1" />
-                              Crear Manualmente
+                              {t('goals.createManually')}
                             </Button>
                           </div>
                         </div>
@@ -847,7 +845,7 @@ export function ObjectiveDetailModal({
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      Notas ({notes.length})
+                      {t('notes.title', { count: notes.length })}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -861,7 +859,7 @@ export function ObjectiveDetailModal({
                                 {note.createdBy}
                               </span>
                               <span className="text-xs text-muted-foreground">
-                                {formatDate(new Date(note.createdAt))}
+                                {formatDateWithLocale(new Date(note.createdAt), 'short')}
                               </span>
                             </div>
                             <p className="text-sm">{note.content}</p>
@@ -871,7 +869,7 @@ export function ObjectiveDetailModal({
                         <div className="text-center py-8">
                           <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                           <p className="text-sm text-muted-foreground">
-                            No hay notas registradas para este objetivo
+                            {t('notes.empty')}
                           </p>
                         </div>
                       )}
@@ -894,14 +892,14 @@ export function ObjectiveDetailModal({
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      Notas del Objetivo ({notes.length})
+                      {t('notes.title', { count: notes.length })}
                     </CardTitle>
                     <button
                       onClick={() => setIsCreateNoteModalOpen(true)}
                       className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
                     >
                       <FileText className="h-4 w-4 mr-1" />
-                      Nueva Nota
+                      {t('notes.newNote')}
                     </button>
                   </div>
                 </CardHeader>
@@ -912,7 +910,7 @@ export function ObjectiveDetailModal({
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                           <p className="text-sm text-muted-foreground">
-                            Cargando notas...
+                            {t('notes.loading')}
                           </p>
                         </div>
                       </div>
@@ -925,7 +923,7 @@ export function ObjectiveDetailModal({
                               {note.createdBy}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              {formatDate(new Date(note.createdAt))}
+                              {formatDateWithLocale(new Date(note.createdAt), 'short')}
                             </span>
                           </div>
                           <h4 className="text-sm font-medium mb-1">
@@ -940,14 +938,14 @@ export function ObjectiveDetailModal({
                       <div className="text-center py-8">
                         <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground">
-                          No hay notas registradas para este objetivo
+                          {t('notes.empty')}
                         </p>
                         <button
                           onClick={() => setIsCreateNoteModalOpen(true)}
                           className="mt-2 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3"
                         >
                           <FileText className="h-3 w-3 mr-1" />
-                          Crear Primera Nota
+                          {t('notes.createFirst')}
                         </button>
                       </div>
                     )}
@@ -962,7 +960,7 @@ export function ObjectiveDetailModal({
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Calendar className="h-5 w-5" />
-                        Sesiones ({sessions.length})
+                        {t('sessions.title', { count: sessions.length })}
                       </CardTitle>
                       <Button
                         variant="outline"
@@ -971,7 +969,7 @@ export function ObjectiveDetailModal({
                         onClick={() => setIsGenerateSessionsModalOpen(true)}
                       >
                         <Plus className="h-4 w-4" />
-                        Generar Sesiones
+                        {t('sessions.generate')}
                       </Button>
                     </div>
                   </CardHeader>
@@ -982,7 +980,7 @@ export function ObjectiveDetailModal({
                           <div className="text-center">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                             <p className="text-sm text-muted-foreground">
-                              Cargando sesiones...
+                              {t('sessions.loading')}
                             </p>
                           </div>
                         </div>
@@ -1024,7 +1022,7 @@ export function ObjectiveDetailModal({
                                     }
                                   >
                                     <Save className="h-3 w-3 mr-1" />
-                                    Guardar
+                                    {t('sessions.buttons.save')}
                                   </Button>
                                   <Button
                                     size="sm"
@@ -1032,7 +1030,7 @@ export function ObjectiveDetailModal({
                                     onClick={cancelEditingSession}
                                   >
                                     <X className="h-3 w-3 mr-1" />
-                                    Cancelar
+                                    {t('sessions.buttons.cancel')}
                                   </Button>
                                 </div>
                               </div>
@@ -1040,29 +1038,13 @@ export function ObjectiveDetailModal({
                               <div className="space-y-3">
                                 <div className="p-3 rounded-lg border border-red-200 bg-red-50">
                                   <h4 className="text-sm font-medium text-red-800 mb-1">
-                                    ¿Estás seguro?
+                                    {t('sessions.confirmDelete.title')}
                                   </h4>
                                   <p className="text-xs text-red-600">
-                                    Esta acción eliminará la sesión programada
-                                    para el{' '}
-                                    {new Date(session.date).toLocaleDateString(
-                                      'es-ES',
-                                      {
-                                        weekday: 'long',
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                      }
-                                    )}{' '}
+                                    {t('sessions.confirmDelete.message')}{' '}
+                                    {formatDateWithLocale(session.date, 'full')}{' '}
                                     a las{' '}
-                                    {new Date(session.date).toLocaleTimeString(
-                                      'es-ES',
-                                      {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                      }
-                                    )}
+                                    {formatTimeWithLocale(session.date, 'time-24')}
                                   </p>
                                 </div>
                                 <div className="flex gap-2">
@@ -1074,7 +1056,7 @@ export function ObjectiveDetailModal({
                                     }
                                   >
                                     <Trash2 className="h-3 w-3 mr-1" />
-                                    SÍ
+                                    {t('sessions.confirmDelete.yes')}
                                   </Button>
                                   <Button
                                     size="sm"
@@ -1082,7 +1064,7 @@ export function ObjectiveDetailModal({
                                     onClick={cancelDeletingSession}
                                   >
                                     <X className="h-3 w-3 mr-1" />
-                                    NO
+                                    {t('sessions.confirmDelete.no')}
                                   </Button>
                                 </div>
                               </div>
@@ -1091,21 +1073,13 @@ export function ObjectiveDetailModal({
                                 <div className="flex items-center gap-2 mb-2">
                                   <Calendar className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-xs font-medium">
-                                    {new Date(session.date).toLocaleDateString(
-                                      'es-ES',
-                                      {
-                                        weekday: 'long',
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                      }
-                                    )}
+                                    {formatDateWithLocale(session.date, 'full')}
                                   </span>
                                 </div>
                                 {session.link && (
                                   <div className="flex items-center gap-2">
                                     <span className="text-xs text-muted-foreground">
-                                      Link:
+                                      {t('sessions.link')}
                                     </span>
                                     <a
                                       href={session.link}
@@ -1113,7 +1087,7 @@ export function ObjectiveDetailModal({
                                       rel="noopener noreferrer"
                                       className="text-xs text-blue-600 hover:underline"
                                     >
-                                      Ingresar a la sesión
+                                      {t('sessions.joinSession')}
                                     </a>
                                   </div>
                                 )}
@@ -1121,13 +1095,7 @@ export function ObjectiveDetailModal({
                                   <div className="flex items-center gap-2">
                                     <Clock className="h-3 w-3 text-muted-foreground" />
                                     <span className="text-xs text-muted-foreground">
-                                      {new Date(
-                                        session.date
-                                      ).toLocaleTimeString('es-ES', {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                      })}
+                                      {formatTimeWithLocale(session.date, 'time-24')}
                                     </span>
                                   </div>
                                   {!session.isCancelled &&
@@ -1139,7 +1107,7 @@ export function ObjectiveDetailModal({
                                           onClick={() =>
                                             handleEditSession(session)
                                           }
-                                          title="Editar sesión"
+                                          title={t('sessions.editSession')}
                                         >
                                           <Edit className="h-3 w-3" />
                                         </Button>
@@ -1149,7 +1117,7 @@ export function ObjectiveDetailModal({
                                           onClick={() =>
                                             startDeletingSession(session._id)
                                           }
-                                          title="Eliminar sesión"
+                                          title={t('sessions.deleteSession')}
                                         >
                                           <Trash2 className="h-3 w-3" />
                                         </Button>
@@ -1164,14 +1132,14 @@ export function ObjectiveDetailModal({
                         <div className="text-center py-8">
                           <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                           <p className="text-sm text-muted-foreground">
-                            No hay sesiones registradas para este objetivo
+                            {t('sessions.empty')}
                           </p>
                           <Button
                             onClick={() => setIsGenerateSessionsModalOpen(true)}
                             className="mt-3"
                           >
                             <Plus className="h-3 w-3 mr-1" />
-                            Generar Primera Sesión
+                            {t('sessions.generateFirst')}
                           </Button>
                         </div>
                       )}

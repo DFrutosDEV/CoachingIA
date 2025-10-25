@@ -65,6 +65,7 @@ export const getBrowserLocale = (): string => {
 };
 
 // Función para formatear fechas con el locale del navegador
+//! DEPRECATED FUNCTION
 export const formatDate = (
   date: Date,
   options?: Intl.DateTimeFormatOptions
@@ -74,6 +75,7 @@ export const formatDate = (
 };
 
 // Función para formatear horas con el locale del navegador
+//! DEPRECATED FUNCTION
 export const formatTime = (
   date: Date,
   options?: Intl.DateTimeFormatOptions
@@ -83,6 +85,7 @@ export const formatTime = (
 };
 
 // Función para formatear fecha y hora con el locale del navegador
+//! DEPRECATED FUNCTION
 export const formatDateTime = (
   date: Date,
   options?: Intl.DateTimeFormatOptions

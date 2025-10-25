@@ -270,7 +270,12 @@
       "goalsCompleted": "goals completed",
       "noGoalsAssigned": "No goals assigned yet",
       "day": "Day:",
-      "by": "By:"
+      "by": "By:",
+      "pdaDocument": "PDA Document",
+      "fileSize": "Size",
+      "uploadedOn": "Uploaded on",
+      "download": "Download",
+      "downloading": "Downloading..."
     }
   },
   "dashboardEnterprise": {

@@ -9,8 +9,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Loader2, Sparkles, AlertCircle, CheckCircle, Upload, FileText } from 'lucide-react';
 import { Goal } from '@/types';
+import { useTranslations } from 'next-intl';
 
 interface AIGoalsGeneratorProps {
   isOpen: boolean;
@@ -27,8 +36,8 @@ export function AIGoalsGenerator({
   objectiveTitle,
   onGoalsGenerated,
 }: AIGoalsGeneratorProps) {
+  const t = useTranslations('common.dashboard.aiGoalsGenerator');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [numberOfGoals, setNumberOfGoals] = useState(5);
   const [aiStatus, setAiStatus] = useState<{
     provider: string;
     available: boolean;
@@ -37,6 +46,17 @@ export function AIGoalsGenerator({
   } | null>(null);
   const [generatedGoals, setGeneratedGoals] = useState<Goal[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Estados para configuración de IA
+  const [voiceTone, setVoiceTone] = useState('supportive');
+  const [difficultyLevel, setDifficultyLevel] = useState('intermediate');
+  const [challengeTypes, setChallengeTypes] = useState('mixed');
+  const [includeWeekends, setIncludeWeekends] = useState('no');
+  const [pdaFile, setPdaFile] = useState<File | null>(null);
+  const [isUploadingPda, setIsUploadingPda] = useState(false);
+
+  // Detectar si estamos en desarrollo
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   // Verificar estado de AI al abrir el modal
   const checkAIStatus = async () => {
@@ -60,12 +80,53 @@ export function AIGoalsGenerator({
     }
   };
 
+  const handlePdaFileUpload = async (file: File) => {
+    setIsUploadingPda(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('objectiveId', objectiveId);
+      formData.append('profile', objectiveId); // Usar objectiveId como profile
+
+      const response = await fetch('/api/pda', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setPdaFile(file);
+          return data.pdaId;
+        } else {
+          throw new Error(data.error || 'Error al cargar el archivo PDA');
+        }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al cargar el archivo PDA');
+      }
+    } catch (error) {
+      console.error('Error al cargar archivo PDA:', error);
+      throw error;
+    } finally {
+      setIsUploadingPda(false);
+    }
+  };
+
   const generateGoals = async () => {
     setIsGenerating(true);
     setError(null);
     setGeneratedGoals([]);
 
     try {
+      let pdaFileId = null;
+
+      // Si hay un archivo PDA, cargarlo primero
+      if (pdaFile) {
+        pdaFileId = await handlePdaFileUpload(pdaFile);
+      }
+
       const response = await fetch('/api/ai/generate-goals', {
         method: 'POST',
         headers: {
@@ -73,7 +134,14 @@ export function AIGoalsGenerator({
         },
         body: JSON.stringify({
           objectiveId: objectiveId,
-          numberOfGoals,
+          numberOfGoals: 30, // Siempre enviar 30 objetivos
+          aiConfig: {
+            voiceTone,
+            difficultyLevel,
+            challengeTypes,
+            includeWeekends: includeWeekends === 'yes',
+            pdaFileId,
+          },
         }),
       });
 
@@ -121,8 +189,8 @@ export function AIGoalsGenerator({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Estado de Gemini */}
-          {aiStatus && (
+          {/* Estado de IA - Solo mostrar en desarrollo */}
+          {isDevelopment && aiStatus && (
             <div className="space-y-3">
               <div className="flex items-center gap-2 p-3 rounded-lg border">
                 {aiStatus.available ? (
@@ -152,40 +220,129 @@ export function AIGoalsGenerator({
             <p className="text-sm text-muted-foreground">{objectiveTitle}</p>
           </div>
 
-          {/* Configuración */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Número de objetivos a generar
-            </label>
-            <div className="flex gap-2">
-              {[3, 5, 7, 10].map(num => (
+          {/* Configuración de IA */}
+          <div className="space-y-4">
+            <h4 className="font-medium">Configuración de IA</h4>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="voiceTone">{t('form.aiConfig.voiceTone')}</Label>
+                <Select value={voiceTone} onValueChange={setVoiceTone}>
+                  <SelectTrigger className="hover:bg-accent">
+                    <SelectValue placeholder={t('form.aiConfig.voiceTonePlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="formal">{t('form.aiConfig.voiceToneOptions.formal')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="casual">{t('form.aiConfig.voiceToneOptions.casual')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="motivational">{t('form.aiConfig.voiceToneOptions.motivational')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="supportive">{t('form.aiConfig.voiceToneOptions.supportive')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="difficultyLevel">{t('form.aiConfig.difficultyLevel')}</Label>
+                <Select value={difficultyLevel} onValueChange={setDifficultyLevel}>
+                  <SelectTrigger className="hover:bg-accent">
+                    <SelectValue placeholder={t('form.aiConfig.difficultyLevelPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="beginner">{t('form.aiConfig.difficultyLevelOptions.beginner')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="intermediate">{t('form.aiConfig.difficultyLevelOptions.intermediate')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="advanced">{t('form.aiConfig.difficultyLevelOptions.advanced')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="expert">{t('form.aiConfig.difficultyLevelOptions.expert')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="challengeTypes">{t('form.aiConfig.challengeTypes')}</Label>
+                <Select value={challengeTypes} onValueChange={setChallengeTypes}>
+                  <SelectTrigger className="hover:bg-accent">
+                    <SelectValue placeholder={t('form.aiConfig.challengeTypesPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="physical">{t('form.aiConfig.challengeTypesOptions.physical')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="mental">{t('form.aiConfig.challengeTypesOptions.mental')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="emotional">{t('form.aiConfig.challengeTypesOptions.emotional')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="social">{t('form.aiConfig.challengeTypesOptions.social')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="mixed">{t('form.aiConfig.challengeTypesOptions.mixed')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="includeWeekends">{t('form.aiConfig.includeWeekends')}</Label>
+                <Select value={includeWeekends} onValueChange={setIncludeWeekends}>
+                  <SelectTrigger className="hover:bg-accent">
+                    <SelectValue placeholder={t('form.aiConfig.includeWeekendsPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="yes">{t('form.aiConfig.includeWeekendsOptions.yes')}</SelectItem>
+                    <SelectItem className="hover:bg-accent hover:text-accent-foreground" value="no">{t('form.aiConfig.includeWeekendsOptions.no')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="pdaFile">{t('form.aiConfig.pdaFile')}</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="pdaFile"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setPdaFile(file);
+                    }
+                  }}
+                  className="hidden"
+                />
                 <Button
-                  key={num}
-                  variant={numberOfGoals === num ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setNumberOfGoals(num)}
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('pdaFile')?.click()}
+                  disabled={isUploadingPda}
+                  className="flex items-center gap-2"
                 >
-                  {num}
+                  {isUploadingPda ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  {pdaFile ? pdaFile.name : t('form.aiConfig.pdaFileButton')}
                 </Button>
-              ))}
+                {pdaFile && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPdaFile(null)}
+                  >
+                    <FileText className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Botón de generación */}
           <Button
             onClick={generateGoals}
-            disabled={!aiStatus?.available || isGenerating}
+            disabled={isGenerating}
             className="w-full"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generando objetivos con IA...
+                Generando 30 objetivos con IA...
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4 mr-2" />
-                Generar {numberOfGoals} objetivos
+                Generar 30 objetivos
               </>
             )}
           </Button>
@@ -233,7 +390,7 @@ export function AIGoalsGenerator({
           )}
 
           {/* Instrucciones de configuración */}
-          {aiStatus && !aiStatus.available && (
+          {/* {aiStatus && !aiStatus.available && (
             <div className="p-4 rounded-lg border border-amber-200 bg-amber-50">
               <h4 className="font-medium text-amber-800 mb-2">Configurar IA</h4>
               <ol className="text-sm text-amber-700 space-y-1">
@@ -266,7 +423,7 @@ export function AIGoalsGenerator({
                 <li>2. Reinicia la aplicación</li>
               </ol>
             </div>
-          )}
+          )} */}
         </div>
       </DialogContent>
     </Dialog>

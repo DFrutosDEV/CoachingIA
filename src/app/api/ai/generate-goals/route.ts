@@ -3,6 +3,7 @@ import { aiService } from '@/lib/services/ai-service';
 import connectDB from '@/lib/mongodb';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
+import Pda from '@/models/Pda';
 import dotenv from 'dotenv';
 import { addWeeks } from 'date-fns';
 
@@ -36,7 +37,17 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { objectiveId, numberOfGoals = 5 } = body;
+    const {
+      objectiveId,
+      numberOfGoals = 30,
+      aiConfig = {
+        voiceTone: 'supportive',
+        difficultyLevel: 'intermediate',
+        challengeTypes: 'mixed',
+        includeWeekends: false,
+        pdaFileId: null
+      }
+    } = body;
 
     if (!objectiveId) {
       return NextResponse.json(
@@ -67,11 +78,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Obtener archivo PDA si existe
+    let pdaContent = null;
+    if (aiConfig.pdaFileId) {
+      try {
+        const pda = await Pda.findById(aiConfig.pdaFileId);
+        if (pda && !pda.isDeleted) {
+          pdaContent = {
+            fileName: pda.fileName,
+            content: pda.fileData.toString('utf-8'), // Convertir Buffer a string
+            mimeType: pda.mimeType
+          };
+        }
+      } catch (error) {
+        console.warn('Error al obtener archivo PDA:', error);
+        // Continuar sin el archivo PDA
+      }
+    }
+
+    // Actualizar la configuración de IA en el objetivo
+    objective.aiConfig = {
+      voiceTone: aiConfig.voiceTone,
+      difficultyLevel: aiConfig.difficultyLevel,
+      challengeTypes: aiConfig.challengeTypes,
+      includeWeekends: aiConfig.includeWeekends,
+      pdaFileId: aiConfig.pdaFileId
+    };
+    await objective.save();
+
     // Preparar métricas para la IA
     const metrics = {
       clientBio: client.bio,
       configFile: objective.configFile,
       coachNotes: [],
+      aiConfig: aiConfig,
+      pdaContent: pdaContent
     };
 
     // Verificar si AI está disponible

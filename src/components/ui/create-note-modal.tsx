@@ -22,6 +22,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate } from '@/utils/validatesInputs';
+import { useTranslations } from 'next-intl';
+import { useDateFormatter } from '@/utils/date-formatter';
 
 interface Meet {
   _id: string;
@@ -47,6 +49,8 @@ export function CreateNoteModal({
   coachId,
   onNoteCreated,
 }: CreateNoteModalProps) {
+  const t = useTranslations('common.dashboard.createNote');
+  const { formatDate: formatDateWithLocale } = useDateFormatter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedSessionId, setSelectedSessionId] = useState<string>('none');
@@ -83,12 +87,12 @@ export function CreateNoteModal({
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error('El título es requerido');
+      toast.error(t('errors.titleRequired'));
       return;
     }
 
     if (!content.trim()) {
-      toast.error('El contenido es requerido');
+      toast.error(t('errors.contentRequired'));
       return;
     }
 
@@ -117,16 +121,16 @@ export function CreateNoteModal({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al crear la nota');
+        throw new Error(errorData.error || t('errors.createNote'));
       }
 
-      toast.success('Nota creada correctamente');
+      toast.success(t('success.noteCreated'));
       onNoteCreated();
       handleClose();
     } catch (error) {
       console.error('Error:', error);
       toast.error(
-        error instanceof Error ? error.message : 'Error al crear la nota'
+        error instanceof Error ? error.message : t('errors.createNote')
       );
     } finally {
       setSaving(false);
@@ -146,58 +150,58 @@ export function CreateNoteModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Crear Nueva Nota
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Título */}
           <div className="space-y-2">
-            <Label htmlFor="title">Título *</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input
               id="title"
-              placeholder="Ingresa el título de la nota..."
+              placeholder={t('form.titlePlaceholder')}
               value={title}
               onChange={e => setTitle(e.target.value)}
               maxLength={100}
             />
             <p className="text-xs text-muted-foreground">
-              {title.length}/100 caracteres
+              {title.length}/100 {t('form.characters')}
             </p>
           </div>
 
           {/* Contenido */}
           <div className="space-y-2">
-            <Label htmlFor="content">Contenido *</Label>
+            <Label htmlFor="content">{t('form.content')}</Label>
             <Textarea
               id="content"
-              placeholder="Escribe el contenido de la nota..."
+              placeholder={t('form.contentPlaceholder')}
               value={content}
               onChange={e => setContent(e.target.value)}
               className="min-h-[120px]"
               maxLength={2000}
             />
             <p className="text-xs text-muted-foreground">
-              {content.length}/2000 caracteres
+              {content.length}/2000 {t('form.characters')}
             </p>
           </div>
 
           {/* Sesión opcional */}
           <div className="space-y-2">
-            <Label htmlFor="session">Sesión (opcional)</Label>
+            <Label htmlFor="session">{t('form.session')}</Label>
             <Select
               value={selectedSessionId}
               onValueChange={setSelectedSessionId}
             >
               <SelectTrigger className="w-full bg-background border border-input hover:bg-accent hover:text-accent-foreground">
-                <SelectValue placeholder="Selecciona una sesión (opcional)" />
+                <SelectValue placeholder={t('form.sessionPlaceholder')} />
               </SelectTrigger>
               <SelectContent className="bg-background border border-input">
                 <SelectItem
                   value="none"
                   className="hover:bg-accent hover:text-accent-foreground"
                 >
-                  Sin sesión
+                  {t('form.noSession')}
                 </SelectItem>
                 {loading ? (
                   <SelectItem
@@ -205,7 +209,7 @@ export function CreateNoteModal({
                     disabled
                     className="text-muted-foreground"
                   >
-                    Cargando sesiones...
+                    {t('form.loadingSessions')}
                   </SelectItem>
                 ) : sessions.length > 0 ? (
                   sessions.map(session => (
@@ -216,7 +220,7 @@ export function CreateNoteModal({
                     >
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3 w-3" />
-                        {formatDate(new Date(session.date))}
+                        {formatDateWithLocale(session.date, 'full')}
                       </div>
                     </SelectItem>
                   ))
@@ -226,7 +230,7 @@ export function CreateNoteModal({
                     disabled
                     className="text-muted-foreground"
                   >
-                    No hay sesiones disponibles
+                    {t('form.noSessionsAvailable')}
                   </SelectItem>
                 )}
               </SelectContent>
@@ -239,14 +243,13 @@ export function CreateNoteModal({
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-3 w-3 text-muted-foreground" />
-                  <span className="font-medium">Sesión seleccionada:</span>
+                  <span className="font-medium">{t('form.selectedSession')}</span>
                 </div>
                 <div className="mt-1 text-sm text-muted-foreground">
                   {sessions.find(s => s._id === selectedSessionId)?.date &&
-                    formatDate(
-                      new Date(
-                        sessions.find(s => s._id === selectedSessionId)!.date
-                      )
+                    formatDateWithLocale(
+                      sessions.find(s => s._id === selectedSessionId)!.date,
+                      'full'
                     )}
                 </div>
               </CardContent>
@@ -256,7 +259,7 @@ export function CreateNoteModal({
           {/* Botones */}
           <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={handleClose} disabled={saving}>
-              Cancelar
+              {t('buttons.cancel')}
             </Button>
             <Button
               onClick={handleSubmit}
@@ -266,12 +269,12 @@ export function CreateNoteModal({
               {saving ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Creando...
+                  {t('buttons.creating')}
                 </>
               ) : (
                 <>
                   <FileText className="h-4 w-4" />
-                  Crear Nota
+                  {t('buttons.create')}
                 </>
               )}
             </Button>

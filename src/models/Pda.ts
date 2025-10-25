@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, ObjectId } from 'mongoose';
 
 export interface IPda extends Document {
   profile: ObjectId;
+  objectiveId?: ObjectId; // Nueva asociación con objetivos
   fileName: string;
   fileData: Buffer;
   fileSize: number;
@@ -16,6 +17,11 @@ const PdaSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Profile',
       required: true,
+    },
+    objectiveId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Objective',
+      required: false,
     },
     fileName: {
       type: String,
@@ -52,6 +58,7 @@ const PdaSchema: Schema = new Schema(
 
 // Índices para optimizar consultas
 PdaSchema.index({ profile: 1, isDeleted: 1 });
+PdaSchema.index({ objectiveId: 1, isDeleted: 1 });
 PdaSchema.index({ uploadedAt: -1 });
 
 export default mongoose.models.Pda || mongoose.model<IPda>('Pda', PdaSchema);

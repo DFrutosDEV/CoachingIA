@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface FinalizeObjectiveModalProps {
   objectiveId: string;
@@ -27,15 +28,14 @@ export function FinalizeObjectiveModal({
   objectiveTitle,
   onObjectiveFinalized,
 }: FinalizeObjectiveModalProps) {
+  const t = useTranslations('common.dashboard.finalizeObjective');
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFinalizeObjective = async () => {
     if (!feedback.trim()) {
-      toast.error(
-        'Por favor ingresa un feedback antes de finalizar el objetivo'
-      );
+      toast.error(t('errors.feedbackRequired'));
       return;
     }
 
@@ -56,16 +56,16 @@ export function FinalizeObjectiveModal({
       const result = await response.json();
 
       if (result.success) {
-        toast.success('Objetivo finalizado exitosamente');
+        toast.success(t('success.objectiveFinalized'));
         setIsOpen(false);
         setFeedback('');
         onObjectiveFinalized?.();
       } else {
-        toast.error(`Error: ${result.error}`);
+        toast.error(t('errors.errorWithMessage', { error: result.error }));
       }
     } catch (error) {
       console.error('Error finalizando objetivo:', error);
-      toast.error('Error interno del servidor');
+      toast.error(t('errors.serverError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -80,30 +80,30 @@ export function FinalizeObjectiveModal({
           startIcon={<CheckCircle />}
           size="small"
         >
-          Finalizar Objetivo
+          {t('button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Finalizar Objetivo</DialogTitle>
+          <DialogTitle>{t('modal.title')}</DialogTitle>
           <DialogDescription>
-            Proporciona un feedback final para el objetivo:{' '}
+            {t('modal.description')}{' '}
             <strong>"{objectiveTitle}"</strong>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="feedback">Feedback Final *</Label>
+            <Label htmlFor="feedback">{t('modal.fields.feedback')}</Label>
             <Textarea
               id="feedback"
-              placeholder="Describe el progreso del cliente, logros alcanzados, áreas de mejora y recomendaciones para el futuro..."
+              placeholder={t('modal.fields.feedbackPlaceholder')}
               value={feedback}
               onChange={e => setFeedback(e.target.value)}
               rows={6}
               maxLength={500}
             />
             <small className="text-sm text-muted-foreground">
-              {feedback.length}/500 caracteres
+              {t('modal.fields.characterCount', { count: feedback.length })}
             </small>
           </div>
         </div>
@@ -116,7 +116,7 @@ export function FinalizeObjectiveModal({
             }}
             disabled={isSubmitting}
           >
-            Cancelar
+            {t('modal.buttons.cancel')}
           </Button>
           <Button
             onClick={handleFinalizeObjective}
@@ -129,7 +129,7 @@ export function FinalizeObjectiveModal({
               )
             }
           >
-            {isSubmitting ? 'Finalizando...' : 'Finalizar Objetivo'}
+            {isSubmitting ? t('modal.buttons.finalizing') : t('modal.buttons.finalize')}
           </Button>
         </DialogFooter>
       </DialogContent>

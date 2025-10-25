@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Objective from '@/models/Objective';
 import Goal from '@/models/Goal';
 import Note from '@/models/Note';
+import Pda from '@/models/Pda';
 
 // GET /api/client/objectives/[id] - Obtener detalles de un objetivo específico
 export async function GET(
@@ -44,6 +45,25 @@ export async function GET(
       .populate('createdBy', 'name lastName')
       .sort({ createdAt: -1 });
 
+    // Obtener información del PDA si existe
+    let pdaInfo = null;
+    if (objective.aiConfig?.pdaFileId) {
+      try {
+        const pda = await Pda.findById(objective.aiConfig.pdaFileId);
+        if (pda && !pda.isDeleted) {
+          pdaInfo = {
+            _id: pda._id.toString(),
+            fileName: pda.fileName,
+            fileSize: pda.fileSize,
+            mimeType: pda.mimeType,
+            uploadedAt: pda.uploadedAt,
+          };
+        }
+      } catch (error) {
+        console.warn('Error al obtener información del PDA:', error);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -54,6 +74,7 @@ export async function GET(
           active: objective.active,
           createdAt: objective.createdAt,
           configFile: objective.configFile,
+          aiConfig: objective.aiConfig,
         },
         goals: goals.map(goal => ({
           _id: goal._id.toString(),
@@ -68,6 +89,7 @@ export async function GET(
           createdBy: `${note.createdBy?.name} ${note.createdBy?.lastName}`,
           createdAt: note.createdAt,
         })),
+        pdaInfo: pdaInfo,
       },
     });
   } catch (error) {

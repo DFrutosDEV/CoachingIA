@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Circle, Clock, FileText, User } from 'lucide-react';
+import { CheckCircle, Circle, Clock, FileText, User, Download } from 'lucide-react';
 import { formatDate } from '@/utils/validatesInputs';
 import { Goal, Note, Objective } from '@/types';
 import { useTranslations } from 'next-intl';
@@ -25,9 +25,23 @@ interface ObjectiveDetails {
     isCompleted: boolean;
     active: boolean;
     createdAt: string;
+    aiConfig?: {
+      voiceTone: string;
+      difficultyLevel: string;
+      challengeTypes: string;
+      includeWeekends: boolean;
+      pdaFileId?: string;
+    };
   };
   goals: Goal[];
   notes: Note[];
+  pdaInfo?: {
+    _id: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    uploadedAt: string;
+  };
 }
 
 export default function ProgressPage() {
@@ -40,6 +54,7 @@ export default function ProgressPage() {
   const [showModal, setShowModal] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [downloadingPda, setDownloadingPda] = useState(false);
   const t = useTranslations('text.dashboardClient.progressPage');
 
   // Función para obtener todos los objetivos
@@ -97,6 +112,51 @@ export default function ProgressPage() {
       alert(t('errorDetails'));
     } finally {
       setLoadingDetails(false);
+    }
+  };
+
+  // Función para descargar PDA
+  const downloadPda = async (pdaId: string, fileName: string) => {
+    try {
+      setDownloadingPda(true);
+
+      const response = await HttpClient.put('/api/pda', {
+        pdaId: pdaId,
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al descargar el archivo');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Convertir base64 a blob
+        const byteCharacters = atob(result.data.fileData);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: result.data.mimeType });
+
+        // Crear enlace de descarga
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        throw new Error(result.error || 'Error al descargar el archivo');
+      }
+    } catch (err) {
+      console.error('Error downloading PDA:', err);
+      alert('Error al descargar el archivo PDA');
+    } finally {
+      setDownloadingPda(false);
     }
   };
 
@@ -337,6 +397,46 @@ export default function ProgressPage() {
                     </div>
                   )}
                 </div>
+
+                {/* PDA */}
+                {selectedObjective.pdaInfo && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      {t('pdaDocument')}
+                    </h3>
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="font-medium">{selectedObjective.pdaInfo.fileName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {t('fileSize')}: {(selectedObjective.pdaInfo.fileSize / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {t('uploadedOn')}: {formatDate(new Date(selectedObjective.pdaInfo.uploadedAt))}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => downloadPda(selectedObjective.pdaInfo!._id, selectedObjective.pdaInfo!.fileName)}
+                          disabled={downloadingPda}
+                          className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+                        >
+                          {downloadingPda ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              {t('downloading')}
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-4 w-4" />
+                              {t('download')}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Notas */}
                 <div>

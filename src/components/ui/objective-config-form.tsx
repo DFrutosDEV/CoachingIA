@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ClipboardMinus, CheckCircle, Eye, Edit } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface ConfigQuestion {
   _id: string;
@@ -33,6 +34,7 @@ export function ObjectiveConfigForm({
   isReadOnly = false,
   handleConfigFormCompleted,
 }: ObjectiveConfigFormProps) {
+  const t = useTranslations('common.dashboard.objectiveConfig');
   const [configQuestions, setConfigQuestions] = useState<ConfigQuestion[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +57,7 @@ export function ObjectiveConfigForm({
       }
     } catch (error) {
       console.error('Error al cargar preguntas de configuración:', error);
-      toast.error('Error al cargar las preguntas de configuración');
+      toast.error(t('errors.loadQuestions'));
     } finally {
       setLoading(false);
     }
@@ -77,7 +79,7 @@ export function ObjectiveConfigForm({
         }
       }
     } catch (error) {
-      console.error('Error al cargar configuración existente:', error);
+      console.error(t('errors.loadExisting'), error);
     }
   };
 
@@ -103,7 +105,7 @@ export function ObjectiveConfigForm({
     });
 
     if (missingAnswers) {
-      toast.error('Por favor responde todas las preguntas obligatorias');
+      toast.error(t('errors.requiredFields'));
       return;
     }
 
@@ -127,21 +129,21 @@ export function ObjectiveConfigForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al guardar el formulario');
+        throw new Error(errorData.error || t('errors.saveForm'));
       }
 
       const data = await response.json();
       setConfigFile(configFileData);
       setHasConfigFile(true);
       setActiveTab('view');
-      toast.success('Formulario de configuración guardado correctamente');
+      toast.success(t('success.formSaved'));
       handleConfigFormCompleted?.(true);
     } catch (error) {
       console.error('Error:', error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Error al guardar el formulario'
+          : t('errors.saveForm')
       );
     } finally {
       setSaving(false);
@@ -156,7 +158,7 @@ export function ObjectiveConfigForm({
             <div className="text-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
               <p className="text-sm text-muted-foreground">
-                Cargando formulario...
+                {t('form.loading')}
               </p>
             </div>
           </div>
@@ -171,12 +173,12 @@ export function ObjectiveConfigForm({
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <ClipboardMinus className="h-5 w-5" />
-            Formulario de Configuración
+            {t('title')}
           </CardTitle>
           {hasConfigFile && (
             <Badge variant="outline" className="flex items-center gap-1">
               <CheckCircle className="h-3 w-3" />
-              Completado
+              {t('status.completed')}
             </Badge>
           )}
         </div>
@@ -190,7 +192,7 @@ export function ObjectiveConfigForm({
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="view" className="flex items-center gap-1">
                 <Eye className="h-4 w-4" />
-                Ver Respuestas
+                {t('tabs.view')}
               </TabsTrigger>
               <TabsTrigger
                 value="form"
@@ -198,7 +200,7 @@ export function ObjectiveConfigForm({
                 disabled
               >
                 <Edit className="h-4 w-4" />
-                Editar
+                {t('tabs.edit')}
               </TabsTrigger>
             </TabsList>
 
@@ -208,13 +210,13 @@ export function ObjectiveConfigForm({
                   <div key={index} className="p-4 rounded-lg border">
                     <div className="mb-2">
                       <Label className="text-sm font-medium text-muted-foreground">
-                        Pregunta {index + 1}
+                        {t('form.question', { number: index + 1 })}
                       </Label>
                       <p className="text-sm mt-1">{item.question}</p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">
-                        Respuesta
+                        {t('form.answer')}
                       </Label>
                       <p className="text-sm mt-1 bg-muted p-2 rounded">
                         {item.answer}
@@ -229,7 +231,7 @@ export function ObjectiveConfigForm({
               <div className="text-center py-8">
                 <ClipboardMinus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  El formulario ya ha sido completado y no se puede modificar
+                  {t('form.messages.alreadyCompleted')}
                 </p>
               </div>
             </TabsContent>
@@ -245,7 +247,7 @@ export function ObjectiveConfigForm({
                   )}
                 </Label>
                 <Textarea
-                  placeholder="Escribe tu respuesta aquí..."
+                  placeholder={t('form.placeholder')}
                   value={answers[index] || ''}
                   onChange={e => handleAnswerChange(index, e.target.value)}
                   className="min-h-[80px]"
@@ -263,12 +265,12 @@ export function ObjectiveConfigForm({
                 {saving ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Guardando...
+                    {t('form.buttons.saving')}
                   </>
                 ) : (
                   <>
                     <CheckCircle className="h-4 w-4" />
-                    Guardar Formulario
+                    {t('form.buttons.save')}
                   </>
                 )}
               </Button>
