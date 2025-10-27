@@ -49,7 +49,7 @@ export function LanguageSwitcher() {
           {currentLanguage.flag} {t(`languages.${currentLanguage.code}`)}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent className="bg-background" align="end">
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
@@ -58,10 +58,9 @@ export function LanguageSwitcher() {
           >
             <span className="mr-2">{language.flag}</span>
             {t(`languages.${language.code}`)}
-          </DropdownMenuItem>
-        ))}
+          </DropdownMenuItem>)
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
-
