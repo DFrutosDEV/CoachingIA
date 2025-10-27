@@ -28,7 +28,7 @@ export function ResourcesGrid({
       {userType === 'coach' && <NewObjectiveCard userType={userType} />}
 
       {/* Agregar Usuario */}
-      {userType === 'admin' || userType === 'enterprise' && <AddUserCard />}
+      {(userType === 'admin' || userType === 'enterprise') && <AddUserCard />}
 
       {/* Generar Ticket */}
       {userType === 'coach' && <TicketCard />}
@@ -41,7 +41,7 @@ export function ResourcesGrid({
       {/* {userType === 'admin' && <ConfigFormsManagerCard />} */}
 
       {/* Gestionar puntos */}
-      {userType === 'admin' || userType === 'enterprise' && <PointsManagerCard />}
+      {(userType === 'admin' || userType === 'enterprise') && <PointsManagerCard />}
     </div>
   );
 }
