@@ -5,28 +5,12 @@ import User from '@/models/User';
 import Role from '@/models/Role';
 import Profile from '@/models/Profile';
 import Enterprise from '@/models/Enterprise';
-
-// Conectar a MongoDB
-async function connectMongoDB() {
-  if (mongoose.connections[0].readyState) {
-    return;
-  }
-
-  try {
-    await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/coachingia'
-    );
-    console.log('✅ Conectado a MongoDB');
-  } catch (error) {
-    console.error('❌ Error conectando a MongoDB:', error);
-    throw error;
-  }
-}
+import connectDB from '@/lib/mongodb';
 
 export async function POST(request) {
   try {
-    // Conectar a la base de datos
-    await connectMongoDB();
+    // Conectar a la base de datos usando la configuración centralizada
+    await connectDB();
 
     // Obtener datos del cuerpo de la petición
     const { email, password } = await request.json();
