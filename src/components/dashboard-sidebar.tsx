@@ -206,13 +206,13 @@ export function DashboardSidebar({
             {userType === 'admin' && (
               <>
                 <Link
-                  href={`/${locale}/dashboard/${userType}/clients`}
+                  href={`/${locale}/dashboard/${userType}/enterprises`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
-                    <Users className="h-4 w-4" />
-                    {t('navigation.clients')}
+                    <Building className="h-4 w-4" />
+                    {t('navigation.enterprises')}
                   </Button>
                 </Link>
                 <Link
@@ -226,13 +226,13 @@ export function DashboardSidebar({
                   </Button>
                 </Link>
                 <Link
-                  href={`/${locale}/dashboard/${userType}/enterprises`}
+                  href={`/${locale}/dashboard/${userType}/clients`}
                   passHref
                   onClick={handleLinkClick}
                 >
                   <Button variant="text" className="w-full justify-start gap-2">
-                    <Building className="h-4 w-4" />
-                    {t('navigation.enterprises')}
+                    <Users className="h-4 w-4" />
+                    {t('navigation.clients')}
                   </Button>
                 </Link>
                 {/* <Link

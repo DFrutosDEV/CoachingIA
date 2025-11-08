@@ -31,6 +31,7 @@ import {
 import { Select } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 export function AddUserCard() {
   const t = useTranslations('common.dashboard.addUserCard');
@@ -40,8 +41,11 @@ export function AddUserCard() {
     name: '',
     lastName: '',
     email: '',
+    enterpriseName: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const user = useAppSelector(state => state.auth.user);
+  const userRole = user?.role?.name;
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -53,6 +57,11 @@ export function AddUserCard() {
   const handleSubmit = async () => {
     if (!formData.name || !formData.lastName || !formData.email || !profile) {
       toast.error(t('errors.completeFields'));
+      return;
+    }
+
+    if (profile === '4' && !formData.enterpriseName.trim()) {
+      toast.error(t('errors.enterpriseNameRequired'));
       return;
     }
 
@@ -68,6 +77,10 @@ export function AddUserCard() {
           lastName: formData.lastName,
           email: formData.email,
           profile: profile,
+          enterpriseId: user?.enterprise?._id,
+          ...(profile === '4' && {
+            enterpriseName: formData.enterpriseName.trim(),
+          }),
         }),
       });
 
@@ -75,7 +88,7 @@ export function AddUserCard() {
 
       if (data.success) {
         toast.success(t('success.userCreated'));
-        setFormData({ name: '', lastName: '', email: '' });
+        setFormData({ name: '', lastName: '', email: '', enterpriseName: '' });
         setShowCoachDialog(false);
       } else {
         toast.error(data.error || t('errors.createUser'));
@@ -181,21 +194,40 @@ export function AddUserCard() {
                     <SelectValue placeholder={t('modal.fields.profilePlaceholder')} />
                   </SelectTrigger>
                   <SelectContent className="bg-background">
-                    <SelectItem className="bg-background-hover" value="1">
-                      {t('modal.profiles.admin')}
-                    </SelectItem>
                     <SelectItem className="bg-background-hover" value="2">
                       {t('modal.profiles.coach')}
                     </SelectItem>
                     <SelectItem className="bg-background-hover" value="3">
                       {t('modal.profiles.client')}
                     </SelectItem>
-                    <SelectItem className="bg-background-hover" value="4">
-                      {t('modal.profiles.enterprise')}
-                    </SelectItem>
+                    {userRole === 'admin' &&
+                      <>
+                        <SelectItem className="bg-background-hover" value="1">
+                          {t('modal.profiles.admin')}
+                        </SelectItem>
+                        <SelectItem className="bg-background-hover" value="4">
+                          {t('modal.profiles.enterprise')}
+                        </SelectItem>
+                      </>}
                   </SelectContent>
                 </Select>
               </div>
+              {profile === '4' && (
+                <div className="grid gap-2">
+                  <Label htmlFor="enterprise-name">
+                    {t('modal.fields.enterpriseName')}{' '}
+                    <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="enterprise-name"
+                    placeholder={t('modal.fields.enterpriseNamePlaceholder')}
+                    value={formData.enterpriseName}
+                    onChange={e =>
+                      handleInputChange('enterpriseName', e.target.value)
+                    }
+                  />
+                </div>
+              )}
             </div>
             <DialogFooter className="flex justify-end gap-2">
               <Button

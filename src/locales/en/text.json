@@ -114,8 +114,8 @@
       "subtitle": "Tools and resources to manage the platform."
     },
     "reportsPage": {
-      "title": "Reports Management",
-      "subtitle": "Review and manage reports submitted by users and coaches.",
+      "title": "Tickets Management",
+      "subtitle": "Review and manage tickets submitted by users and coaches.",
       "filters": "Filters",
       "status": "Status",
       "category": "Category",
@@ -138,16 +138,16 @@
       "high": "High",
       "medium": "Medium",
       "low": "Low",
-      "reports": "Reports",
-      "loadingReports": "Loading reports...",
+      "reports": "Tickets",
+      "loadingReports": "Loading tickets...",
       "showingReports": "Showing",
       "of": "of",
-      "reportsCount": "reports",
-      "errorLoadingReports": "Error loading reports",
-      "connectionError": "Connection error loading reports",
-      "errorResponding": "Error responding to report",
-      "errorClosing": "Error closing report",
-      "errorResolving": "Error resolving report"
+      "reportsCount": "tickets",
+      "errorLoadingReports": "Error loading tickets",
+      "connectionError": "Connection error loading tickets",
+      "errorResponding": "Error responding to ticket",
+      "errorClosing": "Error closing ticket",
+      "errorResolving": "Error resolving ticket"
     },
     "enterprisesPage": {
       "title": "Enterprises",
@@ -171,7 +171,7 @@
       "activeCoaches": "Active Coaches",
       "inactiveCoaches": "Inactive Coaches",
       "newCoaches": "New Coaches",
-      "totalClients": "Total Clients",
+      "totalClients": "Total Coachees",
       "registeredCoaches": "Registered coaches",
       "activeInPlatform": "Active on the platform",
       "temporarilyInactive": "Temporarily inactive",
@@ -180,13 +180,13 @@
       "perCoach": "per coach"
     },
     "clientsPage": {
-      "title": "Clients",
-      "subtitle": "Manage and monitor all clients registered on the platform.",
-      "loading": "Loading clients...",
-      "errorLoading": "Error fetching clients",
+      "title": "Coachees",
+      "subtitle": "Manage and monitor all coachees registered on the platform.",
+      "loading": "Loading coachees...",
+      "errorLoading": "Error fetching coachees",
       "unknownError": "Unknown error",
-      "errorToast": "An error occurred while loading clients",
-      "notAuthenticated": "User not authenticated",
+      "errorToast": "An error occurred while loading coachees",
+      "notAuthenticated": "Coachee not authenticated",
       "noAdminPermissions": "User does not have admin permissions",
       "retry": "Retry"
     },
@@ -198,7 +198,7 @@
   },
   "dashboardCoach": {
     "welcome": "Welcome",
-    "subtitle": "Here’s an overview of your sessions and clients.",
+    "subtitle": "Here’s an overview of your sessions and coachees.",
     "loading": "Loading dashboard data...",
     "error": "Error",
     "retry": "Retry",
@@ -212,12 +212,12 @@
       "subtitle": "Tools and resources to manage your coaching practice."
     },
     "clientsPage": {
-      "title": "My Clients",
-      "subtitle": "Manage your clients and their progress within the coaching program.",
-      "loading": "Loading clients...",
-      "errorLoading": "Error fetching clients",
+      "title": "My Coachees",
+      "subtitle": "Manage your coachees and their progress within the coaching program.",
+      "loading": "Loading coachees...",
+      "errorLoading": "Error fetching coachees",
       "unknownError": "Unknown error",
-      "errorToast": "An error occurred while loading clients"
+      "errorToast": "An error occurred while loading coachees"
     },
     "calendarPage": {
       "title": "Calendar"
@@ -271,7 +271,7 @@
       "noGoalsAssigned": "No goals assigned yet",
       "day": "Day:",
       "by": "By:",
-      "pdaDocument": "PDA Document",
+      "pdaDocument": "View Report",
       "fileSize": "Size",
       "uploadedOn": "Uploaded on",
       "download": "Download",
@@ -289,16 +289,16 @@
       "subtitle": "Tools and resources to manage your company."
     },
     "reportsPage": {
-      "title": "Reports Management",
-      "subtitle": "Review and manage reports submitted by users and coaches."
+      "title": "Tickets Management",
+      "subtitle": "Review and manage tickets submitted by users and coaches."
     },
     "coachesPage": {
       "title": "Coaches",
       "subtitle": "Manage and monitor the coaches registered on the platform."
     },
     "clientsPage": {
-      "title": "Clients",
-      "subtitle": "Manage and monitor the clients registered on the platform."
+      "title": "Coachees",
+      "subtitle": "Manage and monitor the coachees registered on the platform."
     },
     "analyticsPage": {
       "title": "Platform Analytics",

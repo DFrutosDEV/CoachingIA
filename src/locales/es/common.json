@@ -8,9 +8,9 @@
       "whatIAmWorkingOn": "En qué estoy trabajando",
       "tasksToDo": "Tareas a realizar",
       "resources": "Recursos",
-      "myClients": "Mis Clientes",
+      "myClients": "Mis Coachees",
       "sessions": "Sesiones",
-      "clients": "Clientes",
+      "clients": "Coachees",
       "coaches": "Coaches",
       "enterprises": "Empresas",
       "analytics": "Analíticas",
@@ -36,9 +36,9 @@
         "startVideoCall": "Iniciar videollamada"
       },
       "activeClients": {
-        "title": "Clientes Activos",
-        "assignedClients": "Clientes asignados",
-        "viewClients": "Ver clientes"
+        "title": "Coachees Activos",
+        "assignedClients": "Coachees asignados",
+        "viewClients": "Ver coachees"
       },
       "scheduledSessions": {
         "title": "Sesiones Programadas",
@@ -54,13 +54,13 @@
         "jitsi": "Jitsi"
       },
       "recentClients": {
-        "title": "Clientes Recientes",
-        "noClientsAssigned": "No tienes clientes asignados.",
-        "noClientsMessage": "Sin clientes asignados",
-        "description": "Tus clientes más recientes y su progreso.",
+        "title": "Coachees Recientes",
+        "noClientsAssigned": "No tienes coachees asignados.",
+        "noClientsMessage": "Sin coachees asignados",
+        "description": "Tus coachees más recientes y su progreso.",
         "sessionsCount": "{sessions} sesiones",
         "profile": "Perfil",
-        "viewAllClients": "Ver todos los clientes"
+        "viewAllClients": "Ver todos los coachees"
       }
     },
     "points": {
@@ -73,8 +73,8 @@
       }
     },
     "clientsList": {
-      "title": "Lista de Clientes",
-      "description": "Gestiona tus clientes y su información",
+      "title": "Lista de Coachees",
+      "description": "Gestiona tus coachees y su información",
       "search": {
         "placeholder": "Buscar por nombre, email o enfoque...",
         "filter": "Filtrar",
@@ -85,7 +85,7 @@
         "inactive": "Inactivos"
       },
       "table": {
-        "client": "Cliente",
+        "client": "Coachee",
         "status": "Estado",
         "nextSession": "Próxima Sesión",
         "actions": "Acciones",
@@ -93,9 +93,9 @@
         "quickActions": "Acciones Rápidas",
         "deactivate": "Dar de baja",
         "message": "Mensaje",
-        "viewPDA": "Ver PDA",
-        "noClientsFound": "No se encontraron clientes.",
-        "showingResults": "Mostrando {start} a {end} de {total} clientes",
+        "viewPDA": "Ver Reporte",
+        "noClientsFound": "No se encontraron coachees.",
+        "showingResults": "Mostrando {start} a {end} de {total} coachees",
         "previous": "Anterior",
         "next": "Siguiente",
         "toSchedule": "Por programar"
@@ -107,10 +107,10 @@
       }
     },
     "clientDetail": {
-      "title": "Detalle del Cliente",
+      "title": "Detalle del Coachee",
       "actions": {
         "message": "Mensaje",
-        "viewPDA": "Ver PDA"
+        "viewPDA": "Ver Reporte"
       },
       "tabs": {
         "info": "Info",
@@ -132,7 +132,7 @@
         "noBiography": "Sin biografía"
       },
       "objectives": {
-        "title": "Objetivos del Cliente",
+        "title": "Objetivos del Coachee",
         "loading": "Cargando objetivos...",
         "active": "Activo",
         "completed": "Completado",
@@ -155,13 +155,13 @@
       }
     },
     "deleteClientModal": {
-      "title": "Dar de baja cliente",
+      "title": "Dar de baja coachee",
       "description": "¿Estás seguro de que quieres dar de baja a {clientName}? Esta acción marcará al cliente como eliminado pero no borrará sus datos permanentemente.",
       "cancel": "Cancelar",
       "processing": "Procesando...",
       "delete": "Dar de baja",
-      "success": "Cliente dado de baja exitosamente",
-      "error": "Error al dar de baja al cliente"
+      "success": "Coachee dado de baja exitosamente",
+      "error": "Error al dar de baja al coachee"
     },
     "calendar": {
       "title": "Calendario de Sesiones",
@@ -505,7 +505,17 @@
       "title": "Empresas Registradas",
       "total": "Total: {count} empresa{plural}",
       "plural": "s",
-      "singular": ""
+      "singular": "",
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      }
+    },
+    "enterpriseCard": {
+      "administrator": "Admin: {administrator}",
+      "email": "Correo electrónico: {email}",
+      "phone": "Teléfono: {phone}",
+      "coachesAndCoachees": "Coaches: {coaches} | Coachees: {coachees}"
     },
     "addUserCard": {
       "title": "Agregar nuevo usuario",
@@ -525,12 +535,14 @@
           "email": "Email",
           "emailPlaceholder": "email@ejemplo.com",
           "profile": "Perfil",
-          "profilePlaceholder": "Selecciona el perfil"
+          "profilePlaceholder": "Selecciona el perfil",
+          "enterpriseName": "Nombre de la empresa",
+          "enterpriseNamePlaceholder": "Ingresa el nombre de la empresa"
         },
         "profiles": {
           "admin": "Admin",
           "coach": "Coach",
-          "client": "Cliente",
+          "client": "Coachee",
           "enterprise": "Empresa"
         },
         "buttons": {
@@ -541,7 +553,8 @@
       },
       "errors": {
         "completeFields": "Por favor completa todos los campos requeridos",
-        "createUser": "Error al crear usuario"
+        "createUser": "Error al crear usuario",
+        "enterpriseNameRequired": "Ingresa el nombre de la empresa"
       },
       "success": {
         "userCreated": "Usuario creado exitosamente"
@@ -806,8 +819,8 @@
             "yes": "Sí",
             "no": "No"
           },
-          "pdaFile": "Archivo PDA",
-          "pdaFilePlaceholder": "Selecciona un archivo PDA",
+          "pdaFile": "Archivo Reporte",
+          "pdaFilePlaceholder": "Selecciona un archivo Reporte",
           "pdaFileButton": "Seleccionar archivo"
         }
       },
@@ -817,7 +830,7 @@
       },
       "errors": {
         "generateGoals": "Error al generar objetivos",
-        "uploadPda": "Error al cargar archivo PDA"
+        "uploadPda": "Error al cargar reporte"
       },
       "success": {
         "goalsGenerated": "30 objetivos generados exitosamente",

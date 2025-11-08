@@ -10,6 +10,10 @@ export interface IGoal extends Document {
   isCompleted: boolean;
   feedbackId?: ObjectId;
   isDeleted: boolean;
+  aforism?: string;
+  tiempoEstimado?: string;
+  ejemplo?: string;
+  indicadorExito?: string;
 }
 
 const GoalSchema: Schema = new Schema(
@@ -58,6 +62,30 @@ const GoalSchema: Schema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    aforism: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: [300, 'El aforismo no puede exceder 300 caracteres'],
+    },
+    tiempoEstimado: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: [100, 'El tiempo estimado no puede exceder 100 caracteres'],
+    },
+    ejemplo: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: [500, 'El ejemplo no puede exceder 500 caracteres'],
+    },
+    indicadorExito: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: [500, 'El indicador de éxito no puede exceder 500 caracteres'],
     },
   },
   {

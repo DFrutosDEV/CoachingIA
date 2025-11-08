@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Sparkles, AlertCircle, CheckCircle, Upload, FileText } from 'lucide-react';
 import { Goal } from '@/types';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface AIGoalsGeneratorProps {
   isOpen: boolean;
@@ -37,6 +37,7 @@ export function AIGoalsGenerator({
   onGoalsGenerated,
 }: AIGoalsGeneratorProps) {
   const t = useTranslations('common.dashboard.aiGoalsGenerator');
+  const locale = useLocale();
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiStatus, setAiStatus] = useState<{
     provider: string;
@@ -131,6 +132,7 @@ export function AIGoalsGenerator({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept-Language': locale,
         },
         body: JSON.stringify({
           objectiveId: objectiveId,

@@ -1,10 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IEmail extends Document {
-  to: string;
+  to: string[];
   subject: string;
-  html: string;
-  createdAt: Date;
+  data: string;
+  template: string;
   sendDate: Date;
   status: 'pending' | 'sent' | 'failed';
   errorMessage?: string;
@@ -16,10 +16,8 @@ export interface IEmail extends Document {
 const EmailSchema: Schema = new Schema(
   {
     to: {
-      type: String,
-      required: [true, 'Email destinatario es requerido'],
-      lowercase: true,
-      trim: true,
+      type: [String],
+      required: [true, 'Emails destinatarios son requeridos'],
       match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido'],
     },
     subject: {
@@ -28,9 +26,26 @@ const EmailSchema: Schema = new Schema(
       trim: true,
       maxlength: [200, 'El asunto no puede exceder 200 caracteres'],
     },
-    html: {
+    data: {
       type: String,
-      required: [true, 'Contenido HTML es requerido'],
+      required: [true, 'Datos JSON es requerido'],
+    },
+    template: {
+      type: String,
+      required: [true, 'Plantilla es requerida'],
+      trim: true,
+      enum: ['welcome',
+        'appointment-confirmation',
+        'appointment-reminder',
+        'appointment-cancellation',
+        'appointment-rescheduling',
+        'feedback-request',
+        'newsletter',
+        'coaching-session-follow-up',
+        'payment-confirmation',
+        'payment-failed',
+        'course-enrollment',
+        'daily-objective'],
     },
     createdAt: {
       type: Date,

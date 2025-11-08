@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Email from '@/models/Email';
-import { sendEmailWithNodemailer } from '@/lib/services/email-service';
+import { sendEmailWithNodemailer, renderTemplateFromData } from '@/lib/services/email-service';
 
 // Función para verificar autorización del cron job
 const verifyCronAuth = (request: NextRequest): boolean => {
@@ -71,25 +71,42 @@ export async function POST(request: NextRequest) {
 
       try {
         console.log(
-          `📤 Enviando email ${processedCount}/${pendingEmails.length} a ${emailDoc.to}`
+          `📤 Enviando email ${processedCount}/${pendingEmails.length} a ${emailDoc.to.join(', ')}`
         );
 
-        // Intentar enviar el email
-        const result = await sendEmailWithNodemailer({
-          to: emailDoc.to,
-          subject: emailDoc.subject,
-          html: emailDoc.html,
-        });
+        // Renderizar el template con los datos JSON
+        const html = await renderTemplateFromData(
+          `${emailDoc.template}.html`,
+          emailDoc.data
+        );
 
-        if (result.success) {
+        // Enviar a cada destinatario
+        const emailResults = await Promise.allSettled(
+          emailDoc.to.map((toEmail: string) =>
+            sendEmailWithNodemailer({
+              to: toEmail,
+              subject: emailDoc.subject,
+              html,
+            })
+          )
+        );
+
+        // Verificar si todos los envíos fueron exitosos
+        const allSuccessful = emailResults.every(
+          result => result.status === 'fulfilled' && result.value.success
+        );
+
+        if (allSuccessful) {
           // Marcar como enviado
           emailDoc.markAsSent();
           await emailDoc.save();
           successCount++;
 
-          console.log(`✅ Email enviado exitosamente a ${emailDoc.to}`);
+          console.log(
+            `✅ Email enviado exitosamente a ${emailDoc.to.join(', ')}`
+          );
         } else {
-          throw new Error(result.error || 'Error desconocido al enviar email');
+          throw new Error('Uno o más envíos fallaron');
         }
       } catch (error) {
         errorCount++;
@@ -97,7 +114,7 @@ export async function POST(request: NextRequest) {
           error instanceof Error ? error.message : 'Error desconocido';
 
         console.error(
-          `❌ Error enviando email a ${emailDoc.to}:`,
+          `❌ Error enviando email a ${emailDoc.to.join(', ')}:`,
           errorMessage
         );
 

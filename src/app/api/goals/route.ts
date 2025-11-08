@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
+import Objective from '@/models/Objective';
+import Profile from '@/models/Profile';
+import { scheduleDailyObjectiveEmail } from '@/lib/services/email-service';
 
 // POST /api/goals - Crear goals (múltiples o individual)
 export async function POST(request: NextRequest) {
@@ -60,9 +63,56 @@ export async function POST(request: NextRequest) {
         ).toISOString(),
         isCompleted: false,
         isDeleted: false,
+        aforism: goal.aforism || '',
+        tiempoEstimado: goal.tiempoEstimado || '',
+        ejemplo: goal.ejemplo || '',
+        indicadorExito: goal.indicadorExito || '',
       }));
 
       const createdGoals = await Goal.insertMany(goalsToCreate);
+
+      // Programar emails diarios para cada goal
+      try {
+        // Obtener información del objetivo y cliente
+        const objective = await Objective.findById(objectiveId);
+        const client = await Profile.findById(clientId);
+
+        if (objective && client && client.email) {
+          // Programar email para cada goal creado
+          for (let i = 0; i < createdGoals.length; i++) {
+            const goal = createdGoals[i];
+            const sendDate = new Date(goal.date);
+
+            // Configurar hora de envío (por ejemplo, 9 AM hora local)
+            sendDate.setHours(9, 0, 0, 0);
+
+            const emailResult = await scheduleDailyObjectiveEmail(
+              client.email,
+              `${client.firstName} ${client.lastName}`,
+              objective.title,
+              goal.description,
+              i + 1, // currentDay
+              createdGoals.length, // totalDays
+              0, // completedGoals (al inicio, 0 completados)
+              createdGoals.length, // totalGoals
+              sendDate,
+              goal.aforism,
+              goal.tiempoEstimado,
+              goal.ejemplo,
+              goal.indicadorExito
+            );
+
+            if (!emailResult.success) {
+              console.error(`Error programando email para goal ${goal._id}:`, emailResult.error);
+            }
+          }
+
+          console.log(`📧 ${createdGoals.length} emails diarios programados exitosamente`);
+        }
+      } catch (emailError) {
+        console.error('Error programando emails diarios:', emailError);
+        // No fallar la creación de goals si hay error en los emails
+      }
 
       return NextResponse.json({
         success: true,

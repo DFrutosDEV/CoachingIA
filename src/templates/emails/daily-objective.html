@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tu Objetivo del Día - {{companyName}}</title>
+  <style>
+    /* Reset styles */
+    body,
+    table,
+    td,
+    p,
+    a,
+    li,
+    blockquote {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+
+    table,
+    td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+    }
+
+    /* Base styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333333;
+      background-color: #f4f4f4;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .content {
+      padding: 40px 30px;
+    }
+
+    .greeting {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .greeting h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+
+    .objective-card {
+      background: linear-gradient(135deg, #f8f9ff 0%, #fff5f5 100%);
+      border: 2px solid #667eea;
+      border-radius: 12px;
+      padding: 30px;
+      margin: 30px 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
+    }
+
+    .objective-card .objective-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .objective-card .objective-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .objective-card .objective-description {
+      font-size: 18px;
+      color: #495057;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .motivational-message {
+      background-color: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 25px 0;
+    }
+
+    .motivational-message p {
+      color: #2e7d32;
+      font-size: 16px;
+      margin: 0;
+      font-style: italic;
+    }
+
+    .action-buttons {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      margin: 10px;
+      font-size: 16px;
+    }
+
+    .button:hover {
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    }
+
+    .button-secondary {
+      background: #f8f9fa;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .button-secondary:hover {
+      background: #667eea;
+      color: #ffffff;
+    }
+
+    .info-box {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .info-box p {
+      color: #856404;
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .footer {
+      background-color: #f8f9fa;
+      padding: 30px 20px;
+      text-align: center;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .footer p {
+      margin: 5px 0;
+      color: #6c757d;
+      font-size: 14px;
+    }
+
+    .progress-indicator {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .progress-text {
+      color: #6c757d;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 100% !important;
+      }
+
+      .content {
+        padding: 20px 15px !important;
+      }
+
+      .header {
+        padding: 20px 15px !important;
+      }
+
+      .header h1 {
+        font-size: 24px !important;
+      }
+
+      .objective-card {
+        padding: 20px !important;
+      }
+
+      .objective-card .objective-title {
+        font-size: 22px !important;
+      }
+
+      .objective-card .objective-description {
+        font-size: 16px !important;
+      }
+
+      .button {
+        padding: 12px 24px !important;
+        font-size: 14px !important;
+        display: block;
+        margin: 10px auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+      <td align="center" style="background-color: #f4f4f4; padding: 20px 0">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container">
+          <!-- Header -->
+          <tr>
+            <td class="header">
+              <h1>{{companyName}}</h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td class="content">
+              <div class="greeting">
+                <h2>¡Hola, {{clientName}}! 👋</h2>
+                <p style="color: #6c757d; font-size: 16px">
+                  Aquí está tu objetivo para hoy
+                </p>
+              </div>
+
+              <!-- Progress Indicator -->
+              <div class="progress-indicator">
+                <p class="progress-text">
+                  📊 Progreso: {{completedGoals}} de {{totalGoals}} objetivos
+                  completados
+                </p>
+                <div style="text-align: center; font-size: 20px">
+                  {{progressBar}}
+                </div>
+              </div>
+
+              <!-- Objective Card -->
+              <div class="objective-card">
+                <div class="objective-icon">🎯</div>
+                <div class="objective-title">{{objectiveDescription}}</div>
+                <div style="margin-top: 20px; color: #6c757d; font-size: 14px">
+                  📅 Día {{currentDay}} de {{totalDays}}
+                </div>
+              </div>
+
+              <!-- Aforism -->
+              <div class="motivational-message">
+                <p>"{{aforism}}"</p>
+              </div>
+
+              <!-- Tiempo Estimado y Ejemplo -->
+              <div
+                style="display: flex; justify-content: space-between; margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                <div style="flex: 1; text-align: center; border-right: 1px solid #dee2e6;">
+                  <p style="margin: 0; font-size: 14px; color: #6c757d; margin-bottom: 5px;">🕒 Tiempo Estimado</p>
+                  <p style="margin: 0; font-weight: 600; color: #333; font-size: 16px;">{{tiempoEstimado}}</p>
+                </div>
+                <div style="flex: 2; text-align: center; margin-left: 15px;">
+                  <p style="margin: 0; font-size: 14px; color: #6c757d; margin-bottom: 5px;">💡 Sugerencia Práctica</p>
+                  <p style="margin: 0; font-weight: 600; color: #333; font-size: 16px;">{{ejemplo}}</p>
+                </div>
+              </div>
+
+              <!-- Indicador de Éxito -->
+              <div
+                style="background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2e7d32; margin-bottom: 10px;">🎯 Cómo
+                  Medir el Éxito</p>
+                <p style="margin: 0; font-size: 14px; color: #2e7d32;">{{indicadorExito}}</p>
+              </div>
+
+              <!-- Info Box -->
+              <div class="info-box">
+                <p style="margin: 0">
+                  <strong>💡 Tip:</strong> Marca este objetivo como completado
+                  desde la app para seguir tu progreso
+                </p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="action-buttons">
+                <a href="{{dashboardUrl}}" class="button">Ver en la App</a>
+                <a href="{{objectivesUrl}}" class="button button-secondary">Todos mis Objetivos</a>
+              </div>
+
+              <p style="
+                    margin-top: 30px;
+                    color: #6c757d;
+                    font-size: 14px;
+                    text-align: center;
+                  ">
+                ¿Necesitas ayuda? Contáctanos, estamos aquí para apoyarte en tu
+                viaje de crecimiento personal.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="footer">
+              <p><strong>{{companyName}}</strong></p>
+              <p>{{companyAddress}}</p>
+              <p>Email: {{companyEmail}} | Tel: {{companyPhone}}</p>
+              <p>
+                <a href="{{privacyUrl}}" style="color: #6c757d; text-decoration: none">Política de privacidad</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

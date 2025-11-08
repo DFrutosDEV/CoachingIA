@@ -8,9 +8,9 @@
       "whatIAmWorkingOn": "What I'm Working On",
       "tasksToDo": "Tasks to Do",
       "resources": "Resources",
-      "myClients": "My Clients",
+      "myClients": "My Coachees",
       "sessions": "Sessions",
-      "clients": "Clients",
+      "clients": "Coachees",
       "coaches": "Coaches",
       "enterprises": "Enterprises",
       "analytics": "Analytics",
@@ -36,9 +36,9 @@
         "startVideoCall": "Start video call"
       },
       "activeClients": {
-        "title": "Active Clients",
-        "assignedClients": "Assigned clients",
-        "viewClients": "View clients"
+        "title": "Active Coachees",
+        "assignedClients": "Assigned coachees",
+        "viewClients": "View coachees"
       },
       "scheduledSessions": {
         "title": "Scheduled Sessions",
@@ -54,13 +54,13 @@
         "jitsi": "Jitsi"
       },
       "recentClients": {
-        "title": "Recent Clients",
-        "noClientsAssigned": "You don't have clients assigned.",
-        "noClientsMessage": "No clients assigned",
-        "description": "Your most recent clients and their progress.",
+        "title": "Recent Coachees",
+        "noClientsAssigned": "You don't have coachees assigned.",
+        "noClientsMessage": "No coachees assigned",
+        "description": "Your most recent coachees and their progress.",
         "sessionsCount": "{sessions} sessions",
         "profile": "Profile",
-        "viewAllClients": "View all clients"
+        "viewAllClients": "View all coachees"
       }
     },
     "points": {
@@ -73,8 +73,8 @@
       }
     },
     "clientsList": {
-      "title": "Clients List",
-      "description": "Manage your clients and their information",
+      "title": "Coachees List",
+      "description": "Manage your coachees and their information",
       "search": {
         "placeholder": "Search by name, email or focus...",
         "filter": "Filter",
@@ -85,7 +85,7 @@
         "inactive": "Inactive"
       },
       "table": {
-        "client": "Client",
+        "client": "Coachee",
         "status": "Status",
         "nextSession": "Next Session",
         "actions": "Actions",
@@ -93,9 +93,9 @@
         "quickActions": "Quick Actions",
         "deactivate": "Deactivate",
         "message": "Message",
-        "viewPDA": "View PDA",
-        "noClientsFound": "No clients found.",
-        "showingResults": "Showing {start} to {end} of {total} clients",
+        "viewPDA": "View Report",
+        "noClientsFound": "No coachees found.",
+        "showingResults": "Showing {start} to {end} of {total} coachees",
         "previous": "Previous",
         "next": "Next",
         "toSchedule": "To schedule"
@@ -107,10 +107,10 @@
       }
     },
     "clientDetail": {
-      "title": "Client Detail",
+      "title": "Coachee Detail",
       "actions": {
         "message": "Message",
-        "viewPDA": "View PDA"
+        "viewPDA": "View Report"
       },
       "tabs": {
         "info": "Info",
@@ -132,7 +132,7 @@
         "noBiography": "No biography"
       },
       "objectives": {
-        "title": "Client Objectives",
+        "title": "Coachee Objectives",
         "loading": "Loading objectives...",
         "active": "Active",
         "completed": "Completed",
@@ -155,13 +155,13 @@
       }
     },
     "deleteClientModal": {
-      "title": "Deactivate client",
-      "description": "Are you sure you want to deactivate {clientName}? This action will mark the client as deleted but will not permanently delete their data.",
+      "title": "Deactivate coachee",
+      "description": "Are you sure you want to deactivate {clientName}? This action will mark the coachee as deleted but will not permanently delete their data.",
       "cancel": "Cancel",
       "processing": "Processing...",
       "delete": "Deactivate",
-      "success": "Client deactivated successfully",
-      "error": "Error deactivating client"
+      "success": "Coachee deactivated successfully",
+      "error": "Error deactivating coachee"
     },
     "calendar": {
       "title": "Sessions Calendar",
@@ -171,7 +171,7 @@
       "month": "Month",
       "noDescription": "No additional description.",
       "sessionDetails": {
-        "client": "Client:",
+        "client": "Coachee:",
         "coach": "Coach:",
         "objective": "Objective:",
         "time": "Time:",
@@ -200,7 +200,7 @@
     },
     "notificationCard": {
       "title": "Notifications",
-      "description": "Send notifications to your clients about sessions, reminders or important information.",
+      "description": "Send notifications to your coachees about sessions, reminders or important information.",
       "features": {
         "sessionReminders": "Send session reminders",
         "scheduleChanges": "Notify schedule changes",
@@ -211,7 +211,7 @@
         "title": "Create Notification",
         "description": "Send a notification to {userType} system users",
         "massNotifications": "Mass Notifications",
-        "notifyAllClients": "Notify all my clients",
+        "notifyAllClients": "Notify all my coachees",
         "notifyAllCoaches": "Notify all coaches",
         "notifyAllUsers": "Notify all users",
         "orSelectIndividually": "Or select individually",
@@ -505,7 +505,17 @@
       "title": "Registered Enterprises",
       "total": "Total: {count} enterprise{plural}",
       "plural": "s",
-      "singular": ""
+      "singular": "",
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "enterpriseCard": {
+      "administrator": "Admin: {administrator}",
+      "email": "Email: {email}",
+      "phone": "Phone: {phone}",
+      "coachesAndCoachees": "Coaches: {coaches} | Coachees: {coachees}"
     },
     "addUserCard": {
       "title": "Add new user",
@@ -525,12 +535,14 @@
           "email": "Email",
           "emailPlaceholder": "email@example.com",
           "profile": "Profile",
-          "profilePlaceholder": "Select profile"
+          "profilePlaceholder": "Select profile",
+          "enterpriseName": "Enterprise Name",
+          "enterpriseNamePlaceholder": "Enter the enterprise name"
         },
         "profiles": {
           "admin": "Admin",
           "coach": "Coach",
-          "client": "Client",
+          "client": "Coachee",
           "enterprise": "Enterprise"
         },
         "buttons": {
@@ -541,7 +553,8 @@
       },
       "errors": {
         "completeFields": "Please complete all required fields",
-        "createUser": "Error creating user"
+        "createUser": "Error creating user",
+        "enterpriseNameRequired": "Please enter the enterprise name"
       },
       "success": {
         "userCreated": "User created successfully"
@@ -817,7 +830,7 @@
       },
       "errors": {
         "generateGoals": "Error generating goals",
-        "uploadPda": "Error uploading PDA file"
+        "uploadPda": "Error uploading report"
       },
       "success": {
         "goalsGenerated": "30 goals generated successfully",

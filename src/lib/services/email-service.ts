@@ -173,6 +173,115 @@ export const sendAppointmentConfirmationEmail = async (
   );
 };
 
+// Función para renderizar HTML desde un template y datos JSON
+export const renderTemplateFromData = async (
+  templateName: string,
+  dataJson: string
+): Promise<string> => {
+  try {
+    const template = readTemplate(templateName);
+    const data = JSON.parse(dataJson);
+
+    // Combinar datos con variables globales de la empresa
+    const allVariables = {
+      ...data,
+      companyName: process.env.NEXT_PUBLIC_APP_NAME || 'CoachingIA',
+      companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
+      companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
+      companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
+      companyWebsite: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      objectivesUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/objectives`,
+      privacyUrl: process.env.NEXT_PUBLIC_APP_PRIVACY_URL || '',
+      unsubscribeUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings`,
+    };
+
+    return processTemplate(template, allVariables);
+  } catch (error) {
+    console.error(`Error renderizando template ${templateName}:`, error);
+    throw new Error(`Error procesando template: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+  }
+};
+
+// Función para programar email diario de objetivo
+export const scheduleDailyObjectiveEmail = async (
+  clientEmail: string,
+  clientName: string,
+  objectiveTitle: string,
+  objectiveDescription: string,
+  currentDay: number,
+  totalDays: number,
+  completedGoals: number,
+  totalGoals: number,
+  sendDate: Date,
+  aforism?: string,
+  tiempoEstimado?: string,
+  ejemplo?: string,
+  indicadorExito?: string
+) => {
+  try {
+    const connectDB = (await import('@/lib/mongodb')).default;
+    const Email = (await import('@/models/Email')).default;
+
+    await connectDB();
+
+    // Generar barra de progreso simple
+    const progressPercentage = Math.round((completedGoals / totalGoals) * 100);
+    const progressBar = '█'.repeat(Math.floor(progressPercentage / 10)) +
+      '░'.repeat(10 - Math.floor(progressPercentage / 10));
+
+    // Preparar datos JSON para el template
+    const templateData = {
+      clientName,
+      objectiveTitle,
+      objectiveDescription,
+      currentDay: currentDay.toString(),
+      totalDays: totalDays.toString(),
+      completedGoals: completedGoals.toString(),
+      totalGoals: totalGoals.toString(),
+      progressBar,
+      aforism: aforism || '',
+      tiempoEstimado: tiempoEstimado || '',
+      ejemplo: ejemplo || '',
+      indicadorExito: indicadorExito || '',
+    };
+
+    // Crear el email en la base de datos
+    const email = new Email({
+      to: [clientEmail],
+      subject: `🎯 Tu Objetivo del Día - ${objectiveTitle}`,
+      template: 'daily-objective',
+      data: JSON.stringify(templateData),
+      sendDate,
+      status: 'pending',
+      maxRetries: 3,
+    });
+
+    const savedEmail = await email.save();
+
+    console.log(
+      `📅 Email de objetivo diario programado para ${sendDate.toISOString()}: ${clientEmail}`
+    );
+
+    return {
+      success: true,
+      data: {
+        id: savedEmail._id,
+        to: savedEmail.to,
+        subject: savedEmail.subject,
+        sendDate: savedEmail.sendDate,
+        status: savedEmail.status,
+      },
+    };
+  } catch (error) {
+    console.error('Error programando email de objetivo diario:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+    };
+  }
+};
+
 // Función para verificar la configuración de email
 export const checkEmailConfig = async () => {
   try {

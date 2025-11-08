@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -6,39 +8,51 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 
 interface EnterpriseCardProps {
   name: string;
-  VAT: string;
-  codigoFiscal: string;
+  administrator: string;
+  logo: string;
+  address: string;
+  email: string;
+  phone: string;
   status: string;
-  cantidadCoaches: number;
-  cantidadClientes: number;
+  coaches: number;
+  coachees: number;
+  isActive: boolean;
 }
 
 export function EnterpriseCard({
   name,
-  VAT,
-  codigoFiscal,
+  administrator,
+  logo,
+  address,
+  email,
+  phone,
   status,
-  cantidadCoaches,
-  cantidadClientes,
+  coaches,
+  coachees,
+  isActive,
 }: EnterpriseCardProps) {
+  const t = useTranslations('common.dashboard.enterpriseCard');
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-col gap-2">
         <CardTitle>{name}</CardTitle>
-        <CardDescription>VAT: {VAT}</CardDescription>
-        <CardDescription>Código Fiscal: {codigoFiscal}</CardDescription>
+        <CardDescription>{t('administrator', { administrator })}</CardDescription>
+        <CardDescription>{t('email', { email })}</CardDescription>
+        <CardDescription>{t('phone', { phone })}</CardDescription>
         <CardDescription>
-          Cantidad de Coaches: {cantidadCoaches} | Cantidad de Clientes:{' '}
-          {cantidadClientes}
+          {t('coachesAndCoachees', {
+            coaches: coaches,
+            coachees: coachees,
+          })}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Badge variant={status === 'Activo' ? 'active' : 'inactive'}>
-          {status}
-        </Badge>
+        <Badge variant={isActive ? 'active' : 'inactive'}>{status}</Badge>
       </CardContent>
     </Card>
   );

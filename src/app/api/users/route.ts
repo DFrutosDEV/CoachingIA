@@ -54,11 +54,11 @@ export async function GET(request: NextRequest) {
       total: profiles.length,
     });
   } catch (error) {
-    console.error('Error obteniendo usuarios:', error);
+    console.error('Error getting users:', error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Error interno del servidor',
+        error: 'Internal server error',
       },
       { status: 500 }
     );
@@ -71,14 +71,14 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { name, lastName, email, profile } = body;
+    const { name, lastName, email, profile, enterpriseName, enterpriseId } = body;
 
     // Validaciones básicas
     if (!name || !lastName || !email || !profile) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Nombre, apellidos, email y perfil son requeridos',
+          error: 'Name, last name, email and profile are required',
         },
         { status: 400 }
       );
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Ya existe un usuario con este email',
+          error: 'There is already a user with this email',
         },
         { status: 409 }
       );
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Perfil no válido',
+          error: 'Profile not valid',
         },
         { status: 400 }
       );
@@ -111,8 +111,18 @@ export async function POST(request: NextRequest) {
     // Si el perfil es empresa, crear una nueva empresa y guardar el ID de la empresa
     let empresaId: string | undefined;
     if (profile === '4') {
+      if (!enterpriseName || typeof enterpriseName !== 'string' || !enterpriseName.trim()) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Enterprise name is required',
+          },
+          { status: 400 }
+        );
+      }
+
       const nuevaEmpresa = new Enterprise({
-        name: name,
+        name: enterpriseName.trim(),
         email: email,
       });
 
@@ -145,7 +155,7 @@ export async function POST(request: NextRequest) {
       indexDashboard: [],
       clients: [],
       points: 0,
-      ...(profile === '4' && empresaId && { enterprise: empresaId }),
+      ...(profile === '4' && empresaId ? { enterprise: empresaId } : enterpriseId ? { enterprise: enterpriseId } : { enterprise: null }),
     });
 
     const perfilGuardado = await nuevoPerfil.save();

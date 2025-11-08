@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Enterprise from '@/models/Enterprise';
+import Profile from '@/models/Profile';
+import User from '@/models/User';
+import Role from '@/models/Role';
 
 // GET /api/admin/enterprises - Obtener todas las empresas
 export async function GET(request: NextRequest) {
@@ -10,11 +13,18 @@ export async function GET(request: NextRequest) {
     // Obtener todas las empresas no eliminadas
     const enterprises = await Enterprise.find({ isDeleted: false }).sort({
       createdAt: -1,
-    }); // Ordenar por fecha de creación, más recientes primero
+    }).lean(); // Ordenar por fecha de creación, más recientes primero
+
+    // Por cada empresa, agrego un nuevo atributo "administrator" con el nombre y apellido del primer administrador del profile
+    const roleEnterpriseId = await Role.findOne({ code: '4' });
+    const enterprisesWithAdministrator = await Promise.all(enterprises.map(async (enterprise) => {
+      const coacheAdmin = await Profile.findOne({ enterprise: enterprise._id, role: roleEnterpriseId._id })
+      return { ...enterprise, administrator: coacheAdmin?.name + ' ' + coacheAdmin?.lastName };
+    }));
 
     return NextResponse.json({
       success: true,
-      data: enterprises,
+      data: enterprisesWithAdministrator,
       count: enterprises.length,
     });
   } catch (error) {

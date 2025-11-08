@@ -49,6 +49,9 @@ export async function POST(request: NextRequest) {
       }
     } = body;
 
+    // Obtener el idioma del header Accept-Language o usar español por defecto
+    const locale = request.headers.get('Accept-Language') || 'es';
+
     if (!objectiveId) {
       return NextResponse.json(
         { error: 'Se requiere objectiveId' },
@@ -112,7 +115,8 @@ export async function POST(request: NextRequest) {
       configFile: objective.configFile,
       coachNotes: [],
       aiConfig: aiConfig,
-      pdaContent: pdaContent
+      pdaContent: pdaContent,
+      locale: locale
     };
 
     // Verificar si AI está disponible
@@ -146,6 +150,10 @@ export async function POST(request: NextRequest) {
       createdAt: new Date(),
       updatedAt: new Date(),
       isDeleted: false,
+      aforism: goal.aforism,
+      tiempoEstimado: goal.tiempoEstimado,
+      ejemplo: goal.ejemplo,
+      indicadorExito: goal.indicadorExito,
     }));
 
     return NextResponse.json({

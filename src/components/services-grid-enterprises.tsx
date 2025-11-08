@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 interface Enterprise {
   _id: string;
   name: string;
+  administrator: string;
   logo?: string;
   address: string;
   phone: string;
@@ -77,7 +78,7 @@ export function ServicesGrid() {
     );
   }
 
-  if (enterprises.length === 0) {
+  if (!enterprises || enterprises?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
         <p className="text-muted-foreground">{t('noEnterprises')}</p>
@@ -96,7 +97,7 @@ export function ServicesGrid() {
           <h2 className="text-lg font-semibold">{t('title')}</h2>
           <p className="text-sm text-muted-foreground">
             {t('total', {
-              count: enterprises.length,
+              count: enterprises?.length || 0,
               plural: enterprises.length !== 1 ? t('plural') : t('singular')
             })}
           </p>
@@ -108,15 +109,19 @@ export function ServicesGrid() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {enterprises.map(enterprise => (
+        {enterprises?.map(enterprise => (
           <EnterpriseCard
             key={enterprise._id}
             name={enterprise.name}
-            VAT={enterprise.email} // Usando email como VAT temporalmente
-            codigoFiscal={enterprise.phone} // Usando phone como código fiscal temporalmente
+            administrator={enterprise.administrator}
+            logo={enterprise.logo || ''}
+            address={enterprise.address || ''}
+            email={enterprise.email || ''}
+            phone={enterprise.phone || ''}
             status={enterprise.active ? t('status.active') : t('status.inactive')}
-            cantidadCoaches={enterprise.coaches.length}
-            cantidadClientes={enterprise.employees.length}
+            coaches={enterprise.coaches?.length || 0}
+            coachees={enterprise.employees?.length || 0}
+            isActive={enterprise.active}
           />
         ))}
       </div>

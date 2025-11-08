@@ -5,6 +5,19 @@ interface AIMetrics {
   clientBio?: string;
   configFile?: ConfigFile[];
   coachNotes?: string[];
+  locale?: string;
+  pdaContent?: {
+    fileName: string;
+    content: string;
+    mimeType: string;
+  };
+  aiConfig?: {
+    voiceTone?: string;
+    difficultyLevel?: string;
+    challengeTypes?: string;
+    includeWeekends?: boolean;
+    pdaFileId?: string;
+  };
 }
 
 interface ConfigFile {
@@ -15,6 +28,10 @@ interface ConfigFile {
 interface GeneratedGoal {
   description: string;
   day: string;
+  aforism: string;
+  tiempoEstimado: string;
+  ejemplo: string;
+  indicadorExito: string;
   isCompleted: boolean;
 }
 
@@ -72,6 +89,20 @@ export class AIService {
     metrics: AIMetrics,
     numberOfGoals: number
   ): string {
+    // Preparar información adicional del PDA si existe
+    let pdaSection = '';
+    if (metrics.pdaContent) {
+      pdaSection = `
+    DOCUMENTO PDA ADICIONAL:
+    Archivo: ${metrics.pdaContent.fileName}
+    Tipo: ${metrics.pdaContent.mimeType}
+    Contenido:
+    ${metrics.pdaContent.content}
+    
+    IMPORTANTE: Usa la información del PDA para personalizar aún más los objetivos al perfil del cliente.
+`;
+    }
+
     return `Eres un coach profesional experto en desarrollo personal y profesional. 
     
     Necesito que generes ${numberOfGoals} objetivos específicos y medibles para un cliente basándote en la siguiente información:
@@ -84,6 +115,7 @@ export class AIService {
     - Formulario de configuración: ${metrics.configFile?.map(f => `${f.question}: ${f.answer}`).join(', ') || 'No disponible'}
     
     NOTAS DEL COACH: ${metrics.coachNotes?.join(', ') || 'No hay notas'}
+    ${pdaSection}    
     
     INSTRUCCIONES:
     1. Genera ${numberOfGoals} objetivos específicos, medibles y alcanzables
@@ -97,11 +129,23 @@ export class AIService {
       {
         "description": "Descripción del objetivo específico y medible",
         "day": "lunes",
+        "aforism": "Un aforismo motivacional relacionado con el objetivo (máx 200 caracteres)",
+        "tiempoEstimado": "Tiempo estimado en minutos o formato legible (ej: '15 min', '30 minutos')",
+        "ejemplo": "Ejemplo práctico y concreto de cómo aplicar el objetivo",
+        "indicadorExito": "Criterio claro para medir si el objetivo se completó exitosamente",
         "isCompleted": false
       }
     ]
 
-    Responde con el idioma del cliente.
+    IMPORTANTE: 
+    - El aforism debe ser inspirador y relacionado con el objetivo
+    - El tiempoEstimado debe ser realista y específico
+    - El ejemplo debe ser concreto y accionable
+    - El indicadorExito debe ser medible y claro
+    
+    IDIOMA: ${this.getLanguageName(metrics.locale || 'es')}
+    
+    CRÍTICO: Responde TODO (description, aforism, tiempoEstimado, ejemplo, indicadorExito, day) en ${this.getLanguageName(metrics.locale || 'es')}. Nunca mezcles idiomas.
     
     Responde SOLO con el JSON, sin texto adicional.`;
   }
@@ -128,6 +172,10 @@ export class AIService {
       const validGoals = goals.slice(0, expectedCount).map((goal, index) => ({
         description: goal.description || `Objetivo ${index + 1}`,
         day: goal.day || 'lunes',
+        aforism: goal.aforism || '',
+        tiempoEstimado: goal.tiempoEstimado || '',
+        ejemplo: goal.ejemplo || '',
+        indicadorExito: goal.indicadorExito || '',
         isCompleted: goal.isCompleted || false,
       }));
 
@@ -160,6 +208,10 @@ export class AIService {
     return Array.from({ length: count }, (_, index) => ({
       description: defaultGoals[index] || `Objetivo ${index + 1}`,
       day: days[index % days.length],
+      aforism: 'El éxito es la suma de pequeños esfuerzos repetidos día tras día.',
+      tiempoEstimado: '30 min',
+      ejemplo: 'Aplica este objetivo en tu rutina diaria para ver resultados.',
+      indicadorExito: 'Completaste todas las tareas relacionadas con este objetivo.',
       isCompleted: false,
     }));
   }
@@ -229,6 +281,17 @@ export class AIService {
       }
       return data.candidates[0].content.parts[0].text;
     }
+  }
+
+  // Función auxiliar para obtener el nombre del idioma
+  private getLanguageName(locale: string): string {
+    const languageMap: Record<string, string> = {
+      'es': 'Español',
+      'en': 'English',
+      'it': 'Italiano',
+      'fr': 'Français',
+    };
+    return languageMap[locale] || 'Español';
   }
 
   // Método para verificar si el AI está disponible
