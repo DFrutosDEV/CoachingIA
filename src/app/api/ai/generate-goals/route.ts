@@ -82,7 +82,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtener archivo PDA si existe
-    let pdaContent = null;
+    let pdaContent:
+      | {
+        fileName: string;
+        content: string;
+        mimeType: string;
+      }
+      | undefined;
     if (aiConfig.pdaFileId) {
       try {
         const pda = await Pda.findById(aiConfig.pdaFileId);
@@ -115,7 +121,7 @@ export async function POST(request: NextRequest) {
       configFile: objective.configFile,
       coachNotes: [],
       aiConfig: aiConfig,
-      pdaContent: pdaContent,
+      ...(pdaContent && { pdaContent }),
       locale: locale
     };
 

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import mongoose from 'mongoose';
 import { generateToken } from '@/lib/auth-jwt';
 import User from '@/models/User';
 import Role from '@/models/Role';
@@ -41,7 +40,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Credenciales inválidas',
+          message: 'Invalid credentials',
         },
         { status: 401 }
       );
@@ -67,7 +66,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Usuario sin perfil o rol válido',
+          message: 'User without valid profile or role',
         },
         { status: 401 }
       );
