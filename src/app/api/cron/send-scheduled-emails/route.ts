@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Email from '@/models/Email';
-import { sendEmailWithNodemailer, renderTemplateFromData } from '@/lib/services/email-service';
+import { sendEmailWithBrevo, renderTemplateFromData } from '@/lib/services/email-service';
 
 // Función para verificar autorización del cron job
 const verifyCronAuth = (request: NextRequest): boolean => {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         // Enviar a cada destinatario
         const emailResults = await Promise.allSettled(
           emailDoc.to.map((toEmail: string) =>
-            sendEmailWithNodemailer({
+            sendEmailWithBrevo({
               to: toEmail,
               subject: emailDoc.subject,
               html,

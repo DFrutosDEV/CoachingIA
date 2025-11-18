@@ -130,8 +130,8 @@ export async function POST(request: NextRequest) {
       empresaId = empresaGuardada._id.toString();
     }
 
-    // Usar contraseña por defecto
-    const defaultPassword = '!Password1';
+    // Crear una contraseña aleatoria de caracteres entre letras y números
+    const defaultPassword = Math.random().toString(36).substring(2, 5).toLowerCase() + Math.random().toString(36).substring(2, 10).toUpperCase() + Math.random().toString(36).substring(2, 5).toLowerCase();
 
     // Crear nuevo usuario
     const nuevoUsuario = new User({

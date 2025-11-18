@@ -8,7 +8,7 @@
     },
     "hero": {
       "title": "Transforma tu vida con coaching personalizado",
-      "description": "Conecta con coaches profesionales que te ayudarán a alcanzar tus metas personales y profesionales.",
+      "description": "Conecta con coaches profesionales que te ayudarán a alcanzar tus desafíos personales y profesionales.",
       "startButton": "Comenzar ahora",
       "learnMoreButton": "Conoce más"
     },
@@ -50,7 +50,7 @@
     },
     "process": {
       "title": "Tu camino hacia el éxito",
-      "description": "Un proceso simple y efectivo para alcanzar tus metas personales y profesionales.",
+      "description": "Un proceso simple y efectivo para alcanzar tus desafíos personales y profesionales.",
       "step1": {
         "title": "Personaliza tu perfil",
         "description": "Ingresa tus datos de sesión y completa tu perfil personal."
@@ -65,7 +65,7 @@
       },
       "step4": {
         "title": "Transforma tu vida",
-        "description": "Comienza tu viaje de transformación personal y alcanza tus metas."
+        "description": "Comienza tu viaje de transformación personal y alcanza tus desafíos."
       }
     },
     "cta": {
@@ -251,7 +251,7 @@
     },
     "progressPage": {
       "title": "Progreso",
-      "subtitle": "Progreso de tus objetivos y metas.",
+      "subtitle": "Progreso de tus objetivos y desafíos.",
       "loading": "Cargando objetivos...",
       "errorLoading": "Error al obtener los objetivos",
       "errorDetails": "Error al obtener los detalles del objetivo",
@@ -262,13 +262,13 @@
       "active": "Activo",
       "completed": "Completado",
       "progress": "Progreso",
-      "goals": "Metas",
+      "goals": "Desafíos",
       "notes": "Notas",
-      "noGoals": "No hay metas asignadas a este objetivo",
+      "noGoals": "No hay desafíos asignados a este objetivo",
       "noNotes": "No hay notas para este objetivo",
       "completedGoals": "de",
-      "goalsCompleted": "metas completadas",
-      "noGoalsAssigned": "Sin metas asignadas aún",
+      "goalsCompleted": "desafíos completados",
+      "noGoalsAssigned": "Sin desafíos asignados aún",
       "day": "Día:",
       "by": "Por:",
       "pdaDocument": "Ver Reporte",

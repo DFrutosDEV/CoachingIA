@@ -147,13 +147,13 @@ export interface User {
 export interface Role {
   _id: string;
   name: string;
-  client: string;
+  code: string;
 }
 
 export interface Profile {
   _id: string;
   user: string;
-  role: string;
+  role: Role;
   profilePicture: string;
   name: string;
   lastName: string;
@@ -163,7 +163,7 @@ export interface Profile {
   address: string;
   indexDashboard: number[];
   clients: string[];
-  enterprise: string;
+  enterprise: Enterprise;
 }
 
 export interface Enterprise {

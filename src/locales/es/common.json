@@ -138,7 +138,7 @@
         "completed": "Completado",
         "inProgress": "En Progreso",
         "progress": "Progreso: {progress}%",
-        "goals": "de {total} metas",
+        "goals": "de {total} desafíos",
         "created": "Creado: {date}",
         "coach": "Coach: {coach}",
         "noObjectives": "No hay objetivos definidos para este cliente"
@@ -361,14 +361,14 @@
         "monthlyPlan": "{percentage}% de tu plan mensual"
       },
       "goals": {
-        "title": "Metas",
-        "noGoals": "Sin metas asignadas",
-        "noGoalsDescription": "Tu coach te asignará metas específicas",
-        "completed": "Metas completadas",
+        "title": "Desafíos",
+        "noGoals": "Sin desafíos asignados",
+        "noGoalsDescription": "Tu coach te asignará desafíos específicos",
+        "completed": "Desafíos completados",
         "completionPercentage": "{percentage}% completado",
-        "recentGoals": "Metas recientes:",
-        "moreGoals": "+{count} más metas",
-        "viewGoals": "Ver metas"
+        "recentGoals": "Desafíos recientes:",
+        "moreGoals": "+{count} más desafíos",
+        "viewGoals": "Ver desafíos"
       },
       "upcomingSessions": {
         "title": "Próximas Sesiones",
@@ -379,10 +379,10 @@
       },
       "progress": {
         "title": "Tu Progreso",
-        "description": "Seguimiento de tus objetivos y metas.",
+        "description": "Seguimiento de tus objetivos y desafíos.",
         "noObjectives": "No tienes objetivos asignados",
-        "goalsCompleted": "{completedGoals}/{totalGoals} metas completadas",
-        "noGoalsAssigned": "Sin metas asignadas aún",
+        "goalsCompleted": "{completedGoals}/{totalGoals} desafíos completados",
+        "noGoalsAssigned": "Sin desafíos asignados aún",
         "viewFullReport": "Ver informe completo"
       }
     },
@@ -637,7 +637,7 @@
         "created": "Creado:",
         "progress": "Progreso:",
         "generalProgress": "Progreso general",
-        "goalsCompleted": "metas completadas"
+        "goalsCompleted": "desafíos completados"
       },
       "tabs": {
         "details": "Detalles",
@@ -646,8 +646,8 @@
         "sessions": "Sesiones"
       },
       "goals": {
-        "title": "Metas ({count})",
-        "newGoal": "Nueva Meta",
+        "title": "Desafíos ({count})",
+        "newGoal": "Nuevo Desafío",
         "form": {
           "description": "Descripción de la meta",
           "day": "Día (ej: Lunes, Martes, etc.)"
@@ -656,9 +656,9 @@
           "save": "Guardar",
           "cancel": "Cancelar"
         },
-        "loading": "Cargando metas...",
-        "empty": "No hay metas definidas para este objetivo",
-        "configWarning": "Completa el formulario de configuración en la pestaña \"Configuración\" para generar metas con IA",
+        "loading": "Cargando desafíos...",
+        "empty": "No hay desafíos definidos para este objetivo",
+        "configWarning": "Completa el formulario de configuración en la pestaña \"Configuración\" para generar desafíos con IA",
         "aiGenerate": "Generar con IA",
         "createManually": "Crear Manualmente",
         "configRequired": "Completa el formulario de configuración primero"
@@ -694,31 +694,31 @@
         "no": "NO"
       },
       "errors": {
-        "missingData": "Faltan datos necesarios para crear las metas",
-        "saveGoals": "Error al guardar las metas generadas",
+        "missingData": "Faltan datos necesarios para crear las desafíos",
+        "saveGoals": "Error al guardar las desafíos generadas",
         "completeFields": "Por favor completa todos los campos",
-        "createGoal": "Error al crear la meta",
-        "updateGoal": "Error al actualizar la meta",
-        "deleteGoal": "Error al eliminar la meta",
-        "updateGoalStatus": "Error al actualizar el estado de la meta",
+        "createGoal": "Error al crear el desafío",
+        "updateGoal": "Error al actualizar el desafío",
+        "deleteGoal": "Error al eliminar el desafío",
+        "updateGoalStatus": "Error al actualizar el estado del desafío",
         "updateSession": "Error al actualizar la sesión",
         "deleteSession": "Error al eliminar la sesión",
         "updateSessionStatus": "Error al actualizar el estado de la sesión",
-        "configRequired": "Debes completar el formulario de configuración antes de generar metas con IA"
+        "configRequired": "Debes completar el formulario de configuración antes de generar desafíos con IA"
       },
       "success": {
-        "goalCreated": "Meta creada exitosamente",
-        "goalUpdated": "Meta actualizada exitosamente",
-        "goalDeleted": "Meta eliminada exitosamente",
-        "goalMarkedPending": "Meta marcada como pendiente",
-        "goalMarkedCompleted": "Meta marcada como completada",
+        "goalCreated": "Desafío creado exitosamente",
+        "goalUpdated": "Desafío actualizado exitosamente",
+        "goalDeleted": "Desafío eliminado exitosamente",
+        "goalMarkedPending": "Desafío marcado como pendiente",
+        "goalMarkedCompleted": "Desafío marcado como completado",
         "sessionUpdated": "Sesión actualizada exitosamente",
         "sessionDeleted": "Sesión eliminada exitosamente",
         "sessionMarkedActive": "Sesión marcada como activa",
         "sessionMarkedCancelled": "Sesión marcada como cancelada"
       },
       "confirmations": {
-        "deleteGoal": "¿Estás seguro de que quieres eliminar esta meta?"
+        "deleteGoal": "¿Estás seguro de que quieres eliminar este desafío?"
       }
     },
     "objectiveConfig": {

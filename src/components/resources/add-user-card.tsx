@@ -45,7 +45,8 @@ export function AddUserCard() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const user = useAppSelector(state => state.auth.user);
-  const userRole = user?.role?.name;
+  const userCode = user?.role?.code;
+  console.log(userCode);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -67,14 +68,17 @@ export function AddUserCard() {
 
     setIsLoading(true);
     try {
+      // Se formatea el nombre y apellido para que empiecen por mayúscula
+      const formattedName = formData.name.charAt(0).toUpperCase() + formData.name.slice(1).toLowerCase();
+      const formattedLastName = formData.lastName.charAt(0).toUpperCase() + formData.lastName.slice(1).toLowerCase();
       const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          lastName: formData.lastName,
+          name: formattedName,
+          lastName: formattedLastName,
           email: formData.email,
           profile: profile,
           enterpriseId: user?.enterprise?._id,
@@ -191,7 +195,7 @@ export function AddUserCard() {
                 </Label>
                 <Select value={profile || ''} onValueChange={setProfile}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t('modal.fields.profilePlaceholder')} />
+                    <SelectValue placeholder={t('modal.fields.profilePlaceholder')}></SelectValue>
                   </SelectTrigger>
                   <SelectContent className="bg-background">
                     <SelectItem className="bg-background-hover" value="2">
@@ -200,7 +204,7 @@ export function AddUserCard() {
                     <SelectItem className="bg-background-hover" value="3">
                       {t('modal.profiles.client')}
                     </SelectItem>
-                    {userRole === 'admin' &&
+                    {userCode === '1' &&
                       <>
                         <SelectItem className="bg-background-hover" value="1">
                           {t('modal.profiles.admin')}

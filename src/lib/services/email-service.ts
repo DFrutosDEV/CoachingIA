@@ -1,4 +1,3 @@
-import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 
@@ -42,59 +41,58 @@ const readTemplate = (templateName: string): string => {
   }
 };
 
-// Crear transporter de Nodemailer
-const createTransporter = async () => {
-  const emailProvider = process.env.EMAIL_PROVIDER || 'ethereal';
-
-  if (emailProvider === 'gmail') {
-    // Configuración para Gmail SMTP
-    return nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD, // Usar contraseña de aplicación
-      },
-    });
-  } else {
-    // Configuración para Ethereal Email (pruebas locales)
-    const testAccount = await nodemailer.createTestAccount();
-
-    return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false, // true para 465, false para otros puertos
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
+// Helpers para Brevo
+const parseEmailFrom = (fromEnv?: string): { name: string; email: string } => {
+  const fallback = { name: 'CoachingIA', email: 'dfrutos.developer@gmail.com' };
+  if (!fromEnv) return fallback;
+  // Formatos soportados: "Nombre <email@dominio>" o solo "email@dominio"
+  const match = fromEnv.match(/^\s*(.+?)\s*<\s*(.+?)\s*>\s*$/);
+  if (match) {
+    return { name: match[1], email: match[2] };
   }
+  // Si es solo email
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fromEnv)) {
+    return { name: 'CoachingIA', email: fromEnv };
+  }
+  return fallback;
 };
 
-export const sendEmailWithNodemailer = async (emailData: EmailData) => {
-  try {
-    const transporter = await createTransporter();
+const postBrevoEmail = async (payload: any) => {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    throw new Error('Falta BREVO_API_KEY en variables de entorno');
+  }
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': apiKey,
+      'accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  console.log("Brevo response:", JSON.stringify(response, null, 2));
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`Brevo error ${response.status}: ${text || response.statusText}`);
+  }
+  return response.json();
+};
 
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || 'CoachingIA <noreply@coachingia.com>',
-      to: emailData.to,
+export const sendEmailWithBrevo = async (emailData: EmailData) => {
+  try {
+    const sender = parseEmailFrom(process.env.EMAIL_FROM);
+    const payload = {
+      sender: { name: sender.name, email: sender.email },
+      to: [{ email: emailData.to }],
       subject: emailData.subject,
-      html: emailData.html,
+      htmlContent: emailData.html,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-
-    // Si usamos Ethereal, mostrar la URL de preview
-    if (process.env.EMAIL_PROVIDER !== 'gmail') {
-      console.log(
-        '📧 Email enviado (Ethereal):',
-        nodemailer.getTestMessageUrl(info)
-      );
-    }
-
-    return { success: true, data: info };
+    const result = await postBrevoEmail(payload);
+    return { success: true, data: result };
   } catch (error) {
-    console.error('Error enviando email con Nodemailer:', error);
+    console.error('Error enviando email con Brevo:', error);
     return { success: false, error: 'Error enviando email' };
   }
 };
@@ -110,7 +108,7 @@ export const sendTemplateEmail = async (
     const template = readTemplate(templateName);
     const html = processTemplate(template, variables);
 
-    return sendEmailWithNodemailer({
+    return sendEmailWithBrevo({
       to,
       subject,
       html,
@@ -131,7 +129,7 @@ export const sendWelcomeEmail = async (
     userName: name,
     mailSocio: email,
     passwordSocio: password,
-    dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || '',
     companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
     companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
     companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
@@ -285,18 +283,20 @@ export const scheduleDailyObjectiveEmail = async (
 // Función para verificar la configuración de email
 export const checkEmailConfig = async () => {
   try {
-    const transporter = await createTransporter();
-    await transporter.verify();
-
-    const provider = process.env.EMAIL_PROVIDER || 'ethereal';
-    return {
-      success: true,
-      provider,
-      message:
-        provider === 'gmail'
-          ? 'Gmail SMTP configurado correctamente'
-          : 'Ethereal Email configurado para pruebas',
-    };
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
+      return { success: false, error: 'Falta BREVO_API_KEY' };
+    }
+    // Intento de verificación simple contra el endpoint de cuenta
+    const resp = await fetch('https://api.brevo.com/v3/account', {
+      headers: { 'api-key': apiKey, 'accept': 'application/json' },
+    });
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => '');
+      return { success: false, error: `Brevo no verificado: ${text || resp.statusText}` };
+    }
+    const provider = 'brevo';
+    return { success: true, provider, message: 'Brevo API configurado correctamente' };
   } catch (error) {
     return {
       success: false,
