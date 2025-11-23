@@ -318,6 +318,9 @@
     "goBack": "Go Back",
     "goToLogin": "Go to Login"
   },
+  "routeGuard": {
+    "verifyingAccess": "Verifying access..."
+  },
   "profile": {
     "loading": "Loading user information...",
     "title": "My Profile",

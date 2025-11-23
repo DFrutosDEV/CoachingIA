@@ -313,6 +313,9 @@
     "goBack": "Torna Indietro",
     "goToLogin": "Vai al Login"
   },
+  "routeGuard": {
+    "verifyingAccess": "Verifica accesso in corso..."
+  },
   "profile": {
     "loading": "Caricamento informazioni utente...",
     "title": "Il Mio Profilo",

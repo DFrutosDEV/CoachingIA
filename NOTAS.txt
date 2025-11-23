@@ -104,3 +104,9 @@ FORMATO DE RESPUESTA (JSON):
 --------------------------------------------------------------------------------------------------------------
 
 await HttpClient.get CAMBIAR POR FETCH
+
+----------------------------------------------------------------------------------------------------------
+AGREGAR AL ARCHIVO DE ITALIANO ESTO
+  "routeGuard": {
+    "verifyingAccess": "Verifica accesso in corso..."
+  },
