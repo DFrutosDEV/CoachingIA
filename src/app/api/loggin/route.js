@@ -5,11 +5,44 @@ import Role from '@/models/Role';
 import Profile from '@/models/Profile';
 import Enterprise from '@/models/Enterprise';
 import connectDB from '@/lib/mongodb';
+import mongoose from 'mongoose';
 
 export async function POST(request) {
   try {
     // Conectar a la base de datos usando la configuración centralizada
     await connectDB();
+    
+    // Verificar que la conexión esté realmente activa
+    if (mongoose.connection.readyState !== 1) {
+      console.error('❌ MongoDB no está conectado. Estado:', mongoose.connection.readyState);
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Error de conexión a la base de datos',
+        },
+        { status: 503 }
+      );
+    }
+
+    // Hacer una consulta de prueba para verificar que la base de datos responde
+    try {
+      await mongoose.connection.db.admin().ping();
+      console.log('✅ Ping a MongoDB exitoso');
+      console.log('📊 Base de datos:', {
+        host: mongoose.connection.host,
+        name: mongoose.connection.name,
+        readyState: mongoose.connection.readyState
+      });
+    } catch (pingError) {
+      console.error('❌ Error haciendo ping a MongoDB:', pingError);
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Error de conexión a la base de datos',
+        },
+        { status: 503 }
+      );
+    }
 
     // Obtener datos del cuerpo de la petición
     const { email, password } = await request.json();
@@ -28,13 +61,30 @@ export async function POST(request) {
     console.log('🔍 Intentando login con:', { email, password });
 
     // Buscar usuario por email y contraseña (usando el campo correcto 'password')
-    const user = await User.findOne({
-      email: email.toLowerCase(),
-      password: password,
-      isDeleted: false,
-    });
+    let user;
+    try {
+      user = await User.findOne({
+        email: email.toLowerCase(),
+        password: password,
+        isDeleted: false,
+      });
+    } catch (dbError) {
+      console.error('❌ Error consultando base de datos:', dbError);
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Error de conexión a la base de datos',
+        },
+        { status: 503 }
+      );
+    }
 
     console.log('👤 Usuario encontrado:', user ? 'SÍ' : 'NO');
+    if (user) {
+      console.log('👤 Usuario encontrado - ID:', user._id);
+    } else {
+      console.log('❌ No se encontró usuario con esas credenciales');
+    }
 
     if (!user) {
       return NextResponse.json(

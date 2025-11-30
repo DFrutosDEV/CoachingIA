@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { axiosClient } from '@/lib/services/axios-client';
 import { getStoredToken } from '@/lib/token-utils';
+import { useTranslations } from 'next-intl';
 
 // Tipos de roles
 type UserRole = 'admin' | 'coach' | 'client' | 'enterprise';
@@ -14,6 +15,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isVerifying, setIsVerifying] = useState(true);
+  const t = useTranslations('text.routeGuard');
 
   // Función para obtener el locale actual de la URL
   const getCurrentLocale = () => {
@@ -127,15 +129,15 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     verifyAccess();
   }, [pathname, router]);
 
+
   // Mostrar loading mientras verifica
   if (isVerifying) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        Verificando acceso...
+        {t('verifyingAccess')}
       </div>
     );
   }
-
   return <>{children}</>;
 }
 
