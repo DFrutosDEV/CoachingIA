@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { RootState } from '@/lib/redux/store';
 
 interface CoachResponse {
   id: string;
@@ -25,19 +26,19 @@ interface CoachResponse {
   createdAt: string;
 }
 
-export function ServicesGrid({ isEnterprise }: { isEnterprise?: boolean }) {
+export function ServicesGrid({ isEnterprise, isClient }: { isEnterprise?: boolean, isClient?: boolean }) {
   const t = useTranslations('common.dashboard.servicesGrid');
   const [coaches, setCoaches] = useState<CoachResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const user = useAppSelector(state => state.auth.user);
+  const user = useAppSelector((state: RootState) => state.auth.user);
 
   const fetchCoaches = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(isEnterprise ? `/api/enterprise/coaches?enterpriseId=${user?.enterprise?._id}` : '/api/admin/coaches');
+      const response = await fetch(isEnterprise ? `/api/enterprise/coaches?enterpriseId=${user?.enterprise?._id}` : isClient ? `/api/admin/coaches?clientId=${user?.profile?._id}` : '/api/admin/coaches');
       const data = await response.json();
 
       if (!response.ok) {
@@ -83,7 +84,7 @@ export function ServicesGrid({ isEnterprise }: { isEnterprise?: boolean }) {
   if (coaches.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <p className="text-muted-foreground">{t('noCoaches')}</p>
+        <p className="text-muted-foreground">{isClient ? t('noCoachesDescription') : t('noCoaches')}</p>
         <Button onClick={fetchCoaches} variant="outline">
           <RefreshCw className="h-4 w-4 mr-2" />
           {t('update')}

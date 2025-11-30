@@ -108,40 +108,42 @@ export function CoachCard({
             <p className="text-sm text-muted-foreground line-clamp-2">{bio}</p>
           )}
 
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{email}</span>
-            </div>
-
-            {phone && (
+          <div className="flex flex-col space-y-2">
+            <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{phone}</span>
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span className="truncate">{email}</span>
               </div>
-            )}
 
-            {enterprise && (
-              <div className="flex items-center gap-2 text-sm">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-                <span className="truncate">{enterprise.name}</span>
+              {phone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span>{phone}</span>
+                </div>
+              )}
+
+              {enterprise && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate">{enterprise.name}</span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>{t('registered', { date: formatDate(createdAt) })}</span>
               </div>
-            )}
-
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>{t('registered', { date: formatDate(createdAt) })}</span>
             </div>
-          </div>
-          <div className="flex gap-2 ">
-            <Button
-              variant="outlined"
-              size="small"
-              className="flex-1"
-              onClick={handleSendMessage}
-            >
-              {t('sendMessage')}
-            </Button>
+            <div className="flex gap-2 ">
+              <Button
+                variant="outlined"
+                size="small"
+                className="flex-1"
+                onClick={handleSendMessage}
+              >
+                {t('sendMessage')}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

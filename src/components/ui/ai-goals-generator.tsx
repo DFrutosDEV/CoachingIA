@@ -63,8 +63,9 @@ export function AIGoalsGenerator({
   const checkAIStatus = async () => {
     try {
       const response = await fetch('/api/ai/generate-goals');
+      console.log(response);
       const data = await response.json();
-
+      console.log(data);
       setAiStatus({
         provider: data.provider || 'AI Service',
         available: data.available || false,
@@ -218,13 +219,13 @@ export function AIGoalsGenerator({
 
           {/* Información del objetivo */}
           <div className="p-3 rounded-lg bg-muted/50">
-            <h4 className="font-medium mb-1">Objetivo Principal</h4>
+            <h4 className="font-medium mb-1">{t('mainObjective')}</h4>
             <p className="text-sm text-muted-foreground">{objectiveTitle}</p>
           </div>
 
           {/* Configuración de IA */}
           <div className="space-y-4">
-            <h4 className="font-medium">Configuración de IA</h4>
+            <h4 className="font-medium">{t('form.aiConfig.title')}</h4>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -339,12 +340,12 @@ export function AIGoalsGenerator({
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generando 30 objetivos con IA...
+                {t('buttons.generating')}
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4 mr-2" />
-                Generar 30 objetivos
+                {t('buttons.generate')}
               </>
             )}
           </Button>
@@ -359,7 +360,7 @@ export function AIGoalsGenerator({
           {/* Objetivos generados */}
           {generatedGoals.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium">Objetivos Generados</h4>
+              <h4 className="font-medium">{t('success.goalsGenerated')}</h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {generatedGoals.map((goal, index) => (
                   <div key={goal._id} className="p-3 rounded-lg border">
@@ -369,7 +370,7 @@ export function AIGoalsGenerator({
                           {goal.description}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Día: {goal.day}
+                          {t('day')}: {goal.day}
                         </p>
                       </div>
                       <Badge variant="outline" className="text-xs">
@@ -382,10 +383,10 @@ export function AIGoalsGenerator({
 
               <div className="flex gap-2">
                 <Button onClick={handleAcceptGoals} className="flex-1">
-                  Aceptar Objetivos
+                  {t('buttons.accept')}
                 </Button>
                 <Button variant="outline" onClick={() => setGeneratedGoals([])}>
-                  Regenerar
+                  {t('buttons.regenerate')}
                 </Button>
               </div>
             </div>

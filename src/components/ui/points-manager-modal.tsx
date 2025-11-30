@@ -206,7 +206,7 @@ export function PointsManagerModal({
               {!isSearching && searchResults.length > 0 && (
                 <div className="space-y-2">
                   <Label>{t('search.results')}</Label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className=" flex flex-col space-y-2 max-h-48 overflow-y-auto gap-2">
                     {searchResults.map(coach => (
                       <Card
                         key={coach.id}
@@ -215,7 +215,7 @@ export function PointsManagerModal({
                       >
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-start gap-3 flex-col">
                               <div className="flex items-center gap-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="font-medium">

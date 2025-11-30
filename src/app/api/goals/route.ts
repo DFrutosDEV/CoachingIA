@@ -11,22 +11,26 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { clientId, coachId, objectiveId, goals, description, day } = body;
+    const { objectiveId, goals, description, day } = body;
 
     // Si se proporciona description y day, crear una meta individual
-    if (description && day) {
-      if (!clientId || !coachId || !objectiveId) {
-        return NextResponse.json(
-          { error: 'clientId, coachId y objectiveId son requeridos' },
-          { status: 400 }
-        );
-      }
+    if (!objectiveId) {
+      return NextResponse.json(
+        { error: 'objectiveId es requerido' },
+        { status: 400 }
+      );
+    }
 
+    const objective = await Objective.findById(objectiveId);
+    const coachProfile = await Profile.findById(objective?.coachId);
+    const clientProfile = await Profile.findById(objective?.clientId);
+
+    if (description && day) {
       const newGoal = new Goal({
         objectiveId,
         description,
-        createdBy: coachId,
-        clientId,
+        createdBy: coachProfile?._id,
+        clientId: clientProfile?._id,
         day,
         date: new Date().toISOString(),
         isCompleted: false,
@@ -44,9 +48,9 @@ export async function POST(request: NextRequest) {
 
     // Si se proporciona goals array, crear múltiples metas
     if (goals && Array.isArray(goals)) {
-      if (!clientId || !coachId || !objectiveId) {
+      if (!objectiveId) {
         return NextResponse.json(
-          { error: 'clientId, coachId, objectiveId y goals son requeridos' },
+          { error: 'objectiveId y goals son requeridos' },
           { status: 400 }
         );
       }
@@ -55,8 +59,8 @@ export async function POST(request: NextRequest) {
       const goalsToCreate = goals.map((goal: any, index: number) => ({
         objectiveId,
         description: goal.description || goal.title,
-        createdBy: coachId,
-        clientId,
+        createdBy: coachProfile?._id,
+        clientId: clientProfile?._id,
         day: goal.day || 'Lunes',
         date: new Date(
           new Date().setDate(new Date().getDate() + index)
@@ -75,7 +79,7 @@ export async function POST(request: NextRequest) {
       try {
         // Obtener información del objetivo y cliente
         const objective = await Objective.findById(objectiveId);
-        const client = await Profile.findById(clientId);
+        const client = await Profile.findById(clientProfile?._id);
 
         if (objective && client && client.email) {
           // Programar email para cada goal creado
@@ -88,7 +92,7 @@ export async function POST(request: NextRequest) {
 
             const emailResult = await scheduleDailyObjectiveEmail(
               client.email,
-              `${client.firstName} ${client.lastName}`,
+              `${clientProfile?.firstName} ${clientProfile?.lastName}`,
               objective.title,
               goal.description,
               i + 1, // currentDay

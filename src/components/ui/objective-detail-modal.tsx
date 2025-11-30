@@ -231,6 +231,10 @@ export function ObjectiveDetailModal({
       return;
     }
 
+    // Extraer el día del mes de la fecha seleccionada
+    const selectedDate = new Date(newGoal.day);
+    const dayOfMonth = selectedDate.getDate().toString();
+
     try {
       const response = await fetch('/api/goals', {
         method: 'POST',
@@ -240,7 +244,7 @@ export function ObjectiveDetailModal({
         body: JSON.stringify({
           objectiveId: objectiveData?.objective._id,
           description: newGoal.description,
-          day: newGoal.day,
+          day: dayOfMonth,
           clientId: clientId,
           createdBy: coachId,
         }),
@@ -267,6 +271,10 @@ export function ObjectiveDetailModal({
       return;
     }
 
+    // Extraer el día del mes de la fecha seleccionada
+    const selectedDate = new Date(editingGoal.day);
+    const dayOfMonth = selectedDate.getDate().toString();
+
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
         method: 'PUT',
@@ -275,7 +283,7 @@ export function ObjectiveDetailModal({
         },
         body: JSON.stringify({
           description: editingGoal.description,
-          day: editingGoal.day,
+          day: dayOfMonth,
         }),
       });
 
@@ -365,7 +373,18 @@ export function ObjectiveDetailModal({
 
   const startEditingGoal = (goal: Goal) => {
     setEditingGoalId(goal._id);
-    setEditingGoal({ description: goal.description, day: goal.day });
+    // Si el goal tiene fecha, usarla; si no, construir una fecha con el día del mes
+    let dateValue = '';
+    if (goal.date) {
+      const goalDate = new Date(goal.date);
+      dateValue = goalDate.toISOString().split('T')[0];
+    } else if (goal.day) {
+      // Si solo tenemos el día del mes, usar la fecha actual con ese día
+      const today = new Date();
+      today.setDate(parseInt(goal.day));
+      dateValue = today.toISOString().split('T')[0];
+    }
+    setEditingGoal({ description: goal.description, day: dateValue });
   };
 
   const cancelEditing = () => {
@@ -649,6 +668,7 @@ export function ObjectiveDetailModal({
                               }
                             />
                             <Input
+                              type="date"
                               placeholder={t('goals.form.day')}
                               value={newGoal.day}
                               onChange={e =>
@@ -723,6 +743,7 @@ export function ObjectiveDetailModal({
                                     }
                                   />
                                   <Input
+                                    type="date"
                                     value={editingGoal.day}
                                     onChange={e =>
                                       setEditingGoal(prev => ({

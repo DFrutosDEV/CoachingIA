@@ -34,6 +34,7 @@ import { Goal, ClientDetailProps, Objective } from '@/types';
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
 import { useTranslations } from 'next-intl';
+import { RootState } from '@/lib/redux/store';
 
 export function ClientDetail({
   client,
@@ -54,7 +55,7 @@ export function ClientDetail({
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<any>(null);
 
-  const user = useAppSelector(state => state.auth.user);
+  const user = useAppSelector((state: RootState) => state.auth.user);
 
   const handleGoalsUpdate = (updatedGoals: Goal[]) => {
     if (client) {
@@ -202,10 +203,6 @@ export function ClientDetail({
               >
                 <MessageSquare className="h-4 w-4" />
                 {t('actions.message')}
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1">
-                <FileText className="h-4 w-4" />
-                {t('actions.viewPDA')}
               </Button>
             </div>
 

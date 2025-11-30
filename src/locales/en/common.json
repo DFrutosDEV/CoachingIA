@@ -1,5 +1,10 @@
 {
   "dashboard": {
+    "permissionGuard": {
+      "verifying": "Verifying permissions...",
+      "noPermissions": "No you have permissions to view this content",
+      "noPermissionsDescription": "Your current role does not have the necessary permissions to view this content. If you believe this is an error, contact the system administrator."
+    },
     "title": "CoachingIA",
     "navigation": {
       "home": "Home",
@@ -395,6 +400,7 @@
       },
       "retry": "Retry",
       "noCoaches": "No coaches registered",
+      "noCoachesDescription": "No coaches assigned to this client",
       "update": "Update",
       "title": "Registered Coaches",
       "total": "Total: {count} coach{plural}",
@@ -601,9 +607,9 @@
       }
     },
     "finalizeObjective": {
-      "button": "Finalize Objective",
+      "button": "Terminate Objective",
       "modal": {
-        "title": "Finalize Objective",
+        "title": "Terminate Objective",
         "description": "Provide final feedback for the objective:",
         "fields": {
           "feedback": "Final Feedback *",
@@ -613,7 +619,7 @@
         "buttons": {
           "cancel": "Cancel",
           "finalizing": "Finalizing...",
-          "finalize": "Finalize Objective"
+          "finalize": "Terminate Objective"
         }
       },
       "errors": {
@@ -785,6 +791,7 @@
     "aiGoalsGenerator": {
       "title": "Generate Goals with AI",
       "description": "Configure parameters to generate personalized goals with AI",
+      "mainObjective": "Main Objective",
       "form": {
         "aiConfig": {
           "title": "AI Configuration",
@@ -826,14 +833,16 @@
       },
       "buttons": {
         "generating": "Generating goals with AI...",
-        "generate": "Generate 30 goals"
+        "generate": "Generate 30 goals",
+        "accept": "Accept Goals",
+        "regenerate": "Regenerate Goals"
       },
       "errors": {
         "generateGoals": "Error generating goals",
         "uploadPda": "Error uploading report"
       },
       "success": {
-        "goalsGenerated": "30 goals generated successfully",
+        "goalsGenerated": "Objectives generated successfully",
         "pdaUploaded": "PDA file uploaded successfully"
       }
     },

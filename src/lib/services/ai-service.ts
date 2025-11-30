@@ -64,8 +64,23 @@ export class AIService {
         response = await this.callGeminiAPI(prompt);
       }
 
+      console.log('📡 Respuesta recibida:');
+      console.log('Status:', response.status);
+      console.log('OK:', response.ok);
+      console.log('StatusText:', response.statusText);
+
       if (!response.ok) {
         const errorData = await response.text();
+        console.error('❌ Error completo de Gemini API:');
+        console.error('Status:', response.status, response.statusText);
+        console.error('URL:', response.url);
+        console.error('Error Body:', errorData);
+        try {
+          const errorJson = JSON.parse(errorData);
+          console.error('Error JSON:', JSON.stringify(errorJson, null, 2));
+        } catch (e) {
+          console.error('Error como texto:', errorData);
+        }
         throw new Error(
           `Error en la API de ${this.config.provider === 'deepseek' ? 'DeepSeek' : 'Google Gemini'}: ${response.statusText} - ${errorData}`
         );
@@ -77,9 +92,13 @@ export class AIService {
       return this.parseGeneratedGoals(generatedText, numberOfGoals);
     } catch (error) {
       console.error(
-        `Error generando objetivos con ${this.config.provider}:`,
-        error
+        `❌ Error generando objetivos con ${this.config.provider}:`
       );
+      console.error('Error completo:', error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       throw new Error('No se pudieron generar objetivos automáticamente');
     }
   }
@@ -238,30 +257,50 @@ export class AIService {
   }
 
   private async callGeminiAPI(prompt: string): Promise<Response> {
-    const baseUrl =
-      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+    // Usar el modelo configurado en lugar de hardcodearlo
+    const model = this.config.model || 'gemini-1.5-flash';
+    const baseUrl = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent`;
+    const url = `${baseUrl}?key=${this.config.apiKey}`;
 
-    return fetch(`${baseUrl}?key=${this.config.apiKey}`, {
+    const requestBody = {
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: this.config.temperature,
+        topP: 0.9,
+        maxOutputTokens: this.config.maxTokens,
+      },
+    };
+
+    console.log('🔍 Llamando a Gemini API:');
+    console.log('Modelo:', model);
+    console.log('URL (sin key):', baseUrl);
+    console.log('Body (primeros 200 chars del prompt):', {
+      ...requestBody,
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt.substring(0, 200) + '...',
+            },
+          ],
+        },
+      ],
+    });
+
+    return fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: this.config.temperature,
-          topP: 0.9,
-          maxOutputTokens: this.config.maxTokens,
-        },
-      }),
+      body: JSON.stringify(requestBody),
     });
   }
 
@@ -333,29 +372,51 @@ export class AIService {
           }),
         });
       } else {
-        response = await fetch(
-          `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    {
-                      text: 'Hola, responde solo con "OK"',
-                    },
-                  ],
-                },
-              ],
-              generationConfig: {
-                maxOutputTokens: 10,
+        const model = this.config.model || 'gemini-1.5-flash';
+        const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${this.config.apiKey}`;
+        console.log('🔍 checkAIStatus - Llamando a Gemini API:');
+        console.log('Modelo:', model);
+        console.log('URL (sin key):', `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=...`);
+
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: 'Hola, responde solo con "OK"',
+                  },
+                ],
               },
-            }),
-          }
-        );
+            ],
+            generationConfig: {
+              maxOutputTokens: 10,
+            },
+          }),
+        });
+      }
+
+      console.log('📡 checkAIStatus - Respuesta recibida:');
+      console.log('Status:', response.status);
+      console.log('OK:', response.ok);
+      console.log('StatusText:', response.statusText);
+      console.log('URL:', response.url);
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('❌ Error en checkAIStatus:');
+        console.error('Status:', response.status, response.statusText);
+        console.error('Error Body:', errorData);
+        try {
+          const errorJson = JSON.parse(errorData);
+          console.error('Error JSON:', JSON.stringify(errorJson, null, 2));
+        } catch (e) {
+          console.error('Error como texto:', errorData);
+        }
       }
 
       return {

@@ -10,6 +10,7 @@ import { addWeeks } from 'date-fns';
 dotenv.config({ path: '.env' });
 dotenv.config({ path: '.env.local' });
 
+// GET /api/ai/generate-goals - Verificar estado de AI
 export async function GET() {
   try {
     const aiStatus = await aiService.checkAIStatus();
@@ -34,6 +35,7 @@ export async function GET() {
   }
 }
 
+// POST /api/ai/generate-goals - Generar objetivos con IA
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

@@ -1,5 +1,10 @@
 {
   "dashboard": {
+    "permissionGuard": {
+      "verifying": "Verificando permisos...",
+      "noPermissions": "No tienes permisos para ver este contenido",
+      "noPermissionsDescription": "Tu rol actual no tiene los permisos necesarios para ver este contenido. Si crees que esto es un error, contacta al administrador del sistema."
+    },
     "title": "CoachingIA",
     "navigation": {
       "home": "Inicio",
@@ -395,6 +400,7 @@
       },
       "retry": "Reintentar",
       "noCoaches": "No hay coaches registrados",
+      "noCoachesDescription": "No hay coaches asignados a este cliente",
       "update": "Actualizar",
       "title": "Coaches Registrados",
       "total": "Total: {count} coach{plural}",
@@ -785,6 +791,7 @@
     "aiGoalsGenerator": {
       "title": "Generar Objetivos con IA",
       "description": "Configura los parámetros para generar objetivos personalizados con IA",
+      "mainObjective": "Objetivo Principal",
       "form": {
         "aiConfig": {
           "title": "Configuración de IA",
@@ -826,14 +833,16 @@
       },
       "buttons": {
         "generating": "Generando objetivos con IA...",
-        "generate": "Generar 30 objetivos"
+        "generate": "Generar 30 objetivos",
+        "accept": "Aceptar Objetivos",
+        "regenerate": "Regenerar Objetivos"
       },
       "errors": {
         "generateGoals": "Error al generar objetivos",
         "uploadPda": "Error al cargar reporte"
       },
       "success": {
-        "goalsGenerated": "30 objetivos generados exitosamente",
+        "goalsGenerated": "Objetivos generados exitosamente",
         "pdaUploaded": "Archivo PDA cargado exitosamente"
       }
     },

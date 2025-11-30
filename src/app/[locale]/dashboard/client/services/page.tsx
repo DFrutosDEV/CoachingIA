@@ -43,7 +43,7 @@ export default function ServicesPage() {
                 </p>
               </div>
             </div>
-            <ServicesGrid />
+            <ServicesGrid isClient={true} />
           </div>
         </main>
       </div>

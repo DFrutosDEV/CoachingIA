@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useTranslations } from 'next-intl';
 
 interface PermissionGuardProps {
   children: ReactNode;
@@ -27,6 +28,7 @@ export function PermissionGuard({
   showLoading = true,
   loadingComponent,
 }: PermissionGuardProps) {
+  const t = useTranslations('common.dashboard.permissionGuard');
   const { hasAccess, isLoading } = usePermissionGuard(requiredRoles);
 
   // Mostrar loading mientras se verifica el permiso
@@ -39,7 +41,7 @@ export function PermissionGuard({
       return (
         <div className="flex items-center justify-center p-8">
           <Loader2 className="h-6 w-6 animate-spin" />
-          <span className="ml-2">Verificando permisos...</span>
+          <span className="ml-2">{t('verifying')}</span>
         </div>
       );
     }
@@ -60,17 +62,15 @@ export function PermissionGuard({
             <AlertTriangle className="h-6 w-6 text-red-600" />
           </div>
           <CardTitle className="text-lg font-semibold text-gray-900">
-            Sin Permisos
+            {t('noPermissions')}
           </CardTitle>
           <CardDescription className="text-gray-600">
-            No tienes permisos para ver este contenido
+            {t('noPermissionsDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-500 text-center">
-            Tu rol actual no tiene los permisos necesarios para ver este
-            contenido. Si crees que esto es un error, contacta al administrador
-            del sistema.
+            {t('noPermissionsDescription')}
           </p>
         </CardContent>
       </Card>

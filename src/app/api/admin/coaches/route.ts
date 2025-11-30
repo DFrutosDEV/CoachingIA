@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
-
+    const clientId = searchParams.get('clientId');
     // Buscar el rol de coach
     const coachRole = await Role.findOne({ code: '2' });
     if (!coachRole) {
@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     let query: any = {
       role: coachRole._id,
       isDeleted: false,
+      ...(clientId ? { clients: clientId } : {}),
     };
 
     // Si hay búsqueda, agregar filtros
@@ -69,10 +70,10 @@ export async function GET(request: NextRequest) {
       clientsCount: coach.clients ? coach.clients.length : 0,
       enterprise: coach.enterprise
         ? {
-            id: coach.enterprise._id,
-            name: coach.enterprise.name,
-            logo: coach.enterprise.logo,
-          }
+          id: coach.enterprise._id,
+          name: coach.enterprise.name,
+          logo: coach.enterprise.logo,
+        }
         : null,
       createdAt: coach.createdAt,
       updatedAt: coach.updatedAt,

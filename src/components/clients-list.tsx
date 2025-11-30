@@ -281,7 +281,7 @@ export function ClientsList({
                                     : sendEmail({ email: client.email })
                                 }
                               >
-                                <MessageSquare className="h-4 w-4" />
+                                <MessageSquare className="mr-2 h-4 w-4" />
                                 {t('table.message')}
                               </div>
                             </DropdownMenuItem>

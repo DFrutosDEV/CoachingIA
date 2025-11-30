@@ -16,6 +16,10 @@ Error: ENOENT: no such file or directory, open 'C:\Users\danie\OneDrive\Document
 Remove-Item -Recurse -Force .next (en terminal para borrar cache y reinstalar dependencias)
 
 
+-- LIMPIA EL CACHE Y REINSTALA
+rm -rf .next node_modules
+npm install
+npm run dev
 --------- 
 
 Sí, si tenés Gemini Pro pago (el plan de Google AI), podés integrarlo perfectamente en tu proyecto de Next.js.
