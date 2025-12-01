@@ -39,8 +39,7 @@ export function ClientDetail({
   client,
   isOpen,
   onClose,
-  onUpdateClient,
-  locale = 'es',
+  onUpdateClient
 }: ClientDetailProps) {
   const t = useTranslations('common.dashboard.clientDetail');
 

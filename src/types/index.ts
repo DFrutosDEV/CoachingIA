@@ -1,4 +1,3 @@
-import { Locale } from "@/utils/date-formatter";
 
 // Tipos base para sesiones
 export interface NextSession {
@@ -194,7 +193,6 @@ export interface Coach {
 // Tipos para props de componentes
 export interface ClientDetailProps {
   client: ClientResponse | null;
-  locale: Locale | 'es';
   isOpen: boolean;
   onClose: () => void;
   onUpdateClient: (clientId: string, updatedGoals: Goal[]) => void;
