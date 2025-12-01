@@ -459,7 +459,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
         <div className="flex flex-col gap-4 py-10 border-t md:h-16 md:flex-row md:py-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} CoachingIA. {t('footer.copyright')}
+            &copy; {new Date().getFullYear()} KytCoaching. {t('footer.copyright')}
           </p>
           <div className="flex gap-4">
             <Link
