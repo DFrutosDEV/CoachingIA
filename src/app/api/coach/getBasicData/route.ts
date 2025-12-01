@@ -4,7 +4,6 @@ import User from '@/models/User';
 import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
-import { formatTime } from '@/utils/validatesInputs';
 import { formatDate } from 'date-fns';
 
 // GET /api/coach/getBasicData - Obtener datos básicos del dashboard del coach
@@ -165,12 +164,12 @@ export async function GET(request: NextRequest) {
     // Formatear la próxima sesión
     const formattedNextSession = nextSession
       ? {
-          date: nextSession.date,
-          link: nextSession.link,
-          time: nextSession.time,
-          client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,
-          topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
-        }
+        date: nextSession.date,
+        link: nextSession.link,
+        time: nextSession.time,
+        client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,
+        topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
+      }
       : null;
 
     return NextResponse.json({

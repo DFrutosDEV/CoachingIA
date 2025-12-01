@@ -39,11 +39,19 @@ export interface DateFormatterOptions {
   customOptions?: CustomFormatOptions;
 }
 
+//! TODO: ARREGLAR ARCHIVO Y FUNCIONES PARA PODER ESTANDARIZAR LAS FECHAS
 // Mapeo de locales a códigos de idioma completos
 const localeMap: Record<Locale, string> = {
   'es': 'es-ES',
   'en': 'en-US',
   'it': 'it-IT'
+};
+
+// Mapeo de locales a zonas horarias
+const timezoneMap: Record<Locale, string> = {
+  'es': 'Europe/Madrid',
+  'en': 'America/New_York',
+  'it': 'Europe/Rome',
 };
 
 // Configuraciones predefinidas para cada formato
@@ -132,7 +140,7 @@ export function formatDate(
     return 'Fecha inválida';
   }
 
-  const fullLocale = localeMap[locale];
+  const fullLocale = localeMap[locale] || localeMap['es'];
 
   // Manejar formato relativo
   if (format === 'relative') {
@@ -148,8 +156,18 @@ export function formatDate(
     formatOptions = formatConfigs[format];
   }
 
-  // Formatear la fecha
-  return dateObj.toLocaleDateString(fullLocale, formatOptions);
+  // Usar el método correcto según si el formato incluye hora
+  // Convertir a la zona horaria del locale especificado
+  const localeTimeZone = timezoneMap[locale] || timezoneMap['es'];
+  if (format === 'time-12' || format === 'time-24') {
+    const timeOptions = { ...formatOptions, timeZone: localeTimeZone };
+    return dateObj.toLocaleTimeString(fullLocale, timeOptions);
+  } else if (formatOptions.hour !== undefined || formatOptions.minute !== undefined) {
+    const dateTimeOptions = { ...formatOptions, timeZone: localeTimeZone };
+    return dateObj.toLocaleString(fullLocale, dateTimeOptions);
+  } else {
+    return dateObj.toLocaleDateString(fullLocale, formatOptions);
+  }
 }
 
 /**

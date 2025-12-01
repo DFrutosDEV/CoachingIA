@@ -144,7 +144,6 @@ export async function GET(request: NextRequest) {
             ? {
               _id: nextSession._id.toString(),
               date: nextSession.date,
-              time: nextSession.time,
               link: nextSession.link,
               objective: nextSession.objectiveId,
             }
@@ -153,8 +152,6 @@ export async function GET(request: NextRequest) {
             ? {
               _id: lastSession._id.toString(),
               date: lastSession.date,
-              time: lastSession.time,
-              link: lastSession.link,
               objective: lastSession.objectiveId,
             }
             : {},
