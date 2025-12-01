@@ -20,7 +20,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { CalendarService } from '@/lib/services/calendar-service';
+import { CalendarService, SessionEvent as ServiceSessionEvent } from '@/lib/services/calendar-service';
 import RescheduleModal from './reschedule-modal';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useTranslations } from 'next-intl';
@@ -31,6 +31,11 @@ dayjs.extend(localizedFormat);
 
 // Crea el localizador usando dayjs
 const localizer = dayjsLocalizer(dayjs);
+
+// Tipo local que extiende el del servicio para incluir _id
+interface SessionEvent extends ServiceSessionEvent {
+  _id: string;
+}
 
 // Toolbar simplificado que funciona correctamente
 const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
@@ -70,19 +75,6 @@ const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
   );
 };
 
-// Definición local del tipo para evitar conflictos
-interface SessionEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  description?: string;
-  client: string;
-  coach: string;
-  link: string;
-  time: string;
-  objectiveTitle: string;
-}
 
 export default function SessionsPage() {
   const t = useTranslations('common.dashboard.calendar');
@@ -111,9 +103,13 @@ export default function SessionsPage() {
       const result = await CalendarService.getSessions();
 
       if (result.success) {
-        // Las fechas ya vienen correctamente formateadas del API
-        console.log('Sesiones recibidas:', result.events);
-        setSessions(result.events);
+        // Mapear los eventos del servicio para incluir _id desde id
+        const mappedEvents: SessionEvent[] = result.events.map((event: ServiceSessionEvent) => ({
+          ...event,
+          _id: event.id, // Mapear id a _id para compatibilidad
+        }));
+        console.log('Sesiones recibidas:', mappedEvents);
+        setSessions(mappedEvents);
       } else {
         setError(result.error || 'Error al cargar las sesiones');
       }
