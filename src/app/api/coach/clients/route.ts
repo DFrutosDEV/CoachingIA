@@ -142,25 +142,27 @@ export async function GET(request: NextRequest) {
           sessions: completedSessions,
           nextSession: nextSession
             ? {
-                date: nextSession.date,
-                time: nextSession.time,
-                link: nextSession.link,
-                objective: nextSession.objectiveId,
-              }
+              _id: nextSession._id.toString(),
+              date: nextSession.date,
+              time: nextSession.time,
+              link: nextSession.link,
+              objective: nextSession.objectiveId,
+            }
             : {},
           lastSession: lastSession
             ? {
-                date: lastSession.date,
-                time: lastSession.time,
-                link: lastSession.link,
-                objective: lastSession.objectiveId,
-              }
+              _id: lastSession._id.toString(),
+              date: lastSession.date,
+              time: lastSession.time,
+              link: lastSession.link,
+              objective: lastSession.objectiveId,
+            }
             : {},
           progress:
             goals.length > 0
               ? (goals.filter((goal: any) => goal.isCompleted).length /
-                  goals.length) *
-                100
+                goals.length) *
+              100
               : 0,
           status: clientProfile.isDeleted ? 'inactive' : 'active',
           focus: activeObjective?.title || 'Sin objetivo',

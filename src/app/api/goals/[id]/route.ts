@@ -23,12 +23,17 @@ export async function PUT(
     }
 
     // Campos permitidos para actualizar
-    const allowedFields = ['description', 'day', 'isCompleted'];
+    const allowedFields = ['description', 'day', 'date', 'isCompleted'];
     const filteredData: any = {};
 
     allowedFields.forEach(field => {
       if (updateData[field] !== undefined) {
-        filteredData[field] = updateData[field];
+        if (field === 'date') {
+          // Convertir la fecha a ISO string si se proporciona
+          filteredData[field] = new Date(updateData[field]).toISOString();
+        } else {
+          filteredData[field] = updateData[field];
+        }
       }
     });
 

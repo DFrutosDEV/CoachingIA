@@ -3,9 +3,6 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 // Logs para debugging
-console.log('🔍 [MongoDB] Inicializando conexión...');
-console.log('🔍 [MongoDB] NODE_ENV:', process.env.NODE_ENV);
-console.log('🔍 [MONGODB_URI] Existe:', !!MONGODB_URI);
 if (MONGODB_URI) {
   // Mostrar preview sin credenciales
   const uriPreview = MONGODB_URI.includes('@')
@@ -62,7 +59,6 @@ async function connectDB(): Promise<typeof mongoose> {
 
   if (cached.conn) {
     const state = mongoose.connection.readyState;
-    console.log('✅ [MongoDB] Usando conexión cacheada, estado:', state);
     if (state === 1) {
       return cached.conn;
     }

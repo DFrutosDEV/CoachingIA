@@ -11,6 +11,7 @@ interface Goal {
   _id: string;
   description: string;
   day: number;
+  date: string; // Fecha completa del goal
   isCompleted: boolean;
   createdAt: string;
 }
@@ -84,8 +85,30 @@ const ClientTasks: React.FC = () => {
     }
   };
 
+  // Verificar si un goal es del día actual
+  const isToday = (goalDate: string): boolean => {
+    if (!goalDate) return false;
+    const today = new Date();
+    const goalDateObj = new Date(goalDate);
+
+    // Comparar año, mes y día
+    return (
+      today.getFullYear() === goalDateObj.getFullYear() &&
+      today.getMonth() === goalDateObj.getMonth() &&
+      today.getDate() === goalDateObj.getDate()
+    );
+  };
+
   // Actualizar estado de una tarea
   const updateGoalStatus = async (goalId: string, isCompleted: boolean) => {
+    // Buscar el goal para verificar si es del día actual
+    const goal = tasksData?.goals.find(g => g._id === goalId);
+
+    if (goal && !isToday(goal.date)) {
+      toast.error(t('errors.cannotCompleteTask'));
+      return;
+    }
+
     try {
       setUpdatingGoal(goalId);
       const response = await fetch(`/api/client/tasks/goals/${goalId}`, {
@@ -196,66 +219,67 @@ const ClientTasks: React.FC = () => {
           {/* Sección Tareas por Día */}
           {tasksData?.goals && tasksData.goals.length > 0 ? (
             <div className="space-y-3 max-h-76 overflow-y-auto pr-2 scrollbar-thin">
-              {tasksData.goals.map(goal => (
-                <div
-                  key={goal._id}
-                  onClick={() => updateGoalStatus(goal._id, !goal.isCompleted)}
-                  className={`p-3 rounded cursor-pointer transition-all duration-200 hover:opacity-90 ${goal.isCompleted ? 'ring-2 ring-green-500' : ''
-                    }`}
-                  style={{
-                    border: `1px dashed ${theme.palette.divider}`,
-                    backgroundColor: goal.isCompleted
-                      ? theme.palette.success.light
-                      : theme.palette.action.hover,
-                  }}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1">
-                      <h3
-                        className="text-sm font-medium mb-1"
-                        style={{ color: theme.palette.text.primary }}
-                      >
-                        {t('day', { day: goal.day })}
-                      </h3>
-                      <p
-                        className="text-xs"
-                        style={{ color: theme.palette.text.secondary }}
-                      >
-                        {goal.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center ml-2">
-                      {updatingGoal === goal._id ? (
-                        <div
-                          className="animate-spin rounded-full h-4 w-4 border-b-2"
-                          style={{ borderColor: theme.palette.primary.main }}
-                        ></div>
-                      ) : (
-                        <>
-                          {goal.isCompleted && (
-                            <span className="text-green-500 text-sm mr-2">
-                              ✓
+              {tasksData.goals.map(goal => {
+                return (
+                  <div
+                    key={goal._id}
+                    onClick={() => updateGoalStatus(goal._id, !goal.isCompleted)}
+                    className={`p-3 rounded transition-all duration-200 cursor-pointer hover:opacity-90 ${goal.isCompleted ? 'ring-2 ring-green-500' : ''}`}
+                    style={{
+                      border: `1px dashed ${theme.palette.divider}`,
+                      backgroundColor: goal.isCompleted
+                        ? theme.palette.success.light
+                        : theme.palette.action.hover,
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="flex-1">
+                        <h3
+                          className="text-sm font-medium mb-1"
+                          style={{ color: theme.palette.text.primary }}
+                        >
+                          {t('day', { day: goal.day })}
+                        </h3>
+                        <p
+                          className="text-xs"
+                          style={{ color: theme.palette.text.secondary }}
+                        >
+                          {goal.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center ml-2">
+                        {updatingGoal === goal._id ? (
+                          <div
+                            className="animate-spin rounded-full h-4 w-4 border-b-2"
+                            style={{ borderColor: theme.palette.primary.main }}
+                          ></div>
+                        ) : (
+                          <>
+                            {goal.isCompleted && (
+                              <span className="text-green-500 text-sm mr-2">
+                                ✓
+                              </span>
+                            )}
+                            <span
+                              className="text-xs px-2 py-1 rounded-full"
+                              style={{
+                                backgroundColor: goal.isCompleted
+                                  ? theme.palette.success.main
+                                  : theme.palette.warning.main,
+                                color: goal.isCompleted
+                                  ? theme.palette.success.contrastText
+                                  : theme.palette.warning.contrastText,
+                              }}
+                            >
+                              {goal.isCompleted ? t('status.completed') : t('status.pending')}
                             </span>
-                          )}
-                          <span
-                            className="text-xs px-2 py-1 rounded-full"
-                            style={{
-                              backgroundColor: goal.isCompleted
-                                ? theme.palette.success.main
-                                : theme.palette.warning.main,
-                              color: goal.isCompleted
-                                ? theme.palette.success.contrastText
-                                : theme.palette.warning.contrastText,
-                            }}
-                          >
-                            {goal.isCompleted ? t('status.completed') : t('status.pending')}
-                          </span>
-                        </>
-                      )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div

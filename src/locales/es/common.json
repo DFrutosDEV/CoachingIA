@@ -420,7 +420,8 @@
       "loading": "Cargando tareas...",
       "errors": {
         "loadTasks": "Error al cargar las tareas",
-        "updateTask": "Error al actualizar la tarea"
+        "updateTask": "Error al actualizar la tarea",
+        "cannotCompleteTask": "Solo puedes completar tareas del día actual"
       },
       "title": "Tareas Diarias y Pasadas",
       "currentObjective": "Objetivo Actual: {title}",
@@ -642,6 +643,7 @@
         },
         "created": "Creado:",
         "progress": "Progreso:",
+        "startDate": "Fecha de inicio:",
         "generalProgress": "Progreso general",
         "goalsCompleted": "desafíos completados"
       },
@@ -736,6 +738,23 @@
         "view": "Ver Respuestas",
         "edit": "Editar"
       },
+      "questions": [
+        "Describe brevemente tu rol actual (laboral o personal) y tus responsabilidades principales.",
+        "¿Cuál es la situación específica que te ha llevado a iniciar este proceso de coaching? ¿Qué está sucediendo?",
+        "¿Qué funciona bien hoy en tu vida profesional/personal? ¿Cuáles son tus fortalezas?",
+        "¿Qué te gustaría cambiar o mejorar? ¿Cuál es la principal fuente de frustración o insatisfacción?",
+        "¿Cuál es el objetivo más importante que quieres alcanzar al final de este proceso? Sé lo más específico/a posible (ej. \"Conseguir el ascenso a X\", \"Lanzar mi proyecto Y\", \"Gestionar mi equipo con más seguridad\").",
+        "¿Por qué este objetivo es tan importante para ti, precisamente ahora? ¿Qué cambiará en tu vida una vez que lo alcances?",
+        "Imagina que lo has conseguido. Cierra los ojos por un instante. ¿Cómo te sientes? ¿Qué ves? ¿Qué dicen los demás de ti? Describe la escena.",
+        "En términos prácticos, ¿cómo mediremos tu éxito? ¿Qué resultados concretos y observables nos indicarán que has alcanzado tu objetivo?",
+        "¿Cuáles son los principales obstáculos (internos o externos) que prevés encontrar?",
+        "¿Qué comportamientos, hábitos o patrones de pensamiento crees que podrían sabotear tu progreso?",
+        "¿Qué recursos y aliados tienes ya a tu disposición? Piensa en conocimientos, competencias, personas de confianza, herramientas o experiencias pasadas que podrían ayudarte.",
+        "Recuerda que las habilidades blandas (o competencias transversales) son aquellas habilidades personales y relacionales que definen cómo interactúas con los demás, te gestionas a ti mismo/a y afrontas las situaciones. Se refieren al cómo haces las cosas (ej. comunicas, colaboras, gestionas el estrés), a diferencia de las competencias técnicas (\"hard skills\") que se refieren al qué sabes hacer.\n\nDicho esto, ¿cuál es la habilidad blanda que consideras más crucial entrenar para alcanzar tu objetivo?",
+        "Ahora, define qué significa para ti dominar esta competencia. Ejemplo: Si has elegido \"Gestión de Conflictos\", podría significar: \"Lograr expresar mi desacuerdo en una reunión de forma tranquila y asertiva, sin crear tensiones en el equipo\".\n\nPara mí, dominarla significa:",
+        "¿En qué situaciones concretas de tu vida cotidiana te gustaría ver aplicada esta nueva habilidad?",
+        "¿Hay algo más importante que debamos saber para apoyarte de la mejor manera?"
+      ],
       "form": {
         "loading": "Cargando formulario...",
         "placeholder": "Escribe tu respuesta aquí...",

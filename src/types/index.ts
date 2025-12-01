@@ -39,6 +39,7 @@ export interface GoalWithProgress {
 export interface Objective {
   _id: string;
   title: string;
+  startDate: string;
   progress: number;
   totalGoals: number;
   completedGoals: number;

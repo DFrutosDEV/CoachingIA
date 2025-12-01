@@ -147,22 +147,32 @@ export async function POST(request: NextRequest) {
     );
 
     // Convertir a formato Goal
-    const goals = generatedGoals.map((goal, index) => ({
-      _id: `generated-${Date.now()}-${index}`,
-      description: goal.description,
-      day: goal.day,
-      date: addWeeks(new Date(), index),
-      isCompleted: goal.isCompleted,
-      clientId: objective.clientId,
-      objectiveId: objective._id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isDeleted: false,
-      aforism: goal.aforism,
-      tiempoEstimado: goal.tiempoEstimado,
-      ejemplo: goal.ejemplo,
-      indicadorExito: goal.indicadorExito,
-    }));
+    const goals = generatedGoals.map((goal, index) => {
+      // Usar la fecha del goal generado, o calcular una fecha por defecto si no viene
+      const goalDate = goal.date
+        ? new Date(goal.date)
+        : addWeeks(new Date(), index);
+
+      // Extraer el día del mes de la fecha para el campo day (compatibilidad con el modelo)
+      const dayOfMonth = goalDate.getDate().toString();
+
+      return {
+        _id: `generated-${Date.now()}-${index}`,
+        description: goal.description,
+        day: dayOfMonth, // Día del mes extraído de la fecha
+        date: goalDate.toISOString(),
+        isCompleted: goal.isCompleted,
+        clientId: objective.clientId,
+        objectiveId: objective._id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDeleted: false,
+        aforism: goal.aforism,
+        tiempoEstimado: goal.tiempoEstimado,
+        ejemplo: goal.ejemplo,
+        indicadorExito: goal.indicadorExito,
+      };
+    });
 
     return NextResponse.json({
       goals,

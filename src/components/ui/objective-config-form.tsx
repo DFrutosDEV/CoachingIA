@@ -43,17 +43,38 @@ export function ObjectiveConfigForm({
   const [hasConfigFile, setHasConfigFile] = useState(false);
   const [activeTab, setActiveTab] = useState<'form' | 'view'>('form');
 
-  // Cargar preguntas de configuración
-  const loadConfigQuestions = async () => {
+  // Cargar preguntas de configuración (hardcodeadas desde traducciones)
+  const loadConfigQuestions = () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/config-forms');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setConfigQuestions(data.data);
-          setAnswers(new Array(data.data.length).fill(''));
+      // Obtener las preguntas directamente desde t usando índices
+      // next-intl permite acceder a arrays usando la notación de índice
+      const questions: string[] = [];
+      for (let i = 0; i < 15; i++) {
+        try {
+          const question = t(`questions.${i}`);
+          if (question && question !== `questions.${i}`) {
+            questions.push(question);
+          } else {
+            break; // Si no hay más preguntas, salir
+          }
+        } catch (e) {
+          break; // Si hay error, salir
         }
+      }
+
+      if (questions.length > 0) {
+        // Convertir las preguntas al formato ConfigQuestion
+        const formattedQuestions: ConfigQuestion[] = questions.map((question, index) => ({
+          _id: `question-${index + 1}`,
+          title: question,
+          isObligatory: true, // Todas las preguntas son obligatorias
+        }));
+
+        setConfigQuestions(formattedQuestions);
+        setAnswers(new Array(formattedQuestions.length).fill(''));
+      } else {
+        throw new Error('No se encontraron preguntas en las traducciones');
       }
     } catch (error) {
       console.error('Error al cargar preguntas de configuración:', error);

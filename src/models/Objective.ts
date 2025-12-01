@@ -4,8 +4,8 @@ export interface IObjective extends Document {
   title: string;
   createdBy: ObjectId;
   clientId: ObjectId;
-  dateStart: Date;
-  dateEnd: Date;
+  startDate: Date;
+  endDate: Date;
   coachId: ObjectId;
   isCompleted: boolean;
   active: boolean;
@@ -30,13 +30,13 @@ const ObjectiveSchema: Schema = new Schema(
       trim: true,
       maxlength: [50, 'The title cannot exceed 50 characters'],
     },
-    dateStart: {
+    startDate: {
       type: Date,
-      required: [true, 'The dateStart is required'],
+      required: [true, 'The startDate is required'],
     },
-    dateEnd: {
+    endDate: {
       type: Date,
-      required: [true, 'The dateEnd is required'],
+      required: false,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -104,8 +104,8 @@ const ObjectiveSchema: Schema = new Schema(
 
 ObjectiveSchema.index({ title: 1 });
 ObjectiveSchema.index({ createdBy: 1 });
-ObjectiveSchema.index({ dateStart: 1 });
-ObjectiveSchema.index({ dateEnd: 1 });
+ObjectiveSchema.index({ startDate: 1 });
+ObjectiveSchema.index({ endDate: 1 });
 ObjectiveSchema.index({ clientId: 1 });
 ObjectiveSchema.index({ isCompleted: 1 });
 ObjectiveSchema.index({ active: 1 });

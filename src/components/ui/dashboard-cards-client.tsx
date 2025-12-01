@@ -154,6 +154,8 @@ export function GoalsCard({
   const totalGoals = goals.length;
   const completionPercentage =
     totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
 
   return (
     <Card data-swapy-item="goals">
@@ -226,9 +228,11 @@ export function GoalsCard({
           </>
         )}
 
-        <Button size="sm" variant="outline" className="w-full mt-4">
-          {t('viewGoals')}
-          <ArrowRight className="ml-2 h-4 w-4" />
+        <Button size="sm" variant="outline" asChild className="w-full mt-4">
+          <Link href={`/${locale}/dashboard/client/tasks`}>
+            {t('viewGoals')}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         </Button>
       </CardContent>
     </Card>

@@ -134,6 +134,7 @@ export async function GET(request: NextRequest) {
       _id: goal._id.toString(),
       description: goal.description,
       day: goal.day,
+      date: goal.date, // Incluir la fecha completa para comparar con el día actual
       isCompleted: goal.isCompleted,
       createdAt: goal.createdAt,
     }));
@@ -148,9 +149,9 @@ export async function GET(request: NextRequest) {
       createdAt: note.createdAt,
       sessionInfo: note.sessionId
         ? {
-            date: note.sessionId.date,
-            link: note.sessionId.link,
-          }
+          date: note.sessionId.date,
+          link: note.sessionId.link,
+        }
         : null,
     }));
 

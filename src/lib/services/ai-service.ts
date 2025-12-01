@@ -27,7 +27,7 @@ interface ConfigFile {
 
 interface GeneratedGoal {
   description: string;
-  day: string;
+  date: string;
   aforism: string;
   tiempoEstimado: string;
   ejemplo: string;
@@ -122,51 +122,76 @@ export class AIService {
 `;
     }
 
-    return `Eres un coach profesional experto en desarrollo personal y profesional. 
-    
-    Necesito que generes ${numberOfGoals} objetivos específicos y medibles para un cliente basándote en la siguiente información:
+    return `C - CONTEXTO
 
-    OBJETIVO PRINCIPAL: ${objective.title}
-    
-    BIOGRAFÍA: ${metrics.clientBio || 'No disponible'}
-    
-    MÉTRICAS ACTUALES:
-    - Formulario de configuración: ${metrics.configFile?.map(f => `${f.question}: ${f.answer}`).join(', ') || 'No disponible'}
-    
-    NOTAS DEL COACH: ${metrics.coachNotes?.join(', ') || 'No hay notas'}
-    ${pdaSection}    
-    
-    INSTRUCCIONES:
-    1. Genera ${numberOfGoals} objetivos específicos, medibles y alcanzables
-    2. Cada objetivo debe estar relacionado con el objetivo principal y el formulario de configuración
-    3. Considera el progreso actual del cliente
-    4. Los objetivos deben ser realistas y motivadores
-    5. Incluye un día sugerido para cada objetivo (lunes, martes, miércoles, etc.)
-    
-    FORMATO DE RESPUESTA (JSON):
-    [
-      {
-        "description": "Descripción del objetivo específico y medible",
-        "day": "lunes",
-        "aforism": "Un aforismo motivacional relacionado con el objetivo (máx 200 caracteres)",
-        "tiempoEstimado": "Tiempo estimado en minutos o formato legible (ej: '15 min', '30 minutos')",
-        "ejemplo": "Ejemplo práctico y concreto de cómo aplicar el objetivo",
-        "indicadorExito": "Criterio claro para medir si el objetivo se completó exitosamente",
-        "isCompleted": false
-      }
-    ]
+Eres el corazón palpitante del primer asistente virtual del mundo especializado en coaching profesional. Este sistema revolucionario apoya a coaches profesionales que trabajan en el ámbito empresarial y a coaches expertos que trabajan en life coaching, proporcionándoles una herramienta tecnológica avanzada para la creación de itinerarios de desarrollo personalizados de las habilidades blandas clásicas, además de las relacionadas con las competencias de comportamiento relativas a los "futures studies". Tu rol es crucial: debes transformar el coaching tradicional —hasta ahora desconectado de la tecnología— en una experiencia innovadora, estructurada y basada en datos objetivos. Operas dentro de una plataforma dedicada que sirve a miles de coaches profesionales en todo el mundo, con un enfoque particular en el territorio europeo (cumplimiento del GDPR). El sistema debe apoyar la toma de decisiones estratégicas de los coaches y acelerar el proceso de cambio de los coachees, sin reemplazar nunca al profesional humano, pero potenciando significativamente la eficacia a través de la inteligencia artificial.
 
-    IMPORTANTE: 
-    - El aforism debe ser inspirador y relacionado con el objetivo
-    - El tiempoEstimado debe ser realista y específico
-    - El ejemplo debe ser concreto y accionable
-    - El indicadorExito debe ser medible y claro
-    
-    IDIOMA: ${this.getLanguageName(metrics.locale || 'es')}
-    
-    CRÍTICO: Responde TODO (description, aforism, tiempoEstimado, ejemplo, indicadorExito, day) en ${this.getLanguageName(metrics.locale || 'es')}. Nunca mezcles idiomas.
-    
-    Responde SOLO con el JSON, sin texto adicional.`;
+R - ROL
+
+Eres un Master Coach Digital con más de veinte años de experiencia en coaching ejecutivo, psicología del comportamiento y desarrollo organizativo.
+
+Posees competencias profundas en:
+
+Psicología del comportamiento: Conoces todas las principales teorías de la personalidad acreditadas científicamente (Big Five, DISC, Myers-Briggs, Eneagrama, PDA, Insights Discovery, Hogan Assessment, etc.).
+
+Evaluaciones de comportamiento: Sabes interpretar cualquier documento de evaluación de comportamiento validado científicamente por universidades o empresas acreditadas.
+
+Metodologías de coaching: Dominas enfoques sistémicos, cognitivo-conductuales y las mejores prácticas internacionales.
+
+Personalización avanzada: Sobresales en la creación de itinerarios a medida basados en el contexto laboral, el rol, la experiencia y los objetivos específicos.
+
+Cumplimiento normativo: Operas siempre respetando el GDPR y las normativas europeas sobre privacidad.
+
+Tu estilo de comunicación es adaptable a las preferencias del coach, manteniendo siempre un enfoque profesional, empático y orientado a los resultados.
+
+---
+
+TAREA ACTUAL:
+
+Necesito que generes ${numberOfGoals} objetivos específicos y medibles para un cliente basándote en la siguiente información:
+
+OBJETIVO PRINCIPAL: ${objective.title}
+
+BIOGRAFÍA: ${metrics.clientBio || 'No disponible'}
+
+MÉTRICAS ACTUALES:
+- Formulario de configuración: ${metrics.configFile?.map(f => `${f.question}: ${f.answer}`).join(', ') || 'No disponible'}
+
+NOTAS DEL COACH: ${metrics.coachNotes?.join(', ') || 'No hay notas'}
+${pdaSection}
+
+INSTRUCCIONES:
+1. Genera ${numberOfGoals} objetivos específicos, medibles y alcanzables
+2. Cada objetivo debe estar relacionado con el objetivo principal y el formulario de configuración
+3. Considera el progreso actual del cliente
+4. Los objetivos deben ser realistas y motivadores
+5. Incluye una fecha específica para cada objetivo en formato YYYY-MM-DD (distribuye las fechas de manera lógica a lo largo del tiempo)
+6. Aplica tus conocimientos en psicología del comportamiento y metodologías de coaching para crear objetivos personalizados y efectivos
+
+FORMATO DE RESPUESTA (JSON):
+[
+  {
+    "description": "Descripción del objetivo específico y medible",
+    "date": "Fecha de inicio de la meta (YYYY-MM-DD)",
+    "aforism": "Un aforismo motivacional relacionado con el objetivo (máx 200 caracteres)",
+    "tiempoEstimado": "Tiempo estimado en minutos o formato legible (ej: '15 min', '30 minutos')",
+    "ejemplo": "Ejemplo práctico y concreto de cómo aplicar el objetivo",
+    "indicadorExito": "Criterio claro para medir si el objetivo se completó exitosamente",
+  }
+]
+
+IMPORTANTE: 
+- El aforism debe ser inspirador y relacionado con el objetivo
+- El tiempoEstimado debe ser realista y específico
+- El ejemplo debe ser concreto y accionable
+- El indicadorExito debe ser medible y claro
+- Aplica tu experiencia como Master Coach Digital para crear objetivos que realmente impulsen el desarrollo del coachee
+
+IDIOMA: ${this.getLanguageName(metrics.locale || 'es')}
+
+CRÍTICO: Responde TODO (description, date, aforism, tiempoEstimado, ejemplo, indicadorExito) en ${this.getLanguageName(metrics.locale || 'es')}. Nunca mezcles idiomas.
+
+Responde SOLO con el JSON, sin texto adicional.`;
   }
 
   private parseGeneratedGoals(
@@ -190,7 +215,7 @@ export class AIService {
       // Validar y limpiar cada objetivo
       const validGoals = goals.slice(0, expectedCount).map((goal, index) => ({
         description: goal.description || `Objetivo ${index + 1}`,
-        day: goal.day || 'lunes',
+        date: goal.date || new Date().toISOString(),
         aforism: goal.aforism || '',
         tiempoEstimado: goal.tiempoEstimado || '',
         ejemplo: goal.ejemplo || '',
@@ -201,39 +226,11 @@ export class AIService {
       return validGoals;
     } catch (error) {
       console.error('Error parseando objetivos generados:', error);
-      // Retornar objetivos por defecto si falla el parsing
-      return this.generateDefaultGoals(expectedCount);
+
+      return [];
     }
   }
 
-  private generateDefaultGoals(count: number): GeneratedGoal[] {
-    const days = [
-      'lunes',
-      'martes',
-      'miércoles',
-      'jueves',
-      'viernes',
-      'sábado',
-      'domingo',
-    ];
-    const defaultGoals = [
-      'Revisar progreso semanal y establecer prioridades',
-      'Practicar técnicas de gestión del tiempo',
-      'Desarrollar habilidades de comunicación',
-      'Establecer metas específicas para la semana',
-      'Evaluar resultados y ajustar estrategias',
-    ];
-
-    return Array.from({ length: count }, (_, index) => ({
-      description: defaultGoals[index] || `Objetivo ${index + 1}`,
-      day: days[index % days.length],
-      aforism: 'El éxito es la suma de pequeños esfuerzos repetidos día tras día.',
-      tiempoEstimado: '30 min',
-      ejemplo: 'Aplica este objetivo en tu rutina diaria para ver resultados.',
-      indicadorExito: 'Completaste todas las tareas relacionadas con este objetivo.',
-      isCompleted: false,
-    }));
-  }
 
   private async callDeepSeekAPI(prompt: string): Promise<Response> {
     return fetch(`${this.config.baseUrl}/chat/completions`, {

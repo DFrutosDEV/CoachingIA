@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { AuthService } from '@/lib/services/auth-service';
 
 interface SessionEvent {
-  id: string;
+  _id: string;
   title: string;
   start: Date;
   end: Date;
@@ -93,12 +93,11 @@ export default function RescheduleModal({
       }
 
       // Llamar al API para actualizar la sesión
-      const response = await fetch(`/api/meets/${session.id}`, {
+      const response = await fetch(`/api/meets/${session._id}`, {
         method: 'PATCH',
         headers: {
           ...AuthService.getAuthHeaders(),
           'Content-Type': 'application/json',
-          'x-timezone': Intl.DateTimeFormat().resolvedOptions().timeZone, // Enviar zona horaria en header
         },
         body: JSON.stringify({
           date: newDate,

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { objectiveId, goals, description, day } = body;
+    const { objectiveId, goals, description, day, date } = body;
 
     // Si se proporciona description y day, crear una meta individual
     if (!objectiveId) {
@@ -26,13 +26,16 @@ export async function POST(request: NextRequest) {
     const clientProfile = await Profile.findById(objective?.clientId);
 
     if (description && day) {
+      // Usar la fecha proporcionada o la fecha de hoy como fallback
+      const goalDate = date ? new Date(date) : new Date();
+
       const newGoal = new Goal({
         objectiveId,
         description,
         createdBy: coachProfile?._id,
         clientId: clientProfile?._id,
         day,
-        date: new Date().toISOString(),
+        date: goalDate.toISOString(),
         isCompleted: false,
         isDeleted: false,
       });
@@ -56,22 +59,30 @@ export async function POST(request: NextRequest) {
       }
 
       // Crear los goals en la base de datos
-      const goalsToCreate = goals.map((goal: any, index: number) => ({
-        objectiveId,
-        description: goal.description || goal.title,
-        createdBy: coachProfile?._id,
-        clientId: clientProfile?._id,
-        day: goal.day || 'Lunes',
-        date: new Date(
-          new Date().setDate(new Date().getDate() + index)
-        ).toISOString(),
-        isCompleted: false,
-        isDeleted: false,
-        aforism: goal.aforism || '',
-        tiempoEstimado: goal.tiempoEstimado || '',
-        ejemplo: goal.ejemplo || '',
-        indicadorExito: goal.indicadorExito || '',
-      }));
+      const goalsToCreate = goals.map((goal: any, index: number) => {
+        // Si el goal viene con date, usarla; si no, calcular una fecha por defecto
+        const goalDate = goal.date
+          ? new Date(goal.date)
+          : new Date(new Date().setDate(new Date().getDate() + index));
+
+        // Extraer el día del mes de la fecha para el campo day (compatibilidad con el modelo)
+        const dayOfMonth = goalDate.getDate().toString();
+
+        return {
+          objectiveId,
+          description: goal.description || goal.title,
+          createdBy: coachProfile?._id,
+          clientId: clientProfile?._id,
+          day: dayOfMonth, // Día del mes extraído de la fecha
+          date: goalDate.toISOString(),
+          isCompleted: false,
+          isDeleted: false,
+          aforism: goal.aforism || '',
+          tiempoEstimado: goal.tiempoEstimado || '',
+          ejemplo: goal.ejemplo || '',
+          indicadorExito: goal.indicadorExito || '',
+        };
+      });
 
       const createdGoals = await Goal.insertMany(goalsToCreate);
 

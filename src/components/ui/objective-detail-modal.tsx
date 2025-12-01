@@ -179,8 +179,12 @@ export function ObjectiveDetailModal({
     try {
       // Preparar las metas para enviar al servidor
       const goalsToCreate = generatedGoals.map((goal: any) => ({
-        title: goal.description || goal.title,
-        day: goal.day || 'Lunes',
+        description: goal.description || goal.title,
+        date: goal.date || new Date().toISOString(), // Usar la fecha del goal generado
+        aforism: goal.aforism || '',
+        tiempoEstimado: goal.tiempoEstimado || '',
+        ejemplo: goal.ejemplo || '',
+        indicadorExito: goal.indicadorExito || '',
       }));
 
       const response = await fetch('/api/goals', {
@@ -232,8 +236,12 @@ export function ObjectiveDetailModal({
     }
 
     // Extraer el día del mes de la fecha seleccionada
-    const selectedDate = new Date(newGoal.day);
+    // Usar la fecha directamente del input (formato YYYY-MM-DD) y establecer hora a mediodía local
+    const dateParts = newGoal.day.split('-');
+    const selectedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
     const dayOfMonth = selectedDate.getDate().toString();
+    // Convertir la fecha a ISO string para enviarla al endpoint
+    const dateISOString = selectedDate.toISOString();
 
     try {
       const response = await fetch('/api/goals', {
@@ -245,6 +253,7 @@ export function ObjectiveDetailModal({
           objectiveId: objectiveData?.objective._id,
           description: newGoal.description,
           day: dayOfMonth,
+          date: dateISOString, // Enviar la fecha completa seleccionada
           clientId: clientId,
           createdBy: coachId,
         }),
@@ -272,8 +281,12 @@ export function ObjectiveDetailModal({
     }
 
     // Extraer el día del mes de la fecha seleccionada
-    const selectedDate = new Date(editingGoal.day);
+    // Usar la fecha directamente del input (formato YYYY-MM-DD) y establecer hora a mediodía local
+    const dateParts = editingGoal.day.split('-');
+    const selectedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
     const dayOfMonth = selectedDate.getDate().toString();
+    // Convertir la fecha a ISO string para enviarla al endpoint
+    const dateISOString = selectedDate.toISOString();
 
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
@@ -284,6 +297,7 @@ export function ObjectiveDetailModal({
         body: JSON.stringify({
           description: editingGoal.description,
           day: dayOfMonth,
+          date: dateISOString, // Enviar la fecha completa seleccionada
         }),
       });
 
@@ -297,6 +311,7 @@ export function ObjectiveDetailModal({
                   ...goal,
                   description: editingGoal.description,
                   day: editingGoal.day,
+                  date: dateISOString, // Actualizar también la fecha en el estado local
                 }
                 : goal
             )
@@ -526,6 +541,7 @@ export function ObjectiveDetailModal({
   if (!objectiveData) return null;
 
   const { objective } = objectiveData;
+  console.log('objective', objective);
   const completedGoals = goals.filter(goal => goal.isCompleted).length;
   const totalGoals = goals.length;
   const progress = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
@@ -578,6 +594,14 @@ export function ObjectiveDetailModal({
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
                     {t('header.progress')} {Math.round(progress)}%
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {t('header.startDate')} {formatDateWithLocale(new Date(objective.startDate), 'long')}
                   </span>
                 </div>
               </div>
@@ -1043,7 +1067,7 @@ export function ObjectiveDetailModal({
                                     }
                                   >
                                     <Save className="h-3 w-3 mr-1" />
-                                    {t('sessions.buttons.save')}
+                                    {t('buttons.save')}
                                   </Button>
                                   <Button
                                     size="sm"
@@ -1051,7 +1075,7 @@ export function ObjectiveDetailModal({
                                     onClick={cancelEditingSession}
                                   >
                                     <X className="h-3 w-3 mr-1" />
-                                    {t('sessions.buttons.cancel')}
+                                    {t('buttons.cancel')}
                                   </Button>
                                 </div>
                               </div>
@@ -1097,7 +1121,7 @@ export function ObjectiveDetailModal({
                                     {formatDateWithLocale(session.date, 'full')}
                                   </span>
                                 </div>
-                                {session.link && (
+                                {(session.link && new Date(session.date) > new Date()) && (
                                   <div className="flex items-center gap-2">
                                     <span className="text-xs text-muted-foreground">
                                       {t('sessions.link')}

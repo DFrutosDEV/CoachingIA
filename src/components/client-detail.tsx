@@ -25,7 +25,6 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { GoalsModal } from './ui/goals-modal';
 import { ObjectiveDetailModal } from './ui/objective-detail-modal';
-import { FinalizeObjectiveModal } from './ui/finalize-objective-modal';
 import { RescheduleSessionModal } from './ui/reschedule-session-modal';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { formatDate } from '@/utils/validatesInputs';
@@ -41,7 +40,6 @@ export function ClientDetail({
   isOpen,
   onClose,
   onUpdateClient,
-  isAdmin,
 }: ClientDetailProps) {
   const t = useTranslations('common.dashboard.clientDetail');
 
@@ -103,6 +101,7 @@ export function ClientDetail({
       const data = await response.json();
 
       if (data.success) {
+        console.log('data', data.data);
         setSelectedObjectiveData(data.data);
         setIsObjectiveDetailModalOpen(true);
       } else {
@@ -115,11 +114,17 @@ export function ClientDetail({
   };
 
   const handleRescheduleSession = (session: any) => {
+    console.log('session', session);
     // Extraer fecha y hora del campo date
     const sessionDate = new Date(session.date);
+    console.log('sessionDate', sessionDate);
     const dateString = sessionDate.toISOString().split('T')[0];
     const timeString = sessionDate.toTimeString().slice(0, 5);
-
+    console.log('session', {
+      id: session._id || session.id,
+      date: dateString,
+      time: timeString,
+    });
     setSelectedSession({
       id: session._id || session.id,
       date: dateString,
@@ -253,7 +258,7 @@ export function ClientDetail({
                     <div className="rounded-lg border p-3">
                       <div className="flex justify-between">
                         <div className="font-medium">
-                          {`${formatDate(new Date(client.nextSession.date))} - ${client.nextSession.objective.title}`}
+                          {`${formatDate(new Date(client.nextSession.date))} | ${new Date(client.nextSession.date).toLocaleTimeString().slice(0, 4)} - ${client.nextSession.objective.title}`}
                         </div>
                         <Badge variant="outline">{t('info.scheduled')}</Badge>
                       </div>
@@ -366,13 +371,6 @@ export function ClientDetail({
                                 <Button size="sm" variant="outline">
                                   <Eye className="h-4 w-4" />
                                 </Button>
-                                {objective.active && !objective.isCompleted && (
-                                  <FinalizeObjectiveModal
-                                    objectiveId={objective._id}
-                                    objectiveTitle={objective.title}
-                                    onObjectiveFinalized={fetchObjectives}
-                                  />
-                                )}
                               </div>
                             </div>
                           </div>

@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Usar contraseña por defecto
-      const defaultPassword = '!Password1';
+      const defaultPassword = Math.random().toString(36).substring(2, 5).toLowerCase() + Math.random().toString(36).substring(2, 10).toUpperCase() + Math.random().toString(36).substring(2, 5).toLowerCase();
 
       // Crear nuevo usuario
       const newUser = new User({
@@ -174,6 +174,7 @@ export async function POST(request: NextRequest) {
     // Crear el objetivo
     const newObjective = new Objective({
       title: focus,
+      startDate: startDate,
       createdBy: coachId,
       clientId: clientIdToUse,
       coachId,

@@ -112,3 +112,44 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// PATCH /api/meets/:id - Actualizar una sesión
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    await connectDB();
+
+    const { id } = await params;
+    const { date, time } = await request.json();
+
+    const meet = await Meet.findById(id);
+    if (!meet) {
+      return NextResponse.json({ error: 'Sesión no encontrada' }, { status: 404 });
+    }
+
+    // Validar que la fecha y hora sean válidas
+    if (!date || !time) {
+      return NextResponse.json({ error: 'Fecha y hora son requeridos' }, { status: 400 });
+    }
+
+    // Combinar fecha y hora en un solo objeto Date
+    const meetDate = new Date(date);
+    if (time) {
+      const [hours, minutes] = time.split(':');
+      meetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    }
+
+    // Actualizar la sesión
+    const updatedMeet = await Meet.findByIdAndUpdate(id, { date: meetDate }, { new: true });
+    if (!updatedMeet) {
+      return NextResponse.json({ error: 'Error al actualizar la sesión' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, message: 'Sesión actualizada correctamente', meet: updatedMeet });
+  } catch (error) {
+    console.error('Error al actualizar sesión:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
+  }
+}

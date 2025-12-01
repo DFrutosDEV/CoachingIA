@@ -71,18 +71,26 @@ export function FinalizeObjectiveModal({
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevenir propagación del evento
+    setIsOpen(true);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outlined"
-          color="success"
-          startIcon={<CheckCircle />}
-          size="small"
-        >
-          {t('button')}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <Button
+        variant="outlined"
+        color="success"
+        startIcon={<CheckCircle />}
+        size="small"
+        onClick={handleButtonClick}
+      >
+        {t('button')}
+      </Button>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{t('modal.title')}</DialogTitle>

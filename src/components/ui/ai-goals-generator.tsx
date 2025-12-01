@@ -63,9 +63,9 @@ export function AIGoalsGenerator({
   const checkAIStatus = async () => {
     try {
       const response = await fetch('/api/ai/generate-goals');
-      console.log(response);
+
       const data = await response.json();
-      console.log(data);
+
       setAiStatus({
         provider: data.provider || 'AI Service',
         available: data.available || false,

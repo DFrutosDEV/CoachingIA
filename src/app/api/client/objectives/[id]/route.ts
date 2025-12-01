@@ -70,6 +70,7 @@ export async function GET(
         objective: {
           _id: objective._id.toString(),
           title: objective.title,
+          startDate: objective.startDate,
           isCompleted: objective.isCompleted,
           active: objective.active,
           createdAt: objective.createdAt,
