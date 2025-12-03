@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { ObjectiveConfigForm } from './objective-config-form';
 import { CreateNoteModal } from './create-note-modal';
+import { CreateGoalModal } from './create-goal-modal';
 import { AIGoalsGenerator } from './ai-goals-generator';
 import { toast } from 'sonner';
 import { FinalizeObjectiveModal } from './finalize-objective-modal';
@@ -64,6 +65,7 @@ export function ObjectiveDetailModal({
   const t = useTranslations('common.dashboard.objectiveDetail');
   const { formatDate: formatDateWithLocale, formatTime: formatTimeWithLocale } = useDateFormatter();
   const [isCreateNoteModalOpen, setIsCreateNoteModalOpen] = useState(false);
+  const [isCreateGoalModalOpen, setIsCreateGoalModalOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isGenerateSessionsModalOpen, setIsGenerateSessionsModalOpen] =
     useState(false);
@@ -76,9 +78,7 @@ export function ObjectiveDetailModal({
   const [isFormCompleted, setIsFormCompleted] = useState(false);
 
   // Estados para gestión de metas
-  const [isCreatingGoal, setIsCreatingGoal] = useState(false);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
-  const [newGoal, setNewGoal] = useState({ description: '', day: '' });
   const [editingGoal, setEditingGoal] = useState({ description: '', day: '' });
 
   // Estados para gestión de sesiones
@@ -229,49 +229,8 @@ export function ObjectiveDetailModal({
   };
 
   // Funciones para gestión de metas
-  const handleCreateGoal = async () => {
-    if (!newGoal.description.trim() || !newGoal.day.trim()) {
-      toast.error(t('errors.completeFields'));
-      return;
-    }
-
-    // Extraer el día del mes de la fecha seleccionada
-    // Usar la fecha directamente del input (formato YYYY-MM-DD) y establecer hora a mediodía local
-    const dateParts = newGoal.day.split('-');
-    const selectedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
-    const dayOfMonth = selectedDate.getDate().toString();
-    // Convertir la fecha a ISO string para enviarla al endpoint
-    const dateISOString = selectedDate.toISOString();
-
-    try {
-      const response = await fetch('/api/goals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          objectiveId: objectiveData?.objective._id,
-          description: newGoal.description,
-          day: dayOfMonth,
-          date: dateISOString, // Enviar la fecha completa seleccionada
-          clientId: clientId,
-          createdBy: coachId,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setGoals(prevGoals => [...prevGoals, data.goal]);
-          setNewGoal({ description: '', day: '' });
-          setIsCreatingGoal(false);
-          toast.success(t('success.goalCreated'));
-        }
-      }
-    } catch (error) {
-      console.error('Error al crear meta:', error);
-      toast.error(t('errors.createGoal'));
-    }
+  const handleGoalCreated = () => {
+    loadGoals(); // Recargar goals después de crear uno nuevo
   };
 
   const handleUpdateGoal = async (goalId: string) => {
@@ -654,7 +613,7 @@ export function ObjectiveDetailModal({
 
             <TabsContent value="details" className="space-y-4 mt-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Sección de Metas */}
+                {/* Sección de Desafíos */}
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -667,7 +626,7 @@ export function ObjectiveDetailModal({
                           variant="outline"
                           size="sm"
                           className="gap-1"
-                          onClick={() => setIsCreatingGoal(true)}
+                          onClick={() => setIsCreateGoalModalOpen(true)}
                         >
                           <Plus className="h-4 w-4" />
                           {t('goals.newGoal')}
@@ -677,52 +636,6 @@ export function ObjectiveDetailModal({
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                      {/* Formulario para crear nueva meta */}
-                      {isCreatingGoal && (
-                        <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
-                          <div className="space-y-3">
-                            <Input
-                              placeholder={t('goals.form.description')}
-                              value={newGoal.description}
-                              onChange={e =>
-                                setNewGoal(prev => ({
-                                  ...prev,
-                                  description: e.target.value,
-                                }))
-                              }
-                            />
-                            <Input
-                              type="date"
-                              placeholder={t('goals.form.day')}
-                              value={newGoal.day}
-                              onChange={e =>
-                                setNewGoal(prev => ({
-                                  ...prev,
-                                  day: e.target.value,
-                                }))
-                              }
-                            />
-                            <div className="flex gap-2">
-                              <Button size="sm" onClick={handleCreateGoal}>
-                                <Save className="h-3 w-3 mr-1" />
-                                {t('goals.buttons.save')}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setIsCreatingGoal(false);
-                                  setNewGoal({ description: '', day: '' });
-                                }}
-                              >
-                                <X className="h-3 w-3 mr-1" />
-                                {t('goals.buttons.cancel')}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
                       {loadingGoals ? (
                         <div className="flex items-center justify-center py-8">
                           <div className="text-center">
@@ -873,7 +786,7 @@ export function ObjectiveDetailModal({
                             </Button>
                             <Button
                               size="sm"
-                              onClick={() => setIsCreatingGoal(true)}
+                              onClick={() => setIsCreateGoalModalOpen(true)}
                             >
                               <Plus className="h-3 w-3 mr-1" />
                               {t('goals.createManually')}
@@ -1204,6 +1117,15 @@ export function ObjectiveDetailModal({
         clientId={clientId || ''}
         coachId={coachId || ''}
         onNoteCreated={handleNoteCreated}
+      />
+
+      <CreateGoalModal
+        isOpen={isCreateGoalModalOpen}
+        onClose={() => setIsCreateGoalModalOpen(false)}
+        objectiveId={objective._id}
+        clientId={clientId}
+        coachId={coachId}
+        onGoalCreated={handleGoalCreated}
       />
 
       <AIGoalsGenerator

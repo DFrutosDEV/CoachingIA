@@ -11,7 +11,17 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { objectiveId, goals, description, day, date } = body;
+    const {
+      objectiveId,
+      goals,
+      description,
+      day,
+      date,
+      aforism,
+      tiempoEstimado,
+      ejemplo,
+      indicadorExito,
+    } = body;
 
     // Si se proporciona description y day, crear una meta individual
     if (!objectiveId) {
@@ -38,6 +48,10 @@ export async function POST(request: NextRequest) {
         date: goalDate.toISOString(),
         isCompleted: false,
         isDeleted: false,
+        aforism: aforism || '',
+        tiempoEstimado: tiempoEstimado || '',
+        ejemplo: ejemplo || '',
+        indicadorExito: indicadorExito || '',
       });
 
       const createdGoal = await newGoal.save();

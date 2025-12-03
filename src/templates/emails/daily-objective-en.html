@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tu Objetivo del Día - {{companyName}}</title>
+  <title>Your Daily Goal - {{companyName}}</title>
   <style>
     /* Reset styles */
     body,
@@ -248,29 +248,29 @@
           <tr>
             <td class="content">
               <div class="greeting">
-                <h2>¡Hola, {{clientName}}! 👋</h2>
+                <h2>Hello, {{clientName}}! 👋</h2>
                 <p style="color: #6c757d; font-size: 16px">
-                  Aquí está tu objetivo para hoy
+                  Here is your goal for today
                 </p>
               </div>
 
               <!-- Progress Indicator -->
-              <div class="progress-indicator">
+              <!-- <div class="progress-indicator">
                 <p class="progress-text">
-                  📊 Progreso: {{completedGoals}} de {{totalGoals}} objetivos
-                  completados
+                  📊 Progress: {{completedGoals}} of {{totalGoals}} goals
+                  completed
                 </p>
                 <div style="text-align: center; font-size: 20px">
                   {{progressBar}}
                 </div>
-              </div>
+              </div> -->
 
               <!-- Objective Card -->
               <div class="objective-card">
                 <div class="objective-icon">🎯</div>
                 <div class="objective-title">{{objectiveDescription}}</div>
                 <div style="margin-top: 20px; color: #6c757d; font-size: 14px">
-                  📅 Día {{currentDay}} de {{totalDays}}
+                  📅 Day {{currentDay}} of {{totalDays}}
                 </div>
               </div>
 
@@ -279,39 +279,39 @@
                 <p>"{{aforism}}"</p>
               </div>
 
-              <!-- Tiempo Estimado y Ejemplo -->
+              <!-- Estimated Time and Example -->
               <div
                 style="display: flex; justify-content: space-between; margin: 25px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
                 <div style="flex: 1; text-align: center; border-right: 1px solid #dee2e6;">
-                  <p style="margin: 0; font-size: 14px; color: #6c757d; margin-bottom: 5px;">🕒 Tiempo Estimado</p>
+                  <p style="margin: 0; font-size: 14px; color: #6c757d; margin-bottom: 5px;">🕒 Estimated Time</p>
                   <p style="margin: 0; font-weight: 600; color: #333; font-size: 16px;">{{tiempoEstimado}}</p>
                 </div>
                 <div style="flex: 2; text-align: center; margin-left: 15px;">
-                  <p style="margin: 0; font-size: 14px; color: #6c757d; margin-bottom: 5px;">💡 Sugerencia Práctica</p>
+                  <p style="margin: 0; font-size: 14px; color: #6c757d; margin-bottom: 5px;">💡 Practical Suggestion</p>
                   <p style="margin: 0; font-weight: 600; color: #333; font-size: 16px;">{{ejemplo}}</p>
                 </div>
               </div>
 
-              <!-- Indicador de Éxito -->
+              <!-- Success Indicator -->
               <div
                 style="background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 20px; border-radius: 8px; margin: 25px 0;">
-                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2e7d32; margin-bottom: 10px;">🎯 Cómo
-                  Medir el Éxito</p>
+                <p style="margin: 0; font-size: 16px; font-weight: 600; color: #2e7d32; margin-bottom: 10px;">🎯 How to
+                  Measure Success</p>
                 <p style="margin: 0; font-size: 14px; color: #2e7d32;">{{indicadorExito}}</p>
               </div>
 
               <!-- Info Box -->
               <div class="info-box">
                 <p style="margin: 0">
-                  <strong>💡 Tip:</strong> Marca este objetivo como completado
-                  desde la app para seguir tu progreso
+                  <strong>💡 Tip:</strong> Mark this goal as completed
+                  from the app to track your progress
                 </p>
               </div>
 
               <!-- Action Buttons -->
               <div class="action-buttons">
-                <a href="{{dashboardUrl}}" class="button">Ver en la App</a>
-                <!-- <a href="{{objectivesUrl}}" class="button button-secondary">Todos mis Objetivos</a> -->
+                <a href="{{dashboardUrl}}" class="button">View in App</a>
+                <!-- <a href="{{objectivesUrl}}" class="button button-secondary">All My Goals</a> -->
               </div>
 
               <p style="
@@ -320,8 +320,8 @@
                     font-size: 14px;
                     text-align: center;
                   ">
-                ¿Necesitas ayuda? Contáctanos, estamos aquí para apoyarte en tu
-                viaje de crecimiento personal.
+                Need help? Contact us, we're here to support you on your
+                personal growth journey.
               </p>
             </td>
           </tr>
@@ -333,7 +333,7 @@
               <p>{{companyAddress}}</p>
               <p>Email: {{companyEmail}} | Tel: {{companyPhone}}</p>
               <p>
-                <a href="{{privacyUrl}}" style="color: #6c757d; text-decoration: none">Política de privacidad</a>
+                <a href="{{privacyUrl}}" style="color: #6c757d; text-decoration: none">Privacy Policy</a>
               </p>
             </td>
           </tr>

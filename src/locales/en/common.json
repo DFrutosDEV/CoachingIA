@@ -807,6 +807,40 @@
         "noteCreated": "Note created successfully"
       }
     },
+    "createGoal": {
+      "title": "Create New Goal",
+      "form": {
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the challenge that must be completed...",
+        "startDate": "Start Date",
+        "startDateHelper": "Select the date on which this challenge will begin",
+        "aforism": "Aphorism",
+        "aforismPlaceholder": "E.g.: \"Success is the sum of small efforts repeated day in and day out\"",
+        "tiempoEstimado": "Estimated Time",
+        "tiempoEstimadoPlaceholder": "E.g.: 30 minutes, 1 hour, 2 hours per day",
+        "ejemplo": "Example",
+        "ejemploPlaceholder": "Provide a concrete example of how to complete this challenge...",
+        "indicadorExito": "Success Indicator",
+        "indicadorExitoPlaceholder": "Describe how the success of this challenge will be measured...",
+        "characters": "characters",
+        "optionalFields": "Optional Fields",
+        "show": "(Show)",
+        "hide": "(Hide)"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "create": "Create Goal"
+      },
+      "errors": {
+        "descriptionRequired": "Description is required",
+        "startDateRequired": "Start date is required",
+        "createGoal": "Error creating the goal"
+      },
+      "success": {
+        "goalCreated": "Goal created successfully"
+      }
+    },
     "aiGoalsGenerator": {
       "title": "Generate Goals with AI",
       "description": "Configure parameters to generate personalized goals with AI",

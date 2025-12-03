@@ -807,6 +807,40 @@
         "noteCreated": "Nota creada correctamente"
       }
     },
+    "createGoal": {
+      "title": "Crear Nuevo Desafío",
+      "form": {
+        "description": "Descripción",
+        "descriptionPlaceholder": "Describe el desafío que se debe completar...",
+        "startDate": "Fecha de inicio",
+        "startDateHelper": "Selecciona la fecha en la que comenzará este desafío",
+        "aforism": "Aforismo",
+        "aforismPlaceholder": "Ej: \"El éxito es la suma de pequeños esfuerzos repetidos día tras día\"",
+        "tiempoEstimado": "Tiempo Estimado",
+        "tiempoEstimadoPlaceholder": "Ej: 30 minutos, 1 hora, 2 horas al día",
+        "ejemplo": "Ejemplo",
+        "ejemploPlaceholder": "Proporciona un ejemplo concreto de cómo completar este desafío...",
+        "indicadorExito": "Indicador de Éxito",
+        "indicadorExitoPlaceholder": "Describe cómo se medirá el éxito de este desafío...",
+        "characters": "caracteres",
+        "optionalFields": "Campos Opcionales",
+        "show": "(Mostrar)",
+        "hide": "(Ocultar)"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "create": "Crear Desafío"
+      },
+      "errors": {
+        "descriptionRequired": "La descripción es requerida",
+        "startDateRequired": "La fecha de inicio es requerida",
+        "createGoal": "Error al crear el desafío"
+      },
+      "success": {
+        "goalCreated": "Desafío creado exitosamente"
+      }
+    },
     "aiGoalsGenerator": {
       "title": "Generar Objetivos con IA",
       "description": "Configura los parámetros para generar objetivos personalizados con IA",

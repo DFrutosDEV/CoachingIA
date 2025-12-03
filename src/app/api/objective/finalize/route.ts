@@ -47,32 +47,34 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    //! ESTO QUEDO DESCARTADO DE MOMENTO
     // Crear el feedback
-    const newFeedback = new Feedback({
-      coachId: objective.coachId,
-      clientId: objective.clientId,
-      objectiveId: objective._id,
-      feedback: feedback.trim(),
-    });
+    // const newFeedback = new Feedback({
+    //   coachId: objective.coachId,
+    //   clientId: objective.clientId,
+    //   objectiveId: objective._id,
+    //   feedback: feedback.trim(),
+    // });
 
-    await newFeedback.save();
+    // await newFeedback.save();
 
     // Actualizar el objetivo
     objective.isCompleted = true;
     objective.active = false;
+    objective.feedback = feedback.trim();
     await objective.save();
 
     // Actualizar las metas del objetivo
     const goals = await Goal.find({ objectiveId: objective._id });
     goals.forEach(async goal => {
-      goal.isCompleted = true;
+      goal.isDeleted = true;
       await goal.save();
     });
 
     // Actualizar las videollamadas del objetivo
     const meets = await Meet.find({ objectiveId: objective._id });
     meets.forEach(async meet => {
-      meet.isCompleted = true;
+      meet.isCancelled = true;
       await meet.save();
     });
 
@@ -81,8 +83,7 @@ export async function PUT(request: NextRequest) {
         success: true,
         message: 'Objetivo finalizado exitosamente con feedback',
         data: {
-          objective,
-          feedback: newFeedback,
+          feedback: feedback.trim(),
         },
       },
       { status: 200 }

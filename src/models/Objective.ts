@@ -6,6 +6,7 @@ export interface IObjective extends Document {
   clientId: ObjectId;
   startDate: Date;
   endDate: Date;
+  feedback?: string;
   coachId: ObjectId;
   isCompleted: boolean;
   active: boolean;
@@ -47,6 +48,10 @@ const ObjectiveSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Profile',
       required: [true, 'The clientId is required'],
+    },
+    feedback: {
+      type: String,
+      trim: true,
     },
     coachId: {
       type: Schema.Types.ObjectId,

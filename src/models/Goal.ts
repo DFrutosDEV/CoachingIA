@@ -7,12 +7,12 @@ export interface IGoal extends Document {
   clientId: ObjectId;
   date: Date;
   isCompleted: boolean;
-  feedbackId?: ObjectId;
   isDeleted: boolean;
   aforism?: string;
   tiempoEstimado?: string;
   ejemplo?: string;
   indicadorExito?: string;
+  status: string;
 }
 
 const GoalSchema: Schema = new Schema(
@@ -48,12 +48,6 @@ const GoalSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
-    feedbackId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Feedback',
-      required: false,
-      default: null,
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -82,6 +76,12 @@ const GoalSchema: Schema = new Schema(
       trim: true,
       maxlength: [500, 'El indicador de éxito no puede exceder 500 caracteres'],
     },
+    status: {
+      type: String,
+      required: true,
+      default: 'pending',
+      enum: ['pending', 'sent', 'failed'],
+    },
   },
   {
     timestamps: true,
@@ -93,7 +93,6 @@ GoalSchema.index({ createdBy: 1 });
 GoalSchema.index({ clientId: 1 });
 GoalSchema.index({ day: 1 });
 GoalSchema.index({ isCompleted: 1 });
-GoalSchema.index({ feedbackId: 1 });
 
 export default mongoose.models.Goal ||
   mongoose.model<IGoal>('Goal', GoalSchema);

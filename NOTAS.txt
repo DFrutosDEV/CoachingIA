@@ -115,6 +115,19 @@ AGREGAR AL ARCHIVO DE ITALIANO ESTO
     "verifyingAccess": "Verifica accesso in corso..."
   },
 
+
+  TRADUCIR EL COMPONENTE CREATE-GOAL-MODAL AL ITALIANO TAMBIEN
+  "createGoal": 
+      "title": "Crea...
+
+-----------------------------------------------------------------------------------
+
+LA TABLA FEEDBACK NO SE USA, EL FEEDBACK FINAL SE GUARDA EN EL OBJETIVO
+
+
+
+
+
 --------------------------------------------------------------------------------------------------------------------------
 
 3 - PERMITIR QUE LA PANTALLA DE TAREAS A REALIZAR DE LOS CLIENTES PERMITA CARGAR MAS DE 1 OBJETIVO SIMULTANEO
