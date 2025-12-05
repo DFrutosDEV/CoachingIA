@@ -43,7 +43,7 @@ const readTemplate = (templateName: string): string => {
 
 // Helpers para Brevo
 const parseEmailFrom = (fromEnv?: string): { name: string; email: string } => {
-  const fallback = { name: 'CoachingIA', email: 'dfrutos.developer@gmail.com' };
+  const fallback = { name: 'KytCoaching', email: 'dfrutos.developer@gmail.com' };
   if (!fromEnv) return fallback;
   // Formatos soportados: "Nombre <email@dominio>" o solo "email@dominio"
   const match = fromEnv.match(/^\s*(.+?)\s*<\s*(.+?)\s*>\s*$/);
@@ -52,7 +52,7 @@ const parseEmailFrom = (fromEnv?: string): { name: string; email: string } => {
   }
   // Si es solo email
   if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fromEnv)) {
-    return { name: 'CoachingIA', email: fromEnv };
+    return { name: 'KytCoaching', email: fromEnv };
   }
   return fallback;
 };
@@ -71,6 +71,10 @@ const postBrevoEmail = async (payload: any) => {
     },
     body: JSON.stringify(payload),
   });
+  console.log("Brevo status:", response.status);
+  console.log("Brevo status text:", response.statusText);
+  console.log("Brevo headers:", JSON.stringify(response.headers, null, 2));
+  console.log("Brevo body:", await response.text());
   console.log("Brevo response:", JSON.stringify(response, null, 2));
   if (!response.ok) {
     const text = await response.text().catch(() => '');
@@ -125,7 +129,7 @@ export const sendWelcomeEmail = async (
   password: string
 ) => {
   const variables = {
-    companyName: 'CoachingIA',
+    companyName: 'KytCoaching',
     userName: name,
     mailSocio: email,
     passwordSocio: password,
@@ -139,7 +143,7 @@ export const sendWelcomeEmail = async (
   return sendTemplateEmail(
     'welcome.html',
     email,
-    '¡Bienvenido a CoachingIA! - Tus credenciales de acceso',
+    '¡Bienvenido a KytCoaching! - Tus credenciales de acceso',
     variables
   );
 };
@@ -152,7 +156,7 @@ export const sendAppointmentConfirmationEmail = async (
   coachName: string
 ) => {
   const variables = {
-    companyName: 'CoachingIA',
+    companyName: 'KytCoaching',
     userName: name,
     appointmentDate,
     appointmentTime,
@@ -166,7 +170,7 @@ export const sendAppointmentConfirmationEmail = async (
   return sendTemplateEmail(
     'appointment-confirmation.html',
     email,
-    'Confirmación de Cita - CoachingIA',
+    'Confirmación de Cita - KytCoaching',
     variables
   );
 };
@@ -183,7 +187,7 @@ export const renderTemplateFromData = async (
     // Combinar datos con variables globales de la empresa
     const allVariables = {
       ...data,
-      companyName: process.env.NEXT_PUBLIC_APP_NAME || 'CoachingIA',
+      companyName: process.env.NEXT_PUBLIC_APP_NAME || 'KytCoaching',
       companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
       companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
       companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',

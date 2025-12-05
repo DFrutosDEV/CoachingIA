@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Coaching IA',
-  description: 'Coaching IA',
+  title: 'KytCoaching',
+  description: 'KytCoaching',
 };
 
 export default function RootLayout({

@@ -27,8 +27,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Coaching IA',
-  description: 'Coaching IA',
+  title: 'KytCoaching',
+  description: 'KytCoaching',
 };
 
 export function generateStaticParams() {
