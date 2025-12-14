@@ -124,9 +124,7 @@ AGREGAR AL ARCHIVO DE ITALIANO ESTO
 
 LA TABLA FEEDBACK NO SE USA, EL FEEDBACK FINAL SE GUARDA EN EL OBJETIVO
 
-
-
-
+// TODO: GENERALIZAR LA FUNCION DE FORMATEO DE FECHAS
 
 --------------------------------------------------------------------------------------------------------------------------
 

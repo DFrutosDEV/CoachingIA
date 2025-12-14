@@ -3,10 +3,9 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Profile from '@/models/Profile';
 import Role from '@/models/Role';
-import Goal from '@/models/Goal';
-import Note from '@/models/Note';
 import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
+import { getBrowserLocale } from '@/utils/validatesInputs';
 
 // Tipo simplificado para la respuesta del admin
 interface AdminClientResponse {
@@ -66,7 +65,7 @@ export async function GET(request: NextRequest) {
     }).populate({
       path: 'user',
       model: User,
-      select: 'name lastName email phone active isDeleted createdAt',
+      select: 'email active isDeleted createdAt',
     });
 
     if (!clientProfiles || clientProfiles.length === 0) {
@@ -110,13 +109,13 @@ export async function GET(request: NextRequest) {
           _id: profile?.user?._id,
           profileId: profileId,
           name: `${profile.name} ${profile.lastName}`,
-          email: profile.user.email,
-          phone: profile.phone,
-          startDate: profile.createdAt.toLocaleDateString('es-ES', {
+          email: profile.user?.email || '',
+          phone: profile.phone || '',
+          startDate: profile.createdAt?.toLocaleDateString(getBrowserLocale(), {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
-          }),
+          }), // TODO: GENERALIZAR LA FUNCION DE FORMATEO DE FECHAS
           sessions: totalMeets,
           nextSession: nextSession,
           lastSession:

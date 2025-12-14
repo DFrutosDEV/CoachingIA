@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
           hour: '2-digit',
           minute: '2-digit',
           hour12: false,
-        }),
+        }), // TODO: GENERALIZAR LA FUNCION DE FORMATEO DE FECHAS
         objectiveTitle: meet.objectiveId.title,
       };
     });

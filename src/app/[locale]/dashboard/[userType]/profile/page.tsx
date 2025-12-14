@@ -60,7 +60,7 @@ export default function ProfilePage() {
     email: user?.email || '',
     age: user?.profile?.age || '',
     phoneCountryCode: '',
-    phoneArea: '',
+    // phoneArea: '',
     phoneNumber: '',
     bio: user?.profile?.bio || '',
     address: user?.profile?.address || '',
@@ -212,7 +212,7 @@ export default function ProfilePage() {
         email: user.email || '',
         age: user.profile?.age || '',
         phoneCountryCode: phoneParts.countryCode,
-        phoneArea: phoneParts.area,
+        // phoneArea: phoneParts.area,
         phoneNumber: phoneParts.number,
         bio: user.profile?.bio || '',
         address: user.profile?.address || '',
@@ -258,7 +258,7 @@ export default function ProfilePage() {
     // Validar que solo se ingresen números en los campos de teléfono
     if (
       name === 'phoneCountryCode' ||
-      name === 'phoneArea' ||
+      // name === 'phoneArea' ||
       name === 'phoneNumber'
     ) {
       const numericValue = value.replace(/[^0-9]/g, '');
@@ -283,7 +283,7 @@ export default function ProfilePage() {
         email: user.email || '',
         age: user.profile?.age || '',
         phoneCountryCode: phoneParts.countryCode,
-        phoneArea: phoneParts.area,
+        // phoneArea: phoneParts.area,
         phoneNumber: phoneParts.number,
         bio: user.profile?.bio || '',
         address: user.profile?.address || '',
@@ -500,12 +500,11 @@ export default function ProfilePage() {
 
     // Validar campos obligatorios del teléfono
     const countryCode = formData.phoneCountryCode.replace(/\s/g, '');
-    const area = formData.phoneArea.replace(/\s/g, '');
+    // const area = formData.phoneArea.replace(/\s/g, '');
     const number = formData.phoneNumber.replace(/\s/g, '');
 
     if (
       !countryCode ||
-      !area ||
       !number ||
       !formData.name ||
       !formData.lastName
@@ -518,8 +517,8 @@ export default function ProfilePage() {
     try {
       // Concatenar los campos del teléfono en formato E.164
       let fullPhone = '';
-      if (countryCode && area && number) {
-        fullPhone = `+${countryCode}${area}${number}`;
+      if (countryCode && number) {
+        fullPhone = `+${countryCode}${number}`;
       }
 
       const formDataToSend = new FormData();
@@ -826,7 +825,7 @@ export default function ProfilePage() {
                       <Label htmlFor="phone">
                         {t('personalInfo.fields.phone')} <span className="text-red-500">*</span>
                       </Label>
-                      <div className="grid gap-2 md:grid-cols-3">
+                      <div className="grid gap-2 md:grid-cols-2">
                         <div className="flex flex-col gap-1">
                           <Input
                             id="phoneCountryCode"
@@ -843,7 +842,7 @@ export default function ProfilePage() {
                             {t('personalInfo.phoneComponents.country')} <span className="text-red-500">*</span>
                           </p>
                         </div>
-                        <div className="flex flex-col gap-1">
+                        {/* <div className="flex flex-col gap-1">
                           <Input
                             id="phoneArea"
                             name="phoneArea"
@@ -858,7 +857,7 @@ export default function ProfilePage() {
                           <p className="text-xs text-muted-foreground">
                             {t('personalInfo.phoneComponents.area')} <span className="text-red-500">*</span>
                           </p>
-                        </div>
+                        </div> */}
                         <div className="flex flex-col gap-1">
                           <Input
                             id="phoneNumber"

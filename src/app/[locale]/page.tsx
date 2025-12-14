@@ -32,7 +32,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           className="container flex h-16 items-center justify-between px-4 md:px-6"
         >
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="text-primary font-bold text-xl">CoachingIA</span>
+            <span className="text-primary font-bold text-xl">KytCoaching</span>
           </Link>
           <nav className="hidden md:flex gap-6">
             <Link
@@ -361,7 +361,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <div className="flex flex-col gap-4 py-10 md:flex-row md:gap-8 md:p-12">
           <div className="flex-1 space-y-4">
             <div className="flex items-center gap-2 font-semibold">
-              <span className="text-primary font-bold text-xl">CoachingIA</span>
+              <span className="text-primary font-bold text-xl">KytCoaching</span>
             </div>
             <p className="text-sm text-muted-foreground">
               {t('footer.description')}
