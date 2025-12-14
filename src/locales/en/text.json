@@ -83,7 +83,8 @@
       "terms": "Terms",
       "privacy": "Privacy",
       "cookies": "Cookies",
-      "copyright": "All rights reserved."
+      "copyright": "All rights reserved.",
+      "author": "Developed by:"
     }
   },
   "login": {
