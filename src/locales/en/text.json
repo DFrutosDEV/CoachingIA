@@ -29,7 +29,7 @@
       }
     },
     "benefits": {
-      "title": "Why choose CoachingIA?",
+      "title": "Why choose KytCoaching?",
       "description": "Discover the unique advantages that make our platform the perfect choice for your personal growth.",
       "quickResults": {
         "title": "Quick Results",
@@ -70,7 +70,7 @@
     },
     "cta": {
       "title": "Ready to transform your life?",
-      "description": "Join thousands of people who have already changed their lives with CoachingIA."
+      "description": "Join thousands of people who have already changed their lives with KytCoaching."
     },
     "footer": {
       "description": "Transforming lives through personalized coaching.",
@@ -361,7 +361,7 @@
         "area": "Area",
         "number": "Number"
       },
-      "phoneFormat": "Format: +[country] [area] [number] (e.g.: +54 11 40317700, +1 415 5552671)",
+      "phoneFormat": "Format: +[country] [number] (e.g.: +54 1140317700, +1 4155552671)",
       "bioPlaceholder": "Tell us a little about yourself...",
       "addressPlaceholder": "Add address"
     },

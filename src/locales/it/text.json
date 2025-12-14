@@ -2,13 +2,13 @@
   "home": {
     "navigation": {
       "features": "Caratteristiche",
-      "benefits": "Vantaggi",
+      "benefits": "Benefici",
       "process": "Processo",
       "login": "Accedi"
     },
     "hero": {
       "title": "Trasforma la tua vita con il coaching personalizzato",
-      "description": "Connettiti con coach professionali che ti aiuteranno a raggiungere i tuoi obiettivi personali e professionali.",
+      "description": "Connettiti con coach professionisti che ti aiuteranno a raggiungere le tue sfide personali e professionali.",
       "startButton": "Inizia ora",
       "learnMoreButton": "Scopri di più"
     },
@@ -21,22 +21,22 @@
       },
       "flexibleSessions": {
         "title": "Sessioni Flessibili",
-        "description": "Programma sessioni in base alla tua disponibilità e necessità."
+        "description": "Programma le sessioni in base alla tua disponibilità e alle tue esigenze."
       },
       "progressTracking": {
-        "title": "Monitoraggio del Progresso",
-        "description": "Visualizza i tuoi progressi e mantieni un registro dei tuoi successi."
+        "title": "Monitoraggio dei Progressi",
+        "description": "Visualizza i tuoi avanzamenti e tieni traccia dei tuoi risultati."
       }
     },
     "benefits": {
-      "title": "Perché scegliere CoachingIA?",
+      "title": "Perché scegliere KytCoaching?",
       "description": "Scopri i vantaggi unici che rendono la nostra piattaforma la scelta perfetta per il tuo sviluppo personale.",
       "quickResults": {
         "title": "Risultati Rapidi",
         "description": "Il nostro metodo collaudato ti aiuta a vedere cambiamenti significativi nelle prime settimane di coaching."
       },
       "confidentiality": {
-        "title": "Confidenzialità Totale",
+        "title": "Riservatezza Totale",
         "description": "Le tue sessioni e i tuoi dati personali sono protetti con i più alti standard di sicurezza."
       },
       "personalized": {
@@ -45,12 +45,12 @@
       },
       "quality": {
         "title": "Qualità Garantita",
-        "description": "Tutti i nostri coach passano attraverso un rigoroso processo di selezione e certificazione."
+        "description": "Tutti i nostri coach superano un rigoroso processo di selezione e certificazione."
       }
     },
     "process": {
       "title": "Il tuo percorso verso il successo",
-      "description": "Un processo semplice ed efficace per raggiungere i tuoi obiettivi personali e professionali.",
+      "description": "Un processo semplice ed efficace per raggiungere le tue sfide personali e professionali.",
       "step1": {
         "title": "Personalizza il tuo profilo",
         "description": "Inserisci i tuoi dati di sessione e completa il tuo profilo personale."
@@ -60,27 +60,27 @@
         "description": "Rimani connesso con il tuo coach e ricevi consulenza personalizzata."
       },
       "step3": {
-        "title": "Programma la tua sessione",
-        "description": "Programma la tua prima sessione nell'orario che ti conviene di più."
+        "title": "Prenota la tua sessione",
+        "description": "Pianifica la tua prima sessione nell'orario che preferisci."
       },
       "step4": {
         "title": "Trasforma la tua vita",
-        "description": "Inizia il tuo viaggio di trasformazione personale e raggiungi i tuoi obiettivi."
+        "description": "Inizia il tuo viaggio di trasformazione personale e vinci le tue sfide."
       }
     },
     "cta": {
       "title": "Pronto a trasformare la tua vita?",
-      "description": "Unisciti a migliaia di persone che hanno già cambiato le loro vite con CoachingIA."
+      "description": "Unisciti a migliaia di persone che hanno già cambiato la loro vita con KytCoaching."
     },
     "footer": {
-      "description": "Trasformando vite attraverso il coaching personalizzato.",
+      "description": "Trasformiamo vite attraverso il coaching personalizzato.",
       "platform": "Piattaforma",
       "company": "Azienda",
       "aboutUs": "Chi siamo",
       "blog": "Blog",
-      "contact": "Contatto",
+      "contact": "Contatti",
       "legal": "Legale",
-      "terms": "Termini",
+      "terms": "Termini e Condizioni",
       "privacy": "Privacy",
       "cookies": "Cookie",
       "copyright": "Tutti i diritti riservati."
@@ -92,21 +92,21 @@
     "email": "Email",
     "password": "Password",
     "loginButton": "Accedi",
-    "backToHome": "Torna indietro",
+    "backToHome": "Indietro",
     "rememberMe": "Ricordami",
     "loading": "Accesso in corso...",
     "error": "Errore durante l'accesso",
-    "sessionExpired": "La tua sessione è scaduta. Per favore, accedi di nuovo."
+    "sessionExpired": "La tua sessione è scaduta. Per favore, effettua nuovamente l'accesso."
   },
   "dashboardAdmin": {
     "welcome": "Benvenuto",
     "subtitle": "Gestisci utenti, coach e analizza le prestazioni della piattaforma.",
-    "loading": "Caricamento dati del dashboard...",
+    "loading": "Caricamento dati dashboard...",
     "error": "Errore",
     "retry": "Riprova",
     "dragMode": {
-      "activate": "Attiva Drag",
-      "deactivate": "Disattiva Drag",
+      "activate": "Attiva trascinamento",
+      "deactivate": "Disattiva trascinamento",
       "message": "✨ Modalità riorganizzazione attivata - Puoi trascinare le card per riorganizzarle"
     },
     "resourcesPage": {
@@ -114,8 +114,8 @@
       "subtitle": "Strumenti e risorse per gestire la piattaforma."
     },
     "reportsPage": {
-      "title": "Gestione Report",
-      "subtitle": "Rivedi e gestisci i report inviati da utenti e coach.",
+      "title": "Gestione Ticket",
+      "subtitle": "Esamina e gestisci i ticket inviati da utenti e coach.",
       "filters": "Filtri",
       "status": "Stato",
       "category": "Categoria",
@@ -130,7 +130,7 @@
       "inProgress": "In corso",
       "resolved": "Risolto",
       "closed": "Chiuso",
-      "bug": "Errore",
+      "bug": "Errore/Bug",
       "suggestion": "Suggerimento",
       "complaint": "Reclamo",
       "other": "Altro",
@@ -138,86 +138,86 @@
       "high": "Alta",
       "medium": "Media",
       "low": "Bassa",
-      "reports": "Report",
-      "loadingReports": "Caricamento report...",
-      "showingReports": "Mostrando",
+      "reports": "Ticket",
+      "loadingReports": "Caricamento ticket...",
+      "showingReports": "Visualizzando",
       "of": "di",
-      "reportsCount": "report",
-      "errorLoadingReports": "Errore nel caricamento dei report",
-      "connectionError": "Errore di connessione nel caricamento dei report",
-      "errorResponding": "Errore nel rispondere al report",
-      "errorClosing": "Errore nella chiusura del report",
-      "errorResolving": "Errore nella risoluzione del report"
+      "reportsCount": "ticket",
+      "errorLoadingReports": "Errore durante il caricamento dei ticket",
+      "connectionError": "Errore di connessione durante il caricamento dei ticket",
+      "errorResponding": "Errore nell'invio della risposta al ticket",
+      "errorClosing": "Errore durante la chiusura del ticket",
+      "errorResolving": "Errore durante la risoluzione del ticket"
     },
     "enterprisesPage": {
       "title": "Aziende",
-      "subtitle": "Gestisci e supervisiona le aziende registrate nella piattaforma.",
+      "subtitle": "Gestisci e monitora le aziende registrate sulla piattaforma.",
       "totalEnterprises": "Totale Aziende",
       "activeEnterprises": "Aziende Attive",
       "inactiveEnterprises": "Aziende Inattive",
       "newEnterprises": "Nuove Aziende",
       "totalEmployees": "Totale Dipendenti",
       "registeredEnterprises": "Aziende registrate",
-      "activeInPlatform": "Attive nella piattaforma",
-      "temporarilyInactive": "Inattive temporaneamente",
+      "activeInPlatform": "Attive sulla piattaforma",
+      "temporarilyInactive": "Temporaneamente inattive",
       "recentlyRegistered": "Registrate di recente",
       "averagePerEnterprise": "Media:",
       "perEnterprise": "per azienda"
     },
     "coachesPage": {
       "title": "Coach",
-      "subtitle": "Gestisci e supervisiona i coach registrati nella piattaforma.",
+      "subtitle": "Gestisci e monitora i coach registrati sulla piattaforma.",
       "totalCoaches": "Totale Coach",
-      "activeCoaches": "Coach Con Attività",
-      "inactiveCoaches": "Coach Senza Attività",
+      "activeCoaches": "Coach Attivi",
+      "inactiveCoaches": "Coach Inattivi",
       "newCoaches": "Nuovi Coach",
-      "totalClients": "Totale Clienti",
+      "totalClients": "Totale Coachee",
       "registeredCoaches": "Coach registrati",
-      "activeInPlatform": "Attivi nella piattaforma",
-      "temporarilyInactive": "Inattivi temporaneamente",
+      "activeInPlatform": "Attivi sulla piattaforma",
+      "temporarilyInactive": "Temporaneamente inattivi",
       "recentlyRegistered": "Registrati di recente",
       "averagePerCoach": "Media:",
       "perCoach": "per coach"
     },
     "clientsPage": {
-      "title": "Clienti",
-      "subtitle": "Gestisci e supervisiona tutti i clienti registrati nella piattaforma.",
-      "loading": "Caricamento clienti...",
-      "errorLoading": "Errore nell'ottenere i clienti",
+      "title": "Coachee",
+      "subtitle": "Gestisci e monitora tutti i coachee registrati sulla piattaforma.",
+      "loading": "Caricamento coachee...",
+      "errorLoading": "Errore durante il recupero dei coachee",
       "unknownError": "Errore sconosciuto",
-      "errorToast": "Si è verificato un errore nel caricamento dei clienti",
+      "errorToast": "Si è verificato un errore durante il caricamento dei coachee",
       "notAuthenticated": "Utente non autenticato",
-      "noAdminPermissions": "L'utente non ha permessi di amministratore",
+      "noAdminPermissions": "L'utente non dispone dei permessi di amministratore",
       "retry": "Riprova"
     },
     "analyticsPage": {
       "title": "Analisi della Piattaforma",
-      "subtitle": "Visualizza metriche chiave sulle prestazioni, utilizzo e crescita della piattaforma.",
+      "subtitle": "Visualizza metriche chiave su prestazioni, utilizzo e crescita della piattaforma.",
       "temporaryContent": "Contenuto analytics temporaneo"
     }
   },
   "dashboardCoach": {
     "welcome": "Benvenuto",
-    "subtitle": "Qui hai un riepilogo delle tue sessioni e clienti.",
-    "loading": "Caricamento dati del dashboard...",
+    "subtitle": "Ecco un riepilogo delle tue sessioni e dei tuoi coachee.",
+    "loading": "Caricamento dati dashboard...",
     "error": "Errore",
     "retry": "Riprova",
     "dragMode": {
-      "activate": "Attiva Drag",
-      "deactivate": "Disattiva Drag",
+      "activate": "Attiva trascinamento",
+      "deactivate": "Disattiva trascinamento",
       "message": "✨ Modalità riorganizzazione attivata - Puoi trascinare le card per riorganizzarle"
     },
     "resourcesPage": {
       "title": "Risorse",
-      "subtitle": "Strumenti e risorse per gestire la tua pratica di coaching."
+      "subtitle": "Strumenti e risorse per gestire la tua attività di coaching."
     },
     "clientsPage": {
-      "title": "I Miei Clienti",
-      "subtitle": "Gestisci i tuoi clienti e il loro progresso nel programma di coaching.",
-      "loading": "Caricamento clienti...",
-      "errorLoading": "Errore nell'ottenere i clienti",
+      "title": "I miei Coachee",
+      "subtitle": "Gestisci i tuoi clienti e i loro progressi nel programma di coaching.",
+      "loading": "Caricamento coachee...",
+      "errorLoading": "Errore durante il recupero dei coachee",
       "unknownError": "Errore sconosciuto",
-      "errorToast": "Si è verificato un errore nel caricamento dei clienti"
+      "errorToast": "Si è verificato un errore durante il caricamento dei coachee"
     },
     "calendarPage": {
       "title": "Calendario"
@@ -225,58 +225,63 @@
   },
   "dashboardClient": {
     "welcome": "Benvenuto",
-    "subtitle": "Qui hai un riepilogo del tuo progresso e delle prossime sessioni.",
-    "loading": "Caricamento dati del dashboard...",
+    "subtitle": "Ecco un riepilogo dei tuoi progressi e delle prossime sessioni.",
+    "loading": "Caricamento dati dashboard...",
     "error": "Errore",
     "retry": "Riprova",
     "dragMode": {
-      "activate": "Attiva Drag",
-      "deactivate": "Disattiva Drag",
+      "activate": "Attiva trascinamento",
+      "deactivate": "Disattiva trascinamento",
       "message": "✨ Modalità riorganizzazione attivata - Puoi trascinare le card per riorganizzarle"
     },
     "tasksPage": {
-      "title": "Compiti da svolgere",
-      "subtitle": "Qui troverai i compiti che hai in sospeso."
+      "title": "Attività da svolgere",
+      "subtitle": "Qui troverai le attività che hai in sospeso."
     },
     "servicesPage": {
       "title": "Servizi",
-      "subtitle": "Qui troverai i servizi che hai contrattato."
+      "subtitle": "Qui troverai i servizi che hai acquistato/contrattato."
     },
     "resourcesPage": {
       "title": "Risorse",
-      "subtitle": "Strumenti e risorse per gestire la tua esperienza di cliente."
+      "subtitle": "Strumenti e risorse per gestire la tua esperienza come cliente."
     },
     "calendarPage": {
       "title": "Calendario"
     },
     "progressPage": {
       "title": "Progresso",
-      "subtitle": "Progresso dei tuoi obiettivi e mete.",
+      "subtitle": "Avanzamento dei tuoi obiettivi e sfide.",
       "loading": "Caricamento obiettivi...",
-      "errorLoading": "Errore nell'ottenere gli obiettivi",
-      "errorDetails": "Errore nell'ottenere i dettagli dell'obiettivo",
+      "errorLoading": "Errore durante il recupero degli obiettivi",
+      "errorDetails": "Errore durante il recupero dei dettagli dell'obiettivo",
       "unknownError": "Errore sconosciuto",
       "retry": "Riprova",
-      "noObjectives": "Non hai obiettivi assegnati ancora",
+      "noObjectives": "Non hai ancora obiettivi assegnati",
       "coachWillAssign": "Il tuo coach ti assegnerà obiettivi specifici",
       "active": "Attivo",
       "completed": "Completato",
       "progress": "Progresso",
-      "goals": "Mete",
+      "goals": "Sfide",
       "notes": "Note",
-      "noGoals": "Non ci sono mete assegnate a questo obiettivo",
+      "noGoals": "Non ci sono sfide assegnate a questo obiettivo",
       "noNotes": "Non ci sono note per questo obiettivo",
       "completedGoals": "di",
-      "goalsCompleted": "mete completate",
-      "noGoalsAssigned": "Nessuna meta assegnata ancora",
+      "goalsCompleted": "sfide completate",
+      "noGoalsAssigned": "Nessuna sfida ancora assegnata",
       "day": "Giorno:",
-      "by": "Da:"
+      "by": "Da:",
+      "pdaDocument": "Vedi Report",
+      "fileSize": "Dimensione",
+      "uploadedOn": "Caricato il",
+      "download": "Scarica",
+      "downloading": "Scaricamento in corso..."
     }
   },
   "dashboardEnterprise": {
-    "title": "Pannello Aziendale",
+    "title": "Pannello Azienda",
     "subtitle": "Gestisci utenti, coach e analizza le prestazioni della tua Azienda.",
-    "loading": "Caricamento dati del dashboard...",
+    "loading": "Caricamento dati dashboard...",
     "error": "Errore",
     "retry": "Riprova",
     "resourcesPage": {
@@ -284,20 +289,20 @@
       "subtitle": "Strumenti e risorse per gestire la tua azienda."
     },
     "reportsPage": {
-      "title": "Gestione Report",
-      "subtitle": "Rivedi e gestisci i report inviati da utenti e coach."
+      "title": "Gestione Ticket",
+      "subtitle": "Esamina e gestisci i ticket inviati da utenti e coach."
     },
     "coachesPage": {
       "title": "Coach",
-      "subtitle": "Gestisci e supervisiona i coach registrati nella piattaforma."
+      "subtitle": "Gestisci e monitora i coach registrati sulla piattaforma."
     },
     "clientsPage": {
-      "title": "Clienti",
-      "subtitle": "Gestisci e supervisiona i clienti registrati nella piattaforma."
+      "title": "Coachee",
+      "subtitle": "Gestisci e monitora i coachee registrati sulla piattaforma."
     },
     "analyticsPage": {
       "title": "Analisi della Piattaforma",
-      "subtitle": "Visualizza metriche chiave sulle prestazioni, utilizzo e crescita della piattaforma.",
+      "subtitle": "Visualizza metriche chiave su prestazioni, utilizzo e crescita della piattaforma.",
       "userCount": "Numero di utenti",
       "coachCount": "Numero di coach",
       "activeUsers": "Numero di utenti attivi",
@@ -309,7 +314,7 @@
   "unauthorized": {
     "title": "Accesso Negato",
     "subtitle": "Non hai i permessi per accedere a questa pagina",
-    "description": "Il tuo ruolo attuale non ha i permessi necessari per visualizzare questo contenuto. Se pensi che questo sia un errore, contatta l'amministratore del sistema.",
+    "description": "Il tuo ruolo attuale non dispone dei permessi necessari per visualizzare questo contenuto. Se ritieni che si tratti di un errore, contatta l'amministratore del sistema.",
     "goBack": "Torna Indietro",
     "goToLogin": "Vai al Login"
   },
@@ -319,19 +324,19 @@
   "profile": {
     "loading": "Caricamento informazioni utente...",
     "title": "Il Mio Profilo",
-    "subtitle": "Gestisci le tue informazioni personali e configurazione.",
+    "subtitle": "Gestisci le tue informazioni personali e le impostazioni.",
     "buttons": {
       "saving": "Salvataggio...",
       "save": "Salva",
       "cancel": "Annulla",
       "editProfile": "Modifica Profilo",
       "changePassword": "Cambia Password",
-      "changing": "Cambio in corso...",
+      "changing": "Modifica in corso...",
       "changePasswordButton": "Cambia Password"
     },
     "passwordDialog": {
       "title": "Cambia Password",
-      "description": "Inserisci la tua password attuale e la nuova password che vuoi usare.",
+      "description": "Inserisci la tua password attuale e la nuova password che desideri utilizzare.",
       "currentPassword": "Password Attuale",
       "currentPasswordPlaceholder": "Inserisci la tua password attuale",
       "newPassword": "Nuova Password",
@@ -353,11 +358,11 @@
       },
       "phoneComponents": {
         "country": "Paese",
-        "area": "Area",
+        "area": "Prefisso",
         "number": "Numero"
       },
-      "phoneFormat": "Formato: +[paese] [area] [numero] (es: +39 06 1234567, +1 415 5552671)",
-      "bioPlaceholder": "Raccontaci qualcosa di te...",
+      "phoneFormat": "Formato: +[paese] [numero] (es: +39 021234567)",
+      "bioPlaceholder": "Raccontaci un po' di te...",
       "addressPlaceholder": "Aggiungi indirizzo"
     },
     "profilePicture": {
@@ -368,13 +373,13 @@
     },
     "errors": {
       "allFieldsRequired": "Tutti i campi sono obbligatori",
-      "imageTooLarge": "L'immagine non può essere più grande di 10MB",
-      "invalidImageType": "Sono permessi solo file JPG, PNG e WebP",
-      "passwordsDoNotMatch": "Le nuove password non coincidono",
-      "passwordTooShort": "La nuova password deve avere almeno 6 caratteri",
-      "profileUpdateError": "Errore nell'aggiornamento del profilo",
-      "passwordChangeError": "Errore nel cambio password",
-      "profilePictureDeleteError": "Errore nell'eliminazione della foto profilo"
+      "imageTooLarge": "L'immagine non può superare i 10MB",
+      "invalidImageType": "Sono consentiti solo file JPG, PNG e WebP",
+      "passwordsDoNotMatch": "Le nuove password non corrispondono",
+      "passwordTooShort": "La nuova password deve contenere almeno 6 caratteri",
+      "profileUpdateError": "Errore durante l'aggiornamento del profilo",
+      "passwordChangeError": "Errore durante il cambio password",
+      "profilePictureDeleteError": "Errore durante l'eliminazione della foto profilo"
     },
     "success": {
       "profileUpdated": "Profilo aggiornato con successo",
@@ -386,18 +391,18 @@
       "subtitle": "Gestisci le informazioni della tua azienda",
       "loading": "Caricamento dati azienda...",
       "fields": {
-        "name": "Nome Azienda",
+        "name": "Nome dell'Azienda",
         "email": "Email",
         "phone": "Telefono",
         "website": "Sito Web",
         "address": "Indirizzo",
-        "logo": "Logo Azienda",
+        "logo": "Logo Aziendale",
         "socialMedia": "Social Media"
       },
       "placeholders": {
         "name": "Nome dell'azienda",
         "email": "email@azienda.com",
-        "phone": "+1 234 567 8900",
+        "phone": "+39 123 456 7890",
         "website": "https://www.azienda.com",
         "address": "Indirizzo completo dell'azienda",
         "socialMedia": "https://www.facebook.com/azienda"
@@ -409,12 +414,12 @@
       "saveChanges": "Salva Modifiche",
       "saving": "Salvataggio...",
       "success": {
-        "enterpriseUpdated": "Azienda aggiornata con successo"
+        "enterpriseUpdated": "Azienda aggiornata correttamente"
       },
       "errors": {
-        "loadingError": "Errore nel caricamento dei dati azienda",
+        "loadingError": "Errore nel caricamento dati azienda",
         "connectionError": "Errore di connessione",
-        "updateError": "Errore nell'aggiornamento dell'azienda"
+        "updateError": "Errore nell'aggiornamento azienda"
       }
     }
   }

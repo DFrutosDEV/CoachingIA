@@ -1,89 +1,944 @@
 {
-  "homePage": {
+  "dashboard": {
+    "permissionGuard": {
+      "verifying": "Verifica permessi in corso...",
+      "noPermissions": "Non hai i permessi per visualizzare questo contenuto",
+      "noPermissionsDescription": "Il tuo ruolo attuale non dispone dei permessi necessari per visualizzare questo contenuto. Se ritieni che si tratti di un errore, contatta l'amministratore del sistema."
+    },
+    "title": "KytCoaching",
     "navigation": {
-      "features": "Caratteristiche",
-      "benefits": "Benefici",
-      "process": "Processo",
-      "login": "Accedi"
+      "home": "Home",
+      "myServices": "I miei Servizi",
+      "upcomingSessions": "Prossime Sessioni",
+      "whatIAmWorkingOn": "Su cosa sto lavorando",
+      "tasksToDo": "Attività da svolgere",
+      "resources": "Risorse",
+      "myClients": "I miei Coachee",
+      "sessions": "Sessioni",
+      "clients": "Coachee",
+      "coaches": "Coach",
+      "enterprises": "Aziende",
+      "analytics": "Analisi",
+      "reports": "Report",
+      "myCoaches": "I miei Coach",
+      "settings": "Impostazioni",
+      "logout": "Esci"
     },
-    "hero": {
-      "title": "Trasforma la tua vita con coaching personalizzato",
-      "description": "Connettiti con coach professionisti che ti aiuteranno a raggiungere i tuoi obiettivi personali e professionali.",
-      "startButton": "Inizia Ora",
-      "learnMoreButton": "Scopri di Più"
+    "logout": {
+      "confirmTitle": "Conferma Logout",
+      "confirmMessage": "Sei sicuro di voler uscire? Dovrai effettuare nuovamente l'accesso per entrare nel tuo account.",
+      "cancel": "Annulla",
+      "confirm": "Esci"
     },
-    "features": {
-      "title": "Caratteristiche Principali",
-      "description": "La nostra piattaforma offre tutto ciò di cui hai bisogno per un'esperienza di coaching efficace.",
-      "expertCoaches": {
-        "title": "Coach Esperti",
-        "description": "Connettiti con coach certificati specializzati in diverse aree."
+    "coach": {
+      "nextSession": {
+        "title": "Prossima Sessione",
+        "noSessions": "Nessuna sessione programmata",
+        "noSessionsDescription": "Non ci sono sessioni imminenti",
+        "noSessionsButton": "Nessuna sessione",
+        "today": "Oggi",
+        "withClient": "Con {client}",
+        "startVideoCall": "Avvia videochiamata"
       },
-      "flexibleSessions": {
-        "title": "Sessioni Flessibili",
-        "description": "Programma le sessioni secondo la tua disponibilità e necessità."
+      "activeClients": {
+        "title": "Coachee Attivi",
+        "assignedClients": "Coachee assegnati",
+        "viewClients": "Vedi coachee"
       },
-      "progressTracking": {
-        "title": "Monitoraggio dei Progressi",
-        "description": "Visualizza i tuoi progressi e tieni traccia dei tuoi successi."
+      "scheduledSessions": {
+        "title": "Sessioni Programmate",
+        "thisWeek": "Per questa settimana",
+        "viewCalendar": "Vedi calendario"
+      },
+      "todaySessions": {
+        "title": "Sessioni di Oggi",
+        "noSessionsToday": "Non hai sessioni programmate per oggi.",
+        "noSessionsScheduled": "Nessuna sessione programmata",
+        "todaySessionsDescription": "Le tue sessioni programmate per oggi.",
+        "notes": "Note",
+        "jitsi": "Jitsi"
+      },
+      "recentClients": {
+        "title": "Coachee Recenti",
+        "noClientsAssigned": "Non hai coachee assegnati.",
+        "noClientsMessage": "Nessun coachee assegnato",
+        "description": "I tuoi coachee più recenti e i loro progressi.",
+        "sessionsCount": "{sessions} sessioni",
+        "profile": "Profilo",
+        "viewAllClients": "Vedi tutti i coachee"
       }
     },
-    "benefits": {
-      "title": "Perché scegliere CoachingIA?",
-      "description": "Scopri i vantaggi unici che rendono la nostra piattaforma la scelta perfetta per il tuo sviluppo personale.",
-      "quickResults": {
-        "title": "Risultati Rapidi",
-        "description": "Il nostro metodo provato ti aiuta a vedere cambiamenti significativi nelle prime settimane di coaching."
-      },
-      "confidentiality": {
-        "title": "Riservatezza Totale",
-        "description": "Le tue sessioni e i tuoi dati personali sono protetti con i più alti standard di sicurezza."
-      },
-      "personalized": {
-        "title": "Approccio Personalizzato",
-        "description": "Ogni sessione si adatta ai tuoi obiettivi specifici e al tuo stile di apprendimento unico."
-      },
-      "quality": {
-        "title": "Qualità Garantita",
-        "description": "Tutti i nostri coach superano un rigoroso processo di selezione e certificazione."
+    "points": {
+      "title": "I miei Punti",
+      "availablePoints": "Punti disponibili",
+      "messages": {
+        "empty": "Hai bisogno di punti per generare obiettivi. Contatta l'amministratore.",
+        "low": "Hai pochi punti. Considera di richiederne altri all'amministratore.",
+        "good": "Hai abbastanza punti per generare obiettivi."
       }
     },
-    "process": {
-      "title": "Il tuo percorso verso il successo",
-      "description": "Un processo semplice ed efficace per raggiungere i tuoi obiettivi personali e professionali.",
-      "step1": {
-        "title": "Personalizza il tuo profilo",
-        "description": "Inserisci i tuoi dati di sessione e completa il tuo profilo personale."
+    "clientsList": {
+      "title": "Lista Coachee",
+      "description": "Gestisci i tuoi coachee e le loro informazioni",
+      "search": {
+        "placeholder": "Cerca per nome, email o focus...",
+        "filter": "Filtra",
+        "status": "Stato",
+        "all": "Tutti",
+        "active": "Attivi",
+        "pending": "In sospeso",
+        "inactive": "Inattivi"
       },
-      "step2": {
-        "title": "Trova il tuo Coach",
-        "description": "Rimani connesso con il tuo coach e ricevi consulenza personalizzata."
+      "table": {
+        "client": "Coachee",
+        "status": "Stato",
+        "nextSession": "Prossima Sessione",
+        "actions": "Azioni",
+        "openMenu": "Apri menù",
+        "quickActions": "Azioni Rapide",
+        "deactivate": "Disattiva",
+        "message": "Messaggio",
+        "viewPDA": "Vedi Report",
+        "noClientsFound": "Nessun coachee trovato.",
+        "showingResults": "Visualizzando {start} a {end} di {total} coachee",
+        "previous": "Precedente",
+        "next": "Successivo",
+        "toSchedule": "Da programmare"
       },
-      "step3": {
-        "title": "Prenota la tua sessione",
-        "description": "Prenota la tua prima sessione nell'orario che ti conviene di più."
-      },
-      "step4": {
-        "title": "Trasforma la tua vita",
-        "description": "Inizia il tuo viaggio di trasformazione personale e raggiungi i tuoi obiettivi."
+      "status": {
+        "active": "Attivo",
+        "pending": "In sospeso",
+        "inactive": "Inattivo"
       }
     },
-    "cta": {
-      "title": "Pronto a trasformare la tua vita?",
-      "description": "Unisciti a migliaia di persone che hanno già cambiato le loro vite con CoachingIA."
+    "clientDetail": {
+      "title": "Dettaglio Coachee",
+      "actions": {
+        "message": "Messaggio",
+        "viewPDA": "Vedi Report"
+      },
+      "tabs": {
+        "info": "Info",
+        "objectives": "Obiettivi"
+      },
+      "info": {
+        "noEmail": "Nessuna email",
+        "noPhone": "Nessun telefono",
+        "clientSince": "Cliente dal {date}",
+        "sessionsCompleted": "{sessions} sessioni completate",
+        "nextSession": "Prossima Sessione",
+        "scheduled": "Programmata",
+        "reschedule": "Reprogramma",
+        "start": "Avvia",
+        "noSessionsScheduled": "Non ci sono sessioni programmate",
+        "lastSession": "Ultima Sessione",
+        "noPreviousSessions": "Non ci sono sessioni precedenti",
+        "biography": "Biografia",
+        "noBiography": "Nessuna biografia"
+      },
+      "objectives": {
+        "title": "Obiettivi del Coachee",
+        "loading": "Caricamento obiettivi...",
+        "active": "Attivo",
+        "completed": "Completato",
+        "inProgress": "In Corso",
+        "progress": "Progresso: {progress}%",
+        "goals": "di {total} sfide",
+        "created": "Creato: {date}",
+        "coach": "Coach: {coach}",
+        "noObjectives": "Non ci sono obiettivi definiti per questo cliente"
+      },
+      "notes": {
+        "title": "Note delle Sessioni",
+        "newNote": "Nuova Nota",
+        "noNotes": "Non ci sono note registrate."
+      },
+      "status": {
+        "active": "Attivo",
+        "pending": "In sospeso",
+        "inactive": "Inattivo"
+      }
     },
-    "footer": {
-      "description": "Trasformare vite attraverso il coaching personalizzato.",
-      "platform": "Piattaforma",
-      "company": "Azienda",
-      "aboutUs": "Chi Siamo",
-      "blog": "Blog",
-      "contact": "Contatto",
-      "legal": "Legale",
-      "terms": "Termini",
-      "privacy": "Privacy",
-      "cookies": "Cookie",
-      "copyright": "Tutti i diritti riservati."
+    "deleteClientModal": {
+      "title": "Disattiva coachee",
+      "description": "Sei sicuro di voler disattivare {clientName}? Questa azione contrassegnerà il cliente come eliminato ma non cancellerà i suoi dati permanentemente.",
+      "cancel": "Annulla",
+      "processing": "Elaborazione...",
+      "delete": "Disattiva",
+      "success": "Coachee disattivato con successo",
+      "error": "Errore durante la disattivazione del coachee"
+    },
+    "calendar": {
+      "title": "Calendario Sessioni",
+      "loading": "Caricamento sessioni...",
+      "retry": "Riprova",
+      "update": "Aggiorna",
+      "month": "Mese",
+      "noDescription": "Nessuna descrizione aggiuntiva.",
+      "sessionDetails": {
+        "client": "Cliente:",
+        "coach": "Coach:",
+        "objective": "Obiettivo:",
+        "time": "Ora:",
+        "date": "Data:",
+        "link": "Link:",
+        "joinSession": "Unisciti alla sessione"
+      },
+      "actions": {
+        "close": "Chiudi",
+        "reschedule": "Reprogramma"
+      },
+      "messages": {
+        "next": "Successivo",
+        "previous": "Precedente",
+        "today": "Oggi",
+        "month": "Mese",
+        "week": "Settimana",
+        "day": "Giorno",
+        "agenda": "Agenda",
+        "date": "Data",
+        "time": "Ora",
+        "event": "Sessione",
+        "noEventsInRange": "Nessuna sessione in questo intervallo.",
+        "showMore": "Vedi altro ({total})"
+      }
+    },
+    "notificationCard": {
+      "title": "Notifiche",
+      "description": "Invia notifiche ai tuoi clienti su sessioni, promemoria o informazioni importanti.",
+      "features": {
+        "sessionReminders": "Invia promemoria sessioni",
+        "scheduleChanges": "Notifica cambi di orario",
+        "shareResources": "Condividi risorse e materiali"
+      },
+      "createNotification": "Crea Notifica",
+      "modal": {
+        "title": "Crea Notifica",
+        "description": "Invia una notifica a {userType} utenti del sistema",
+        "massNotifications": "Notifiche di Massa",
+        "notifyAllClients": "Notifica tutti i miei clienti",
+        "notifyAllCoaches": "Notifica tutti i coach",
+        "notifyAllUsers": "Notifica tutti gli utenti",
+        "orSelectIndividually": "O seleziona individualmente",
+        "recipients": "Destinatari",
+        "searchPlaceholder": "Digita 3 lettere per iniziare la ricerca...",
+        "searching": "Ricerca utenti...",
+        "noUsersFound": "Nessun utente trovato",
+        "selectedRecipients": "Destinatari selezionati:",
+        "titleLabel": "Titolo",
+        "titlePlaceholder": "Titolo della notifica",
+        "messageLabel": "Messaggio",
+        "messagePlaceholder": "Scrivi qui il tuo messaggio...",
+        "cancel": "Annulla",
+        "sending": "Invio in corso...",
+        "send": "Invia Notifica"
+      },
+      "errors": {
+        "selectRecipients": "Seleziona almeno un destinatario o un'opzione di notifica di massa",
+        "completeFields": "Completa il titolo e il messaggio",
+        "userNotIdentified": "Impossibile identificare l'utente autenticato",
+        "serverError": "Errore interno del server"
+      }
+    },
+    "newObjectiveCard": {
+      "title": "Crea nuovo Obiettivo",
+      "description": "Aggiungi nuovi obiettivi alla tua lista e configura i loro profili, obiettivi e piani di coaching.",
+      "features": {
+        "createObjective": "Crea un nuovo obiettivo",
+        "setInitialGoals": "Imposta obiettivi iniziali",
+        "scheduleFirstSessions": "Programma prime sessioni"
+      },
+      "addObjective": "Aggiungi Obiettivo",
+      "modal": {
+        "title": "Aggiungi Nuovo Obiettivo",
+        "description": "Completa le informazioni per creare un nuovo profilo obiettivo.",
+        "email": "Email *",
+        "emailPlaceholder": "email@esempio.com",
+        "checkingEmail": "Verifica email...",
+        "existingClient": "✓ Cliente esistente",
+        "firstName": "Nome",
+        "lastName": "Cognome",
+        "focus": "Focus principale",
+        "focusPlaceholder": "Es: Sviluppo personale, Leadership, ecc.",
+        "startDate": "Data Inizio",
+        "startTime": "Ora Inizio",
+        "assignedCoach": "Coach assegnato",
+        "coachPlaceholder": "ID del coach (opzionale - sarà assegnato automaticamente se lasciato vuoto)",
+        "coachHelper": "Lascia vuoto per assegnare automaticamente all'utente attuale",
+        "cancel": "Annulla",
+        "creating": "Creazione...",
+        "create": "Crea Obiettivo"
+      },
+      "existingUserModal": {
+        "title": "Utente trovato",
+        "description": "Esiste già un utente con l'email {email}:",
+        "noOtherUser": "No, è un altro utente",
+        "yesThisUser": "Sì, è questo utente",
+        "years": "anni"
+      },
+      "errors": {
+        "validEmail": "Inserisci un'email valida",
+        "completeFields": "Completa tutti i campi richiesti",
+        "userNotIdentified": "Impossibile identificare l'utente autenticato",
+        "activeObjective": "Questo cliente ha già un obiettivo attivo. Deve completare l'obiettivo attuale prima di crearne uno nuovo.",
+        "checkActiveObjective": "Errore durante la verifica dell'obiettivo attivo",
+        "checkEmail": "Errore durante la verifica dell'email",
+        "serverError": "Errore interno del server"
+      },
+      "success": {
+        "clientDataLoaded": "Dati cliente caricati automaticamente",
+        "differentEmail": "Inserisci un'email differente",
+        "clientCreated": "Cliente creato con successo con obiettivo e riunione programmata"
+      }
+    },
+    "ticketCard": {
+      "title": "Genera Ticket",
+      "description": "Crea ticket per segnalare problemi, richiedere supporto o inviare suggerimenti al team tecnico.",
+      "features": {
+        "reportTechnicalIssues": "Segnala problemi tecnici",
+        "requestNewFeatures": "Richiedi nuove funzionalità",
+        "receivePersonalizedSupport": "Ricevi supporto personalizzato"
+      },
+      "createTicket": "Crea Ticket",
+      "modal": {
+        "title": "Genera Ticket di Supporto",
+        "description": "Descrivi il problema o la richiesta per il team di supporto.",
+        "ticketType": "Tipo di Ticket",
+        "selectType": "Seleziona tipo",
+        "types": {
+          "technical": "Problema tecnico",
+          "billing": "Fatturazione",
+          "feature": "Richiesta funzionalità",
+          "other": "Altro"
+        },
+        "subject": "Oggetto",
+        "subjectPlaceholder": "Oggetto del ticket",
+        "descriptionLabel": "Descrizione",
+        "descriptionPlaceholder": "Descrivi il problema o la richiesta in dettaglio...",
+        "priority": "Priorità",
+        "priorities": {
+          "low": "Bassa",
+          "medium": "Media",
+          "high": "Alta",
+          "urgent": "Urgente"
+        },
+        "cancel": "Annulla",
+        "send": "Invia Ticket"
+      }
+    },
+    "settings": {
+      "title": "Impostazioni",
+      "description": "Regola le impostazioni del tuo account per il profilo di {userType}.",
+      "theme": {
+        "title": "Tema",
+        "description": "Seleziona il tema visivo dell'applicazione.",
+        "light": "Chiaro",
+        "dark": "Scuro",
+        "system": "Sistema"
+      },
+      "language": {
+        "title": "Lingua",
+        "description": "Seleziona la lingua dell'applicazione.",
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano"
+      }
+    },
+    "languageSwitcher": {
+      "languages": {
+        "es": "Español",
+        "en": "English",
+        "it": "Italiano"
+      }
+    },
+    "clientCards": {
+      "nextSession": {
+        "title": "Prossima Sessione",
+        "noSessions": "Nessuna sessione programmata",
+        "noSessionsDescription": "Non hai sessioni imminenti",
+        "today": "Oggi",
+        "withCoach": "Con {coach}",
+        "joinSession": "Unisciti alla sessione"
+      },
+      "completedSessions": {
+        "title": "Sessioni Completate",
+        "thisMonth": "+{sessionsThisMonth} questo mese",
+        "monthlyPlan": "{percentage}% del tuo piano mensile"
+      },
+      "goals": {
+        "title": "Sfide",
+        "noGoals": "Nessuna sfida assegnata",
+        "noGoalsDescription": "Il tuo coach ti assegnerà sfide specifiche",
+        "completed": "Sfide completate",
+        "completionPercentage": "{percentage}% completato",
+        "recentGoals": "Sfide recenti:",
+        "moreGoals": "+{count} altre sfide",
+        "viewGoals": "Vedi sfide"
+      },
+      "upcomingSessions": {
+        "title": "Prossime Sessioni",
+        "description": "Le tue sessioni programmate per i prossimi giorni.",
+        "noSessions": "Non hai sessioni programmate",
+        "withCoach": "Con {coach}",
+        "details": "Dettagli"
+      },
+      "progress": {
+        "title": "Il Tuo Progresso",
+        "description": "Monitoraggio dei tuoi obiettivi e sfide.",
+        "noObjectives": "Non hai obiettivi assegnati",
+        "goalsCompleted": "{completedGoals}/{totalGoals} sfide completate",
+        "noGoalsAssigned": "Nessuna sfida ancora assegnata",
+        "viewFullReport": "Vedi report completo"
+      }
+    },
+    "servicesGrid": {
+      "loading": "Caricamento coach...",
+      "error": {
+        "loadCoaches": "Errore nel caricamento dei coach",
+        "unknown": "Errore sconosciuto",
+        "message": "Errore: {error}"
+      },
+      "retry": "Riprova",
+      "noCoaches": "Nessun coach registrato",
+      "noCoachesDescription": "Nessun coach assegnato a questo cliente",
+      "update": "Aggiorna",
+      "title": "Coach Registrati",
+      "total": "Totale: {count} coach{plural}",
+      "plural": "",
+      "singular": ""
+    },
+    "coachCard": {
+      "status": {
+        "active": "Attivo",
+        "inactive": "Inattivo"
+      },
+      "age": "{age} anni",
+      "registered": "Registrato: {date}",
+      "sendMessage": "Invia Messaggio"
+    },
+    "clientTasks": {
+      "loading": "Caricamento attività...",
+      "errors": {
+        "loadTasks": "Errore nel caricamento delle attività",
+        "updateTask": "Errore nell'aggiornamento dell'attività",
+        "cannotCompleteTask": "Puoi completare solo le attività del giorno corrente"
+      },
+      "title": "Attività Giornaliere e Passate",
+      "currentObjective": "Obiettivo Attuale: {title}",
+      "coach": "Coach: {coach}",
+      "day": "Giorno {day}",
+      "status": {
+        "completed": "Completata",
+        "pending": "In sospeso"
+      },
+      "noTasks": "Nessuna attività assegnata",
+      "summary": "Riepilogo",
+      "completed": "Completate: {count}",
+      "pending": "In sospeso: {count}",
+      "total": "Totale: {count}",
+      "coachNotes": "Note del Coach",
+      "note": "Nota",
+      "session": "Sessione: {date}",
+      "by": "Da: {createdBy}",
+      "noNotes": "Non ci sono note disponibili",
+      "feedback": "Feedback",
+      "noFeedback": "Non c'è feedback disponibile"
+    },
+    "notifications": {
+      "title": "Notifiche",
+      "markAllAsRead": "Segna tutte come lette",
+      "noNotifications": "Non hai notifiche",
+      "new": "Nuovo",
+      "timeAgo": {
+        "minutesAgo": "Qualche minuto fa",
+        "hoursAgo": "{hours} ora{plural} fa",
+        "daysAgo": "{days} giorno{plural} fa",
+        "hoursPlural": "e",
+        "daysPlural": "i",
+        "hoursSingular": "",
+        "daysSingular": ""
+      }
+    },
+    "adminCards": {
+      "totalUsers": {
+        "title": "Totale Utenti",
+        "thisMonth": "+{count} questo mese",
+        "viewUsers": "Vedi utenti"
+      },
+      "activeCoaches": {
+        "title": "Coach Attivi",
+        "thisMonth": "+{count} questo mese",
+        "viewCoaches": "Vedi coach"
+      },
+      "completedSessions": {
+        "title": "Sessioni Svolte",
+        "thisMonth": "+{count} questo mese",
+        "viewAnalytics": "Vedi analisi"
+      },
+      "reports": {
+        "title": "Report",
+        "pendingReview": "In attesa di revisione",
+        "viewReports": "Vedi report"
+      },
+      "newUsers": {
+        "title": "Nuovi Utenti",
+        "description": "Utenti registrati negli ultimi 7 giorni.",
+        "viewProfile": "Vedi profilo",
+        "noNewUsers": "Non ci sono nuovi utenti"
+      },
+      "platformPerformance": {
+        "title": "Prestazioni Piattaforma",
+        "description": "Statistiche di utilizzo e crescita.",
+        "metrics": {
+          "conversionRate": "Tasso di Conversione",
+          "avgSessionsPerUser": "Media Sessioni per Utente",
+          "avgSessionTime": "Tempo Medio Sessione",
+          "churnRate": "Tasso di Abbandono",
+          "monthlyRevenue": "Entrate Mensili"
+        },
+        "viewFullReport": "Vedi report completo"
+      }
+    },
+    "enterprisesGrid": {
+      "loading": "Caricamento aziende...",
+      "error": {
+        "loadEnterprises": "Errore nel caricamento delle aziende",
+        "unknown": "Errore sconosciuto",
+        "message": "Errore: {error}"
+      },
+      "retry": "Riprova",
+      "noEnterprises": "Nessuna azienda registrata",
+      "update": "Aggiorna",
+      "title": "Aziende Registrate",
+      "total": "Totale: {count} aziend{plural}",
+      "plural": "e",
+      "singular": "a",
+      "status": {
+        "active": "Attiva",
+        "inactive": "Inattiva"
+      }
+    },
+    "enterpriseCard": {
+      "administrator": "Admin: {administrator}",
+      "email": "Email: {email}",
+      "phone": "Telefono: {phone}",
+      "coachesAndCoachees": "Coach: {coaches} | Coachee: {coachees}"
+    },
+    "addUserCard": {
+      "title": "Aggiungi nuovo utente",
+      "description": "Aggiungi nuovi utenti alla tua lista e configura i loro profili, obiettivi e piani di coaching.",
+      "features": {
+        "createProfiles": "Crea profili utente",
+        "startScheduling": "Inizia a programmare sessioni",
+        "scheduleWithClients": "Programma sessioni con i tuoi clienti"
+      },
+      "addUser": "Aggiungi Utente",
+      "modal": {
+        "title": "Aggiungi Nuovo Utente",
+        "description": "Completa le informazioni per creare un nuovo utente.",
+        "fields": {
+          "name": "Nome",
+          "lastName": "Cognome",
+          "email": "Email",
+          "emailPlaceholder": "email@esempio.com",
+          "profile": "Profilo",
+          "profilePlaceholder": "Seleziona il profilo",
+          "enterpriseName": "Nome dell'azienda",
+          "enterpriseNamePlaceholder": "Inserisci il nome dell'azienda"
+        },
+        "profiles": {
+          "admin": "Admin",
+          "coach": "Coach",
+          "client": "Coachee",
+          "enterprise": "Azienda"
+        },
+        "buttons": {
+          "cancel": "Annulla",
+          "creating": "Creazione...",
+          "create": "Crea Utente"
+        }
+      },
+      "errors": {
+        "completeFields": "Per favore completa tutti i campi richiesti",
+        "createUser": "Errore durante la creazione dell'utente",
+        "enterpriseNameRequired": "Inserisci il nome dell'azienda"
+      },
+      "success": {
+        "userCreated": "Utente creato con successo"
+      }
+    },
+    "pointsManager": {
+      "card": {
+        "title": "Gestione Punti",
+        "description": "Gestisci i punti dei coach per la generazione di obiettivi",
+        "features": {
+          "assignPoints": "Assegna punti ai coach",
+          "removePoints": "Rimuovi punti ai coach",
+          "viewPoints": "Visualizza i punti dei coach"
+        },
+        "managePoints": "Gestisci Punti"
+      },
+      "modal": {
+        "title": "Gestione Punti Coach",
+        "description": "Cerca un coach e gestisci i suoi punti per la generazione di obiettivi.",
+        "search": {
+          "label": "Cerca Coach",
+          "placeholder": "Cerca per nome, cognome o email...",
+          "searching": "Ricerca coach...",
+          "results": "Risultati:",
+          "noResults": "Nessun coach trovato"
+        },
+        "coach": {
+          "currentPoints": "punti attuali",
+          "newPoints": "Nuovi Punti",
+          "points": "punti"
+        },
+        "buttons": {
+          "cancel": "Annulla",
+          "updating": "Aggiornamento...",
+          "confirm": "Conferma Modifiche"
+        },
+        "errors": {
+          "searchCoaches": "Errore durante la ricerca dei coach",
+          "updatePoints": "Errore durante l'aggiornamento dei punti"
+        },
+        "success": {
+          "pointsUpdated": "Punti aggiornati con successo"
+        }
+      }
+    },
+    "finalizeObjective": {
+      "button": "Finalizza Obiettivo",
+      "modal": {
+        "title": "Finalizza Obiettivo",
+        "description": "Fornisci un feedback finale per l'obiettivo:",
+        "fields": {
+          "feedback": "Feedback Finale *",
+          "feedbackPlaceholder": "Descrivi il progresso del cliente, i traguardi raggiunti, le aree di miglioramento e le raccomandazioni per il futuro...",
+          "characterCount": "{count}/500 caratteri"
+        },
+        "buttons": {
+          "cancel": "Annulla",
+          "finalizing": "Finalizzazione...",
+          "finalize": "Finalizza Obiettivo"
+        }
+      },
+      "errors": {
+        "feedbackRequired": "Per favore inserisci un feedback prima di finalizzare l'obiettivo",
+        "serverError": "Errore interno del server",
+        "errorWithMessage": "Errore: {error}"
+      },
+      "success": {
+        "objectiveFinalized": "Obiettivo finalizzato con successo"
+      }
+    },
+    "objectiveDetail": {
+      "header": {
+        "title": "Informazioni Obiettivo",
+        "status": {
+          "active": "Attivo",
+          "inactive": "Inattivo",
+          "completed": "Completato",
+          "inProgress": "In Corso"
+        },
+        "created": "Creato:",
+        "progress": "Progresso:",
+        "startDate": "Data di inizio:",
+        "generalProgress": "Progresso generale",
+        "goalsCompleted": "sfide completate"
+      },
+      "tabs": {
+        "details": "Dettagli",
+        "config": "Configurazione",
+        "notes": "Note",
+        "sessions": "Sessioni"
+      },
+      "goals": {
+        "title": "Sfide ({count})",
+        "newGoal": "Nuova Sfida",
+        "form": {
+          "description": "Descrizione della meta",
+          "day": "Giorno (es: Lunedì, Martedì, ecc.)"
+        },
+        "buttons": {
+          "save": "Salva",
+          "cancel": "Annulla"
+        },
+        "loading": "Caricamento sfide...",
+        "empty": "Non ci sono sfide definite per questo obiettivo",
+        "configWarning": "Completa il modulo di configurazione nella scheda \"Configurazione\" per generare sfide con l'IA",
+        "aiGenerate": "Genera con IA",
+        "createManually": "Crea Manualmente",
+        "configRequired": "Completa prima il modulo di configurazione"
+      },
+      "notes": {
+        "title": "Note ({count})",
+        "newNote": "Nuova Nota",
+        "createFirst": "Crea Prima Nota",
+        "loading": "Caricamento note...",
+        "empty": "Non ci sono note registrate per questo obiettivo"
+      },
+      "sessions": {
+        "title": "Sessioni ({count})",
+        "generate": "Genera Sessioni",
+        "generateFirst": "Genera Prima Sessione",
+        "loading": "Caricamento sessioni...",
+        "empty": "Non ci sono sessioni registrate per questo obiettivo",
+        "link": "Link:",
+        "joinSession": "Accedi alla sessione",
+        "editSession": "Modifica sessione",
+        "deleteSession": "Elimina sessione",
+        "confirmDelete": {
+          "title": "Sei sicuro?",
+          "message": "Questa azione eliminerà la sessione programmata per il",
+          "yes": "SÌ",
+          "no": "NO"
+        }
+      },
+      "buttons": {
+        "save": "Salva",
+        "cancel": "Annulla",
+        "yes": "SÌ",
+        "no": "NO"
+      },
+      "errors": {
+        "missingData": "Mancano dati necessari per creare le sfide",
+        "saveGoals": "Errore durante il salvataggio delle sfide generate",
+        "completeFields": "Per favore completa tutti i campi",
+        "createGoal": "Errore durante la creazione della sfida",
+        "updateGoal": "Errore durante l'aggiornamento della sfida",
+        "deleteGoal": "Errore durante l'eliminazione della sfida",
+        "updateGoalStatus": "Errore durante l'aggiornamento dello stato della sfida",
+        "updateSession": "Errore durante l'aggiornamento della sessione",
+        "deleteSession": "Errore durante l'eliminazione della sessione",
+        "updateSessionStatus": "Errore durante l'aggiornamento dello stato della sessione",
+        "configRequired": "Devi completare il modulo di configurazione prima di generare sfide con l'IA"
+      },
+      "success": {
+        "goalCreated": "Sfida creata con successo",
+        "goalUpdated": "Sfida aggiornata con successo",
+        "goalDeleted": "Sfida eliminata con successo",
+        "goalMarkedPending": "Sfida contrassegnata come in sospeso",
+        "goalMarkedCompleted": "Sfida contrassegnata come completata",
+        "sessionUpdated": "Sessione aggiornata con successo",
+        "sessionDeleted": "Sessione eliminata con successo",
+        "sessionMarkedActive": "Sessione contrassegnata come attiva",
+        "sessionMarkedCancelled": "Sessione contrassegnata come cancellata"
+      },
+      "confirmations": {
+        "deleteGoal": "Sei sicuro di voler eliminare questa sfida?"
+      }
+    },
+    "objectiveConfig": {
+      "title": "Modulo di Configurazione",
+      "status": {
+        "completed": "Completato"
+      },
+      "tabs": {
+        "view": "Vedi Risposte",
+        "edit": "Modifica"
+      },
+      "questions": [
+        "Descrivi brevemente il tuo ruolo attuale (lavorativo o personale) e le tue responsabilità principali.",
+        "Qual è la situazione specifica che ti ha spinto a iniziare questo percorso di coaching? Cosa sta succedendo?",
+        "Cosa funziona bene oggi nella tua vita professionale/personale? Quali sono i tuoi punti di forza?",
+        "Cosa vorresti cambiare o migliorare? Qual è la principale fonte di frustrazione o insoddisfazione?",
+        "Qual è l'obiettivo più importante che vuoi raggiungere al termine di questo percorso? Sii il più specifico/a possibile (es. \"Ottenere la promozione a X\", \"Avviare il mio progetto Y\", \"Gestire il mio team con più sicurezza\").",
+        "Perché questo obiettivo è così importante per te, proprio ora? Cosa cambierà nella tua vita una volta raggiunto?",
+        "Immagina di avercela fatta. Chiudi gli occhi per un istante. Come ti senti? Cosa vedi? Cosa dicono gli altri di te? Descrivi la scena.",
+        "In termini pratici, come misureremo il tuo successo? Quali risultati concreti e osservabili ci indicheranno che hai raggiunto il tuo obiettivo?",
+        "Quali sono i principali ostacoli (interni o esterni) che prevedi di incontrare?",
+        "Quali comportamenti, abitudini o schemi di pensiero potrebbero sabotare i tuoi progressi?",
+        "Quali risorse e alleati hai già a tua disposizione? Pensa a conoscenze, competenze, persone di fiducia, strumenti o esperienze passate che potrebbero aiutarti.",
+        "Ricorda che le soft skill (o competenze trasversali) sono quelle abilità personali e relazionali che definiscono il modo in cui interagisci con gli altri, gestisci te stesso/a e affronti le situazioni. Si riferiscono al come fai le cose (es. comunichi, collabori, gestisci lo stress), a differenza delle competenze tecniche (\"hard skills\") che si riferiscono al cosa sai fare.\n\nDetto questo, quale soft skill ritieni più cruciale allenare per raggiungere il tuo obiettivo?",
+        "Ora, definisci cosa significa per te padroneggiare questa competenza. Esempio: Se hai scelto \"Gestione dei Conflitti\", potrebbe significare: \"Riuscire a esprimere il mio disaccordo in riunione in modo calmo e assertivo, senza creare tensioni nel team\".\n\nPer me, padroneggarla significa:",
+        "In quali situazioni concrete della tua vita quotidiana vorresti vedere applicata questa nuova abilità?",
+        "C'è qualcos'altro di importante che dovremmo sapere per supportarti al meglio?"
+      ],
+      "form": {
+        "loading": "Caricamento modulo...",
+        "placeholder": "Scrivi qui la tua risposta...",
+        "question": "Domanda {number}",
+        "answer": "Risposta",
+        "buttons": {
+          "saving": "Salvataggio...",
+          "save": "Salva Modulo"
+        },
+        "messages": {
+          "alreadyCompleted": "Il modulo è già stato completato e non può essere modificato"
+        }
+      },
+      "errors": {
+        "loadQuestions": "Errore nel caricamento delle domande di configurazione",
+        "loadExisting": "Errore nel caricamento della configurazione esistente:",
+        "requiredFields": "Per favore rispondi a tutte le domande obbligatorie",
+        "saveForm": "Errore nel salvataggio del modulo"
+      },
+      "success": {
+        "formSaved": "Modulo di configurazione salvato correttamente"
+      }
+    },
+    "createNote": {
+      "title": "Crea Nuova Nota",
+      "form": {
+        "title": "Titolo *",
+        "titlePlaceholder": "Inserisci il titolo della nota...",
+        "content": "Contenuto *",
+        "contentPlaceholder": "Scrivi il contenuto della nota...",
+        "session": "Sessione (opzionale)",
+        "sessionPlaceholder": "Seleziona una sessione (opzionale)",
+        "noSession": "Nessuna sessione",
+        "loadingSessions": "Caricamento sessioni...",
+        "noSessionsAvailable": "Nessuna sessione disponibile",
+        "selectedSession": "Sessione selezionata:",
+        "characters": "caratteri"
+      },
+      "buttons": {
+        "cancel": "Annulla",
+        "creating": "Creazione...",
+        "create": "Crea Nota"
+      },
+      "errors": {
+        "titleRequired": "Il titolo è obbligatorio",
+        "contentRequired": "Il contenuto è obbligatorio",
+        "createNote": "Errore nella creazione della nota"
+      },
+      "success": {
+        "noteCreated": "Nota creata correttamente"
+      }
+    },
+    "createGoal": {
+      "title": "Crea Nuova Sfida",
+      "form": {
+        "description": "Descrizione",
+        "descriptionPlaceholder": "Descrivi la sfida che deve essere completata...",
+        "startDate": "Data di inizio",
+        "startDateHelper": "Seleziona la data in cui inizierà questa sfida",
+        "aforism": "Aforisma",
+        "aforismPlaceholder": "Es: \"Il successo è la somma di piccoli sforzi ripetuti giorno dopo giorno\"",
+        "tiempoEstimado": "Tempo Stimato",
+        "tiempoEstimadoPlaceholder": "Es: 30 minuti, 1 ora, 2 ore al giorno",
+        "ejemplo": "Esempio",
+        "ejemploPlaceholder": "Fornisci un esempio concreto di come completare questa sfida...",
+        "indicadorExito": "Indicatore di Successo",
+        "indicadorExitoPlaceholder": "Descrivi come verrà misurato il successo di questa sfida...",
+        "characters": "caratteri",
+        "optionalFields": "Campi Opzionali",
+        "show": "(Mostra)",
+        "hide": "(Nascondi)"
+      },
+      "buttons": {
+        "cancel": "Annulla",
+        "creating": "Creazione...",
+        "create": "Crea Sfida"
+      },
+      "errors": {
+        "descriptionRequired": "La descrizione è obbligatoria",
+        "startDateRequired": "La data di inizio è obbligatoria",
+        "createGoal": "Errore nella creazione della sfida"
+      },
+      "success": {
+        "goalCreated": "Sfida creata con successo"
+      }
+    },
+    "aiGoalsGenerator": {
+      "title": "Genera Obiettivi con IA",
+      "description": "Configura i parametri per generare obiettivi personalizzati con l'IA",
+      "mainObjective": "Obiettivo Principale",
+      "form": {
+        "aiConfig": {
+          "title": "Configurazione IA",
+          "voiceTone": "Tono di voce",
+          "voiceTonePlaceholder": "Seleziona il tono di voce",
+          "voiceToneOptions": {
+            "formal": "Formale",
+            "casual": "Informale",
+            "motivational": "Motivazionale",
+            "supportive": "Di supporto"
+          },
+          "difficultyLevel": "Livello di difficoltà",
+          "difficultyLevelPlaceholder": "Seleziona il livello di difficoltà",
+          "difficultyLevelOptions": {
+            "beginner": "Principiante",
+            "intermediate": "Intermedio",
+            "advanced": "Avanzato",
+            "expert": "Esperto"
+          },
+          "challengeTypes": "Tipi di sfide",
+          "challengeTypesPlaceholder": "Seleziona i tipi di sfide",
+          "challengeTypesOptions": {
+            "physical": "Fisiche",
+            "mental": "Mentali",
+            "emotional": "Emotive",
+            "social": "Sociali",
+            "mixed": "Miste"
+          },
+          "includeWeekends": "Includi fine settimana",
+          "includeWeekendsPlaceholder": "Includere i fine settimana?",
+          "includeWeekendsOptions": {
+            "yes": "Sì",
+            "no": "No"
+          },
+          "pdaFile": "File Report",
+          "pdaFilePlaceholder": "Seleziona un file Report",
+          "pdaFileButton": "Seleziona file"
+        }
+      },
+      "buttons": {
+        "generating": "Generazione obiettivi con IA...",
+        "generate": "Genera 30 obiettivi",
+        "accept": "Accetta Obiettivi",
+        "regenerate": "Rigenera Obiettivi"
+      },
+      "errors": {
+        "generateGoals": "Errore nella generazione degli obiettivi",
+        "uploadPda": "Errore nel caricamento del report"
+      },
+      "success": {
+        "goalsGenerated": "Obiettivi generati con successo",
+        "pdaUploaded": "File PDA caricato con successo"
+      }
+    },
+    "generateSessions": {
+      "title": "Genera Sessioni",
+      "description": "Configura i parametri per generare le sessioni dell'obiettivo",
+      "form": {
+        "startDate": "Data di inizio",
+        "startTime": "Ora di inizio",
+        "sessionCount": "Quantità di sessioni",
+        "sessionCountPlaceholder": "Es: 4",
+        "periodicity": "Periodicità",
+        "periodicityPlaceholder": "Seleziona la periodicità",
+        "periodicityOptions": {
+          "daily": "Giornaliera",
+          "weekly": "Settimanale",
+          "biweekly": "Quindicinale",
+          "monthly": "Mensile"
+        }
+      },
+      "sessions": {
+        "generated": "Sessioni Generate ({count})",
+        "session": "Sessione {number}"
+      },
+      "buttons": {
+        "generating": "Generazione...",
+        "generate": "Genera Sessioni",
+        "creating": "Creazione...",
+        "create": "Crea Sessioni"
+      },
+      "errors": {
+        "completeFields": "Per favore completa tutti i campi",
+        "sessionCountRange": "La quantità di sessioni deve essere tra 1 e 52",
+        "generateSessions": "Errore nella generazione delle sessioni",
+        "validDateTime": "Per favore inserisci una data e ora valide",
+        "noSessionsToCreate": "Non ci sono sessioni da creare",
+        "createSessions": "Errore nella creazione delle sessioni"
+      },
+      "success": {
+        "sessionsGenerated": "{count} sessioni generate",
+        "sessionUpdated": "Sessione aggiornata",
+        "sessionsCreated": "{count} sessioni create con successo"
+      }
     }
   }
 }

@@ -15,7 +15,7 @@ import { useTranslations } from 'next-intl';
 const languages = [
   { code: 'es', flag: '🇪🇸' },
   { code: 'en', flag: '🇬🇧' },
-  // { code: 'it', flag: '🇮🇹' }, // TODO: Add Italian language
+  { code: 'it', flag: '🇮🇹' },
 ];
 
 export function LanguageSwitcher() {

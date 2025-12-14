@@ -1,8 +1,8 @@
-const CACHE_NAME = 'coaching-ia-v1';
+const CACHE_NAME = 'kyt-coaching-v1';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/next.svg', //! MODIFICAR Icono de la aplicación 
+  '/logo.png', //! MODIFICAR Icono de la aplicación 
   // '/next.svg', //! MODIFICAR Icono de la aplicación
 ];
 
@@ -27,7 +27,7 @@ self.addEventListener('fetch', (event) => {
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
-            
+
             // ✅ Solo cachear requests HTTP/HTTPS (no chrome-extension, etc.)
             if (event.request.url.startsWith('http')) {
               const responseToCache = response.clone();
@@ -39,7 +39,7 @@ self.addEventListener('fetch', (event) => {
                   console.warn('Service Worker: Error cacheando request:', error);
                 });
             }
-            
+
             return response;
           });
       })
