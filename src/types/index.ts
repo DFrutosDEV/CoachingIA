@@ -30,6 +30,10 @@ export interface Goal {
   isCompleted: boolean;
   day: string;
   date: string;
+  aforism?: string;
+  tiempoEstimado?: string;
+  ejemplo?: string;
+  indicadorExito?: string;
 }
 
 export interface GoalWithProgress {

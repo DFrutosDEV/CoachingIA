@@ -17,9 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Sparkles, AlertCircle, CheckCircle, Upload, FileText } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, CheckCircle, Upload, FileText, Edit, Calendar, Clock, Lightbulb, Target as TargetIcon, CheckCircle2 } from 'lucide-react';
 import { Goal } from '@/types';
 import { useTranslations, useLocale } from 'next-intl';
+import { useAuth } from '@/hooks/useAuth';
+import { useDateFormatter } from '@/utils/date-formatter';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AIGoalsGeneratorProps {
   isOpen: boolean;
@@ -38,6 +43,8 @@ export function AIGoalsGenerator({
 }: AIGoalsGeneratorProps) {
   const t = useTranslations('common.dashboard.aiGoalsGenerator');
   const locale = useLocale();
+  const { token } = useAuth();
+  const { formatDate: formatDateWithLocale } = useDateFormatter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiStatus, setAiStatus] = useState<{
     provider: string;
@@ -47,6 +54,8 @@ export function AIGoalsGenerator({
   } | null>(null);
   const [generatedGoals, setGeneratedGoals] = useState<Goal[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
+  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
 
   // Estados para configuración de IA
   const [voiceTone, setVoiceTone] = useState('supportive');
@@ -83,6 +92,10 @@ export function AIGoalsGenerator({
   };
 
   const handlePdaFileUpload = async (file: File) => {
+    if (!token) {
+      throw new Error('Token de autenticación requerido');
+    }
+
     setIsUploadingPda(true);
 
     try {
@@ -93,6 +106,9 @@ export function AIGoalsGenerator({
 
       const response = await fetch('/api/pda', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 
@@ -162,11 +178,39 @@ export function AIGoalsGenerator({
     }
   };
 
+  const handleEditGoal = (goalId: string, field: string, value: string | Date) => {
+    setGeneratedGoals(prevGoals =>
+      prevGoals.map(goal =>
+        goal._id === goalId
+          ? {
+            ...goal,
+            [field]: value,
+            // Si se edita la fecha, actualizar también el campo day
+            ...(field === 'date' && {
+              day: new Date(value as string).getDate().toString()
+            })
+          }
+          : goal
+      )
+    );
+  };
+
+  const handleToggleEdit = (goalId: string) => {
+    setEditingGoalId(editingGoalId === goalId ? null : goalId);
+    setExpandedGoalId(expandedGoalId === goalId ? null : goalId);
+  };
+
+  const handleToggleExpand = (goalId: string) => {
+    setExpandedGoalId(expandedGoalId === goalId ? null : goalId);
+  };
+
   const handleAcceptGoals = () => {
     onGoalsGenerated(generatedGoals);
     onClose();
     setGeneratedGoals([]);
     setError(null);
+    setEditingGoalId(null);
+    setExpandedGoalId(null);
   };
 
   const handleClose = () => {
@@ -191,7 +235,7 @@ export function AIGoalsGenerator({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-[600px] overflow-y-auto">
           {/* Estado de IA - Solo mostrar en desarrollo */}
           {isDevelopment && aiStatus && (
             <div className="space-y-3">
@@ -360,25 +404,205 @@ export function AIGoalsGenerator({
           {/* Objetivos generados */}
           {generatedGoals.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium">{t('success.goalsGenerated')}</h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {generatedGoals.map((goal, index) => (
-                  <div key={goal._id} className="p-3 rounded-lg border">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {goal.description}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {t('day')}: {goal.day}
-                        </p>
+              <h4 className="font-medium">{t('success.goalsGenerated')} ({generatedGoals.length})</h4>
+              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                {generatedGoals.map((goal, index) => {
+                  const isEditing = editingGoalId === goal._id;
+                  const isExpanded = expandedGoalId === goal._id || isEditing;
+
+                  return (
+                    <div key={goal._id} className="p-4 rounded-lg border bg-card">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          {/* Número y Descripción */}
+                          <div className="flex items-start gap-2 mb-2">
+                            <Badge variant="outline" className="text-xs shrink-0">
+                              {index + 1}
+                            </Badge>
+                            {isEditing ? (
+                              <Textarea
+                                value={goal.description || ''}
+                                onChange={(e) => handleEditGoal(goal._id, 'description', e.target.value)}
+                                className="min-h-[60px] text-sm"
+                                placeholder="Descripción del objetivo"
+                              />
+                            ) : (
+                              <p className="text-sm font-medium flex-1">
+                                {goal.description}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Fecha - Siempre visible */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="h-3 w-3 text-muted-foreground shrink-0" />
+                            {isEditing ? (
+                              <Input
+                                type="date"
+                                value={goal.date ? new Date(goal.date).toISOString().split('T')[0] : ''}
+                                onChange={(e) => {
+                                  const newDate = new Date(e.target.value);
+                                  newDate.setHours(12, 0, 0, 0);
+                                  handleEditGoal(goal._id, 'date', newDate.toISOString());
+                                }}
+                                className="text-xs h-8"
+                              />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                {goal.date ? formatDateWithLocale(new Date(goal.date), 'short') : 'Sin fecha'}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Campos opcionales - Expandibles */}
+                          {isExpanded && (
+                            <div className="space-y-2 mt-3 pt-3 border-t">
+                              {/* Aforismo */}
+                              {(goal.aforism || isEditing) && (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1">
+                                    <Lightbulb className="h-3 w-3 text-muted-foreground" />
+                                    <Label className="text-xs font-medium">Aforismo</Label>
+                                  </div>
+                                  {isEditing ? (
+                                    <Input
+                                      value={goal.aforism || ''}
+                                      onChange={(e) => handleEditGoal(goal._id, 'aforism', e.target.value)}
+                                      placeholder="Aforismo motivacional"
+                                      className="text-xs h-8"
+                                      maxLength={300}
+                                    />
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground italic pl-4">
+                                      "{goal.aforism}"
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Tiempo Estimado */}
+                              {(goal.tiempoEstimado || isEditing) && (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <Label className="text-xs font-medium">Tiempo Estimado</Label>
+                                  </div>
+                                  {isEditing ? (
+                                    <Input
+                                      value={goal.tiempoEstimado || ''}
+                                      onChange={(e) => handleEditGoal(goal._id, 'tiempoEstimado', e.target.value)}
+                                      placeholder="Ej: 30 minutos"
+                                      className="text-xs h-8"
+                                      maxLength={100}
+                                    />
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground pl-4">
+                                      {goal.tiempoEstimado}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Ejemplo */}
+                              {(goal.ejemplo || isEditing) && (
+                                <div className="space-y-1">
+                                  <Label className="text-xs font-medium">Ejemplo</Label>
+                                  {isEditing ? (
+                                    <Textarea
+                                      value={goal.ejemplo || ''}
+                                      onChange={(e) => handleEditGoal(goal._id, 'ejemplo', e.target.value)}
+                                      placeholder="Ejemplo práctico"
+                                      className="text-xs min-h-[60px]"
+                                      maxLength={500}
+                                    />
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground pl-2">
+                                      {goal.ejemplo}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Indicador de Éxito */}
+                              {(goal.indicadorExito || isEditing) && (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1">
+                                    <CheckCircle2 className="h-3 w-3 text-muted-foreground" />
+                                    <Label className="text-xs font-medium">Indicador de Éxito</Label>
+                                  </div>
+                                  {isEditing ? (
+                                    <Textarea
+                                      value={goal.indicadorExito || ''}
+                                      onChange={(e) => handleEditGoal(goal._id, 'indicadorExito', e.target.value)}
+                                      placeholder="Criterio de éxito medible"
+                                      className="text-xs min-h-[60px]"
+                                      maxLength={500}
+                                    />
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground pl-4">
+                                      {goal.indicadorExito}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Botón para expandir/colapsar */}
+                          {!isEditing && (
+                            <button
+                              onClick={() => handleToggleExpand(goal._id)}
+                              className="text-xs text-muted-foreground hover:text-foreground mt-2 flex items-center gap-1"
+                            >
+                              {isExpanded ? (
+                                <>
+                                  <ChevronUp className="h-3 w-3" />
+                                  Ocultar detalles
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-3 w-3" />
+                                  Ver detalles
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Botón de editar */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleEdit(goal._id)}
+                          className="shrink-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {index + 1}
-                      </Badge>
+
+                      {/* Botones de guardar/cancelar cuando está editando */}
+                      {isEditing && (
+                        <div className="flex gap-2 mt-3 pt-3 border-t">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingGoalId(null)}
+                            className="flex-1"
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => setEditingGoalId(null)}
+                            className="flex-1"
+                          >
+                            Guardar
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="flex gap-2">

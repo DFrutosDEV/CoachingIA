@@ -897,7 +897,8 @@
       "success": {
         "goalsGenerated": "Objectives generated successfully",
         "pdaUploaded": "PDA file uploaded successfully"
-      }
+      },
+      "day": "Day"
     },
     "generateSessions": {
       "title": "Generate Sessions",

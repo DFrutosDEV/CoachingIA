@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -138,23 +138,44 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
     }
   };
 
-  // Función para manejar cambios en el campo email
-  const handleEmailChange = (value: string) => {
-    handleClientFormChange('email', value);
+  // Ref para almacenar el timeout y poder limpiarlo
+  const emailTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // useEffect para validar el email con debounce
+  useEffect(() => {
+    // Limpiar timeout anterior si existe
+    if (emailTimeoutRef.current) {
+      clearTimeout(emailTimeoutRef.current);
+    }
 
     // Si el email está vacío, deshabilitar campos
-    if (!value) {
+    if (!clientForm.email) {
       setFieldsEnabled(false);
       setExistingClient(null);
       return;
     }
 
-    // Verificar email después de un delay para evitar muchas requests
-    const timeoutId = setTimeout(() => {
-      checkEmailExists(value);
-    }, 500);
+    // Si el email tiene menos de 3 caracteres, no validar
+    if (clientForm.email.length < 3) {
+      return;
+    }
 
-    return () => clearTimeout(timeoutId);
+    // Crear nuevo timeout para validar después del delay
+    emailTimeoutRef.current = setTimeout(() => {
+      checkEmailExists(clientForm.email);
+    }, 1500);
+
+    // Cleanup: limpiar timeout cuando el componente se desmonte o el email cambie
+    return () => {
+      if (emailTimeoutRef.current) {
+        clearTimeout(emailTimeoutRef.current);
+      }
+    };
+  }, [clientForm.email]);
+
+  // Función para manejar cambios en el campo email
+  const handleEmailChange = (value: string) => {
+    handleClientFormChange('email', value);
   };
 
   // Función para confirmar usuario existente

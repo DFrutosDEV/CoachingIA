@@ -5,7 +5,9 @@ import Profile from '@/models/Profile';
 import { verifyToken } from '@/lib/auth-jwt';
 
 interface DecodedToken {
-  id: string;
+  userId: string;
+  email: string;
+  role: string;
   [key: string]: any;
 }
 
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Buscar el perfil del usuario
     const profile = await Profile.findOne({
-      user: decoded.id,
+      user: decoded.userId,
       isDeleted: false,
     });
 
@@ -69,34 +71,47 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear o actualizar PDA
 export async function POST(request: NextRequest) {
+  console.log('🔵 POST /api/pda - Iniciando...');
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    console.log('🔵 Token recibido:', token ? 'Sí' : 'No');
 
     if (!token) {
+      console.log('❌ No hay token');
       return NextResponse.json({ error: 'Token requerido' }, { status: 401 });
     }
 
     const decoded = verifyToken(token) as DecodedToken;
+    console.log('🔵 Token decodificado:', decoded ? 'Sí' : 'No');
+    console.log('🔵 Contenido del token:', JSON.stringify(decoded, null, 2));
     if (!decoded) {
+      console.log('❌ Token inválido');
       return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
     }
 
     await connectDB();
+    console.log('🔵 BD conectada');
 
-    // Buscar el perfil del usuario
+    // Buscar el perfil del usuario - el token contiene userId
+    const userId = decoded.userId;
+    console.log('🔵 Buscando perfil con userId:', userId);
     const profile = await Profile.findOne({
-      user: decoded.id,
+      user: userId,
       isDeleted: false,
     });
+    console.log('🔵 Perfil encontrado:', profile ? 'Sí' : 'No');
 
     if (!profile) {
+      console.log('❌ Perfil no encontrado');
       return NextResponse.json(
         { error: 'Perfil no encontrado' },
         { status: 404 }
       );
     }
 
+    console.log('🔵 Obteniendo formData...');
     const formData = await request.formData();
+    console.log('🔵 FormData obtenido');
     const file = formData.get('file') as File;
     const objectiveId = formData.get('objectiveId') as string;
     const profileId = formData.get('profile') as string;
@@ -185,7 +200,8 @@ export async function POST(request: NextRequest) {
       pda = await pda.save();
     }
 
-    return NextResponse.json({
+    console.log('🔵 Retornando respuesta exitosa');
+    const response = NextResponse.json({
       success: true,
       message: existingPda
         ? 'PDA actualizado exitosamente'
@@ -200,12 +216,16 @@ export async function POST(request: NextRequest) {
         objectiveId: pda.objectiveId,
       },
     });
+    console.log('🔵 Response creada, retornando...');
+    return response;
   } catch (error) {
-    console.error('Error al crear/actualizar PDA:', error);
-    return NextResponse.json(
+    console.error('❌ Error al crear/actualizar PDA:', error);
+    const errorResponse = NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
     );
+    console.log('🔵 Error response creada, retornando...');
+    return errorResponse;
   }
 }
 
@@ -266,7 +286,7 @@ export async function DELETE(request: NextRequest) {
 
     // Buscar el perfil del usuario
     const profile = await Profile.findOne({
-      user: decoded.id,
+      user: decoded.userId,
       isDeleted: false,
     });
 
