@@ -26,8 +26,15 @@ async function processGoalsAndSendEmails() {
   let successCount = 0;
   let errorCount = 0;
 
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log('🚀 INICIO: Procesamiento de desafíos programados');
+  console.log(`⏰ Timestamp inicio: ${startTime.toISOString()}`);
+  console.log('═══════════════════════════════════════════════════════════');
+
   try {
+    console.log('📡 Conectando a la base de datos...');
     await connectDB();
+    console.log('✅ Conexión a la base de datos establecida');
 
     // Obtener la fecha de hoy (solo día, sin hora)
     const now = new Date();
@@ -35,11 +42,15 @@ async function processGoalsAndSendEmails() {
     const todayEnd = new Date(todayStart);
     todayEnd.setDate(todayEnd.getDate() + 1);
 
-    console.log(
-      `📧 Procesando Goals del día: ${todayStart.toISOString().split('T')[0]}`
-    );
+    console.log('─────────────────────────────────────────────────────────');
+    console.log(`📅 Buscando desafíos del día: ${todayStart.toISOString().split('T')[0]}`);
+    console.log(`   Rango de búsqueda: ${todayStart.toISOString()} - ${todayEnd.toISOString()}`);
+    console.log('─────────────────────────────────────────────────────────');
 
     // Obtener Goals del día actual que no estén eliminados y estén pendientes (solo de objetivos activos)
+    console.log('🔍 Ejecutando consulta de Goals...');
+    console.log('   Filtros: isDeleted=false, status=pending, objective.active=true');
+
     const goalsOfToday = await Goal.find({
       date: {
         $gte: todayStart,
@@ -66,28 +77,40 @@ async function processGoalsAndSendEmails() {
       })
       .sort({ date: 1 });
 
+    console.log(`📊 Goals encontrados en consulta inicial: ${goalsOfToday.length}`);
+
     // Filtrar Goals que no tienen Objective activo (objectiveId será null si no cumple el match)
     const goalsWithActiveObjectives = goalsOfToday.filter(
       goal => goal.objectiveId !== null && goal.objectiveId !== undefined
     );
 
+    console.log(`📊 Goals con objetivos activos: ${goalsWithActiveObjectives.length}`);
+
     if (goalsWithActiveObjectives.length === 0) {
       console.log('📭 No hay Goals programados para hoy con objetivos activos');
+      console.log('═══════════════════════════════════════════════════════════');
+      console.log('🏁 FIN: Proceso completado sin desafíos para procesar');
+      console.log('═══════════════════════════════════════════════════════════');
       return;
     }
 
-    console.log(`📬 Encontrados ${goalsWithActiveObjectives.length} Goals para procesar`);
+    console.log('─────────────────────────────────────────────────────────');
+    console.log(`📬 Iniciando procesamiento de ${goalsWithActiveObjectives.length} desafíos`);
+    console.log('─────────────────────────────────────────────────────────');
 
     // Procesar cada Goal
     for (const goal of goalsWithActiveObjectives) {
       processedCount++;
 
+      console.log('');
+      console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      console.log(`📋 Desafío ${processedCount}/${goalsWithActiveObjectives.length}`);
+      console.log(`   Goal ID: ${goal._id}`);
+
       try {
         // Verificar que el Goal tiene los datos necesarios
         if (!goal.objectiveId || !goal.clientId) {
-          console.warn(
-            `⚠️ Goal ${goal._id} no tiene objectiveId o clientId, saltando...`
-          );
+          console.warn(`   ⚠️  Goal ${goal._id} no tiene objectiveId o clientId, saltando...`);
           errorCount++;
           continue;
         }
@@ -96,11 +119,12 @@ async function processGoalsAndSendEmails() {
         const clientProfile = goal.clientId as any;
         const clientUser = clientProfile?.user as any;
 
+        console.log(`   Objetivo: ${objective.title || 'N/A'}`);
+        console.log(`   Cliente: ${clientProfile.name || ''} ${clientProfile.lastName || ''}`.trim() || 'N/A');
+
         // Verificar que el cliente tiene email
         if (!clientUser || !clientUser.email) {
-          console.warn(
-            `⚠️ Cliente ${clientProfile._id} no tiene email, saltando Goal ${goal._id}...`
-          );
+          console.warn(`   ⚠️  Cliente ${clientProfile._id} no tiene email, saltando Goal ${goal._id}...`);
           errorCount++;
           continue;
         }
@@ -108,11 +132,11 @@ async function processGoalsAndSendEmails() {
         const clientEmail = clientUser.email;
         const clientName = `${clientProfile.name || ''} ${clientProfile.lastName || ''}`.trim() || 'Client';
 
-        console.log(
-          `📤 Procesando Goal ${processedCount}/${goalsWithActiveObjectives.length} para ${clientEmail}`
-        );
+        console.log(`   📧 Email destino: ${clientEmail}`);
+        console.log(`   📝 Descripción: ${goal.description?.substring(0, 50) || 'N/A'}...`);
 
         // Obtener todos los Goals del mismo Objective para calcular progreso
+        console.log(`   🔄 Calculando progreso del objetivo...`);
         const allGoalsOfObjective = await Goal.find({
           objectiveId: goal.objectiveId,
           isDeleted: false,
@@ -132,8 +156,12 @@ async function processGoalsAndSendEmails() {
         const progressBar = '█'.repeat(Math.floor(progressPercentage / 10)) +
           '░'.repeat(10 - Math.floor(progressPercentage / 10));
 
+        console.log(`   📊 Progreso: Día ${currentDay}/${totalGoals} | Completados: ${completedGoals}/${totalGoals} (${progressPercentage}%)`);
+        console.log(`   📈 Barra: ${progressBar}`);
+
         // Preparar datos para el template
         // Nota: Los Goals generados manualmente pueden no tener aforism, tiempoEstimado, ejemplo, indicadorExito
+        console.log(`   🎨 Preparando datos del template...`);
         const templateData = {
           clientName,
           objectiveTitle: objective.title || 'Goal',
@@ -150,27 +178,35 @@ async function processGoalsAndSendEmails() {
         };
 
         // Renderizar el template con los datos (en inglés)
+        console.log(`   📄 Renderizando template HTML...`);
         const html = await renderTemplateFromData(
-          'daily-objective-en.html',
+          'daily-objective-it.html', //TODO: HACERLO DINAMICO PARA EL IDIOMA
           JSON.stringify(templateData)
         );
+        console.log(`   ✅ Template renderizado (${Math.round(html.length / 1024)}KB)`);
 
         // Enviar el email (subject en inglés)
+        const emailSubject = `🎯 Your Daily Goal - ${objective.title || 'Goal'}`;
+        console.log(`   📧 Enviando email...`);
+        console.log(`      Asunto: ${emailSubject}`);
+        console.log(`      Destino: ${clientEmail}`);
+
         const emailResult = await sendEmailWithBrevo({
           to: clientEmail,
-          subject: `🎯 Your Daily Goal - ${objective.title || 'Goal'}`,
+          subject: emailSubject,
           html,
         });
 
         if (emailResult.success) {
           // Actualizar el Goal a status: 'sent'
+          console.log(`   ✅ Email enviado exitosamente`);
+          console.log(`   💾 Actualizando estado del Goal a 'sent'...`);
           goal.status = 'sent';
           await goal.save();
+          console.log(`   ✅ Estado actualizado correctamente`);
 
           successCount++;
-          console.log(
-            `✅ Email enviado exitosamente a ${clientEmail} para Goal ${goal._id}`
-          );
+          console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
         } else {
           throw new Error(emailResult.error || 'Error desconocido al enviar email');
         }
@@ -179,50 +215,93 @@ async function processGoalsAndSendEmails() {
         const errorMessage =
           error instanceof Error ? error.message : 'Error desconocido';
 
-        // Actualizar el Goal a status: 'failed'
-        try {
-          goal.status = 'failed';
-          await goal.save();
-        } catch (saveError) {
-          console.error(`Error actualizando status del Goal ${goal._id}:`, saveError);
+        console.error(`   ❌ Error procesando desafío:`);
+        console.error(`      Mensaje: ${errorMessage}`);
+        if (error instanceof Error && error.stack) {
+          console.error(`      Stack: ${error.stack}`);
         }
 
-        console.error(
-          `❌ Error procesando Goal ${goal._id}:`,
-          errorMessage
-        );
+        // Actualizar el Goal a status: 'failed'
+        try {
+          console.log(`   💾 Actualizando estado del Goal a 'failed'...`);
+          goal.status = 'failed';
+          await goal.save();
+          console.log(`   ✅ Estado actualizado a 'failed'`);
+        } catch (saveError) {
+          console.error(`   ⚠️  Error actualizando status del Goal ${goal._id}:`, saveError);
+        }
+
+        console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
       }
 
       // Pequeña pausa entre envíos para no sobrecargar el servidor SMTP
-      await new Promise(resolve => setTimeout(resolve, 100));
+      if (processedCount < goalsWithActiveObjectives.length) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
     }
 
     const executionTime = Date.now() - startTime.getTime();
+    const endTime = new Date();
 
-    console.log(
-      `📊 Processing completed: ${successCount} successful, ${errorCount} errors, ${processedCount} total`
-    );
+    console.log('');
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('📊 RESUMEN DEL PROCESAMIENTO');
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log(`⏰ Inicio: ${startTime.toISOString()}`);
+    console.log(`⏰ Fin: ${endTime.toISOString()}`);
+    console.log(`⏱️  Duración: ${(executionTime / 1000).toFixed(2)} segundos`);
+    console.log(`📬 Total procesados: ${processedCount}`);
+    console.log(`✅ Exitosos: ${successCount}`);
+    console.log(`❌ Errores: ${errorCount}`);
+    console.log(`📈 Tasa de éxito: ${processedCount > 0 ? ((successCount / processedCount) * 100).toFixed(1) : 0}%`);
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('🏁 FIN: Proceso completado');
+    console.log('═══════════════════════════════════════════════════════════');
   } catch (error) {
     const executionTime = Date.now() - startTime.getTime();
     const errorMessage =
       error instanceof Error ? error.message : 'Error desconocido';
 
-    console.error('💥 Error crítico en cron job de emails:', errorMessage);
+    console.error('');
+    console.error('═══════════════════════════════════════════════════════════');
+    console.error('💥 ERROR CRÍTICO EN CRON JOB');
+    console.error('═══════════════════════════════════════════════════════════');
+    console.error(`⏱️  Duración antes del error: ${(executionTime / 1000).toFixed(2)} segundos`);
+    console.error(`❌ Mensaje: ${errorMessage}`);
+    if (error instanceof Error && error.stack) {
+      console.error(`📚 Stack trace:`);
+      console.error(error.stack);
+    }
+    console.error('═══════════════════════════════════════════════════════════');
   }
 }
 
 // Función principal para procesar emails programados
 export async function POST(request: NextRequest) {
+  const requestStartTime = new Date();
+
+  console.log('');
+  console.log('╔═══════════════════════════════════════════════════════════╗');
+  console.log('║        ENDPOINT CRON: send-scheduled-emails               ║');
+  console.log('╚═══════════════════════════════════════════════════════════╝');
+  console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
+
   try {
     // Verificar autorización
     // if (!verifyCronAuth(request)) {
     //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     // }
 
+    console.log('🚀 Iniciando procesamiento en background...');
+
     // Iniciar procesamiento en background y devolver respuesta inmediata
     processGoalsAndSendEmails().catch(error => {
       console.error('💥 Error no manejado en procesamiento en background:', error);
     });
+
+    const responseTime = Date.now() - requestStartTime.getTime();
+    console.log(`✅ Respuesta enviada en ${responseTime}ms`);
+    console.log('💡 El procesamiento continúa en background');
 
     // Devolver respuesta inmediata para evitar timeouts
     return NextResponse.json({
@@ -235,6 +314,9 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error.message : 'Error desconocido';
 
     console.error('💥 Error en endpoint POST:', errorMessage);
+    if (error instanceof Error && error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
 
     return NextResponse.json(
       {

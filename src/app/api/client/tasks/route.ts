@@ -82,11 +82,16 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Obtener los goals del objetivo actual
+    // Calcular la fecha de hoy al final del día (23:59:59) para incluir el día actual
+    const now = new Date();
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    // Obtener los goals del objetivo actual solo hasta el día actual (incluyendo hoy)
     const goals = await Goal.find({
       objectiveId: currentObjective._id,
       // clientId: clientProfile._id,
       isDeleted: false,
+      date: { $lte: todayEnd }, // Solo goals hasta hoy (incluyendo hoy)
     }).sort({ day: 1, createdAt: 1 });
 
     // Obtener las notas relacionadas con este objetivo

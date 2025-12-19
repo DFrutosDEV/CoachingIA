@@ -64,8 +64,6 @@ MONGODB_URI=mongodb+srv://dfrutosdeveloper:UvhPXveH2baJNsc1@coachingia.ysqkesb.m
 
 import bcrypt from 'bcryptjs'; PARA ENCRIPTAR CONTRASEÑAS
 
-
-
 --------------------------------------------------------------------------
 C:\Users\Daniel Frutos\Documents\CoachingIA\src\components\ui\goals-modal.tsx REVISAR PARA ELIMINAR
 
@@ -89,42 +87,17 @@ IMPORTANTES
 - MODIFICACION DE LA GENERACION DE DESAFIOS (25) ✔ (FALTA TESTEO)
 - ARCHIVO DE TEXTOS PARA TRADUCIR ✔
 
-------------------------------------------------------------------------------------------------------------
-
-FORMATO DE RESPUESTA (JSON):
-    [
-      {
-        "description": "Descripción del objetivo específico y medible",
-        "day": "lunes",
-        "aforism": "Aforismo del objetivo",
-        "tiempoEstimado": "Tiempo estimado para completar el objetivo",
-        "ejemplo": "Ejemplo de como completar el objetivo",
-        "indicadordeExito": "Indicador de éxito para el objetivo",
-        "isCompleted": false
-      }
-    ]
-
-
 --------------------------------------------------------------------------------------------------------------
 
 await HttpClient.get CAMBIAR POR FETCH
-
-----------------------------------------------------------------------------------------------------------
-AGREGAR AL ARCHIVO DE ITALIANO ESTO
-  "routeGuard": {
-    "verifyingAccess": "Verifica accesso in corso..."
-  },
-
-
-  TRADUCIR EL COMPONENTE CREATE-GOAL-MODAL AL ITALIANO TAMBIEN
-  "createGoal": 
-      "title": "Crea...
 
 -----------------------------------------------------------------------------------
 
 LA TABLA FEEDBACK NO SE USA, EL FEEDBACK FINAL SE GUARDA EN EL OBJETIVO
 
 // TODO: GENERALIZAR LA FUNCION DE FORMATEO DE FECHAS
+
+//TODO: HACERLO DINAMICO PARA EL IDIOMA
 
 --------------------------------------------------------------------------------------------------------------------------
 

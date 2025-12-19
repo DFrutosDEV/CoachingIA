@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { formatDate, Locale } from '@/utils/date-formatter';
 
 interface Goal {
   _id: string;
@@ -73,7 +74,20 @@ const ClientTasks: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        setTasksData(result.data);
+        // Filtrar goals solo hasta el día actual (respaldo del filtro del backend)
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // Final del día de hoy
+
+        const filteredData = {
+          ...result.data,
+          goals: result.data.goals.filter((goal: Goal) => {
+            if (!goal.date) return false;
+            const goalDate = new Date(goal.date);
+            return goalDate <= today;
+          }),
+        };
+
+        setTasksData(filteredData);
       } else {
         toast.error(t('errors.loadTasks'));
       }
@@ -238,7 +252,7 @@ const ClientTasks: React.FC = () => {
                           className="text-sm font-medium mb-1"
                           style={{ color: theme.palette.text.primary }}
                         >
-                          {t('day', { day: goal.day })}
+                          {formatDate(goal.date, { locale: locale as Locale }) || ''}
                         </h3>
                         <p
                           className="text-xs"
