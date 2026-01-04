@@ -170,16 +170,16 @@ export async function GET(request: NextRequest) {
     // Formatear la próxima sesión
     const formattedNextSession = nextSession
       ? {
-          date: nextSession.date,
-          link: nextSession.link,
-          time: new Date(nextSession.date).toLocaleTimeString('es-ES', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          }),
-          coach: `${nextSession.coachId.name} ${nextSession.coachId.lastName}`,
-          topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
-        }
+        date: nextSession.date,
+        link: nextSession.link,
+        time: new Date(nextSession.date).toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }),
+        coach: `${nextSession.coachId.name} ${nextSession.coachId.lastName}`,
+        topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
+      }
       : null;
 
     // Transformar los Goals al formato esperado para la card de progreso
@@ -194,6 +194,15 @@ export async function GET(request: NextRequest) {
       description: goal.description,
       isCompleted: goal.isCompleted,
       objectiveTitle: goal.objectiveId?.title || 'Sin objetivo',
+      createdBy: goal.createdBy,
+      clientId: goal.clientId,
+      date: goal.date,
+      isDeleted: goal.isDeleted,
+      aforism: goal.aforism,
+      tiempoEstimado: goal.tiempoEstimado,
+      ejemplo: goal.ejemplo,
+      indicadorExito: goal.indicadorExito,
+      status: goal.status,
     }));
 
     return NextResponse.json({

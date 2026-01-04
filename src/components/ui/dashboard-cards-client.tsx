@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { formatDate } from '@/utils/validatesInputs';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { ObjectId } from 'mongoose';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -23,16 +24,19 @@ interface NextSessionData {
   topic: string;
 }
 
-interface GoalProgress {
-  goal: string;
-  progress: number;
-  objectiveTitle?: string;
-}
-
 interface ClientGoal {
   description: string;
   isCompleted: boolean;
   objectiveTitle: string;
+  createdBy: ObjectId;
+  clientId: ObjectId;
+  date: Date;
+  isDeleted: boolean;
+  aforism?: string;
+  tiempoEstimado?: string;
+  ejemplo?: string;
+  indicadorExito?: string;
+  status: string;
 }
 
 interface ObjectiveProgress {
@@ -149,8 +153,8 @@ export function GoalsCard({
   hasGoals?: boolean;
 }) {
   const t = useTranslations('common.dashboard.clientCards.goals');
-
   const completedGoals = goals.filter(goal => goal.isCompleted).length;
+  const goalsInProgress = goals.filter(goal => new Date(goal.date) <= new Date());
   const totalGoals = goals.length;
   const completionPercentage =
     totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
@@ -203,24 +207,24 @@ export function GoalsCard({
             </div>
 
             {/* Lista de metas recientes */}
-            {goals.length > 0 && (
+            {goalsInProgress.length > 0 && (
               <div className="mt-4 space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
                   {t('recentGoals')}
                 </p>
-                {goals.slice(0, 3).map((goal, index) => (
+                {goalsInProgress.slice(-3).map((goal, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div
-                      className={`w-2 h-2 rounded-full ${goal.isCompleted ? 'bg-green-500' : 'bg-gray-300'}`}
+                      className={`w-2 h-2 rounded-full bg-gray-300`}
                     ></div>
                     <p className="text-xs text-muted-foreground truncate">
                       {goal.description}
                     </p>
                   </div>
                 ))}
-                {goals.length > 3 && (
+                {goalsInProgress.length > 3 && (
                   <p className="text-xs text-muted-foreground">
-                    {t('moreGoals', { count: goals.length - 3 })}
+                    {t('moreGoals', { count: goalsInProgress.length - 3 })}
                   </p>
                 )}
               </div>

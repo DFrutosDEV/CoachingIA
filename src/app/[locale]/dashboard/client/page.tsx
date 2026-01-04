@@ -14,6 +14,7 @@ import {
   ProgressCard,
 } from '@/components/ui/dashboard-cards-client';
 import { HttpClient } from '@/lib/utils/http-client';
+import { ObjectId } from 'mongoose';
 
 // Interfaces para los datos
 interface ClientBasicData {
@@ -39,9 +40,18 @@ interface ClientBasicData {
     objectiveTitle?: string;
   }>;
   clientGoals: Array<{
+    objectiveTitle: string;
     description: string;
     isCompleted: boolean;
-    objectiveTitle: string;
+    createdBy: ObjectId;
+    clientId: ObjectId;
+    date: Date;
+    isDeleted: boolean;
+    aforism?: string;
+    tiempoEstimado?: string;
+    ejemplo?: string;
+    indicadorExito?: string;
+    status: string;
   }>;
   hasGoals: boolean;
   objectivesWithProgress: Array<{
