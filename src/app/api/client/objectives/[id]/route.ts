@@ -81,7 +81,7 @@ export async function GET(
           _id: goal._id.toString(),
           description: goal.description,
           isCompleted: goal.isCompleted,
-          day: goal.day,
+          date: goal.date,
           createdAt: goal.createdAt,
         })),
         notes: notes.map(note => ({

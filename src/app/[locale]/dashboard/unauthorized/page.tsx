@@ -10,11 +10,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { AlertTriangle, ArrowLeft, Home } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 export default function UnauthorizedPage() {
   const router = useRouter();
-  const locale = useLocale();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
   const t = useTranslations('text.unauthorized');
 
   return (

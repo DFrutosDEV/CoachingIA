@@ -57,7 +57,6 @@ export function GoalsModal({
       _id: Date.now().toString(), // ID simple basado en timestamp
       description: 'Nuevo Objetivo',
       isCompleted: false,
-      day: 'Lunes',
       date: new Date().toISOString(),
     };
     setGoals(currentGoals => [...currentGoals, newGoal]);

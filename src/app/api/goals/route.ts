@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
       objectiveId,
       goals,
       description,
-      day,
       date,
       aforism,
       tiempoEstimado,
@@ -35,7 +34,7 @@ export async function POST(request: NextRequest) {
     const coachProfile = await Profile.findById(objective?.coachId);
     const clientProfile = await Profile.findById(objective?.clientId);
 
-    if (description && day) {
+    if (description) {
       // Usar la fecha proporcionada o la fecha de hoy como fallback
       const goalDate = date ? new Date(date) : new Date();
 
@@ -44,7 +43,6 @@ export async function POST(request: NextRequest) {
         description,
         createdBy: coachProfile?._id,
         clientId: clientProfile?._id,
-        day,
         date: goalDate.toISOString(),
         isCompleted: false,
         isDeleted: false,

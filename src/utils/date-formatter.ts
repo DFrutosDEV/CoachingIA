@@ -41,7 +41,7 @@ export interface DateFormatterOptions {
 
 //! TODO: ARREGLAR ARCHIVO Y FUNCIONES PARA PODER ESTANDARIZAR LAS FECHAS
 // Mapeo de locales a códigos de idioma completos
-const localeMap: Record<Locale, string> = {
+export const localeMap: Record<string, string> = {
   'es': 'es-ES',
   'en': 'en-US',
   'it': 'it-IT'

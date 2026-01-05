@@ -39,7 +39,8 @@ import { FinalizeObjectiveModal } from './finalize-objective-modal';
 import { GenerateSessionsModal } from './generate-sessions-modal';
 import { Goal, Note, Objective, Session } from '@/types';
 import { useTranslations } from 'next-intl';
-import { useDateFormatter } from '@/utils/date-formatter';
+import { localeMap, useDateFormatter } from '@/utils/date-formatter';
+import { usePathname } from 'next/navigation';
 
 interface ObjectiveDetailData {
   objective: Objective;
@@ -77,6 +78,8 @@ export function ObjectiveDetailModal({
   const [loadingGoals, setLoadingGoals] = useState(false);
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [isFormCompleted, setIsFormCompleted] = useState(false);
+  const pathname = usePathname();
+  const locale = localeMap[pathname.split('/')[1]];
 
   // Estados para gestión de metas
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
@@ -707,7 +710,7 @@ export function ObjectiveDetailModal({
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-3 w-3 text-muted-foreground" />
                                       <span className="text-xs text-muted-foreground">
-                                        {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) || ''}
+                                        {goal.date ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) : ''}
                                       </span>
                                     </div>
                                     <div className="flex gap-1">

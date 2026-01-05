@@ -17,6 +17,8 @@ import { CheckCircle, Circle, Clock, FileText, User, Download } from 'lucide-rea
 import { formatDate } from '@/utils/validatesInputs';
 import { Goal, Note, Objective } from '@/types';
 import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
+import { localeMap } from '@/utils/date-formatter';
 
 interface ObjectiveDetails {
   objective: {
@@ -55,6 +57,8 @@ export default function ProgressPage() {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [downloadingPda, setDownloadingPda] = useState(false);
+  const pathname = usePathname();
+  const locale = localeMap[pathname.split('/')[1]];
   const t = useTranslations('text.dashboardClient.progressPage');
 
   // Función para obtener todos los objetivos
@@ -389,7 +393,7 @@ export default function ProgressPage() {
                           <div className="flex-1">
                             <p className="font-medium">{goal.description}</p>
                             <p className="text-sm text-muted-foreground">
-                              {t('day')} {goal.day}
+                              {t('day')} {goal.date ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) : ''}
                             </p>
                           </div>
                         </div>

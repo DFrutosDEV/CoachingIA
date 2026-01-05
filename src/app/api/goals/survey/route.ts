@@ -33,8 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Decodificar el token para obtener el goalId
-    const decoded = verifyToken(token);
-
+    const decoded = verifyToken(token) as { goalId: string };
     if (!decoded || !decoded.goalId) {
       return NextResponse.json(
         {
@@ -44,8 +43,7 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    const goalId = decoded.goalId;
+    const goalId = decoded?.goalId;
 
     // Buscar el Goal
     const goal = await Goal.findById(goalId);
