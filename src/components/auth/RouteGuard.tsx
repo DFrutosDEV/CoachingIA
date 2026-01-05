@@ -32,7 +32,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
       // Rutas públicas (remover locale de la comparación)
       const cleanPath = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
-      const publicRoutes = ['/', '/login', '/register', '/debug-middleware'];
+      const publicRoutes = ['/', '/login', '/register', '/debug-middleware', '/survey'];
       const isPublicRoute = publicRoutes.some(route => {
         if (route === '/') return cleanPath === '/'; // Solo la raíz exacta
         return cleanPath.startsWith(route);
