@@ -6,7 +6,14 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import { formatDate, Locale } from '@/utils/date-formatter';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Goal {
   _id: string;
@@ -15,6 +22,8 @@ interface Goal {
   date: string; // Fecha completa del goal
   isCompleted: boolean;
   createdAt: string;
+  surveyRating?: 'excellent' | 'so-so' | 'bad';
+  surveyComment?: string;
 }
 
 interface Note {
@@ -61,6 +70,10 @@ const ClientTasks: React.FC = () => {
   const [tasksData, setTasksData] = useState<TasksData | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingGoal, setUpdatingGoal] = useState<string | null>(null);
+  const [surveyOpen, setSurveyOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const [selectedRating, setSelectedRating] = useState<'excellent' | 'so-so' | 'bad' | null>(null);
+  const [surveyComment, setSurveyComment] = useState('');
 
   // Cargar datos de tareas
   const loadTasksData = async () => {
@@ -74,16 +87,12 @@ const ClientTasks: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        // Filtrar goals solo hasta el día actual (respaldo del filtro del backend)
-        const today = new Date();
-        today.setHours(23, 59, 59, 999); // Final del día de hoy
-
         const filteredData = {
           ...result.data,
           goals: result.data.goals.filter((goal: Goal) => {
             if (!goal.date) return false;
             const goalDate = new Date(goal.date);
-            return goalDate <= today;
+            return goalDate <= new Date();
           }),
         };
 
@@ -107,30 +116,50 @@ const ClientTasks: React.FC = () => {
 
     // Comparar año, mes y día
     return (
-      today.getFullYear() === goalDateObj.getFullYear() &&
-      today.getMonth() === goalDateObj.getMonth() &&
-      today.getDate() === goalDateObj.getDate()
+      today.getUTCFullYear() === goalDateObj.getUTCFullYear() &&
+      today.getUTCMonth() === goalDateObj.getUTCMonth() &&
+      today.getUTCDate() === goalDateObj.getUTCDate()
     );
   };
 
-  // Actualizar estado de una tarea
-  const updateGoalStatus = async (goalId: string, isCompleted: boolean) => {
-    // Buscar el goal para verificar si es del día actual
-    const goal = tasksData?.goals.find(g => g._id === goalId);
+  // Abrir modal de encuesta cuando se hace clic en un goal
+  const handleGoalClick = (goal: Goal) => {
+    // Si ya está completado, no hacer nada
+    if (goal.isCompleted) {
+      return;
+    }
 
-    if (goal && !isToday(goal.date)) {
+    // Verificar si es del día actual
+    if (!isToday(goal.date) && new Date(goal.date) > new Date()) {
       toast.error(t('errors.cannotCompleteTask'));
       return;
     }
 
+    // Abrir el modal de encuesta
+    setSelectedGoal(goal);
+    setSelectedRating(null);
+    setSurveyComment('');
+    setSurveyOpen(true);
+  };
+
+  // Confirmar y enviar la encuesta
+  const handleConfirmSurvey = async () => {
+    if (!selectedGoal || !selectedRating) {
+      return;
+    }
+
     try {
-      setUpdatingGoal(goalId);
-      const response = await fetch(`/api/client/tasks/goals/${goalId}`, {
+      setUpdatingGoal(selectedGoal._id);
+      const response = await fetch(`/api/client/tasks/goals/${selectedGoal._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ isCompleted }),
+        body: JSON.stringify({
+          isCompleted: true,
+          surveyRating: selectedRating,
+          surveyComment: surveyComment.trim(),
+        }),
       });
 
       const result = await response.json();
@@ -142,12 +171,18 @@ const ClientTasks: React.FC = () => {
           return {
             ...prev,
             goals: prev.goals.map(goal =>
-              goal._id === goalId ? { ...goal, isCompleted } : goal
+              goal._id === selectedGoal._id
+                ? { ...goal, isCompleted: true, surveyRating: selectedRating, surveyComment: surveyComment.trim() }
+                : goal
             ),
           };
         });
 
         toast.success(result.message);
+        setSurveyOpen(false);
+        setSelectedGoal(null);
+        setSelectedRating(null);
+        setSurveyComment('');
       } else {
         toast.error(t('errors.updateTask'));
       }
@@ -157,6 +192,14 @@ const ClientTasks: React.FC = () => {
     } finally {
       setUpdatingGoal(null);
     }
+  };
+
+  // Cerrar el modal sin confirmar
+  const handleCloseSurvey = () => {
+    setSurveyOpen(false);
+    setSelectedGoal(null);
+    setSelectedRating(null);
+    setSurveyComment('');
   };
 
   // Cargar datos al montar el componente
@@ -233,67 +276,65 @@ const ClientTasks: React.FC = () => {
           {/* Sección Tareas por Día */}
           {tasksData?.goals && tasksData.goals.length > 0 ? (
             <div className="space-y-3 max-h-76 overflow-y-auto pr-2 scrollbar-thin">
-              {tasksData.goals.map(goal => {
-                return (
-                  <div
-                    key={goal._id}
-                    onClick={() => updateGoalStatus(goal._id, !goal.isCompleted)}
-                    className={`p-3 rounded transition-all duration-200 cursor-pointer hover:opacity-90 ${goal.isCompleted ? 'ring-2 ring-green-500' : ''}`}
-                    style={{
-                      border: `1px dashed ${theme.palette.divider}`,
-                      backgroundColor: goal.isCompleted
-                        ? theme.palette.success.light
-                        : theme.palette.action.hover,
-                    }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <h3
-                          className="text-sm font-medium mb-1"
-                          style={{ color: theme.palette.text.primary }}
-                        >
-                          {formatDate(goal.date, { locale: locale as Locale }) || ''}
-                        </h3>
-                        <p
-                          className="text-xs"
-                          style={{ color: theme.palette.text.secondary }}
-                        >
-                          {goal.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center ml-2">
-                        {updatingGoal === goal._id ? (
-                          <div
-                            className="animate-spin rounded-full h-4 w-4 border-b-2"
-                            style={{ borderColor: theme.palette.primary.main }}
-                          ></div>
-                        ) : (
-                          <>
-                            {goal.isCompleted && (
-                              <span className="text-green-500 text-sm mr-2">
-                                ✓
-                              </span>
-                            )}
-                            <span
-                              className="text-xs px-2 py-1 rounded-full"
-                              style={{
-                                backgroundColor: goal.isCompleted
-                                  ? theme.palette.success.main
-                                  : theme.palette.warning.main,
-                                color: goal.isCompleted
-                                  ? theme.palette.success.contrastText
-                                  : theme.palette.warning.contrastText,
-                              }}
-                            >
-                              {goal.isCompleted ? t('status.completed') : t('status.pending')}
+              {tasksData.goals.map(goal => (
+                <div
+                  key={goal._id}
+                  onClick={() => handleGoalClick(goal)}
+                  className={`p-3 rounded transition-all duration-200 ${goal.isCompleted ? '' : 'cursor-pointer hover:opacity-90'} ${goal.isCompleted ? 'ring-2 ring-green-500' : ''}`}
+                  style={{
+                    border: `1px dashed ${theme.palette.divider}`,
+                    backgroundColor: goal.isCompleted
+                      ? theme.palette.success.light
+                      : theme.palette.action.hover,
+                  }}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1">
+                      <h3
+                        className="text-sm font-medium mb-1"
+                        style={{ color: theme.palette.text.primary }}
+                      >
+                        {new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) || ''}
+                      </h3>
+                      <p
+                        className="text-xs"
+                        style={{ color: theme.palette.text.secondary }}
+                      >
+                        {goal.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center ml-2">
+                      {updatingGoal === goal._id ? (
+                        <div
+                          className="animate-spin rounded-full h-4 w-4 border-b-2"
+                          style={{ borderColor: theme.palette.primary.main }}
+                        ></div>
+                      ) : (
+                        <>
+                          {goal.isCompleted && (
+                            <span className="text-green-500 text-sm mr-2">
+                              ✓
                             </span>
-                          </>
-                        )}
-                      </div>
+                          )}
+                          <span
+                            className="text-xs px-2 py-1 rounded-full"
+                            style={{
+                              backgroundColor: goal.isCompleted
+                                ? theme.palette.success.main
+                                : theme.palette.warning.main,
+                              color: goal.isCompleted
+                                ? theme.palette.success.contrastText
+                                : theme.palette.warning.contrastText,
+                            }}
+                          >
+                            {goal.isCompleted ? t('status.completed') : t('status.pending')}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           ) : (
             <div
@@ -473,6 +514,145 @@ const ClientTasks: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de Encuesta */}
+      <Dialog open={surveyOpen} onOpenChange={handleCloseSurvey}>
+        <DialogContent
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle style={{ color: theme.palette.text.primary }}>
+              {t('survey.title')}
+            </DialogTitle>
+            <DialogDescription style={{ color: theme.palette.text.secondary }}>
+              {selectedGoal?.description}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Opciones del semáforo */}
+            <div className="space-y-3">
+              {(['excellent', 'so-so', 'bad'] as const).map((rating) => {
+                const isSelected = selectedRating === rating;
+                const emoji = t(`survey.options.${rating}.emoji`);
+                const label = t(`survey.options.${rating}.label`);
+                const description = t(`survey.options.${rating}.description`);
+
+                let borderColor = theme.palette.divider;
+                let backgroundColor = theme.palette.background.default;
+                if (isSelected) {
+                  if (rating === 'excellent') {
+                    borderColor = '#22c55e'; // green-500
+                    backgroundColor = theme.palette.success.light;
+                  } else if (rating === 'so-so') {
+                    borderColor = '#eab308'; // yellow-500
+                    backgroundColor = theme.palette.warning.light;
+                  } else {
+                    borderColor = '#ef4444'; // red-500
+                    backgroundColor = theme.palette.error.light;
+                  }
+                }
+
+                return (
+                  <div
+                    key={rating}
+                    onClick={() => setSelectedRating(rating)}
+                    className="p-4 rounded-lg cursor-pointer transition-all duration-200 hover:opacity-90"
+                    style={{
+                      border: `2px solid ${borderColor}`,
+                      backgroundColor,
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{emoji}</span>
+                      <div className="flex-1">
+                        <h4
+                          className="font-semibold mb-1"
+                          style={{ color: theme.palette.text.primary }}
+                        >
+                          {label}
+                        </h4>
+                        <p
+                          className="text-sm"
+                          style={{ color: theme.palette.text.secondary }}
+                        >
+                          {description}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <span className="text-lg">✓</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Campo de comentarios */}
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium"
+                style={{ color: theme.palette.text.primary }}
+              >
+                {t('survey.commentLabel')}
+              </label>
+              <textarea
+                value={surveyComment}
+                onChange={(e) => setSurveyComment(e.target.value)}
+                placeholder={t('survey.commentPlaceholder')}
+                rows={4}
+                className="w-full p-3 rounded-lg resize-none"
+                style={{
+                  backgroundColor: theme.palette.background.default,
+                  border: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.primary,
+                }}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <button
+              onClick={handleCloseSurvey}
+              className="px-4 py-2 rounded-lg transition-colors"
+              style={{
+                backgroundColor: theme.palette.action.hover,
+                color: theme.palette.text.primary,
+              }}
+            >
+              {t('survey.cancelButton')}
+            </button>
+            <button
+              onClick={handleConfirmSurvey}
+              disabled={!selectedRating || updatingGoal === selectedGoal?._id}
+              className="px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: selectedRating
+                  ? theme.palette.primary.main
+                  : theme.palette.action.disabled,
+                color: selectedRating
+                  ? theme.palette.primary.contrastText
+                  : theme.palette.action.disabledBackground,
+              }}
+            >
+              {updatingGoal === selectedGoal?._id ? (
+                <div className="flex items-center gap-2">
+                  <div
+                    className="animate-spin rounded-full h-4 w-4 border-b-2"
+                    style={{ borderColor: theme.palette.primary.contrastText }}
+                  />
+                  {t('loading')}
+                </div>
+              ) : (
+                t('survey.confirmButton')
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

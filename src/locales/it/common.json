@@ -442,7 +442,31 @@
       "by": "Da: {createdBy}",
       "noNotes": "Non ci sono note disponibili",
       "feedback": "Feedback",
-      "noFeedback": "Non c'è feedback disponibile"
+      "noFeedback": "Non c'è feedback disponibile",
+      "survey": {
+        "title": "Com'è andata l'applicazione della sfida oggi?",
+        "options": {
+          "excellent": {
+            "emoji": "🟢",
+            "label": "Benissimo!",
+            "description": "L'ho applicata con successo e mi sono sentito/a a mio agio."
+          },
+          "so-so": {
+            "emoji": "🟡",
+            "label": "Così così...",
+            "description": "Ci ho provato, ma ho incontrato qualche difficoltà o non sono del tutto soddisfatto/a."
+          },
+          "bad": {
+            "emoji": "🔴",
+            "label": "Male",
+            "description": "Non sono riuscito/a ad applicarla o mi sono sentito/a molto a disagio."
+          }
+        },
+        "commentLabel": "C'è qualcosa in particolare che vuoi raccontarmi?",
+        "commentPlaceholder": "Scrivi il tuo commento qui...",
+        "confirmButton": "Conferma",
+        "cancelButton": "Annulla"
+      }
     },
     "notifications": {
       "title": "Notifiche",

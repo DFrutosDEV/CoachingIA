@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
 
-// PUT /api/goals/[id] - Actualizar una meta específica
+// PUT /api/goals/[id] - Actualizar un desafio específico
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: goalId } = await params;
-  console.log('goalId', goalId);
+  const log = `Goal: ${goalId}`;
+  console.log('Se procesa a actualizar un desafio', log);
   try {
     await connectDB();
     const updateData = await request.json();
@@ -16,14 +17,15 @@ export async function PUT(
     // Validar que la meta existe
     const existingGoal = await Goal.findById(goalId);
     if (!existingGoal) {
+      console.log('Desafio no encontrado', log);
       return NextResponse.json(
-        { error: 'Meta no encontrada' },
+        { error: 'Desafio no encontrado' },
         { status: 404 }
       );
     }
 
     // Campos permitidos para actualizar
-    const allowedFields = ['description', 'day', 'date', 'isCompleted'];
+    const allowedFields = ['description', 'date', 'isCompleted', 'surveyRating', 'surveyComment'];
     const filteredData: any = {};
 
     allowedFields.forEach(field => {
@@ -41,13 +43,14 @@ export async function PUT(
       new: true,
     });
 
+    console.log('Desafio actualizado correctamente', log);
     return NextResponse.json({
       success: true,
-      message: 'Meta actualizada correctamente',
+      message: 'Desafio actualizado correctamente',
       goal: updatedGoal,
     });
   } catch (error) {
-    console.error('Error al actualizar meta:', error);
+    console.error('Error al actualizar desafio:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
@@ -55,20 +58,23 @@ export async function PUT(
   }
 }
 
-// DELETE /api/goals/[id] - Eliminar una meta específica
+// DELETE /api/goals/[id] - Eliminar un desafio específico
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: goalId } = await params;
+  const log = `Goal: ${goalId}`;
+  console.log('Se procesa a eliminar un desafio', log);
   try {
     await connectDB();
 
     // Validar que la meta existe
     const existingGoal = await Goal.findById(goalId);
     if (!existingGoal) {
+      console.log('Desafio no encontrado', log);
       return NextResponse.json(
-        { error: 'Meta no encontrada' },
+        { error: 'Desafio no encontrado' },
         { status: 404 }
       );
     }
@@ -76,12 +82,13 @@ export async function DELETE(
     // Soft delete - marcar como eliminada en lugar de eliminar físicamente
     await Goal.findByIdAndUpdate(goalId, { isDeleted: true });
 
+    console.log('Desafio eliminado correctamente', log);
     return NextResponse.json({
       success: true,
-      message: 'Meta eliminada correctamente',
+      message: 'Desafio eliminado correctamente',
     });
   } catch (error) {
-    console.error('Error al eliminar meta:', error);
+    console.error('Error al eliminar desafio:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

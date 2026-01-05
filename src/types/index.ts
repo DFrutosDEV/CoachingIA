@@ -28,7 +28,8 @@ export interface Goal {
   _id: string;
   description: string;
   isCompleted: boolean;
-  day: string;
+  surveyRating?: 'excellent' | 'so-so' | 'bad';
+  surveyComment?: string;
   date: string;
   aforism?: string;
   tiempoEstimado?: string;

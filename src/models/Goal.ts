@@ -13,6 +13,8 @@ export interface IGoal extends Document {
   ejemplo?: string;
   indicadorExito?: string;
   status: string;
+  surveyRating?: 'excellent' | 'so-so' | 'bad';
+  surveyComment?: string;
 }
 
 const GoalSchema: Schema = new Schema(
@@ -81,6 +83,17 @@ const GoalSchema: Schema = new Schema(
       required: true,
       default: 'pending',
       enum: ['pending', 'sent', 'failed'],
+    },
+    surveyRating: {
+      type: String,
+      required: false,
+      enum: ['excellent', 'so-so', 'bad'],
+    },
+    surveyComment: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: [1000, 'El comentario no puede exceder 1000 caracteres'],
     },
   },
   {

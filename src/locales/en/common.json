@@ -442,7 +442,31 @@
       "by": "By: {createdBy}",
       "noNotes": "No notes available",
       "feedback": "Feedback",
-      "noFeedback": "No feedback available"
+      "noFeedback": "No feedback available",
+      "survey": {
+        "title": "How did the challenge application go today?",
+        "options": {
+          "excellent": {
+            "emoji": "🟢",
+            "label": "Excellent!",
+            "description": "I applied it successfully and felt comfortable."
+          },
+          "so-so": {
+            "emoji": "🟡",
+            "label": "So-so...",
+            "description": "I tried, but encountered some difficulties or I'm not entirely satisfied."
+          },
+          "bad": {
+            "emoji": "🔴",
+            "label": "Bad",
+            "description": "I couldn't apply it or felt very uncomfortable."
+          }
+        },
+        "commentLabel": "Is there anything in particular you'd like to tell me?",
+        "commentPlaceholder": "Write your comment here...",
+        "confirmButton": "Confirm",
+        "cancelButton": "Cancel"
+      }
     },
     "notifications": {
       "title": "Notifications",

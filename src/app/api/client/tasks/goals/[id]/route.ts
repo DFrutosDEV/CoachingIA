@@ -11,11 +11,19 @@ export async function PUT(
     await connectDB();
 
     const { id: goalId } = await params;
-    const { isCompleted } = await request.json();
+    const { isCompleted, surveyRating, surveyComment } = await request.json();
 
     if (typeof isCompleted !== 'boolean') {
       return NextResponse.json(
         { error: 'isCompleted debe ser un valor booleano' },
+        { status: 400 }
+      );
+    }
+
+    // Validar surveyRating si se proporciona
+    if (surveyRating && !['excellent', 'so-so', 'bad'].includes(surveyRating)) {
+      return NextResponse.json(
+        { error: 'surveyRating debe ser uno de: excellent, so-so, bad' },
         { status: 400 }
       );
     }
@@ -29,10 +37,23 @@ export async function PUT(
       );
     }
 
-    // Actualizar el estado de completado
+    // Preparar los datos de actualización
+    const updateData: any = { isCompleted };
+
+    // Si se completa la tarea, agregar los datos de la encuesta
+    if (isCompleted) {
+      if (surveyRating) {
+        updateData.surveyRating = surveyRating;
+      }
+      if (surveyComment !== undefined) {
+        updateData.surveyComment = surveyComment || '';
+      }
+    }
+
+    // Actualizar el estado de completado y los datos de la encuesta
     const updatedGoal = await Goal.findByIdAndUpdate(
       goalId,
-      { isCompleted },
+      updateData,
       { new: true }
     );
 
@@ -47,6 +68,8 @@ export async function PUT(
         day: updatedGoal.day,
         isCompleted: updatedGoal.isCompleted,
         createdAt: updatedGoal.createdAt,
+        surveyRating: updatedGoal.surveyRating,
+        surveyComment: updatedGoal.surveyComment,
       },
     });
   } catch (error) {

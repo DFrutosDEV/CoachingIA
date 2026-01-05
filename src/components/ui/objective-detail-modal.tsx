@@ -28,6 +28,7 @@ import {
   Trash2,
   Save,
   X,
+  Eye,
 } from 'lucide-react';
 import { ObjectiveConfigForm } from './objective-config-form';
 import { CreateNoteModal } from './create-note-modal';
@@ -79,7 +80,7 @@ export function ObjectiveDetailModal({
 
   // Estados para gestión de metas
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
-  const [editingGoal, setEditingGoal] = useState({ description: '', day: '' });
+  const [editingGoal, setEditingGoal] = useState({ description: '', date: '' });
 
   // Estados para gestión de sesiones
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
@@ -125,6 +126,7 @@ export function ObjectiveDetailModal({
         const data = await response.json();
         if (data.success) {
           setGoals(data.goals);
+          console.log('Metas cargadas:', JSON.stringify(data.goals, null, 2));
         }
       }
     } catch (error) {
@@ -234,18 +236,10 @@ export function ObjectiveDetailModal({
   };
 
   const handleUpdateGoal = async (goalId: string) => {
-    if (!editingGoal.description.trim() || !editingGoal.day.trim()) {
+    if (!editingGoal.description.trim() || !editingGoal.date.trim()) {
       toast.error(t('errors.completeFields'));
       return;
     }
-
-    // Extraer el día del mes de la fecha seleccionada
-    // Usar la fecha directamente del input (formato YYYY-MM-DD) y establecer hora a mediodía local
-    const dateParts = editingGoal.day.split('-');
-    const selectedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
-    const dayOfMonth = selectedDate.getDate().toString();
-    // Convertir la fecha a ISO string para enviarla al endpoint
-    const dateISOString = selectedDate.toISOString();
 
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
@@ -255,8 +249,7 @@ export function ObjectiveDetailModal({
         },
         body: JSON.stringify({
           description: editingGoal.description,
-          day: dayOfMonth,
-          date: dateISOString, // Enviar la fecha completa seleccionada
+          date: editingGoal.date,
         }),
       });
 
@@ -269,14 +262,13 @@ export function ObjectiveDetailModal({
                 ? {
                   ...goal,
                   description: editingGoal.description,
-                  day: editingGoal.day,
-                  date: dateISOString, // Actualizar también la fecha en el estado local
+                  date: editingGoal.date, // Actualizar también la fecha en el estado local
                 }
                 : goal
             )
           );
           setEditingGoalId(null);
-          setEditingGoal({ description: '', day: '' });
+          setEditingGoal({ description: '', date: '' });
           toast.success(t('success.goalUpdated'));
         }
       }
@@ -307,43 +299,44 @@ export function ObjectiveDetailModal({
     }
   };
 
-  const handleToggleGoalCompletion = async (
-    goalId: string,
-    currentStatus: boolean
-  ) => {
-    try {
-      const response = await fetch(`/api/goals/${goalId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          isCompleted: !currentStatus,
-        }),
-      });
+  //! EL COACH NO PUEDE MARCAR COMO COMPLETADO MAS DESAFIOS SOLO EL CLIENTE PUEDE MARCARLOS
+  // const handleToggleGoalCompletion = async (
+  //   goalId: string,
+  //   currentStatus: boolean
+  // ) => {
+  //   try {
+  //     const response = await fetch(`/api/goals/${goalId}`, {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         isCompleted: !currentStatus,
+  //       }),
+  //     });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setGoals(prevGoals =>
-            prevGoals.map(goal =>
-              goal._id === goalId
-                ? { ...goal, isCompleted: !currentStatus }
-                : goal
-            )
-          );
-          toast.success(
-            currentStatus
-              ? t('success.goalMarkedPending')
-              : t('success.goalMarkedCompleted')
-          );
-        }
-      }
-    } catch (error) {
-      console.error('Error al actualizar estado de meta:', error);
-      toast.error(t('errors.updateGoalStatus'));
-    }
-  };
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       if (data.success) {
+  //         setGoals(prevGoals =>
+  //           prevGoals.map(goal =>
+  //             goal._id === goalId
+  //               ? { ...goal, isCompleted: !currentStatus }
+  //               : goal
+  //           )
+  //         );
+  //         toast.success(
+  //           currentStatus
+  //             ? t('success.goalMarkedPending')
+  //             : t('success.goalMarkedCompleted')
+  //         );
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Error al actualizar estado de meta:', error);
+  //     toast.error(t('errors.updateGoalStatus'));
+  //   }
+  // };
 
   const startEditingGoal = (goal: Goal) => {
     setEditingGoalId(goal._id);
@@ -352,18 +345,13 @@ export function ObjectiveDetailModal({
     if (goal.date) {
       const goalDate = new Date(goal.date);
       dateValue = goalDate.toISOString().split('T')[0];
-    } else if (goal.day) {
-      // Si solo tenemos el día del mes, usar la fecha actual con ese día
-      const today = new Date();
-      today.setDate(parseInt(goal.day));
-      dateValue = today.toISOString().split('T')[0];
     }
-    setEditingGoal({ description: goal.description, day: dateValue });
+    setEditingGoal({ description: goal.description, date: dateValue });
   };
 
   const cancelEditing = () => {
     setEditingGoalId(null);
-    setEditingGoal({ description: '', day: '' });
+    setEditingGoal({ description: '', date: '' });
   };
 
   // Funciones para gestión de sesiones
@@ -650,14 +638,15 @@ export function ObjectiveDetailModal({
                           <div
                             key={goal._id}
                             className="flex items-start gap-3 p-3 rounded-lg border"
+                            style={{
+                              borderColor:
+                                goal.surveyRating === 'excellent' ? '#22c55e' : // green-500  
+                                  goal.surveyRating === 'so-so' ? '#eab308' : // yellow-500
+                                    goal.surveyRating === 'bad' ? '#ef4444' : // red-500
+                                      '#6b7280', // gray-500
+                            }}
                           >
                             <button
-                              onClick={() =>
-                                handleToggleGoalCompletion(
-                                  goal._id,
-                                  goal.isCompleted
-                                )
-                              }
                               className="mt-1 flex-shrink-0"
                             >
                               {goal.isCompleted ? (
@@ -681,11 +670,11 @@ export function ObjectiveDetailModal({
                                   />
                                   <Input
                                     type="date"
-                                    value={editingGoal.day}
+                                    value={editingGoal.date}
                                     onChange={e =>
                                       setEditingGoal(prev => ({
                                         ...prev,
-                                        day: e.target.value,
+                                        date: e.target.value,
                                       }))
                                     }
                                   />
@@ -718,19 +707,18 @@ export function ObjectiveDetailModal({
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-3 w-3 text-muted-foreground" />
                                       <span className="text-xs text-muted-foreground">
-                                        {goal.day} •{' '}
-                                        {formatDateWithLocale(new Date(goal.date), 'short')}
+                                        {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) || ''}
                                       </span>
                                     </div>
                                     <div className="flex gap-1">
-                                      <Button
+                                      {!goal.isCompleted && <Button
                                         size="sm"
                                         variant="outline"
                                         onClick={() => startEditingGoal(goal)}
                                       >
                                         <Edit className="h-3 w-3" />
-                                      </Button>
-                                      <Button
+                                      </Button>}
+                                      {!goal.isCompleted && <Button
                                         size="sm"
                                         variant="outline"
                                         onClick={() =>
@@ -738,9 +726,14 @@ export function ObjectiveDetailModal({
                                         }
                                       >
                                         <Trash2 className="h-3 w-3" />
-                                      </Button>
+                                      </Button>}
                                     </div>
                                   </div>
+                                  {goal.surveyComment && (
+                                    <div className="text-left text-xs text-muted-foreground border border-muted-foreground rounded-md p-2 mt-2">
+                                      {goal.surveyComment}
+                                    </div>
+                                  )}
                                 </>
                               )}
                             </div>
