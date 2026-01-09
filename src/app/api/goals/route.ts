@@ -3,7 +3,8 @@ import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
-import { scheduleDailyObjectiveEmail } from '@/lib/services/email-service';
+import User from '@/models/User';
+import { scheduleDailyObjectiveEmail, sendEmailWithBrevo, renderTemplateFromData } from '@/lib/services/email-service';
 
 // POST /api/goals - Crear goals (múltiples o individual)
 export async function POST(request: NextRequest) {
@@ -100,41 +101,160 @@ export async function POST(request: NextRequest) {
 
       // Programar emails diarios para cada goal
       try {
-        // Obtener información del objetivo y cliente
+        // Obtener información del objetivo y cliente con email
         const objective = await Objective.findById(objectiveId);
-        const client = await Profile.findById(clientProfile?._id);
+        const client = await Profile.findById(clientProfile?._id)
+          .populate({
+            path: 'user',
+            model: User,
+            select: 'email',
+          });
 
-        if (objective && client && client.email) {
-          // Programar email para cada goal creado
-          for (let i = 0; i < createdGoals.length; i++) {
-            const goal = createdGoals[i];
-            const sendDate = new Date(goal.date);
+        if (objective && client) {
+          const clientUser = (client as any).user as any;
+          const clientEmail = clientUser?.email;
 
-            // Configurar hora de envío (por ejemplo, 9 AM hora local)
-            sendDate.setHours(9, 0, 0, 0);
+          if (clientEmail) {
+            // Verificar si el primer goal tiene fecha de hoy
+            const firstGoal = createdGoals[0];
+            const firstGoalDate = new Date(firstGoal.date);
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const todayEnd = new Date(todayStart);
+            todayEnd.setDate(todayEnd.getDate() + 1);
 
-            const emailResult = await scheduleDailyObjectiveEmail(
-              client.email,
-              `${clientProfile?.firstName} ${clientProfile?.lastName}`,
-              objective.title,
-              goal.description,
-              i + 1, // currentDay
-              createdGoals.length, // totalDays
-              0, // completedGoals (al inicio, 0 completados)
-              createdGoals.length, // totalGoals
-              sendDate,
-              goal.aforism,
-              goal.tiempoEstimado,
-              goal.ejemplo,
-              goal.indicadorExito
-            );
+            const isFirstGoalToday = firstGoalDate >= todayStart && firstGoalDate < todayEnd;
 
-            if (!emailResult.success) {
-              console.error(`Error programando email para goal ${goal._id}:`, emailResult.error);
+            // Programar email para cada goal creado
+            for (let i = 0; i < createdGoals.length; i++) {
+              const goal = createdGoals[i];
+              const sendDate = new Date(goal.date);
+
+              // Configurar hora de envío (por ejemplo, 9 AM hora local)
+              sendDate.setHours(9, 0, 0, 0);
+
+              // Si es el primer goal y tiene fecha de hoy, enviar inmediatamente
+              if (i === 0 && isFirstGoalToday) {
+                // Preparar nombre del cliente (disponible para try y catch)
+                const clientName = `${clientProfile?.name || ''} ${clientProfile?.lastName || ''}`.trim() || 'Client';
+                
+                try {
+                  console.log(`📧 Enviando email inmediato para el primer desafío del día...`);
+                  
+                  // Obtener todos los Goals del mismo Objective para calcular progreso
+                  const allGoalsOfObjective = await Goal.find({
+                    objectiveId: objective._id,
+                    isDeleted: false,
+                  }).sort({ date: 1 });
+
+                  const totalGoals = allGoalsOfObjective.length;
+                  const completedGoals = allGoalsOfObjective.filter(g => g.isCompleted).length;
+
+                  // Calcular el día actual (posición del Goal en la secuencia)
+                  const currentDayIndex = allGoalsOfObjective.findIndex(
+                    g => g._id.toString() === goal._id.toString()
+                  );
+                  const currentDay = currentDayIndex >= 0 ? currentDayIndex + 1 : 1;
+
+                  // Generar barra de progreso
+                  const progressPercentage = Math.round((completedGoals / totalGoals) * 100);
+                  const progressBar = '█'.repeat(Math.floor(progressPercentage / 10)) +
+                    '░'.repeat(10 - Math.floor(progressPercentage / 10));
+
+                  // Preparar datos para el template
+                  const templateData = {
+                    clientName,
+                    objectiveTitle: objective.title || 'Goal',
+                    objectiveDescription: goal.description,
+                    currentDay: currentDay.toString(),
+                    totalDays: totalGoals.toString(),
+                    completedGoals: completedGoals.toString(),
+                    totalGoals: totalGoals.toString(),
+                    progressBar,
+                    aforism: goal.aforism || '',
+                    tiempoEstimado: goal.tiempoEstimado || '',
+                    ejemplo: goal.ejemplo || '',
+                    indicadorExito: goal.indicadorExito || '',
+                  };
+
+                  // Renderizar el template con los datos
+                  const html = await renderTemplateFromData(
+                    'daily-objective-it.html', // TODO: HACERLO DINAMICO PARA EL IDIOMA
+                    JSON.stringify(templateData)
+                  );
+
+                  // Enviar el email inmediatamente
+                  const emailSubject = `🎯 Your Daily Goal - ${objective.title || 'Goal'}`;
+                  const emailResult = await sendEmailWithBrevo({
+                    to: clientEmail,
+                    subject: emailSubject,
+                    html,
+                  });
+
+                  if (emailResult.success) {
+                    // Actualizar el Goal a status: 'sent'
+                    goal.status = 'sent';
+                    await goal.save();
+                    console.log(`✅ Email enviado inmediatamente para el primer desafío del día`);
+                  } else {
+                    throw new Error(emailResult.error || 'Error desconocido al enviar email');
+                  }
+                } catch (immediateEmailError) {
+                  console.error('Error enviando email inmediato:', immediateEmailError);
+                  // Continuar con la programación normal si falla el envío inmediato
+                  const sendDate = new Date(goal.date);
+                  sendDate.setHours(9, 0, 0, 0);
+
+                  const emailResult = await scheduleDailyObjectiveEmail(
+                    clientEmail,
+                    clientName,
+                    objective.title,
+                    goal.description,
+                    i + 1, // currentDay
+                    createdGoals.length, // totalDays
+                    0, // completedGoals (al inicio, 0 completados)
+                    createdGoals.length, // totalGoals
+                    sendDate,
+                    goal.aforism,
+                    goal.tiempoEstimado,
+                    goal.ejemplo,
+                    goal.indicadorExito
+                  );
+
+                  if (!emailResult.success) {
+                    console.error(`Error programando email para goal ${goal._id}:`, emailResult.error);
+                  }
+                }
+              } else {
+                // Programar email normalmente para los demás goals
+                const clientName = `${clientProfile?.name || ''} ${clientProfile?.lastName || ''}`.trim() || 'Client';
+                const emailResult = await scheduleDailyObjectiveEmail(
+                  clientEmail,
+                  clientName,
+                  objective.title,
+                  goal.description,
+                  i + 1, // currentDay
+                  createdGoals.length, // totalDays
+                  0, // completedGoals (al inicio, 0 completados)
+                  createdGoals.length, // totalGoals
+                  sendDate,
+                  goal.aforism,
+                  goal.tiempoEstimado,
+                  goal.ejemplo,
+                  goal.indicadorExito
+                );
+
+                if (!emailResult.success) {
+                  console.error(`Error programando email para goal ${goal._id}:`, emailResult.error);
+                }
+              }
+            }
+
+            console.log(`📧 ${createdGoals.length} emails diarios programados exitosamente`);
+            if (isFirstGoalToday) {
+              console.log(`📧 Email del primer desafío enviado inmediatamente`);
             }
           }
-
-          console.log(`📧 ${createdGoals.length} emails diarios programados exitosamente`);
         }
       } catch (emailError) {
         console.error('Error programando emails diarios:', emailError);

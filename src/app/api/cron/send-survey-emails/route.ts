@@ -36,11 +36,11 @@ async function processCompletedGoalsAndSendSurveys() {
     await connectDB();
     console.log('✅ Conexión a la base de datos establecida');
 
-    // Obtener la fecha de hoy (solo día, sin hora)
+    // Obtener la fecha de hoy en UTC (solo día, sin hora)
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
+    todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
 
     console.log('─────────────────────────────────────────────────────────');
     console.log(`📅 Buscando Goals completados del día: ${todayStart.toISOString().split('T')[0]}`);
@@ -281,11 +281,11 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Obtener la fecha de hoy
+    // Obtener la fecha de hoy en UTC
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
+    todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
 
     // Obtener Goals completados de hoy que no tengan encuesta
     const completedGoalsToday = await Goal.find({

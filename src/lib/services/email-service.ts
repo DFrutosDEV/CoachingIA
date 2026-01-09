@@ -71,16 +71,26 @@ const postBrevoEmail = async (payload: any) => {
     },
     body: JSON.stringify(payload),
   });
+
+  // Leer el body UNA SOLA VEZ
+  const responseText = await response.text();
+
   console.log("Brevo status:", response.status);
   console.log("Brevo status text:", response.statusText);
-  console.log("Brevo headers:", JSON.stringify(response.headers, null, 2));
-  console.log("Brevo body:", await response.text());
-  console.log("Brevo response:", JSON.stringify(response, null, 2));
+  console.log("Brevo headers:", Object.fromEntries(response.headers.entries()));
+  console.log("Brevo body:", responseText);
+
   if (!response.ok) {
-    const text = await response.text().catch(() => '');
-    throw new Error(`Brevo error ${response.status}: ${text || response.statusText}`);
+    throw new Error(`Brevo error ${response.status}: ${responseText || response.statusText}`);
   }
-  return response.json();
+
+  // Parsear el JSON del texto ya leído
+  try {
+    return JSON.parse(responseText);
+  } catch (error) {
+    // Si no es JSON válido, retornar el texto
+    return { message: responseText };
+  }
 };
 
 export const sendEmailWithBrevo = async (emailData: EmailData) => {
