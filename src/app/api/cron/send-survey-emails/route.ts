@@ -126,11 +126,11 @@ async function processCompletedGoalsAndSendSurveys() {
         console.log(`   📧 Email destino: ${clientEmail}`);
         console.log(`   📝 Descripción: ${goal.description?.substring(0, 50) || 'N/A'}...`);
 
-        // Generar token JWT con el goalId (expira en 7 días)
-        const token = generateToken({ goalId: goal._id.toString() }, '7d');
+        // Generar token JWT con el goalId (expira en 2 días)
+        const token = generateToken({ goalId: goal._id.toString() }, '2d');
         const surveyUrl = `${baseUrl}/it/survey?token=${encodeURIComponent(token)}`;
 
-        console.log(`   🔐 Token generado (expira en 7 días)`);
+        console.log(`   🔐 Token generado (expira en 2 días)`);
         console.log(`   🔗 URL de encuesta: ${surveyUrl}`);
 
         // Preparar datos para el template

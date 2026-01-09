@@ -7,24 +7,7 @@ import { Loader2, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { RootState } from '@/lib/redux/store';
-
-interface CoachResponse {
-  id: string;
-  name: string;
-  lastName: string;
-  email: string;
-  age?: number;
-  phone: string;
-  bio: string;
-  profilePicture?: string;
-  active: boolean;
-  enterprise?: {
-    id: string;
-    name: string;
-    logo?: string;
-  } | null;
-  createdAt: string;
-}
+import { CoachResponse } from '@/types';
 
 export function ServicesGrid({ isEnterprise, isClient }: { isEnterprise?: boolean, isClient?: boolean }) {
   const t = useTranslations('common.dashboard.servicesGrid');
@@ -119,6 +102,7 @@ export function ServicesGrid({ isEnterprise, isClient }: { isEnterprise?: boolea
             name={coach.name}
             lastName={coach.lastName}
             email={coach.email}
+            points={coach.points}
             age={coach.age}
             phone={coach.phone}
             bio={coach.bio}

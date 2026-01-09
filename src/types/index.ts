@@ -103,6 +103,25 @@ export interface ClientResponse {
   activeObjectiveId: string | null;
 }
 
+export interface CoachResponse {
+  id: string;
+  name: string;
+  lastName: string;
+  points: number;
+  email: string;
+  age?: number;
+  phone: string;
+  bio: string;
+  profilePicture?: string;
+  active: boolean;
+  enterprise?: {
+    id: string;
+    name: string;
+    logo?: string;
+  } | null;
+  createdAt: string;
+}
+
 // Tipo para datos básicos del cliente
 export interface ClientBasicData {
   nextSession: {

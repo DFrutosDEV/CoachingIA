@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
 import { verifyToken } from '@/lib/auth-jwt';
 
+
+// POST /api/goals/survey - Guardar la encuesta de un cliente
 export async function POST(request: NextRequest) {
   try {
     await connectDB();

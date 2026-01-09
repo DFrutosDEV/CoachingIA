@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que el coach tiene puntos suficientes
-    if (coachProfile.points < 10) {
+    if (coachProfile.points < 1) {
       return NextResponse.json(
         {
           success: false,
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
     const savedObjective = await newObjective.save();
 
     // Sacar 10 puntos al coach
-    coachProfile.points -= 10;
+    coachProfile.points -= 1;
     await coachProfile.save();
 
     // Crear la fecha combinando startDate y startTime

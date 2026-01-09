@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@mui/material';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mail, Phone, Building2, Calendar } from 'lucide-react';
+import { Mail, Phone, Building2, Calendar, Coins } from 'lucide-react';
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
 import { useTranslations } from 'next-intl';
@@ -15,6 +15,7 @@ interface CoachCardProps {
   name: string;
   lastName: string;
   email: string;
+  points: number;
   age?: number;
   phone: string;
   bio: string;
@@ -33,6 +34,7 @@ export function CoachCard({
   name,
   lastName,
   email,
+  points,
   age,
   phone,
   bio,
@@ -132,6 +134,10 @@ export function CoachCard({
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span>{t('registered', { date: formatDate(createdAt) })}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Coins className="h-4 w-4" />
+                <span>{t('points', { points: points ?? 'Sin puntos' })}</span>
               </div>
             </div>
             <div className="flex gap-2 ">

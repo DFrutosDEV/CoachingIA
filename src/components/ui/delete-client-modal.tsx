@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { HttpClient } from '@/lib/utils/http-client';
 
 interface DeleteClientModalProps {
   isOpen: boolean;
@@ -35,15 +36,12 @@ export function DeleteClientModal({
   const handleDeleteClient = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/users/${clientId}/delete`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // HttpClient automáticamente añade el token de autenticación del usuario
+      const response = await HttpClient.put(`/api/users/${clientId}/delete`);
 
       if (!response.ok) {
-        throw new Error(t('error'));
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || t('error'));
       }
 
       toast.success(t('success'));
@@ -51,7 +49,8 @@ export function DeleteClientModal({
       onClose();
     } catch (error) {
       console.error('Error:', error);
-      toast.error(t('error'));
+      const errorMessage = error instanceof Error ? error.message : t('error');
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

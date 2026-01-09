@@ -414,6 +414,7 @@
       },
       "age": "{age} años",
       "registered": "Registrado: {date}",
+      "points": "Puntos: {points}",
       "sendMessage": "Enviar Mensaje"
     },
     "clientTasks": {

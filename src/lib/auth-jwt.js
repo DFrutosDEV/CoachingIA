@@ -1,6 +1,27 @@
 import jwt from 'jsonwebtoken';
 
 /**
+ * Obtiene el JWT_SECRET de las variables de entorno
+ * Next.js carga automáticamente las variables de entorno desde .env.local y .env
+ * @returns {string} - El secret JWT
+ * @throws {Error} - Si JWT_SECRET no está definido
+ */
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    const error = new Error(
+      'JWT_SECRET is not defined in the environment variables. ' +
+      'Please add JWT_SECRET in your .env.local or .env file in the project root.'
+    );
+    console.error('❌ Critical error:', error.message);
+    throw error;
+  }
+
+  return secret;
+}
+
+/**
  * Verifica un token JWT
  * @param {string} token - El token JWT a verificar
  * @returns {object|null} - Los datos del token si es válido, null si no es válido
@@ -12,7 +33,8 @@ export function verifyToken(token) {
     }
     // Remover 'Bearer ' si está presente
     const cleanToken = token.startsWith('Bearer ') ? token.slice(7) : token;
-    const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
+    const secret = getJwtSecret();
+    const decoded = jwt.verify(cleanToken, secret);
     return decoded;
   } catch (error) {
     console.error('❌ Token JWT inválido:', error.message);
@@ -28,7 +50,8 @@ export function verifyToken(token) {
  */
 export function generateToken(payload, expiresIn = '6h') {
   try {
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+    const secret = getJwtSecret();
+    return jwt.sign(payload, secret, { expiresIn });
   } catch (error) {
     console.error('❌ Error generando token JWT:', error.message);
     throw error;

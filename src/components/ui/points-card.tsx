@@ -20,7 +20,7 @@ export function PointsCard({ count }: PointsCardProps) {
 
   // Determinar el estado de los puntos
   const getPointsStatus = () => {
-    if (count <= 9) {
+    if (count <= 0) {
       return {
         status: 'empty',
         color: 'text-red-600',
@@ -29,7 +29,7 @@ export function PointsCard({ count }: PointsCardProps) {
         icon: Minus,
         message: t('messages.empty'),
       };
-    } else if (count <= 19) {
+    } else if (count <= 3) {
       return {
         status: 'low',
         color: 'text-orange-600',

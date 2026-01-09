@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import { verifyToken, extractTokenFromRequest } from '@/lib/auth-jwt';
+import User from '@/models/User';
 
 interface DecodedToken {
   userId: string;
@@ -18,20 +19,20 @@ export async function PUT(
     const token = extractTokenFromRequest(request);
     if (!token) {
       return NextResponse.json(
-        { error: 'Token de autenticación requerido' },
+        { error: 'Authentication token required' },
         { status: 401 }
       );
     }
 
     const decoded = verifyToken(token) as DecodedToken;
     if (!decoded) {
-      return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     // Verificar que el usuario sea admin
     if (decoded.role !== 'admin') {
       return NextResponse.json(
-        { error: 'Acceso denegado. Se requieren permisos de administrador' },
+        { error: 'Access denied. Admin permissions are required' },
         { status: 403 }
       );
     }
@@ -41,7 +42,7 @@ export async function PUT(
     // Validar que el ID sea válido
     if (!id || id === 'undefined') {
       return NextResponse.json(
-        { error: 'ID de cliente requerido' },
+        { error: 'Client ID is required' },
         { status: 400 }
       );
     }
@@ -56,29 +57,28 @@ export async function PUT(
       { new: true }
     );
 
+    if (updatedProfile?.user) {
+      await User.findByIdAndUpdate(updatedProfile.user, { isDeleted: true });
+    }
+
     if (!updatedProfile) {
       return NextResponse.json(
-        { error: 'Cliente no encontrado o ya eliminado' },
+        { error: 'Client not found or already deleted' },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
       {
-        message: 'Cliente dado de baja exitosamente',
-        profile: {
-          id: updatedProfile._id,
-          name: updatedProfile.name,
-          lastName: updatedProfile.lastName,
-          isDeleted: updatedProfile.isDeleted,
-        },
+        success: true,
+        message: 'Client deleted successfully',
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error al dar de baja al cliente:', error);
+    console.error('Error in delete client:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

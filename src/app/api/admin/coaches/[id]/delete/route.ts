@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Profile from '@/models/Profile';
 import User from '@/models/User';
 
-// PUT /api/admin/coaches/[id]/deactivate - Dar de baja a un coach
+// PUT /api/admin/coaches/[id]/delete - Eliminar un coach
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -15,7 +15,7 @@ export async function PUT(
 
     if (!id) {
       return NextResponse.json(
-        { error: 'ID del coach es requerido' },
+        { error: 'Coach ID is required' },
         { status: 400 }
       );
     }
@@ -24,7 +24,7 @@ export async function PUT(
     const coachProfile = await Profile.findById(id);
     if (!coachProfile) {
       return NextResponse.json(
-        { error: 'Coach no encontrado' },
+        { error: 'Coach not found' },
         { status: 404 }
       );
     }
@@ -34,16 +34,16 @@ export async function PUT(
     await coachProfile.save();
 
     // También marcar el usuario como inactivo
-    await User.findByIdAndUpdate(coachProfile.user, { active: false });
+    await User.findByIdAndUpdate(coachProfile.user, { isDeleted: true });
 
     return NextResponse.json({
       success: true,
-      message: 'Coach dado de baja exitosamente',
+      message: 'Coach deleted successfully',
     });
   } catch (error) {
-    console.error('Error al dar de baja al coach:', error);
+    console.error('Error in delete coach:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
