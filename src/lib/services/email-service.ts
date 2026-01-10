@@ -153,7 +153,7 @@ export const sendWelcomeEmail = async (
   return sendTemplateEmail(
     'welcome.html',
     email,
-    '¡Bienvenido a KytCoaching! - Tus credenciales de acceso',
+    '¡Welcome to KytCoaching! - Your access credentials',
     variables
   );
 };

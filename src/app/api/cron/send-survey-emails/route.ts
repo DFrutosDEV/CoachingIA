@@ -223,61 +223,66 @@ async function processCompletedGoalsAndSendSurveys() {
   }
 }
 
-// Función principal para procesar encuestas
-export async function POST(request: NextRequest) {
+// Endpoint GET: si viene de cron job de Vercel, ejecuta la misma lógica que POST
+// Si no, devuelve estadísticas (para debugging)
+export async function GET(request: NextRequest) {
   const requestStartTime = new Date();
 
-  console.log('');
-  console.log('╔═══════════════════════════════════════════════════════════╗');
-  console.log('║        ENDPOINT CRON: send-survey-emails                 ║');
-  console.log('╚═══════════════════════════════════════════════════════════╝');
-  console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
+  // Verificar si viene de un cron job de Vercel
+  const isVercelCron = request.headers.get('x-vercel-cron') !== null ||
+    request.headers.get('authorization')?.startsWith('Bearer') === true;
 
-  try {
-    // Verificar autorización
-    // if (!verifyCronAuth(request)) {
-    //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    // }
+  // Si viene de un cron job, ejecutar la misma lógica que POST
+  if (isVercelCron) {
+    console.log('');
+    console.log('╔═══════════════════════════════════════════════════════════╗');
+    console.log('║        ENDPOINT CRON (GET): send-survey-emails          ║');
+    console.log('╚═══════════════════════════════════════════════════════════╝');
+    console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
 
-    console.log('🚀 Iniciando procesamiento en background...');
+    try {
+      // Verificar autorización
+      // if (!verifyCronAuth(request)) {
+      //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+      // }
 
-    // Iniciar procesamiento en background y devolver respuesta inmediata
-    await processCompletedGoalsAndSendSurveys().catch(error => {
-      console.error('💥 Error no manejado en procesamiento en background:', error);
-    });
+      console.log('🚀 Iniciando procesamiento en background...');
 
-    const responseTime = Date.now() - requestStartTime.getTime();
-    console.log(`✅ Respuesta enviada en ${responseTime}ms`);
-    // console.log('💡 El procesamiento continúa en background');
+      // Iniciar procesamiento en background y devolver respuesta inmediata
+      await processCompletedGoalsAndSendSurveys().catch(error => {
+        console.error('💥 Error no manejado en procesamiento en background:', error);
+      });
 
-    // Devolver respuesta inmediata para evitar timeouts
-    return NextResponse.json({
-      success: true,
-      message: 'Procesamiento de encuestas iniciado en background',
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Error desconocido';
+      const responseTime = Date.now() - requestStartTime.getTime();
+      console.log(`✅ Respuesta enviada en ${responseTime}ms`);
 
-    console.error('💥 Error en endpoint POST:', errorMessage);
-    if (error instanceof Error && error.stack) {
-      console.error('Stack trace:', error.stack);
+      // Devolver respuesta inmediata para evitar timeouts
+      return NextResponse.json({
+        success: true,
+        message: 'Procesamiento de encuestas iniciado en background',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+
+      console.error('💥 Error en endpoint GET (cron):', errorMessage);
+      if (error instanceof Error && error.stack) {
+        console.error('Stack trace:', error.stack);
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Error interno del servidor',
+          details: errorMessage,
+        },
+        { status: 500 }
+      );
     }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Error interno del servidor',
-        details: errorMessage,
-      },
-      { status: 500 }
-    );
   }
-}
 
-// Endpoint GET para verificar el estado del cron job (opcional, para debugging)
-export async function GET(request: NextRequest) {
+  // Si no es un cron job, devolver estadísticas (para debugging)
   try {
     await connectDB();
 
