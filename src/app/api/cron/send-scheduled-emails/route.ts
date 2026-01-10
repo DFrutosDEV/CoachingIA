@@ -281,147 +281,159 @@ async function processGoalsAndSendEmails() {
 export async function GET(request: NextRequest) {
   const requestStartTime = new Date();
 
-  // Verificar si viene de un cron job de Vercel
-  const isVercelCron = request.headers.get('x-vercel-cron') !== null ||
-    request.headers.get('authorization')?.startsWith('Bearer') === true;
+  const secret = request.nextUrl.searchParams.get("secret");
 
-  // Si viene de un cron job, ejecutar la misma lógica que POST
-  if (isVercelCron) {
-    console.log('');
-    console.log('╔═══════════════════════════════════════════════════════════╗');
-    console.log('║        ENDPOINT CRON (GET): send-scheduled-emails         ║');
-    console.log('╚═══════════════════════════════════════════════════════════╝');
-    console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
-
-    try {
-      // Verificar autorización
-      // if (!verifyCronAuth(request)) {
-      //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-      // }
-
-      console.log('🚀 Iniciando procesamiento en background...');
-
-      // Iniciar procesamiento en background y devolver respuesta inmediata
-      await processGoalsAndSendEmails().catch(error => {
-        console.error('💥 Error no manejado en procesamiento en background:', error);
-      });
-
-      const responseTime = Date.now() - requestStartTime.getTime();
-      console.log(`✅ Respuesta enviada en ${responseTime}ms`);
-
-      // Devolver respuesta inmediata para evitar timeouts
-      return NextResponse.json({
-        success: true,
-        message: 'Procesamiento de Goals iniciado en background',
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Error desconocido';
-
-      console.error('💥 Error en endpoint GET (cron):', errorMessage);
-      if (error instanceof Error && error.stack) {
-        console.error('Stack trace:', error.stack);
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Error interno del servidor',
-          details: errorMessage,
-        },
-        { status: 500 }
-      );
-    }
+  if (secret !== process.env.CRON_SECRET) {
+    console.warn("⛔ Intento de acceso no autorizado al cron");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Si no es un cron job, devolver estadísticas (para debugging)
+  console.log('');
+  console.log('╔═══════════════════════════════════════════════════════════╗');
+  console.log('║        ENDPOINT CRON (GET): send-scheduled-emails         ║');
+  console.log('╚═══════════════════════════════════════════════════════════╝');
+  console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
+
   try {
-    await connectDB();
+    // Verificar autorización
+    // if (!verifyCronAuth(request)) {
+    //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    // }
 
-    // Obtener la fecha de hoy en UTC
-    const now = new Date();
-    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    const todayEnd = new Date(todayStart);
-    todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
+    console.log('🚀 Iniciando procesamiento en background...');
 
-    // Obtener Goals de hoy (solo de objetivos activos)
-    const goalsToday = await Goal.find({
-      date: {
-        $gte: todayStart,
-        $lt: todayEnd,
-      },
-      isDeleted: false,
-    })
-      .populate({
-        path: 'objectiveId',
-        model: Objective,
-        select: 'title active',
-        match: { active: true },
-      })
-      .populate({
-        path: 'clientId',
-        model: Profile,
-        select: 'name lastName',
-      })
-      .sort({ date: 1 })
-      .limit(10);
+    // Iniciar procesamiento en background y devolver respuesta inmediata
+    await processGoalsAndSendEmails()
 
-    // Filtrar Goals que no tienen Objective activo
-    const goalsTodayFiltered = goalsToday.filter(
-      goal => goal.objectiveId !== null && goal.objectiveId !== undefined
-    );
+    const responseTime = Date.now() - requestStartTime.getTime();
+    console.log(`✅ Respuesta enviada en ${responseTime}ms`);
 
-    // Obtener Goals de los próximos días (solo de objetivos activos)
-    const nextGoals = await Goal.find({
-      date: { $gte: todayEnd },
-      isDeleted: false,
-    })
-      .populate({
-        path: 'objectiveId',
-        model: Objective,
-        select: 'title',
-        match: { active: true },
-      })
-      .populate({
-        path: 'clientId',
-        model: Profile,
-        select: 'name lastName',
-      })
-      .sort({ date: 1 })
-      .limit(5);
-
-    // Filtrar Goals que no tienen Objective activo
-    const nextGoalsFiltered = nextGoals.filter(
-      goal => goal.objectiveId !== null && goal.objectiveId !== undefined
-    );
-
+    // Devolver respuesta inmediata para evitar timeouts
     return NextResponse.json({
       success: true,
-      stats: {
-        goalsToday: goalsTodayFiltered.length,
-        nextGoals: nextGoalsFiltered.length,
-      },
-      goalsToday: goalsTodayFiltered.map(goal => ({
-        id: goal._id,
-        description: goal.description,
-        date: goal.date,
-        objectiveTitle: (goal.objectiveId as any)?.title || 'N/A',
-        clientName: `${(goal.clientId as any)?.name || ''} ${(goal.clientId as any)?.lastName || ''}`.trim() || 'N/A',
-      })),
-      nextGoals: nextGoalsFiltered.map(goal => ({
-        id: goal._id,
-        description: goal.description,
-        date: goal.date,
-        objectiveTitle: (goal.objectiveId as any)?.title || 'N/A',
-        clientName: `${(goal.clientId as any)?.name || ''} ${(goal.clientId as any)?.lastName || ''}`.trim() || 'N/A',
-      })),
+      message: 'Procesamiento de Goals iniciado en background',
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error obteniendo estadísticas de Goals:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido';
+
+    console.error('💥 Error en endpoint GET (cron):', errorMessage);
+    if (error instanceof Error && error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      {
+        success: false,
+        error: 'Error interno del servidor',
+        details: errorMessage,
+      },
       { status: 500 }
     );
   }
+
+  //! DESCOMENTAR PARA PROBAR EN LOCAL Y VER STATS
+  // try {
+  //   await connectDB();
+
+  //   // Obtener la fecha de hoy en UTC
+  //   const now = new Date();
+  //   const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  //   const todayEnd = new Date(todayStart);
+  //   todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
+
+  //   // Obtener Goals de hoy (solo de objetivos activos)
+  //   const goalsToday = await Goal.find({
+  //     date: {
+  //       $gte: todayStart,
+  //       $lt: todayEnd,
+  //     },
+  //     isDeleted: false,
+  //   })
+  //     .populate({
+  //       path: 'objectiveId',
+  //       model: Objective,
+  //       select: 'title active',
+  //       match: { active: true },
+  //     })
+  //     .populate({
+  //       path: 'clientId',
+  //       model: Profile,
+  //       select: 'name lastName',
+  //       populate: {
+  //         path: 'user',
+  //         model: User,
+  //         select: 'email',
+  //       }
+  //     })
+  //     .sort({ date: 1 })
+  //     .limit(10);
+
+  //   // Filtrar Goals que no tienen Objective activo
+  //   const goalsTodayFiltered = goalsToday.filter(
+  //     goal => goal.objectiveId !== null && goal.objectiveId !== undefined
+  //   );
+
+  //   // Obtener Goals de los próximos días (solo de objetivos activos)
+  //   const nextGoals = await Goal.find({
+  //     date: { $gte: todayEnd },
+  //     isDeleted: false,
+  //   })
+  //     .populate({
+  //       path: 'objectiveId',
+  //       model: Objective,
+  //       select: 'title',
+  //       match: { active: true },
+  //     })
+  //     .populate({
+  //       path: 'clientId',
+  //       model: Profile,
+  //       select: 'name lastName',
+  //       populate: {
+  //         path: 'user',
+  //         model: User,
+  //         select: 'email',
+  //       }
+  //     })
+  //     .sort({ date: 1 })
+  //     .limit(5);
+
+  //   // Filtrar Goals que no tienen Objective activo
+  //   const nextGoalsFiltered = nextGoals.filter(
+  //     goal => goal.objectiveId !== null && goal.objectiveId !== undefined
+  //   );
+
+  //   return NextResponse.json({
+  //     success: true,
+  //     stats: {
+  //       goalsToday: goalsTodayFiltered.length,
+  //       nextGoals: nextGoalsFiltered.length,
+  //     },
+  //     goalsToday: goalsTodayFiltered.map(goal => ({
+  //       id: goal._id,
+  //       description: goal.description,
+  //       date: goal.date,
+  //       objectiveTitle: (goal.objectiveId as any)?.title || 'N/A',
+  //       clientName: `${(goal.clientId as any)?.name || ''} ${(goal.clientId as any)?.lastName || ''}`.trim() || 'N/A',
+  //       clientEmail: (goal.clientId as any)?.user?.email || 'N/A',
+  //       status: goal.status,
+  //     })),
+  //     nextGoals: nextGoalsFiltered.map(goal => ({
+  //       id: goal._id,
+  //       description: goal.description,
+  //       date: goal.date,
+  //       objectiveTitle: (goal.objectiveId as any)?.title || 'N/A',
+  //       clientName: `${(goal.clientId as any)?.name || ''} ${(goal.clientId as any)?.lastName || ''}`.trim() || 'N/A',
+  //       clientEmail: (goal.clientId as any)?.user?.email || 'N/A',
+  //       status: goal.status,
+  //     })),
+  //   });
+  // } catch (error) {
+  //   console.error('Error obteniendo estadísticas de Goals:', error);
+  //   return NextResponse.json(
+  //     { error: 'Error interno del servidor' },
+  //     { status: 500 }
+  //   );
+  // }
 }

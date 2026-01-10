@@ -228,109 +228,108 @@ async function processCompletedGoalsAndSendSurveys() {
 export async function GET(request: NextRequest) {
   const requestStartTime = new Date();
 
-  // Verificar si viene de un cron job de Vercel
-  const isVercelCron = request.headers.get('x-vercel-cron') !== null ||
-    request.headers.get('authorization')?.startsWith('Bearer') === true;
+  const secret = request.nextUrl.searchParams.get("secret");
 
-  // Si viene de un cron job, ejecutar la misma lógica que POST
-  if (isVercelCron) {
-    console.log('');
-    console.log('╔═══════════════════════════════════════════════════════════╗');
-    console.log('║        ENDPOINT CRON (GET): send-survey-emails          ║');
-    console.log('╚═══════════════════════════════════════════════════════════╝');
-    console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
-
-    try {
-      // Verificar autorización
-      // if (!verifyCronAuth(request)) {
-      //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-      // }
-
-      console.log('🚀 Iniciando procesamiento en background...');
-
-      // Iniciar procesamiento en background y devolver respuesta inmediata
-      await processCompletedGoalsAndSendSurveys().catch(error => {
-        console.error('💥 Error no manejado en procesamiento en background:', error);
-      });
-
-      const responseTime = Date.now() - requestStartTime.getTime();
-      console.log(`✅ Respuesta enviada en ${responseTime}ms`);
-
-      // Devolver respuesta inmediata para evitar timeouts
-      return NextResponse.json({
-        success: true,
-        message: 'Procesamiento de encuestas iniciado en background',
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Error desconocido';
-
-      console.error('💥 Error en endpoint GET (cron):', errorMessage);
-      if (error instanceof Error && error.stack) {
-        console.error('Stack trace:', error.stack);
-      }
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Error interno del servidor',
-          details: errorMessage,
-        },
-        { status: 500 }
-      );
-    }
+  if (secret !== process.env.CRON_SECRET) {
+    console.warn("⛔ Intento de acceso no autorizado al cron");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Si no es un cron job, devolver estadísticas (para debugging)
+  // Si viene de un cron job, ejecutar la misma lógica que POST
+  console.log('');
+  console.log('╔═══════════════════════════════════════════════════════════╗');
+  console.log('║        ENDPOINT CRON (GET): send-survey-emails          ║');
+  console.log('╚═══════════════════════════════════════════════════════════╝');
+  console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
+
   try {
-    await connectDB();
+    // Verificar autorización
+    // if (!verifyCronAuth(request)) {
+    //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    // }
 
-    // Obtener la fecha de hoy en UTC
-    const now = new Date();
-    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    const todayEnd = new Date(todayStart);
-    todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
+    console.log('🚀 Iniciando procesamiento en background...');
 
-    // Obtener Goals completados de hoy que no tengan encuesta
-    const completedGoalsToday = await Goal.find({
-      date: {
-        $gte: todayStart,
-        $lt: todayEnd,
-      },
-      isDeleted: false,
-      isCompleted: true,
-      $or: [
-        { surveyRating: { $exists: false } },
-        { surveyRating: null },
-      ],
-    })
-      .populate({
-        path: 'clientId',
-        model: Profile,
-        select: 'name lastName',
-      })
-      .sort({ date: 1 })
-      .limit(10);
+    // Iniciar procesamiento en background y devolver respuesta inmediata
+    await processCompletedGoalsAndSendSurveys()
 
+    const responseTime = Date.now() - requestStartTime.getTime();
+    console.log(`✅ Respuesta enviada en ${responseTime}ms`);
+
+    // Devolver respuesta inmediata para evitar timeouts
     return NextResponse.json({
       success: true,
-      stats: {
-        completedGoalsNeedingSurvey: completedGoalsToday.length,
-      },
-      goals: completedGoalsToday.map(goal => ({
-        id: goal._id,
-        description: goal.description,
-        date: goal.date,
-        clientName: `${(goal.clientId as any)?.name || ''} ${(goal.clientId as any)?.lastName || ''}`.trim() || 'N/A',
-      })),
+      message: 'Procesamiento de encuestas iniciado en background',
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error obteniendo estadísticas de Goals completados:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Error desconocido';
+
+    console.error('💥 Error en endpoint GET (cron):', errorMessage);
+    if (error instanceof Error && error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      {
+        success: false,
+        error: 'Error interno del servidor',
+        details: errorMessage,
+      },
       { status: 500 }
     );
   }
+
+  //! DESCOMENTAR PARA PROBAR EN LOCAL Y VER STATS
+  // try {
+  //   await connectDB();
+
+  //   // Obtener la fecha de hoy en UTC
+  //   const now = new Date();
+  //   const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  //   const todayEnd = new Date(todayStart);
+  //   todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
+
+  //   // Obtener Goals completados de hoy que no tengan encuesta
+  //   const completedGoalsToday = await Goal.find({
+  //     date: {
+  //       $gte: todayStart,
+  //       $lt: todayEnd,
+  //     },
+  //     isDeleted: false,
+  //     isCompleted: true,
+  //     $or: [
+  //       { surveyRating: { $exists: false } },
+  //       { surveyRating: null },
+  //     ],
+  //   })
+  //     .populate({
+  //       path: 'clientId',
+  //       model: Profile,
+  //       select: 'name lastName',
+  //     })
+  //     .sort({ date: 1 })
+  //     .limit(10);
+
+  //   return NextResponse.json({
+  //     success: true,
+  //     stats: {
+  //       completedGoalsNeedingSurvey: completedGoalsToday.length,
+  //     },
+  //     goals: completedGoalsToday.map(goal => ({
+  //       id: goal._id,
+  //       description: goal.description,
+  //       date: goal.date,
+  //       clientName: `${(goal.clientId as any)?.name || ''} ${(goal.clientId as any)?.lastName || ''}`.trim() || 'N/A',
+  //     })),
+  //   });
+  // } catch (error) {
+  //   console.error('Error obteniendo estadísticas de Goals completados:', error);
+  //   return NextResponse.json(
+  //     { error: 'Error interno del servidor' },
+  //     { status: 500 }
+  //   );
+  // }
 }
 
