@@ -97,7 +97,20 @@
     "rememberMe": "Remember me",
     "loading": "Logging in...",
     "error": "Login error",
-    "sessionExpired": "Your session has expired. Please log in again."
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": {
+      "title": "Reset Password",
+      "description": "Enter your email address and we will send you a new password",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email address",
+      "submit": "Send",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "success": "If the email exists, you will receive an email with your new password",
+      "error": "Error sending reset email",
+      "invalidEmail": "Please enter a valid email address"
+    }
   },
   "dashboardAdmin": {
     "welcome": "Welcome",

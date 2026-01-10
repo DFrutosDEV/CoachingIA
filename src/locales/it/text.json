@@ -97,7 +97,20 @@
     "rememberMe": "Ricordami",
     "loading": "Accesso in corso...",
     "error": "Errore durante l'accesso",
-    "sessionExpired": "La tua sessione è scaduta. Per favore, effettua nuovamente l'accesso."
+    "sessionExpired": "La tua sessione è scaduta. Per favore, effettua nuovamente l'accesso.",
+    "forgotPassword": "Hai dimenticato la password?",
+    "resetPassword": {
+      "title": "Reimposta Password",
+      "description": "Inserisci il tuo indirizzo email e ti invieremo una nuova password",
+      "email": "Email",
+      "emailPlaceholder": "Inserisci il tuo indirizzo email",
+      "submit": "Invia",
+      "cancel": "Annulla",
+      "sending": "Invio in corso...",
+      "success": "Se l'email esiste, riceverai un'email con la tua nuova password",
+      "error": "Errore nell'invio dell'email di reimpostazione",
+      "invalidEmail": "Inserisci un indirizzo email valido"
+    }
   },
   "dashboardAdmin": {
     "welcome": "Benvenuto",

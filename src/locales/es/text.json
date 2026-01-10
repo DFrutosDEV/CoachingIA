@@ -97,7 +97,20 @@
     "rememberMe": "Recuérdame",
     "loading": "Iniciando sesión...",
     "error": "Error al iniciar sesión",
-    "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente."
+    "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+    "forgotPassword": "¿Has olvidado la contraseña?",
+    "resetPassword": {
+      "title": "Restablecer Contraseña",
+      "description": "Ingresa tu correo electrónico y te enviaremos una nueva contraseña",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "submit": "Enviar",
+      "cancel": "Cancelar",
+      "sending": "Enviando...",
+      "success": "Si el email existe, recibirás un correo con tu nueva contraseña",
+      "error": "Error al enviar el correo de restablecimiento",
+      "invalidEmail": "Por favor ingresa un email válido"
+    }
   },
   "dashboardAdmin": {
     "welcome": "Bienvenido",

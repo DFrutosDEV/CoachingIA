@@ -185,6 +185,26 @@ export const sendAppointmentConfirmationEmail = async (
   );
 };
 
+export const sendPasswordResetEmail = async (
+  email: string,
+  newPassword: string
+) => {
+  const variables = {
+    companyName: 'KytCoaching',
+    newPassword,
+    companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
+    companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
+    companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
+  };
+
+  return sendTemplateEmail(
+    'reset-password-it.html',
+    email,
+    'Reset Password - KytCoaching',
+    variables
+  );
+};
+
 // Función para renderizar HTML desde un template y datos JSON
 export const renderTemplateFromData = async (
   templateName: string,

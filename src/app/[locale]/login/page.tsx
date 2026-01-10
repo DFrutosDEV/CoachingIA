@@ -15,6 +15,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAuthService } from '@/lib/services/auth-service';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
@@ -36,6 +44,9 @@ export default function LoginPage({ params }: LoginPageProps) {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [locale, setLocale] = useState('es');
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
   // Obtener locale de params
   useEffect(() => {
@@ -115,6 +126,39 @@ export default function LoginPage({ params }: LoginPageProps) {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!resetEmail || !resetEmail.includes('@')) {
+      toast.error(t('resetPassword.invalidEmail'));
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success(t('resetPassword.success'));
+        setShowResetPasswordDialog(false);
+        setResetEmail('');
+      } else {
+        toast.error(result.error || t('resetPassword.error'));
+      }
+    } catch (error) {
+      console.error('Error reseteando contraseña:', error);
+      toast.error(t('resetPassword.error'));
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center mx-auto">
       <Link href={`/${locale}`} className="absolute left-4 top-4 md:left-8 md:top-8">
@@ -168,20 +212,29 @@ export default function LoginPage({ params }: LoginPageProps) {
                       required
                     />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="rememberMe"
-                      checked={rememberMe}
-                      onChange={e => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                    />
-                    <Label
-                      htmlFor="rememberMe"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="rememberMe"
+                        checked={rememberMe}
+                        onChange={e => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <Label
+                        htmlFor="rememberMe"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {t('rememberMe')}
+                      </Label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowResetPasswordDialog(true)}
+                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                      {t('rememberMe')}
-                    </Label>
+                      {t('forgotPassword')}
+                    </button>
                   </div>
                   <Button variant="outlined" type="submit" className="w-full">
                     {t('loginButton')}
@@ -192,6 +245,50 @@ export default function LoginPage({ params }: LoginPageProps) {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dialog para reset de contraseña */}
+      <Dialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('resetPassword.title')}</DialogTitle>
+            <DialogDescription>
+              {t('resetPassword.description')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="resetEmail">{t('resetPassword.email')}</Label>
+              <Input
+                id="resetEmail"
+                type="email"
+                placeholder={t('resetPassword.emailPlaceholder')}
+                value={resetEmail}
+                onChange={e => setResetEmail(e.target.value)}
+                autoComplete="email"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setShowResetPasswordDialog(false);
+                setResetEmail('');
+              }}
+              disabled={isResetting}
+            >
+              {t('resetPassword.cancel')}
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleResetPassword}
+              disabled={isResetting || !resetEmail}
+            >
+              {isResetting ? t('resetPassword.sending') : t('resetPassword.submit')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
