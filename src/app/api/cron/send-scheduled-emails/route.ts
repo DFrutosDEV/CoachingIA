@@ -6,19 +6,6 @@ import Profile from '@/models/Profile';
 import User from '@/models/User';
 import { sendEmailWithBrevo, renderTemplateFromData } from '@/lib/services/email-service';
 
-// Función para verificar autorización del cron job
-const verifyCronAuth = (request: NextRequest): boolean => {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    console.warn('⚠️ CRON_SECRET no configurado en variables de entorno');
-    return false;
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-};
-
 // Función para procesar Goals y enviar emails (ejecuta en background)
 async function processGoalsAndSendEmails() {
   const startTime = new Date();
@@ -295,11 +282,6 @@ export async function GET(request: NextRequest) {
   console.log(`📥 Request recibido: ${requestStartTime.toISOString()}`);
 
   try {
-    // Verificar autorización
-    // if (!verifyCronAuth(request)) {
-    //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    // }
-
     console.log('🚀 Iniciando procesamiento en background...');
 
     // Iniciar procesamiento en background y devolver respuesta inmediata

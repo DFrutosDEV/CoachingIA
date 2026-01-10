@@ -6,19 +6,6 @@ import User from '@/models/User';
 import { sendEmailWithBrevo, renderTemplateFromData } from '@/lib/services/email-service';
 import { generateToken } from '@/lib/auth-jwt';
 
-// Función para verificar autorización del cron job
-const verifyCronAuth = (request: NextRequest): boolean => {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    console.warn('⚠️ CRON_SECRET no configurado en variables de entorno');
-    return false;
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-};
-
 // Función para procesar Goals completados y enviar emails de encuesta
 async function processCompletedGoalsAndSendSurveys() {
   const startTime = new Date();
