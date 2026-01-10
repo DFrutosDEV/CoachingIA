@@ -295,13 +295,13 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Iniciando procesamiento en background...');
 
     // Iniciar procesamiento en background y devolver respuesta inmediata
-    processGoalsAndSendEmails().catch(error => {
+    await processGoalsAndSendEmails().catch(error => {
       console.error('💥 Error no manejado en procesamiento en background:', error);
     });
 
     const responseTime = Date.now() - requestStartTime.getTime();
     console.log(`✅ Respuesta enviada en ${responseTime}ms`);
-    console.log('💡 El procesamiento continúa en background');
+    // console.log('💡 El procesamiento continúa en background');
 
     // Devolver respuesta inmediata para evitar timeouts
     return NextResponse.json({
