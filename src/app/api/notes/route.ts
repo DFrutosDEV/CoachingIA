@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Note from '@/models/Note';
 import Profile from '@/models/Profile';
+import Meet from '@/models/Meet';
 
 // POST /api/notes - Crear una nueva nota
 export async function POST(request: NextRequest) {
@@ -123,27 +124,54 @@ export async function GET(request: NextRequest) {
       .populate({
         path: 'createdBy',
         model: Profile,
-        populate: {
-          path: 'user name lastName',
-          model: 'User',
-          select: 'name lastName',
-        },
+        select: 'name lastName',
+        strictPopulate: false, // Permite valores null/inválidos sin lanzar error
+      })
+      .populate({
+        path: 'coachId',
+        model: Profile,
+        select: 'name lastName',
+        strictPopulate: false,
+      })
+      .populate({
+        path: 'clientId',
+        model: Profile,
+        select: 'name lastName',
+        strictPopulate: false,
+      })
+      .populate({
+        path: 'sessionId',
+        model: Meet,
+        select: 'date link',
+        strictPopulate: false,
       })
       .sort({ createdAt: -1 });
 
-    const formattedNotes = notes.map(note => ({
-      _id: note._id.toString(),
-      title: note.title,
-      content: note.content,
-      objectiveId: note.objectiveId?.toString(),
-      clientId: note.clientId?.toString(),
-      coachId: note.coachId?.toString(),
-      sessionId: note.sessionId?.toString(),
-      createdBy: note.createdBy?.user
-        ? `${note.createdBy.name} ${note.createdBy.lastName}`
-        : 'Usuario desconocido',
-      createdAt: note.createdAt,
-    }));
+    const formattedNotes = notes.map(note => {
+      // Manejar el caso donde createdBy puede ser null o un objeto
+      let createdByName = 'Desconocido';
+      if (note.createdBy) {
+        if (typeof note.createdBy === 'object' && note.createdBy !== null) {
+          const profile = note.createdBy as any;
+          createdByName = `${profile.name || ''} ${profile.lastName || ''}`.trim() || 'Desconocido';
+        } else if (typeof note.createdBy === 'string') {
+          // Si es un string, puede ser un ID o un nombre guardado directamente
+          createdByName = note.createdBy;
+        }
+      }
+
+      return {
+        _id: note._id.toString(),
+        title: note.title,
+        content: note.content,
+        createdBy: createdByName,
+        objectiveId: note.objectiveId?.toString() || null,
+        clientId: note.clientId?.toString() || null,
+        coachId: note.coachId?.toString() || null,
+        sessionId: note.sessionId?.toString() || null,
+        createdAt: note.createdAt,
+      };
+    });
 
     return NextResponse.json({
       success: true,
