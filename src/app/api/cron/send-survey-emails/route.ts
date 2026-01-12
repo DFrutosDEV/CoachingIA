@@ -38,13 +38,12 @@ async function processCompletedGoalsAndSendSurveys() {
     console.log('🔍 Ejecutando consulta de Goals...');
     console.log('   Filtros: isDeleted=false, isCompleted=true, date=hoy, surveyRating=null');
 
-    const completedGoalsToday = await Goal.find({
+    const goalsNeedingSurveyToday = await Goal.find({
       date: {
         $gte: todayStart,
         $lt: todayEnd,
       },
       isDeleted: false,
-      isCompleted: true,
       $or: [
         { surveyRating: { $exists: false } },
         { surveyRating: null },
@@ -62,29 +61,29 @@ async function processCompletedGoalsAndSendSurveys() {
       })
       .sort({ date: 1 });
 
-    console.log(`📊 Goals completados encontrados: ${completedGoalsToday.length}`);
+    console.log(`📊 Goals para mandar encuesta encontrados: ${goalsNeedingSurveyToday.length}`);
 
-    if (completedGoalsToday.length === 0) {
-      console.log('📭 No hay Goals completados para hoy que necesiten encuesta');
+    if (goalsNeedingSurveyToday.length === 0) {
+      console.log('📭 No hay Goals para mandar encuesta para hoy');
       console.log('═══════════════════════════════════════════════════════════');
-      console.log('🏁 FIN: Proceso completado sin Goals para procesar');
+      console.log('🏁 FIN: Proceso completado sin Goals para mandar encuesta para procesar');
       console.log('═══════════════════════════════════════════════════════════');
       return;
     }
 
     console.log('─────────────────────────────────────────────────────────');
-    console.log(`📬 Iniciando procesamiento de ${completedGoalsToday.length} encuestas`);
+    console.log(`📬 Iniciando procesamiento de ${goalsNeedingSurveyToday.length} encuestas`);
     console.log('─────────────────────────────────────────────────────────');
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
     // Procesar cada Goal
-    for (const goal of completedGoalsToday) {
+    for (const goal of goalsNeedingSurveyToday) {
       processedCount++;
 
       console.log('');
       console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-      console.log(`📋 Goal ${processedCount}/${completedGoalsToday.length}`);
+      console.log(`📋 Goal ${processedCount}/${goalsNeedingSurveyToday.length}`);
       console.log(`   Goal ID: ${goal._id}`);
 
       try {
@@ -169,7 +168,7 @@ async function processCompletedGoalsAndSendSurveys() {
       }
 
       // Pequeña pausa entre envíos para no sobrecargar el servidor SMTP
-      if (processedCount < completedGoalsToday.length) {
+      if (processedCount < goalsNeedingSurveyToday.length) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     }
