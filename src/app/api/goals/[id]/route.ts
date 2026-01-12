@@ -25,7 +25,17 @@ export async function PUT(
     }
 
     // Campos permitidos para actualizar
-    const allowedFields = ['description', 'date', 'isCompleted', 'surveyRating', 'surveyComment'];
+    const allowedFields = [
+      'description',
+      'date',
+      'isCompleted',
+      'surveyRating',
+      'surveyComment',
+      'aforism',
+      'tiempoEstimado',
+      'ejemplo',
+      'indicadorExito',
+    ];
     const filteredData: any = {};
 
     allowedFields.forEach(field => {

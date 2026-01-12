@@ -110,6 +110,7 @@ export function ServicesGrid({ isEnterprise, isClient }: { isEnterprise?: boolea
             active={coach.active}
             enterprise={coach.enterprise}
             createdAt={coach.createdAt}
+            onCoachUpdated={fetchCoaches}
           />
         ))}
       </div>

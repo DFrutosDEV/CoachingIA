@@ -1,14 +1,27 @@
 'use client';
 
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@mui/material';
+import { Button as MuiButton } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mail, Phone, Building2, Calendar, Coins } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Mail, Phone, Building2, Calendar, Coins, MoreVertical, Trash2, Unlink } from 'lucide-react';
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { useAppSelector } from '@/lib/redux/hooks';
+import { RootState } from '@/lib/redux/store';
+import { toast } from 'sonner';
+import { getStoredToken } from '@/lib/token-utils';
+import { ConfirmModal } from '@/components/ui/confirm-modal';
 
 interface CoachCardProps {
   id: string;
@@ -27,6 +40,7 @@ interface CoachCardProps {
     logo?: string;
   } | null;
   createdAt: string;
+  onCoachUpdated?: () => void;
 }
 
 export function CoachCard({
@@ -42,10 +56,16 @@ export function CoachCard({
   active,
   enterprise,
   createdAt,
+  onCoachUpdated,
 }: CoachCardProps) {
   const t = useTranslations('common.dashboard.coachCard');
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'es';
+  const user = useAppSelector((state: RootState) => state.auth.user);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUnlinking, setIsUnlinking] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [unlinkModalOpen, setUnlinkModalOpen] = useState(false);
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -73,6 +93,91 @@ export function CoachCard({
       sendEmail({ email });
     }
   };
+
+  // Verificar si el usuario es admin y puede realizar acciones
+  const canPerformActions = () => {
+    if (!user || user.role?.name.toLowerCase() !== 'admin') {
+      return false;
+    }
+
+    const adminEnterpriseId = user.enterprise?._id?.toString() || null;
+    const coachEnterpriseId = enterprise?.id || null;
+
+    // Admin sin empresa o admin con misma empresa
+    return !adminEnterpriseId || adminEnterpriseId === coachEnterpriseId;
+  };
+
+  const handleDeleteCoach = async () => {
+    try {
+      setIsDeleting(true);
+      const token = getStoredToken();
+
+      if (!token) {
+        toast.error(t('error.noToken'));
+        return;
+      }
+
+      const response = await fetch(`/api/admin/coaches/${id}/delete`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || t('error.deleteFailed'));
+      }
+
+      toast.success(t('success.deleted'));
+      setDeleteModalOpen(false);
+      onCoachUpdated?.();
+    } catch (error) {
+      console.error('Error deleting coach:', error);
+      toast.error(error instanceof Error ? error.message : t('error.deleteFailed'));
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleUnlinkEnterprise = async () => {
+    try {
+      setIsUnlinking(true);
+      const token = getStoredToken();
+
+      if (!token) {
+        toast.error(t('error.noToken'));
+        return;
+      }
+
+      const response = await fetch(`/api/admin/coaches/${id}/unlink-enterprise`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || t('error.unlinkFailed'));
+      }
+
+      toast.success(t('success.unlinked'));
+      setUnlinkModalOpen(false);
+      onCoachUpdated?.();
+    } catch (error) {
+      console.error('Error unlinking coach:', error);
+      toast.error(error instanceof Error ? error.message : t('error.unlinkFailed'));
+    } finally {
+      setIsUnlinking(false);
+    }
+  };
+
+  const canPerform = canPerformActions();
 
   return (
     <div key={id}>
@@ -102,6 +207,37 @@ export function CoachCard({
                 <p className="text-sm text-muted-foreground">{t('age', { age })}</p>
               )}
             </div>
+            {canPerform && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="text"
+                    size="icon"
+                    className="h-8 w-8"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">{t('openMenu')}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    className="bg-background-hover"
+                    onClick={() => setUnlinkModalOpen(true)}
+                    disabled={!enterprise}
+                  >
+                    <Unlink className="h-4 w-4 mr-2" />
+                    {t('unlinkEnterprise')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="bg-background-hover"
+                    onClick={() => setDeleteModalOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {t('deleteCoach')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </CardHeader>
 
@@ -141,18 +277,42 @@ export function CoachCard({
               </div>
             </div>
             <div className="flex gap-2 ">
-              <Button
+              <MuiButton
                 variant="outlined"
                 size="small"
                 className="flex-1"
                 onClick={handleSendMessage}
               >
                 {t('sendMessage')}
-              </Button>
+              </MuiButton>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteCoach}
+        title={t('confirmDeleteTitle')}
+        description={t('confirmDelete', { name: `${name} ${lastName}` })}
+        confirmText={t('confirmDeleteButton')}
+        cancelText={t('cancel')}
+        isLoading={isDeleting}
+        variant="destructive"
+      />
+
+      <ConfirmModal
+        isOpen={unlinkModalOpen}
+        onClose={() => setUnlinkModalOpen(false)}
+        onConfirm={handleUnlinkEnterprise}
+        title={t('confirmUnlinkTitle')}
+        description={t('confirmUnlink', { name: `${name} ${lastName}`, enterprise: enterprise?.name || '' })}
+        confirmText={t('confirmUnlinkButton')}
+        cancelText={t('cancel')}
+        isLoading={isUnlinking}
+        variant="default"
+      />
     </div>
   );
 }

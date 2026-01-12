@@ -82,8 +82,7 @@ export function ObjectiveDetailModal({
   const locale = localeMap[pathname.split('/')[1]];
 
   // Estados para gestión de metas
-  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
-  const [editingGoal, setEditingGoal] = useState({ description: '', date: '' });
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 
   // Estados para gestión de sesiones
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
@@ -235,50 +234,7 @@ export function ObjectiveDetailModal({
 
   // Funciones para gestión de metas
   const handleGoalCreated = () => {
-    loadGoals(); // Recargar goals después de crear uno nuevo
-  };
-
-  const handleUpdateGoal = async (goalId: string) => {
-    if (!editingGoal.description.trim() || !editingGoal.date.trim()) {
-      toast.error(t('errors.completeFields'));
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/goals/${goalId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          description: editingGoal.description,
-          date: editingGoal.date,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setGoals(prevGoals =>
-            prevGoals.map(goal =>
-              goal._id === goalId
-                ? {
-                  ...goal,
-                  description: editingGoal.description,
-                  date: editingGoal.date, // Actualizar también la fecha en el estado local
-                }
-                : goal
-            )
-          );
-          setEditingGoalId(null);
-          setEditingGoal({ description: '', date: '' });
-          toast.success(t('success.goalUpdated'));
-        }
-      }
-    } catch (error) {
-      console.error('Error al actualizar meta:', error);
-      toast.error(t('errors.updateGoal'));
-    }
+    loadGoals(); // Recargar goals después de crear o editar uno
   };
 
   const handleDeleteGoal = async (goalId: string) => {
@@ -342,19 +298,8 @@ export function ObjectiveDetailModal({
   // };
 
   const startEditingGoal = (goal: Goal) => {
-    setEditingGoalId(goal._id);
-    // Si el goal tiene fecha, usarla; si no, construir una fecha con el día del mes
-    let dateValue = '';
-    if (goal.date) {
-      const goalDate = new Date(goal.date);
-      dateValue = goalDate.toISOString().split('T')[0];
-    }
-    setEditingGoal({ description: goal.description, date: dateValue });
-  };
-
-  const cancelEditing = () => {
-    setEditingGoalId(null);
-    setEditingGoal({ description: '', date: '' });
+    setEditingGoal(goal);
+    setIsCreateGoalModalOpen(true);
   };
 
   // Funciones para gestión de sesiones
@@ -660,84 +605,41 @@ export function ObjectiveDetailModal({
                             </button>
 
                             <div className="flex-1 min-w-0">
-                              {editingGoalId === goal._id ? (
-                                <div className="space-y-2">
-                                  <Input
-                                    value={editingGoal.description}
-                                    onChange={e =>
-                                      setEditingGoal(prev => ({
-                                        ...prev,
-                                        description: e.target.value,
-                                      }))
-                                    }
-                                  />
-                                  <Input
-                                    type="date"
-                                    value={editingGoal.date}
-                                    onChange={e =>
-                                      setEditingGoal(prev => ({
-                                        ...prev,
-                                        date: e.target.value,
-                                      }))
-                                    }
-                                  />
-                                  <div className="flex gap-2">
-                                    <Button
-                                      size="sm"
-                                      onClick={() => handleUpdateGoal(goal._id)}
-                                    >
-                                      <Save className="h-3 w-3 mr-1" />
-                                      {t('goals.buttons.save')}
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={cancelEditing}
-                                    >
-                                      <X className="h-3 w-3 mr-1" />
-                                      {t('goals.buttons.cancel')}
-                                    </Button>
-                                  </div>
+                              <p
+                                className={`text-sm ${goal.isCompleted ? 'line-through text-muted-foreground' : ''}`}
+                              >
+                                {goal.description}
+                              </p>
+                              <div className="flex items-center justify-between mt-1">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-xs text-muted-foreground">
+                                    {goal.date ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) : ''}
+                                  </span>
                                 </div>
-                              ) : (
-                                <>
-                                  <p
-                                    className={`text-sm ${goal.isCompleted ? 'line-through text-muted-foreground' : ''}`}
+                                <div className="flex gap-1">
+                                  {!goal.isCompleted && <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => startEditingGoal(goal)}
                                   >
-                                    {goal.description}
-                                  </p>
-                                  <div className="flex items-center justify-between mt-1">
-                                    <div className="flex items-center gap-2">
-                                      <Clock className="h-3 w-3 text-muted-foreground" />
-                                      <span className="text-xs text-muted-foreground">
-                                        {goal.date ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) : ''}
-                                      </span>
-                                    </div>
-                                    <div className="flex gap-1">
-                                      {!goal.isCompleted && <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => startEditingGoal(goal)}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>}
-                                      {!goal.isCompleted && <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                          handleDeleteGoal(goal._id)
-                                        }
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </Button>}
-                                    </div>
-                                  </div>
-                                  {goal.surveyComment && (
-                                    <div className="text-left text-xs text-muted-foreground border border-muted-foreground rounded-md p-2 mt-2">
-                                      {goal.surveyComment}
-                                    </div>
-                                  )}
-                                </>
+                                    <Edit className="h-3 w-3" />
+                                  </Button>}
+                                  {!goal.isCompleted && <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                      handleDeleteGoal(goal._id)
+                                    }
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>}
+                                </div>
+                              </div>
+                              {goal.surveyComment && (
+                                <div className="text-left text-xs text-muted-foreground border border-muted-foreground rounded-md p-2 mt-2">
+                                  {goal.surveyComment}
+                                </div>
                               )}
                             </div>
                           </div>
@@ -1117,11 +1019,15 @@ export function ObjectiveDetailModal({
 
       <CreateGoalModal
         isOpen={isCreateGoalModalOpen}
-        onClose={() => setIsCreateGoalModalOpen(false)}
+        onClose={() => {
+          setIsCreateGoalModalOpen(false);
+          setEditingGoal(null);
+        }}
         objectiveId={objective._id}
         clientId={clientId}
         coachId={coachId}
         onGoalCreated={handleGoalCreated}
+        editingGoal={editingGoal}
       />
 
       <AIGoalsGenerator

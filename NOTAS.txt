@@ -116,3 +116,9 @@ LA TABLA FEEDBACK NO SE USA, EL FEEDBACK FINAL SE GUARDA EN EL OBJETIVO
 -----------------------------------------------------------------------------------------------------------------------------
 
 REVISAR QUE EL MAIL DE LA ENCUESTA AL CLIENTE TRAMBIEN CONTEMPLE LOS CASOS DONDE LOS DESAFIOS YA FUERON COMPLETADOS POR OTRO MEDIO
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+MODIFICAR 'es' por routing.defaultLocale (i18n libreria)

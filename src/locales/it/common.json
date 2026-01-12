@@ -415,7 +415,26 @@
       "age": "{age} anni",
       "registered": "Registrato: {date}",
       "points": "Punti: {points}",
-      "sendMessage": "Invia Messaggio"
+      "sendMessage": "Invia Messaggio",
+      "openMenu": "Apri menu",
+      "unlinkEnterprise": "Scollega dall'azienda",
+      "deleteCoach": "Elimina coach",
+      "confirmDeleteTitle": "Conferma eliminazione",
+      "confirmDelete": "Sei sicuro di voler eliminare {name}? Questa azione non può essere annullata.",
+      "confirmDeleteButton": "Elimina",
+      "confirmUnlinkTitle": "Conferma scollegamento",
+      "confirmUnlink": "Sei sicuro di voler scollegare {name} dall'azienda {enterprise}?",
+      "confirmUnlinkButton": "Scollega",
+      "cancel": "Annulla",
+      "success": {
+        "deleted": "Coach eliminato con successo",
+        "unlinked": "Coach scollegato dall'azienda con successo"
+      },
+      "error": {
+        "noToken": "Token di autenticazione non trovato",
+        "deleteFailed": "Errore nell'eliminazione del coach",
+        "unlinkFailed": "Errore nello scollegamento del coach dall'azienda"
+      }
     },
     "clientTasks": {
       "loading": "Caricamento attività...",
@@ -681,13 +700,16 @@
       "goals": {
         "title": "Sfide ({count})",
         "newGoal": "Nuova Sfida",
+        "editTitle": "Modifica Sfida",
         "form": {
           "description": "Descrizione della meta",
           "day": "Giorno (es: Lunedì, Martedì, ecc.)"
         },
         "buttons": {
           "save": "Salva",
-          "cancel": "Annulla"
+          "cancel": "Annulla",
+          "update": "Aggiorna Sfida",
+          "updating": "Aggiornamento..."
         },
         "loading": "Caricamento sfide...",
         "empty": "Non ci sono sfide definite per questo obiettivo",
@@ -872,6 +894,11 @@
       "mainObjective": "Obiettivo Principale",
       "form": {
         "aiConfig": {
+          "voiceToneTooltip": "Tono di voce che verrà utilizzato per generare i goal",
+          "difficultyLevelTooltip": "Livello di difficoltà che verrà utilizzato per generare i goal",
+          "challengeTypesTooltip": "Tipi di sfide che verranno utilizzati per generare i goal",
+          "includeWeekendsTooltip": "Includere i fine settimana nei goal",
+          "pdaFileTooltip": "File Report che verrà utilizzato per generare i goal",
           "title": "Configurazione IA",
           "voiceTone": "Tono di voce",
           "voiceTonePlaceholder": "Seleziona il tono di voce",
@@ -892,7 +919,6 @@
           "challengeTypes": "Tipi di sfide",
           "challengeTypesPlaceholder": "Seleziona i tipi di sfide",
           "challengeTypesOptions": {
-            "physical": "Fisiche",
             "mental": "Mentali",
             "emotional": "Emotive",
             "social": "Sociali",

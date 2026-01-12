@@ -415,7 +415,26 @@
       "age": "{age} years old",
       "registered": "Registered: {date}",
       "points": "Points: {points}",
-      "sendMessage": "Send Message"
+      "sendMessage": "Send Message",
+      "openMenu": "Open menu",
+      "unlinkEnterprise": "Unlink from enterprise",
+      "deleteCoach": "Delete coach",
+      "confirmDeleteTitle": "Confirm deletion",
+      "confirmDelete": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "confirmDeleteButton": "Delete",
+      "confirmUnlinkTitle": "Confirm unlink",
+      "confirmUnlink": "Are you sure you want to unlink {name} from the enterprise {enterprise}?",
+      "confirmUnlinkButton": "Unlink",
+      "cancel": "Cancel",
+      "success": {
+        "deleted": "Coach deleted successfully",
+        "unlinked": "Coach unlinked from enterprise successfully"
+      },
+      "error": {
+        "noToken": "Authentication token not found",
+        "deleteFailed": "Error deleting coach",
+        "unlinkFailed": "Error unlinking coach from enterprise"
+      }
     },
     "clientTasks": {
       "loading": "Loading tasks...",
@@ -681,13 +700,16 @@
       "goals": {
         "title": "Goals ({count})",
         "newGoal": "New Goal",
+        "editTitle": "Edit Goal",
         "form": {
           "description": "Goal description",
           "day": "Day (e.g: Monday, Tuesday, etc.)"
         },
         "buttons": {
           "save": "Save",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "update": "Update Goal",
+          "updating": "Updating..."
         },
         "loading": "Loading goals...",
         "empty": "No goals defined for this objective",
@@ -872,6 +894,11 @@
       "mainObjective": "Main Objective",
       "form": {
         "aiConfig": {
+          "voiceToneTooltip": "Voice tone that will be used to generate goals",
+          "difficultyLevelTooltip": "Difficulty level that will be used to generate goals",
+          "challengeTypesTooltip": "Challenge types that will be used to generate goals",
+          "includeWeekendsTooltip": "Include weekends in goals",
+          "pdaFileTooltip": "PDA file that will be used to generate goals",
           "title": "AI Configuration",
           "voiceTone": "Voice tone",
           "voiceTonePlaceholder": "Select voice tone",
@@ -892,7 +919,6 @@
           "challengeTypes": "Challenge types",
           "challengeTypesPlaceholder": "Select challenge types",
           "challengeTypesOptions": {
-            "physical": "Physical",
             "mental": "Mental",
             "emotional": "Emotional",
             "social": "Social",
@@ -960,7 +986,6 @@
           "challengeTypes": "Challenge types",
           "challengeTypesPlaceholder": "Select challenge types",
           "challengeTypesOptions": {
-            "physical": "Physical",
             "mental": "Mental",
             "emotional": "Emotional",
             "social": "Social",

@@ -415,7 +415,26 @@
       "age": "{age} años",
       "registered": "Registrado: {date}",
       "points": "Puntos: {points}",
-      "sendMessage": "Enviar Mensaje"
+      "sendMessage": "Enviar Mensaje",
+      "openMenu": "Abrir menú",
+      "unlinkEnterprise": "Desvincular de empresa",
+      "deleteCoach": "Dar de baja",
+      "confirmDeleteTitle": "Confirmar baja",
+      "confirmDelete": "¿Estás seguro de que deseas dar de baja a {name}? Esta acción no se puede deshacer.",
+      "confirmDeleteButton": "Dar de baja",
+      "confirmUnlinkTitle": "Confirmar desvinculación",
+      "confirmUnlink": "¿Estás seguro de que deseas desvincular a {name} de la empresa {enterprise}?",
+      "confirmUnlinkButton": "Desvincular",
+      "cancel": "Cancelar",
+      "success": {
+        "deleted": "Coach dado de baja exitosamente",
+        "unlinked": "Coach desvinculado de la empresa exitosamente"
+      },
+      "error": {
+        "noToken": "No se encontró el token de autenticación",
+        "deleteFailed": "Error al dar de baja al coach",
+        "unlinkFailed": "Error al desvincular al coach de la empresa"
+      }
     },
     "clientTasks": {
       "loading": "Cargando tareas...",
@@ -681,13 +700,16 @@
       "goals": {
         "title": "Desafíos ({count})",
         "newGoal": "Nuevo Desafío",
+        "editTitle": "Editar Desafío",
         "form": {
           "description": "Descripción de la meta",
           "day": "Día (ej: Lunes, Martes, etc.)"
         },
         "buttons": {
           "save": "Guardar",
-          "cancel": "Cancelar"
+          "cancel": "Cancelar",
+          "update": "Actualizar Desafío",
+          "updating": "Actualizando..."
         },
         "loading": "Cargando desafíos...",
         "empty": "No hay desafíos definidos para este objetivo",
@@ -872,6 +894,11 @@
       "mainObjective": "Objetivo Principal",
       "form": {
         "aiConfig": {
+          "voiceToneTooltip": "Tono de voz que se usará para generar los objetivos",
+          "difficultyLevelTooltip": "Nivel de dificultad que se usará para generar los objetivos",
+          "challengeTypesTooltip": "Tipos de desafíos que se usarán para generar los objetivos",
+          "includeWeekendsTooltip": "Incluir fines de semana en los objetivos",
+          "pdaFileTooltip": "Archivo Reporte que se usará para generar los objetivos",
           "title": "Configuración de IA",
           "voiceTone": "Tono de voz",
           "voiceTonePlaceholder": "Selecciona el tono de voz",
@@ -892,7 +919,6 @@
           "challengeTypes": "Tipos de desafíos",
           "challengeTypesPlaceholder": "Selecciona los tipos de desafíos",
           "challengeTypesOptions": {
-            "physical": "Físicos",
             "mental": "Mentales",
             "emotional": "Emocionales",
             "social": "Sociales",

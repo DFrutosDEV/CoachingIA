@@ -6,6 +6,7 @@ import Profile from '@/models/Profile';
 import Pda from '@/models/Pda';
 import dotenv from 'dotenv';
 import { addWeeks } from 'date-fns';
+import { routing } from '@/i18n/routing';
 
 dotenv.config({ path: '.env' });
 dotenv.config({ path: '.env.local' });
@@ -51,8 +52,8 @@ export async function POST(request: NextRequest) {
       }
     } = body;
 
-    // Obtener el idioma del header Accept-Language o usar español por defecto
-    const locale = request.headers.get('Accept-Language') || 'es';
+    // Obtener el idioma de la URL
+    const locale = request.nextUrl.searchParams.get('locale') || routing.defaultLocale;
 
     if (!objectiveId) {
       return NextResponse.json(

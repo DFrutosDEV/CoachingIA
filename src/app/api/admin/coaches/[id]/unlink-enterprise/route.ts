@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Profile from '@/models/Profile';
-import User from '@/models/User';
 import { verifyToken, extractTokenFromRequest } from '@/lib/auth-jwt';
 
 interface DecodedToken {
@@ -10,7 +9,7 @@ interface DecodedToken {
   role: string;
 }
 
-// PUT /api/admin/coaches/[id]/delete - Eliminar un coach
+// PUT /api/admin/coaches/[id]/unlink-enterprise - Desvincular coach de empresa
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -73,24 +72,21 @@ export async function PUT(
 
     if (adminEnterpriseId && adminEnterpriseId !== coachEnterpriseId) {
       return NextResponse.json(
-        { error: 'Access denied. You can only delete coaches from your own enterprise' },
+        { error: 'Access denied. You can only unlink coaches from your own enterprise' },
         { status: 403 }
       );
     }
 
-    // Marcar como eliminado (soft delete)
-    coachProfile.isDeleted = true;
+    // Desvincular empresa (setear a null)
+    coachProfile.enterprise = null;
     await coachProfile.save();
-
-    // También marcar el usuario como eliminado
-    await User.findByIdAndUpdate(coachProfile.user, { isDeleted: true });
 
     return NextResponse.json({
       success: true,
-      message: 'Coach deleted successfully',
+      message: 'Coach unlinked from enterprise successfully',
     });
   } catch (error) {
-    console.error('Error in delete coach:', error);
+    console.error('Error in unlink coach from enterprise:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

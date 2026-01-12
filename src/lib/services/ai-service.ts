@@ -57,6 +57,8 @@ export class AIService {
       // Si son muchos objetivos (más de 15), dividir en múltiples llamadas
       const GOALS_PER_BATCH = 12; // Número seguro de objetivos por llamada
 
+      const language = this.getLanguageName(metrics.locale || 'es');
+
       if (numberOfGoals > GOALS_PER_BATCH) {
         console.log(`🔵 Dividiendo generación en múltiples lotes: ${numberOfGoals} objetivos en lotes de ${GOALS_PER_BATCH}`);
         const allGoals: GeneratedGoal[] = [];
@@ -100,7 +102,8 @@ export class AIService {
             batchStartDateStr,
             batchEndDateStr,
             allGoals.length + 1,
-            numberOfGoals
+            numberOfGoals,
+            language
           );
 
           let response: Response;
@@ -194,7 +197,8 @@ export class AIService {
     batchStartDate?: string,
     batchEndDate?: string,
     goalStartIndex?: number,
-    totalGoals?: number
+    totalGoals?: number,
+    language?: string
   ): string {
     // Preparar información adicional del PDA si existe
     let pdaSection = '';
@@ -286,9 +290,8 @@ IMPORTANTE:
 - Distribuye las fechas de manera progresiva: si generas ${numberOfGoals} objetivos, distribúyelos equitativamente en el período de 30 días desde ${objective.startDate || 'la fecha actual'}
 - Aplica tu experiencia como Master Coach Digital para crear objetivos que realmente impulsen el desarrollo del coachee
 
-IDIOMA: ${this.getLanguageName(metrics.locale || 'es')}
 
-CRÍTICO: Responde TODO (description, date, aforism, tiempoEstimado, ejemplo, indicadorExito) en ${this.getLanguageName(metrics.locale || 'es')}. Nunca mezcles idiomas.
+¡¡¡CRÍTICO!!!: Responde TODO (description, date, aforism, tiempoEstimado, ejemplo, indicadorExito) en el idioma ${language}. Nunca mezcles idiomas.
 
 Responde SOLO con el JSON, sin texto adicional.`;
   }

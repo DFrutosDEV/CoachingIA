@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Target, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { Goal } from '@/types';
 
 interface CreateGoalModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface CreateGoalModalProps {
   clientId?: string;
   coachId?: string;
   onGoalCreated: () => void;
+  editingGoal?: Goal | null;
 }
 
 export function CreateGoalModal({
@@ -31,8 +33,10 @@ export function CreateGoalModal({
   clientId,
   coachId,
   onGoalCreated,
+  editingGoal,
 }: CreateGoalModalProps) {
   const t = useTranslations('common.dashboard.createGoal');
+  const tDetail = useTranslations('common.dashboard.objectiveDetail');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
   const [aforism, setAforism] = useState('');
@@ -41,6 +45,35 @@ export function CreateGoalModal({
   const [indicadorExito, setIndicadorExito] = useState('');
   const [saving, setSaving] = useState(false);
   const [showOptionalFields, setShowOptionalFields] = useState(false);
+  const isEditing = !!editingGoal;
+
+  // Precargar datos cuando se abre el modal en modo edición
+  useEffect(() => {
+    if (isOpen && editingGoal) {
+      setDescription(editingGoal.description || '');
+      if (editingGoal.date) {
+        const goalDate = new Date(editingGoal.date);
+        setStartDate(goalDate.toISOString().split('T')[0]);
+      }
+      setAforism(editingGoal.aforism || '');
+      setTiempoEstimado(editingGoal.tiempoEstimado || '');
+      setEjemplo(editingGoal.ejemplo || '');
+      setIndicadorExito(editingGoal.indicadorExito || '');
+      // Mostrar campos opcionales si tienen datos
+      if (editingGoal.aforism || editingGoal.tiempoEstimado || editingGoal.ejemplo || editingGoal.indicadorExito) {
+        setShowOptionalFields(true);
+      }
+    } else if (isOpen && !editingGoal) {
+      // Limpiar campos cuando se abre en modo creación
+      setDescription('');
+      setStartDate('');
+      setAforism('');
+      setTiempoEstimado('');
+      setEjemplo('');
+      setIndicadorExito('');
+      setShowOptionalFields(false);
+    }
+  }, [isOpen, editingGoal]);
 
   const handleSubmit = async () => {
     // Validar campos obligatorios
@@ -67,45 +100,84 @@ export function CreateGoalModal({
         0,
         0
       );
-      const dayOfMonth = selectedDate.getDate().toString();
       const dateISOString = selectedDate.toISOString();
 
-      const goalData = {
-        objectiveId,
-        description: description.trim(),
-        day: dayOfMonth,
-        date: dateISOString,
-        aforism: aforism.trim() || '',
-        tiempoEstimado: tiempoEstimado.trim() || '',
-        ejemplo: ejemplo.trim() || '',
-        indicadorExito: indicadorExito.trim() || '',
-      };
+      if (isEditing && editingGoal) {
+        // Modo edición: usar PUT
+        const goalData = {
+          description: description.trim(),
+          date: dateISOString,
+          aforism: aforism.trim() || '',
+          tiempoEstimado: tiempoEstimado.trim() || '',
+          ejemplo: ejemplo.trim() || '',
+          indicadorExito: indicadorExito.trim() || '',
+        };
 
-      const response = await fetch('/api/goals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(goalData),
-      });
+        const response = await fetch(`/api/goals/${editingGoal._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(goalData),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t('errors.createGoal'));
-      }
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || tDetail('errors.updateGoal'));
+        }
 
-      const data = await response.json();
-      if (data.success) {
-        toast.success(t('success.goalCreated'));
-        onGoalCreated();
-        handleClose();
+        const data = await response.json();
+        if (data.success) {
+          toast.success(tDetail('success.goalUpdated'));
+          onGoalCreated();
+          handleClose();
+        } else {
+          throw new Error(tDetail('errors.updateGoal'));
+        }
       } else {
-        throw new Error(t('errors.createGoal'));
+        // Modo creación: usar POST
+        const dayOfMonth = selectedDate.getDate().toString();
+        const goalData = {
+          objectiveId,
+          description: description.trim(),
+          day: dayOfMonth,
+          date: dateISOString,
+          aforism: aforism.trim() || '',
+          tiempoEstimado: tiempoEstimado.trim() || '',
+          ejemplo: ejemplo.trim() || '',
+          indicadorExito: indicadorExito.trim() || '',
+        };
+
+        const response = await fetch('/api/goals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(goalData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || t('errors.createGoal'));
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          toast.success(t('success.goalCreated'));
+          onGoalCreated();
+          handleClose();
+        } else {
+          throw new Error(t('errors.createGoal'));
+        }
       }
     } catch (error) {
       console.error('Error:', error);
       toast.error(
-        error instanceof Error ? error.message : t('errors.createGoal')
+        error instanceof Error
+          ? error.message
+          : isEditing
+            ? tDetail('errors.updateGoal')
+            : t('errors.createGoal')
       );
     } finally {
       setSaving(false);
@@ -128,7 +200,7 @@ export function CreateGoalModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            {t('title')}
+            {isEditing ? tDetail('goals.editTitle') : t('title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -273,12 +345,12 @@ export function CreateGoalModal({
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {t('buttons.creating')}
+                  {isEditing ? tDetail('goals.buttons.updating') : t('buttons.creating')}
                 </>
               ) : (
                 <>
                   <Target className="h-4 w-4" />
-                  {t('buttons.create')}
+                  {isEditing ? tDetail('goals.buttons.update') : t('buttons.create')}
                 </>
               )}
             </Button>
