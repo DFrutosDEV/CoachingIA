@@ -136,9 +136,46 @@ export const sendTemplateEmail = async (
 export const sendWelcomeEmail = async (
   email: string,
   name: string,
-  password: string
+  password: string,
+  coachData?: {
+    name: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  }
 ) => {
-  const variables = {
+  // Generar HTML de la firma del coach si hay datos
+  let coachSignature = '';
+  if (coachData) {
+    const emailLine = coachData.email
+      ? `<p style="margin: 5px 0; color: #6c757d; font-size: 14px">
+                  Email: <a href="mailto:${coachData.email}" style="color: #667eea; text-decoration: none">${coachData.email}</a>
+                </p>`
+      : '';
+    const phoneLine = coachData.phone
+      ? `<p style="margin: 5px 0; color: #6c757d; font-size: 14px">
+                  Telefono: <a href="tel:${coachData.phone}" style="color: #667eea; text-decoration: none">${coachData.phone}</a>
+                </p>`
+      : '';
+
+    coachSignature = `
+          <tr>
+            <td style="padding: 30px 30px 20px 30px; border-top: 1px solid #e9ecef">
+              <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea">
+                <p style="margin: 0 0 10px 0; color: #495057; font-size: 14px; font-weight: 600">
+                  Ti ha dato il benvenuto:
+                </p>
+                <p style="margin: 5px 0; color: #333333; font-size: 16px; font-weight: 600">
+                  ${coachData.name} ${coachData.lastName}
+                </p>
+                ${emailLine}
+                ${phoneLine}
+              </div>
+            </td>
+          </tr>`;
+  }
+
+  const variables: Record<string, string> = {
     companyName: 'KytCoaching',
     userName: name,
     mailSocio: email,
@@ -148,6 +185,7 @@ export const sendWelcomeEmail = async (
     companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
     companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
     privacyUrl: process.env.NEXT_PUBLIC_APP_PRIVACY_URL || '',
+    coachSignature,
   };
 
   return sendTemplateEmail(

@@ -131,7 +131,16 @@ export async function POST(request: NextRequest) {
 
       // Enviar email de bienvenida
       try {
-        await sendWelcomeEmail(email, firstName, defaultPassword);
+        // Obtener el email del coach desde su perfil
+        const coachUser = await User.findById(coachProfile.user);
+        const coachEmail = coachUser?.email || '';
+
+        await sendWelcomeEmail(email, firstName, defaultPassword, {
+          name: coachProfile.name,
+          lastName: coachProfile.lastName,
+          email: coachEmail,
+          phone: coachProfile.phone || '',
+        });
       } catch (emailError) {
         console.error('Error enviando email de bienvenida:', emailError);
         // No fallamos la creación del usuario si falla el email
