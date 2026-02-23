@@ -6,7 +6,7 @@ import User from '@/models/User';
 import { sendEmailWithBrevo, renderTemplateFromData } from '@/lib/services/email-service';
 import { generateToken } from '@/lib/auth-jwt';
 
-// Función para procesar Goals completados y enviar emails de encuesta
+// Función para procesar Goals a mandar encuesta y enviar emails de encuesta
 async function processCompletedGoalsAndSendSurveys() {
   const startTime = new Date();
   let processedCount = 0;
@@ -14,7 +14,7 @@ async function processCompletedGoalsAndSendSurveys() {
   let errorCount = 0;
 
   console.log('═══════════════════════════════════════════════════════════');
-  console.log('🚀 INICIO: Envío de encuestas de Goals completados');
+  console.log('🚀 INICIO: Envío de encuestas de Goals a mandar');
   console.log(`⏰ Timestamp inicio: ${startTime.toISOString()}`);
   console.log('═══════════════════════════════════════════════════════════');
 
@@ -30,11 +30,11 @@ async function processCompletedGoalsAndSendSurveys() {
     todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
 
     console.log('─────────────────────────────────────────────────────────');
-    console.log(`📅 Buscando Goals completados del día: ${todayStart.toISOString().split('T')[0]}`);
+    console.log(`📅 Buscando Goals a mandar encuesta del día: ${todayStart.toISOString().split('T')[0]}`);
     console.log(`   Rango de búsqueda: ${todayStart.toISOString()} - ${todayEnd.toISOString()}`);
     console.log('─────────────────────────────────────────────────────────');
 
-    // Obtener Goals del día actual que estén completados, no eliminados, y que no tengan encuesta ya enviada
+    // Obtener Goals del día actual que estén completados, no eliminados, y que no tengan encuesta a mandar
     console.log('🔍 Ejecutando consulta de Goals...');
     console.log('   Filtros: isDeleted=false, isCompleted=true, date=hoy, surveyRating=null');
 
