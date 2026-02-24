@@ -142,7 +142,8 @@ export const sendWelcomeEmail = async (
     lastName: string;
     email: string;
     phone: string;
-  }
+  },
+  enterpriseName?: string
 ) => {
   // Generar HTML de la firma del coach si hay datos
   let coachSignature = '';
@@ -180,6 +181,9 @@ export const sendWelcomeEmail = async (
     userName: name,
     mailSocio: email,
     passwordSocio: password,
+    enterpriseLine: enterpriseName?.trim()
+      ? `<p>Enterprise: ${enterpriseName.trim()}</p>`
+      : '',
     dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || '',
     companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
     companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',

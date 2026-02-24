@@ -166,8 +166,13 @@ export async function POST(request: NextRequest) {
       .populate('role', 'name code');
 
     // Enviar email de bienvenida
+    let enterpriseNameForEmail: string | undefined;
+    if (perfilGuardado.enterprise) {
+      const enterpriseDoc = await Enterprise.findById(perfilGuardado.enterprise).select('name').lean();
+      enterpriseNameForEmail = enterpriseDoc?.name ?? '';
+    }
     try {
-      await sendWelcomeEmail(email, name, defaultPassword);
+      await sendWelcomeEmail(email, name, defaultPassword, undefined, enterpriseNameForEmail);
     } catch (emailError) {
       console.error('Error enviando email de bienvenida:', emailError);
       // No fallamos la creación del usuario si falla el email

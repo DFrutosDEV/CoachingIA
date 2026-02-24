@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -21,7 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UserPlus, ArrowRight } from 'lucide-react';
+import { Card as UICard, CardContent as UICardContent } from '@/components/ui/card';
+import { UserPlus, ArrowRight, Search, Building2, Loader2, X } from 'lucide-react';
 import {
   SelectContent,
   SelectItem,
@@ -32,6 +33,11 @@ import { Select } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { useAppSelector } from '@/lib/redux/hooks';
+
+interface EnterpriseOption {
+  _id: string;
+  name: string;
+}
 
 export function AddUserCard() {
   const t = useTranslations('common.dashboard.addUserCard');
@@ -46,7 +52,12 @@ export function AddUserCard() {
   const [isLoading, setIsLoading] = useState(false);
   const user = useAppSelector(state => state.auth.user);
   const userCode = user?.role?.code;
-  console.log(userCode);
+
+  // Asignar coach a empresa (solo Admin, perfil Coach)
+  const [enterpriseSearchQuery, setEnterpriseSearchQuery] = useState('');
+  const [enterpriseSearchResults, setEnterpriseSearchResults] = useState<EnterpriseOption[]>([]);
+  const [isSearchingEnterprise, setIsSearchingEnterprise] = useState(false);
+  const [selectedEnterprise, setSelectedEnterprise] = useState<EnterpriseOption | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -54,6 +65,33 @@ export function AddUserCard() {
       [field]: value,
     }));
   };
+
+  // Búsqueda de empresas (debounce) para asignar coach a empresa
+  useEffect(() => {
+    if (enterpriseSearchQuery.trim().length < 2) {
+      setEnterpriseSearchResults([]);
+      return;
+    }
+    const timeoutId = setTimeout(async () => {
+      setIsSearchingEnterprise(true);
+      try {
+        const res = await fetch(
+          `/api/admin/enterprises?search=${encodeURIComponent(enterpriseSearchQuery.trim())}`
+        );
+        const result = await res.json();
+        setEnterpriseSearchResults(result.success ? result.data || [] : []);
+      } catch {
+        setEnterpriseSearchResults([]);
+      } finally {
+        setIsSearchingEnterprise(false);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [enterpriseSearchQuery]);
+
+  useEffect(() => {
+    if (profile !== '2') setSelectedEnterprise(null);
+  }, [profile]);
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.lastName || !formData.email || !profile) {
@@ -81,7 +119,12 @@ export function AddUserCard() {
           lastName: formattedLastName,
           email: formData.email,
           profile: profile,
-          enterpriseId: user?.enterprise?._id,
+          enterpriseId:
+            profile === '2'
+              ? selectedEnterprise?._id ?? undefined
+              : profile === '4'
+                ? undefined
+                : undefined,
           ...(profile === '4' && {
             enterpriseName: formData.enterpriseName.trim(),
           }),
@@ -93,6 +136,9 @@ export function AddUserCard() {
       if (data.success) {
         toast.success(t('success.userCreated'));
         setFormData({ name: '', lastName: '', email: '', enterpriseName: '' });
+        setSelectedEnterprise(null);
+        setEnterpriseSearchQuery('');
+        setEnterpriseSearchResults([]);
         setShowCoachDialog(false);
       } else {
         toast.error(data.error || t('errors.createUser'));
@@ -230,6 +276,69 @@ export function AddUserCard() {
                       handleInputChange('enterpriseName', e.target.value)
                     }
                   />
+                </div>
+              )}
+              {profile === '2' && userCode === '1' && (
+                <div className="grid gap-2">
+                  <Label>{t('modal.fields.assignToEnterprise')}</Label>
+                  {selectedEnterprise ? (
+                    <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                      <span className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        {selectedEnterprise.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="text"
+                        size="small"
+                        onClick={() => {
+                          setSelectedEnterprise(null);
+                          setEnterpriseSearchQuery('');
+                          setEnterpriseSearchResults([]);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder={t('modal.fields.enterpriseSearchPlaceholder')}
+                          value={enterpriseSearchQuery}
+                          onChange={e => setEnterpriseSearchQuery(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      {isSearchingEnterprise && (
+                        <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          {t('modal.fields.searching')}
+                        </div>
+                      )}
+                      {!isSearchingEnterprise && enterpriseSearchResults.length > 0 && (
+                        <div className="flex flex-col gap-2 max-h-40 overflow-y-auto rounded-md border p-2">
+                          {enterpriseSearchResults.map((ent: EnterpriseOption) => (
+                            <UICard
+                              key={ent._id}
+                              className="cursor-pointer hover:bg-accent transition-colors"
+                              onClick={() => {
+                                setSelectedEnterprise(ent);
+                                setEnterpriseSearchQuery('');
+                                setEnterpriseSearchResults([]);
+                              }}
+                            >
+                              <UICardContent className="p-3 flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-muted-foreground" />
+                                {ent.name}
+                              </UICardContent>
+                            </UICard>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               )}
             </div>

@@ -183,6 +183,7 @@ export async function GET(request: NextRequest) {
       })),
       platformStats,
       pendingReports,
+      enterprisePoints: enterprise.points ?? 0,
     };
 
     return NextResponse.json({

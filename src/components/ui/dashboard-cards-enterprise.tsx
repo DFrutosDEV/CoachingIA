@@ -14,6 +14,7 @@ import {
   BarChart3,
   ArrowRight,
   FileText,
+  Coins,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -136,6 +137,24 @@ export function CompletedSessionsCard({
             </Button>
           </Link>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Card: Puntos disponibles (solo dashboard Empresa)
+export function EnterprisePointsCard({ enterprisePoints = 0 }) {
+  const t = useTranslations('common.dashboard.enterprisePointsCard');
+
+  return (
+    <Card data-swapy-item="enterprise-points">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
+        <Coins className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{enterprisePoints}</div>
+        <p className="text-xs text-muted-foreground">{t('description')}</p>
       </CardContent>
     </Card>
   );

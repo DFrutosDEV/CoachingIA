@@ -9,10 +9,9 @@ import { useTranslations } from 'next-intl';
 import {
   TotalUsersCard,
   ActiveCoachesCard,
-  CompletedSessionsCard,
   ReportsCard,
   NewUsersCard,
-  PlatformPerformanceCard,
+  EnterprisePointsCard,
 } from '@/components/ui/dashboard-cards-enterprise';
 import { HttpClient } from '@/lib/utils/http-client';
 
@@ -38,6 +37,7 @@ interface EnterpriseBasicData {
     monthlyRevenue: { value: string; change: string; positive: boolean };
   };
   pendingReports: number;
+  enterprisePoints?: number;
 }
 
 export default function EnterpriseDashboard() {
@@ -67,17 +67,26 @@ export default function EnterpriseDashboard() {
 
   // Función para obtener los datos básicos
   const fetchBasicData = async () => {
+    const enterpriseId = user?.enterprise?._id;
+    if (!enterpriseId) {
+      setError('No se encontró información de la empresa');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
 
       const response = await HttpClient.get(
-        `/api/enterprise/getBasicData?enterpriseId=${user?._id}`
+        `/api/enterprise/getBasicData?enterpriseId=${enterpriseId}`
       );
 
-      const data = await response.json();
-      setBasicData(data);
-      setError(null);
+      const result = await response.json();
+      if (result.success && result.data) {
+        setBasicData(result.data);
+      } else {
+        throw new Error(result.error || 'Error al cargar datos');
+      }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -87,13 +96,13 @@ export default function EnterpriseDashboard() {
   };
 
   useEffect(() => {
-    if (user?._id) {
+    if (user?.enterprise?._id) {
       fetchBasicData();
-    } else {
-      setError('No se encontró información del usuario');
+    } else if (user?._id) {
+      setError('No se encontró información de la empresa');
       setLoading(false);
     }
-  }, [user?._id]);
+  }, [user?.enterprise?._id, user?._id]);
 
   useEffect(() => {
     // Marcar como listo después de que el componente se monte
@@ -306,23 +315,20 @@ export default function EnterpriseDashboard() {
               className="small-cards-container grid gap-6 md:grid-cols-4"
             >
               <div data-swapy-slot="1" className="w-full">
+                <EnterprisePointsCard
+                  enterprisePoints={basicData?.enterprisePoints ?? 0}
+                />
+              </div>
+              <div data-swapy-slot="2" className="w-full">
                 <TotalUsersCard
                   totalUsers={basicData?.totalUsers || 0}
                   newUsersThisMonth={basicData?.newUsersThisMonth || 0}
                 />
               </div>
-              <div data-swapy-slot="2" className="w-full">
+              <div data-swapy-slot="3" className="w-full">
                 <ActiveCoachesCard
                   activeCoaches={basicData?.activeCoaches || 0}
                   newCoachesThisMonth={basicData?.newCoachesThisMonth || 0}
-                />
-              </div>
-              <div data-swapy-slot="3" className="w-full">
-                <CompletedSessionsCard
-                  completedSessions={basicData?.completedSessions || 0}
-                  completedSessionsThisMonth={
-                    basicData?.completedSessionsThisMonth || 0
-                  }
                 />
               </div>
               <div data-swapy-slot="4" className="w-full">

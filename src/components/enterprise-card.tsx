@@ -21,6 +21,7 @@ interface EnterpriseCardProps {
   coaches: number;
   coachees: number;
   isActive: boolean;
+  points?: number;
 }
 
 export function EnterpriseCard({
@@ -34,6 +35,7 @@ export function EnterpriseCard({
   coaches,
   coachees,
   isActive,
+  points = 0,
 }: EnterpriseCardProps) {
   const t = useTranslations('common.dashboard.enterpriseCard');
 
@@ -50,6 +52,7 @@ export function EnterpriseCard({
             coachees: coachees,
           })}
         </CardDescription>
+        <CardDescription>{t('points', { points })}</CardDescription>
       </CardHeader>
       <CardContent>
         <Badge variant={isActive ? 'active' : 'inactive'}>{status}</Badge>

@@ -27,8 +27,8 @@ export function ResourcesGrid({
       {/* Agregar Cliente */}
       {userType === 'coach' && <NewObjectiveCard userType={userType} />}
 
-      {/* Agregar Usuario */}
-      {(userType === 'admin' || userType === 'enterprise') && <AddUserCard />}
+      {/* Agregar Usuario (solo Admin) */}
+      {userType === 'admin' && <AddUserCard />}
 
       {/* Generar Ticket */}
       {userType === 'coach' && <TicketCard />}

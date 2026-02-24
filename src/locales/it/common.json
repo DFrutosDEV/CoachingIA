@@ -503,6 +503,10 @@
         "daysSingular": ""
       }
     },
+    "enterprisePointsCard": {
+      "title": "Punti disponibili",
+      "description": "Assegna punti ai tuoi coach da Gestisci Punti"
+    },
     "adminCards": {
       "totalUsers": {
         "title": "Totale Utenti",
@@ -566,7 +570,8 @@
       "administrator": "Admin: {administrator}",
       "email": "Email: {email}",
       "phone": "Telefono: {phone}",
-      "coachesAndCoachees": "Coach: {coaches} | Coachee: {coachees}"
+      "coachesAndCoachees": "Coach: {coaches} | Coachee: {coachees}",
+      "points": "Punti: {points}"
     },
     "addUserCard": {
       "title": "Aggiungi nuovo utente",
@@ -588,7 +593,10 @@
           "profile": "Profilo",
           "profilePlaceholder": "Seleziona il profilo",
           "enterpriseName": "Nome dell'azienda",
-          "enterpriseNamePlaceholder": "Inserisci il nome dell'azienda"
+          "enterpriseNamePlaceholder": "Inserisci il nome dell'azienda",
+          "assignToEnterprise": "Assegna ad azienda (opzionale)",
+          "enterpriseSearchPlaceholder": "Cerca per nome azienda...",
+          "searching": "Ricerca..."
         },
         "profiles": {
           "admin": "Admin",
@@ -644,10 +652,23 @@
         },
         "errors": {
           "searchCoaches": "Errore durante la ricerca dei coach",
-          "updatePoints": "Errore durante l'aggiornamento dei punti"
+          "updatePoints": "Errore durante l'aggiornamento dei punti",
+          "searchEnterprises": "Errore durante la ricerca delle aziende",
+          "insufficientPoints": "Punti insufficienti nell'azienda"
         },
         "success": {
           "pointsUpdated": "Punti aggiornati con successo"
+        },
+        "mode": {
+          "coach": "Assegna a Coach",
+          "enterprise": "Assegna ad Azienda"
+        },
+        "enterprise": {
+          "searchLabel": "Cerca azienda",
+          "searchPlaceholder": "Cerca per nome...",
+          "yourPoints": "I tuoi punti disponibili",
+          "pointsToAssign": "Punti da assegnare",
+          "currentPoints": "punti attuali"
         }
       }
     },

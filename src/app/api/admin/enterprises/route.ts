@@ -5,27 +5,44 @@ import Profile from '@/models/Profile';
 import User from '@/models/User';
 import Role from '@/models/Role';
 
-// GET /api/admin/enterprises - Obtener todas las empresas
+// GET /api/admin/enterprises - Obtener todas las empresas (opcional: ?search= para filtrar por nombre)
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Obtener todas las empresas no eliminadas
-    const enterprises = await Enterprise.find({ isDeleted: false }).sort({
-      createdAt: -1,
-    }).lean(); // Ordenar por fecha de creación, más recientes primero
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search');
 
-    // Por cada empresa, agrego un nuevo atributo "administrator" con el nombre y apellido del primer administrador del profile
+    const query: { isDeleted: boolean; name?: RegExp } = { isDeleted: false };
+    if (search && search.trim().length >= 2) {
+      query.name = new RegExp(search.trim(), 'i');
+    }
+
+    const enterprises = await Enterprise.find(query)
+      .sort({ createdAt: -1 })
+      .lean();
+
     const roleEnterpriseId = await Role.findOne({ code: '4' });
-    const enterprisesWithAdministrator = await Promise.all(enterprises.map(async (enterprise) => {
-      const coacheAdmin = await Profile.findOne({ enterprise: enterprise._id, role: roleEnterpriseId._id })
-      return { ...enterprise, administrator: coacheAdmin?.name + ' ' + coacheAdmin?.lastName };
-    }));
+    const enterprisesWithAdministrator = await Promise.all(
+      enterprises.map(async (enterprise: any) => {
+        const coacheAdmin = await Profile.findOne({
+          enterprise: enterprise._id,
+          role: roleEnterpriseId._id,
+        });
+        return {
+          ...enterprise,
+          administrator: coacheAdmin
+            ? `${coacheAdmin.name} ${coacheAdmin.lastName}`
+            : '',
+          points: enterprise.points ?? 0,
+        };
+      })
+    );
 
     return NextResponse.json({
       success: true,
       data: enterprisesWithAdministrator,
-      count: enterprises.length,
+      count: enterprisesWithAdministrator.length,
     });
   } catch (error) {
     console.error('Error al obtener empresas:', error);

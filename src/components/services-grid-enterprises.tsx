@@ -22,6 +22,7 @@ interface Enterprise {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  points?: number;
 }
 
 export function ServicesGrid() {
@@ -122,6 +123,7 @@ export function ServicesGrid() {
             coaches={enterprise.coaches?.length || 0}
             coachees={enterprise.employees?.length || 0}
             isActive={enterprise.active}
+            points={enterprise.points ?? 0}
           />
         ))}
       </div>

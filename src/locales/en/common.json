@@ -503,6 +503,10 @@
         "daysSingular": ""
       }
     },
+    "enterprisePointsCard": {
+      "title": "Available points",
+      "description": "Assign points to your coaches from Manage Points"
+    },
     "adminCards": {
       "totalUsers": {
         "title": "Total Users",
@@ -566,7 +570,8 @@
       "administrator": "Admin: {administrator}",
       "email": "Email: {email}",
       "phone": "Phone: {phone}",
-      "coachesAndCoachees": "Coaches: {coaches} | Coachees: {coachees}"
+      "coachesAndCoachees": "Coaches: {coaches} | Coachees: {coachees}",
+      "points": "Points: {points}"
     },
     "addUserCard": {
       "title": "Add new user",
@@ -588,7 +593,10 @@
           "profile": "Profile",
           "profilePlaceholder": "Select profile",
           "enterpriseName": "Enterprise Name",
-          "enterpriseNamePlaceholder": "Enter the enterprise name"
+          "enterpriseNamePlaceholder": "Enter the enterprise name",
+          "assignToEnterprise": "Assign to enterprise (optional)",
+          "enterpriseSearchPlaceholder": "Search by enterprise name...",
+          "searching": "Searching..."
         },
         "profiles": {
           "admin": "Admin",
@@ -644,10 +652,23 @@
         },
         "errors": {
           "searchCoaches": "Error searching coaches",
-          "updatePoints": "Error updating points"
+          "updatePoints": "Error updating points",
+          "searchEnterprises": "Error searching enterprises",
+          "insufficientPoints": "Insufficient points in the enterprise"
         },
         "success": {
           "pointsUpdated": "Points updated successfully"
+        },
+        "mode": {
+          "coach": "Assign to Coach",
+          "enterprise": "Assign to Enterprise"
+        },
+        "enterprise": {
+          "searchLabel": "Search enterprise",
+          "searchPlaceholder": "Search by name...",
+          "yourPoints": "Your available points",
+          "pointsToAssign": "Points to assign",
+          "currentPoints": "current points"
         }
       }
     },

@@ -10,6 +10,7 @@ export interface IEnterprise extends Document {
   socialMedia: string[];
   active: boolean;
   isDeleted: boolean;
+  points: number;
 }
 
 const EnterpriseSchema: Schema = new Schema(
@@ -58,6 +59,10 @@ const EnterpriseSchema: Schema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    points: {
+      type: Number,
+      default: 0,
     },
   },
   {

@@ -503,6 +503,10 @@
         "daysSingular": ""
       }
     },
+    "enterprisePointsCard": {
+      "title": "Puntos disponibles",
+      "description": "Asigna puntos a tus coaches desde Gestionar Puntos"
+    },
     "adminCards": {
       "totalUsers": {
         "title": "Total Usuarios",
@@ -566,7 +570,8 @@
       "administrator": "Admin: {administrator}",
       "email": "Correo electrónico: {email}",
       "phone": "Teléfono: {phone}",
-      "coachesAndCoachees": "Coaches: {coaches} | Coachees: {coachees}"
+      "coachesAndCoachees": "Coaches: {coaches} | Coachees: {coachees}",
+      "points": "Puntos: {points}"
     },
     "addUserCard": {
       "title": "Agregar nuevo usuario",
@@ -588,7 +593,10 @@
           "profile": "Perfil",
           "profilePlaceholder": "Selecciona el perfil",
           "enterpriseName": "Nombre de la empresa",
-          "enterpriseNamePlaceholder": "Ingresa el nombre de la empresa"
+          "enterpriseNamePlaceholder": "Ingresa el nombre de la empresa",
+          "assignToEnterprise": "Asignar a empresa (opcional)",
+          "enterpriseSearchPlaceholder": "Buscar por nombre de empresa...",
+          "searching": "Buscando..."
         },
         "profiles": {
           "admin": "Admin",
@@ -644,10 +652,23 @@
         },
         "errors": {
           "searchCoaches": "Error al buscar coaches",
-          "updatePoints": "Error al actualizar puntos"
+          "updatePoints": "Error al actualizar puntos",
+          "searchEnterprises": "Error al buscar empresas",
+          "insufficientPoints": "Puntos insuficientes en la empresa"
         },
         "success": {
           "pointsUpdated": "Puntos actualizados exitosamente"
+        },
+        "mode": {
+          "coach": "Asignar a Coach",
+          "enterprise": "Asignar a Empresa"
+        },
+        "enterprise": {
+          "searchLabel": "Buscar empresa",
+          "searchPlaceholder": "Buscar por nombre...",
+          "yourPoints": "Tus puntos disponibles",
+          "pointsToAssign": "Puntos a asignar",
+          "currentPoints": "puntos actuales"
         }
       }
     },

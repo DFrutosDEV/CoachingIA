@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const enterpriseId = request.nextUrl.searchParams.get('enterpriseId');
+    const search = request.nextUrl.searchParams.get('search');
     if (!enterpriseId) {
       return NextResponse.json(
         { success: false, error: 'ID de empresa requerido' },
@@ -18,7 +19,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Obtener el rol de coach
     const coachRole = await Role.findOne({ code: '2' });
     if (!coachRole) {
       return NextResponse.json(
@@ -27,12 +27,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Obtener todos los perfiles de coaches con sus datos de usuario
-    const coaches = await Profile.find({
+    const query: any = {
       enterprise: enterpriseId,
       role: coachRole._id,
       isDeleted: false,
-    })
+    };
+    if (search && search.trim().length >= 2) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      query.$or = [
+        { name: searchRegex },
+        { lastName: searchRegex },
+      ];
+    }
+
+    const coaches = await Profile.find(query)
       .populate({
         path: 'user',
         model: User,
