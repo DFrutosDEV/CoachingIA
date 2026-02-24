@@ -80,7 +80,7 @@ export function DashboardSidebar({
 
   const sidebarContent = (
     <div className={`border-r bg-muted/40 ${className}`}>
-      <div className="flex h-full max-h-screen flex-col gap-2">
+      <div className="flex h-full max-h-screen flex-col gap-2 bg-background">
         <div className="flex h-14 items-center border-b px-4 min-h-15 justify-between">
           <Link
             href={`/${locale}/dashboard/${userType}`}
@@ -335,7 +335,7 @@ export function DashboardSidebar({
             </Link>
           </div>
         </ScrollArea>
-        <div className="p-2 pt-8">
+        <div className="p-2 pt-8 space-y-2">
           <Button
             variant="text"
             className="w-full justify-start gap-2"
@@ -344,6 +344,11 @@ export function DashboardSidebar({
             <LogOut className="h-4 w-4" />
             {t('navigation.logout')}
           </Button>
+          {process.env.NEXT_PUBLIC_APP_VERSION && (
+            <p className="px-2 text-xs text-muted-foreground text-right opacity-50">
+              v{process.env.NEXT_PUBLIC_APP_VERSION}
+            </p>
+          )}
         </div>
       </div>
 

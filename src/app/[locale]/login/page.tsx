@@ -159,8 +159,10 @@ export default function LoginPage({ params }: LoginPageProps) {
     }
   };
 
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? '';
+
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center mx-auto">
+    <div className="container relative flex h-screen w-screen flex-col items-center justify-center mx-auto">
       <Link href={`/${locale}`} className="absolute left-4 top-4 md:left-8 md:top-8">
         <Button variant="outlined">← {t('backToHome')}</Button>
       </Link>
@@ -289,6 +291,11 @@ export default function LoginPage({ params }: LoginPageProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {appVersion && (
+        <span className="text-xs text-muted-foreground absolute bottom-4 right-4 opacity-50">
+          v{appVersion}
+        </span>
+      )}
     </div>
   );
 }
