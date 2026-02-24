@@ -168,7 +168,9 @@ export async function POST(request: NextRequest) {
     // Enviar email de bienvenida
     let enterpriseNameForEmail: string | undefined;
     if (perfilGuardado.enterprise) {
-      const enterpriseDoc = await Enterprise.findById(perfilGuardado.enterprise).select('name').lean();
+      const enterpriseDoc = await Enterprise.findById(perfilGuardado.enterprise)
+        .select('name')
+        .lean() as { name: string } | null;
       enterpriseNameForEmail = enterpriseDoc?.name ?? '';
     }
     try {
