@@ -16,13 +16,13 @@ interface Enterprise {
   email: string;
   website: string;
   socialMedia: string[];
-  coaches: string[];
-  employees: string[];
   active: boolean;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   points?: number;
+  coachesCount?: number;
+  coacheesCount?: number;
 }
 
 export function ServicesGrid() {
@@ -120,8 +120,8 @@ export function ServicesGrid() {
             email={enterprise.email || ''}
             phone={enterprise.phone || ''}
             status={enterprise.active ? t('status.active') : t('status.inactive')}
-            coaches={enterprise.coaches?.length || 0}
-            coachees={enterprise.employees?.length || 0}
+            coaches={enterprise.coachesCount ?? 0}
+            coachees={enterprise.coacheesCount ?? 0}
             isActive={enterprise.active}
             points={enterprise.points ?? 0}
           />

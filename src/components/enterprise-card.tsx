@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 interface EnterpriseCardProps {
@@ -42,7 +43,20 @@ export function EnterpriseCard({
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
-        <CardTitle>{name}</CardTitle>
+        <CardTitle className="flex items-center gap-3">
+          {logo ? (
+            <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-muted">
+              <Image
+                src={logo}
+                alt={name}
+                width={40}
+                height={40}
+                className="object-contain"
+              />
+            </span>
+          ) : null}
+          <span>{name}</span>
+        </CardTitle>
         <CardDescription>{t('administrator', { administrator })}</CardDescription>
         <CardDescription>{t('email', { email })}</CardDescription>
         <CardDescription>{t('phone', { phone })}</CardDescription>

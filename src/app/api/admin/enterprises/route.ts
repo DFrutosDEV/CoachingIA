@@ -22,19 +22,39 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .lean();
 
-    const roleEnterpriseId = await Role.findOne({ code: '4' });
+    const roleEnterprise = await Role.findOne({ code: '4' });
+    const roleCoach = await Role.findOne({ code: '2' });
+    const roleClient = await Role.findOne({ code: '3' });
+
     const enterprisesWithAdministrator = await Promise.all(
       enterprises.map(async (enterprise: any) => {
         const coacheAdmin = await Profile.findOne({
           enterprise: enterprise._id,
-          role: roleEnterpriseId._id,
+          role: roleEnterprise._id,
+          isDeleted: false,
         });
+        const coachesCount = roleCoach
+          ? await Profile.countDocuments({
+              enterprise: enterprise._id,
+              role: roleCoach._id,
+              isDeleted: false,
+            })
+          : 0;
+        const coacheesCount = roleClient
+          ? await Profile.countDocuments({
+              enterprise: enterprise._id,
+              role: roleClient._id,
+              isDeleted: false,
+            })
+          : 0;
         return {
           ...enterprise,
           administrator: coacheAdmin
             ? `${coacheAdmin.name} ${coacheAdmin.lastName}`
             : '',
           points: enterprise.points ?? 0,
+          coachesCount,
+          coacheesCount,
         };
       })
     );
