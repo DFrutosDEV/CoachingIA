@@ -16,11 +16,13 @@ import {
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { getTranslations } from 'next-intl/server';
-import { setRequestLocale } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  setRequestLocale(locale);
+
+  // Redirigir a login - la página ya no se muestra pero el código se conserva
+  redirect(`/${locale}/login`);
 
   const t = await getTranslations('text.home');
 
@@ -109,30 +111,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             </div>
           </div>
         </section>
-
-        {/* Sección de Estadísticas */}
-        {/* <section className="w-full py-12 md:py-24 bg-gradient-to-r from-primary/10 to-secondary/10">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-primary">500+</div>
-                <p className="text-sm text-muted-foreground">Coaches Certificados</p>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-primary">10K+</div>
-                <p className="text-sm text-muted-foreground">Sesiones Completadas</p>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-primary">95%</div>
-                <p className="text-sm text-muted-foreground">Satisfacción</p>
-              </div>
-              <div className="space-y-2">
-                <div className="text-3xl md:text-4xl font-bold text-primary">24/7</div>
-                <p className="text-sm text-muted-foreground">Soporte Disponible</p>
-              </div>
-            </div>
-          </div>
-        </section> */}
 
         <section
           id="features"

@@ -163,9 +163,9 @@ export default function LoginPage({ params }: LoginPageProps) {
 
   return (
     <div className="container relative flex h-screen w-screen flex-col items-center justify-center mx-auto">
-      <Link href={`/${locale}`} className="absolute left-4 top-4 md:left-8 md:top-8">
+      {/* <Link href={`/${locale}`} className="absolute left-4 top-4 md:left-8 md:top-8">
         <Button variant="outlined">← {t('backToHome')}</Button>
-      </Link>
+      </Link> */}
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
