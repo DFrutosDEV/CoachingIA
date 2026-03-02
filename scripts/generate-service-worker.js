@@ -1,5 +1,14 @@
-// Generado en build - CACHE_NAME incluye la versión de package.json (3.2.4)
-const CACHE_NAME = 'kyt-coaching-v3.2.4';
+const fs = require('fs');
+const path = require('path');
+
+const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const version = packageJson.version || '1.0.0';
+
+const CACHE_NAME = `kyt-coaching-v${version}`;
+
+const serviceWorkerContent = `// Generado en build - CACHE_NAME incluye la versión de package.json (${version})
+const CACHE_NAME = '${CACHE_NAME}';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -56,3 +65,8 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+`;
+
+const outputPath = path.join(__dirname, '..', 'public', 'service-worker.js');
+fs.writeFileSync(outputPath, serviceWorkerContent, 'utf8');
+console.log(`[generate-service-worker] service-worker.js generado con CACHE_NAME="${CACHE_NAME}"`);
