@@ -505,7 +505,8 @@
     },
     "enterprisePointsCard": {
       "title": "Punti disponibili",
-      "description": "Assegna punti ai tuoi coach da Gestisci Punti"
+      "description": "Assegna punti ai tuoi coach da Gestisci Punti",
+      "viewResources": "Vedi risorse"
     },
     "adminCards": {
       "totalUsers": {

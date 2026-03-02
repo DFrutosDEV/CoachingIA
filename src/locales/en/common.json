@@ -505,7 +505,8 @@
     },
     "enterprisePointsCard": {
       "title": "Available points",
-      "description": "Assign points to your coaches from Manage Points"
+      "description": "Assign points to your coaches from Manage Points",
+      "viewResources": "View resources"
     },
     "adminCards": {
       "totalUsers": {

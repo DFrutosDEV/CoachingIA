@@ -145,9 +145,11 @@ export function CompletedSessionsCard({
 // Card: Puntos disponibles (solo dashboard Empresa)
 export function EnterprisePointsCard({ enterprisePoints = 0 }) {
   const t = useTranslations('common.dashboard.enterprisePointsCard');
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'es';
 
   return (
-    <Card data-swapy-item="enterprise-points">
+    <Card data-swapy-item="enterprise-points" style={{ minHeight: '100%' }}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
         <Coins className="h-4 w-4 text-muted-foreground" />
@@ -155,7 +157,16 @@ export function EnterprisePointsCard({ enterprisePoints = 0 }) {
       <CardContent>
         <div className="text-2xl font-bold">{enterprisePoints}</div>
         <p className="text-xs text-muted-foreground">{t('description')}</p>
+        <div className="mt-4">
+          <Link href={`/${locale}/dashboard/enterprise/resources`}>
+            <Button size="sm" variant="outline" className="w-full">
+              {t('viewResources')}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </CardContent>
+
     </Card>
   );
 }
@@ -218,20 +229,12 @@ export function NewUsersCard({
                   <p className="text-sm font-medium">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${user.type === 'Coach'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
-                        }`}
-                    >
-                      {user.type}
-                    </span>
                     <span className="text-xs text-muted-foreground">
                       {user.date}
                     </span>
                   </div>
                 </div>
-                <Link href={`/${locale}/dashboard/admin/clients`}>
+                <Link href={`/${locale}/dashboard/enterprise/coaches`}>
                   <Button size="sm" variant="outline">
                     {t('viewProfile')}
                   </Button>

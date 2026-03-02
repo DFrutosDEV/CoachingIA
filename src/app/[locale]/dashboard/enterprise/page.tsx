@@ -314,11 +314,6 @@ export default function EnterpriseDashboard() {
               ref={smallCardsRef}
               className="small-cards-container grid gap-6 md:grid-cols-4"
             >
-              <div data-swapy-slot="1" className="w-full">
-                <EnterprisePointsCard
-                  enterprisePoints={basicData?.enterprisePoints ?? 0}
-                />
-              </div>
               <div data-swapy-slot="2" className="w-full">
                 <TotalUsersCard
                   totalUsers={basicData?.totalUsers || 0}
@@ -333,6 +328,11 @@ export default function EnterpriseDashboard() {
               </div>
               <div data-swapy-slot="4" className="w-full">
                 <ReportsCard pendingReports={basicData?.pendingReports || 0} />
+              </div>
+              <div data-swapy-slot="1" className="w-full">
+                <EnterprisePointsCard
+                  enterprisePoints={basicData?.enterprisePoints ?? 0}
+                />
               </div>
             </div>
 

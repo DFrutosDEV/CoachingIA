@@ -123,6 +123,7 @@ export async function GET(request: NextRequest) {
     // 7. Nuevos profiles de la empresa en los últimos 7 días
     const recentProfiles = await Profile.find({
       enterprise: enterpriseId,
+      role: coachRole._id,
       createdAt: { $gte: startOfWeek },
     })
       .populate('user', 'email')
