@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useAuthService } from '@/lib/services/auth-service';
 import { useTranslations } from 'next-intl';
+import { appVersion } from '@/lib/app-version';
 
 interface SidebarProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -344,9 +345,9 @@ export function DashboardSidebar({
             <LogOut className="h-4 w-4" />
             {t('navigation.logout')}
           </Button>
-          {process.env.NEXT_PUBLIC_APP_VERSION && (
+          {appVersion && (
             <p className="px-2 text-xs text-muted-foreground text-right opacity-50">
-              v{process.env.NEXT_PUBLIC_APP_VERSION}
+              v{appVersion}
             </p>
           )}
         </div>

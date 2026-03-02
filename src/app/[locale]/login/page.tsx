@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { getStoredToken, getTokenData } from '@/lib/token-utils';
 import { useTranslations } from 'next-intl';
+import { appVersion } from '@/lib/app-version';
 
 interface LoginPageProps {
   params: Promise<{ locale: string }>;
@@ -158,8 +159,6 @@ export default function LoginPage({ params }: LoginPageProps) {
       setIsResetting(false);
     }
   };
-
-  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? '';
 
   return (
     <div className="container relative flex h-screen w-screen flex-col items-center justify-center mx-auto">
