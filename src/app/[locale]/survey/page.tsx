@@ -224,7 +224,7 @@ export default function SurveyPage() {
                 onChange={(e) => setComment(e.target.value)}
                 rows={5}
                 maxLength={1000}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-[hsl(var(--background))] text-[hsl(var(--foreground))] border border-[hsl(var(--input))] placeholder:text-[hsl(var(--muted-foreground))]"
                 placeholder="Scrivi qui il tuo commento (opzionale)..."
               />
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
