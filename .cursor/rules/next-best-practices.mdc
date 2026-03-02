@@ -1,0 +1,17 @@
+---
+description: Usar skills de Next.js en todo desarrollo del proyecto
+globs:
+  - "**/*.tsx"
+  - "**/*.ts"
+  - "**/app/**"
+  - "**/src/**"
+---
+
+# Next.js – Best practices del proyecto
+
+En todo desarrollo relacionado con Next.js en este proyecto:
+
+1. **Consultar las skills** en `.agents/skills/next-best-practices/` antes de implementar.
+2. Leer `SKILL.md` para el índice y cuándo usar cada práctica.
+3. Revisar los `.md` relevantes según la tarea (error-handling, data-patterns, metadata, image, font, rsc-boundaries, file-conventions, etc.).
+4. Aplicar las convenciones y patrones descritos ahí (RSC, datos async, metadata, errores, imágenes, fuentes, bundling, etc.).
