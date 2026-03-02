@@ -21,6 +21,11 @@ export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+      {user?.enterprise?.logo && (
+        <div className="flex items-center justify-center w-[100px] h-[100px] shrink-0 bg-muted/30 rounded-lg overflow-hidden">
+          <Image src={user?.enterprise?.logo} alt="Logo" width={50} height={50} className="object-contain w-full h-full" />
+        </div>
+      )}
       <div className="md:hidden">
         <Button variant="text" onClick={onToggleSidebar} className="p-2">
           <Menu className="h-5 w-5" />
@@ -36,11 +41,6 @@ export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
           </Button>
         </Link>
       </div>
-      {user?.enterprise?.logo && (
-        <div className="flex items-center gap-2">
-          <Image src={user?.enterprise?.logo} alt="Logo" width={32} height={32} className="rounded-full" />
-        </div>
-      )}
     </header>
   );
 }
