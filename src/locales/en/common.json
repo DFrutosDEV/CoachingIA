@@ -644,7 +644,8 @@
         "coach": {
           "currentPoints": "current points",
           "newPoints": "New Points",
-          "points": "points"
+          "points": "points",
+          "pointsSubtractedToEnterprise": "The {count} points subtracted will be added to enterprise {enterpriseName}."
         },
         "buttons": {
           "cancel": "Cancel",

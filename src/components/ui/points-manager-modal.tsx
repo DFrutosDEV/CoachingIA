@@ -37,6 +37,7 @@ interface Coach {
   lastName: string;
   email: string;
   points: number;
+  enterprise?: { id: string; name: string } | null;
 }
 
 interface EnterpriseOption {
@@ -453,6 +454,14 @@ export function PointsManagerModal({
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
+                {selectedCoach.enterprise && newPoints < selectedCoach.points && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {t('coach.pointsSubtractedToEnterprise', {
+                      enterpriseName: selectedCoach.enterprise.name,
+                      count: selectedCoach.points - newPoints,
+                    })}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

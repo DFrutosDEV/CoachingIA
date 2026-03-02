@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Profile from '@/models/Profile';
+import Enterprise from '@/models/Enterprise';
 
-// PUT /api/admin/coaches/[id]/points - Actualizar puntos de un coach
+// PUT /api/admin/coaches/[id]/points - Actualizar puntos de un coach.
+// Si se restan puntos y el coach tiene empresa asignada, la diferencia se suma a la empresa.
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -27,7 +29,6 @@ export async function PUT(
       );
     }
 
-    // Buscar el perfil del coach
     const coachProfile = await Profile.findById(id);
     if (!coachProfile) {
       return NextResponse.json(
@@ -36,7 +37,20 @@ export async function PUT(
       );
     }
 
-    // Actualizar los puntos
+    const currentPoints = coachProfile.points ?? 0;
+    const pointsToTransfer = currentPoints - points;
+
+    // Si se restan puntos y el coach tiene empresa, sumar la diferencia a la empresa
+    if (pointsToTransfer > 0 && coachProfile.enterprise) {
+      const enterpriseId = coachProfile.enterprise.toString();
+      const enterprise = await Enterprise.findById(enterpriseId);
+      if (enterprise && !enterprise.isDeleted) {
+        const newEnterprisePoints = (enterprise.points ?? 0) + pointsToTransfer;
+        enterprise.points = newEnterprisePoints;
+        await enterprise.save();
+      }
+    }
+
     coachProfile.points = points;
     await coachProfile.save();
 
