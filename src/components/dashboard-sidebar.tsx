@@ -301,7 +301,7 @@ export function DashboardSidebar({
                     {t('navigation.analytics')}
                   </Button>
                 </Link> */}
-                <Link
+                {/* <Link
                   href={`/${locale}/dashboard/${userType}/reports`}
                   passHref
                   onClick={handleLinkClick}
@@ -310,7 +310,7 @@ export function DashboardSidebar({
                     <File className="h-4 w-4" />
                     {t('navigation.reports')}
                   </Button>
-                </Link>
+                </Link> */}
                 <Link
                   href={`/${locale}/dashboard/${userType}/resources`}
                   passHref
