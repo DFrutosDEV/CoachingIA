@@ -28,7 +28,7 @@ interface CoachCardProps {
   name: string;
   lastName: string;
   email: string;
-  points: number;
+  points?: number;
   age?: number;
   phone: string;
   bio: string;
@@ -271,10 +271,14 @@ export function CoachCard({
                 <Calendar className="h-4 w-4" />
                 <span>{t('registered', { date: formatDate(createdAt) })}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Coins className="h-4 w-4" />
-                <span>{t('points', { points: points ?? 'Sin puntos' })}</span>
-              </div>
+              {
+                points && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Coins className="h-4 w-4" />
+                    <span>{t('points', { points: points })}</span>
+                  </div>
+                )
+              }
             </div>
             <div className="flex gap-2 ">
               <MuiButton

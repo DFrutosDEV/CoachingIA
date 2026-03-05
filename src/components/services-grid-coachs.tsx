@@ -102,7 +102,6 @@ export function ServicesGrid({ isEnterprise, isClient }: { isEnterprise?: boolea
             name={coach.name}
             lastName={coach.lastName}
             email={coach.email}
-            points={coach.points}
             age={coach.age}
             phone={coach.phone}
             bio={coach.bio}
