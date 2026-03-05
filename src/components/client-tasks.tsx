@@ -14,6 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle, Circle, Clock, Target } from 'lucide-react';
 
 interface Goal {
   _id: string;
@@ -237,25 +239,16 @@ const ClientTasks: React.FC = () => {
       }}
     >
       {/* Fila superior */}
-      <div className="flex flex-1 mb-4">
+      <div className="flex flex-col lg:flex-row flex-1 mb-4 gap-4">
         {/* Sección Tareas (Superior Izquierda) */}
         <div
-          className="flex-1 rounded-lg p-6 mr-4"
+          className="flex-1 rounded-lg p-6"
           style={{
             border: `1px solid ${theme.palette.divider}`,
             backgroundColor: theme.palette.background.paper,
             boxShadow: theme.shadows[1],
           }}
         >
-          <h2
-            className="text-center mt-0 mb-4"
-            style={{
-              color: theme.palette.text.primary,
-            }}
-          >
-            {t('title')}
-          </h2>
-
           {tasksData?.currentObjective && (
             <div
               className="mb-4 p-3 rounded"
@@ -273,77 +266,85 @@ const ClientTasks: React.FC = () => {
             </div>
           )}
 
-          {/* Sección Tareas por Día */}
-          {tasksData?.goals && tasksData.goals.length > 0 ? (
-            <div className="space-y-3 max-h-76 overflow-y-auto pr-2 scrollbar-thin">
-              {tasksData.goals.map(goal => (
-                <div
-                  key={goal._id}
-                  onClick={() => handleGoalClick(goal)}
-                  className={`p-3 rounded transition-all duration-200 ${goal.isCompleted ? '' : 'cursor-pointer hover:opacity-90'} ${goal.isCompleted ? 'ring-2 ring-green-500' : ''}`}
-                  style={{
-                    border: `1px dashed ${theme.palette.divider}`,
-                    backgroundColor: goal.isCompleted
-                      ? theme.palette.success.light
-                      : theme.palette.action.hover,
-                  }}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1">
-                      <h3
-                        className="text-sm font-medium mb-1"
-                        style={{ color: theme.palette.text.primary }}
-                      >
-                        {new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(goal.date)) || ''}
-                      </h3>
-                      <p
-                        className="text-xs"
-                        style={{ color: theme.palette.text.secondary }}
-                      >
-                        {goal.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center ml-2">
-                      {updatingGoal === goal._id ? (
-                        <div
-                          className="animate-spin rounded-full h-4 w-4 border-b-2"
-                          style={{ borderColor: theme.palette.primary.main }}
-                        ></div>
-                      ) : (
-                        <>
-                          {goal.isCompleted && (
-                            <span className="text-green-500 text-sm mr-2">
-                              ✓
+          {/* Sección Desafíos (estilo modal) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                {t('title')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {tasksData?.goals && tasksData.goals.length > 0 ? (
+                  tasksData.goals.map(goal => (
+                    <div
+                      key={goal._id}
+                      onClick={() => handleGoalClick(goal)}
+                      className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 ${goal.isCompleted ? '' : 'cursor-pointer hover:opacity-90'}`}
+                      style={{
+                        borderColor:
+                          goal.surveyRating === 'excellent'
+                            ? '#22c55e'
+                            : goal.surveyRating === 'so-so'
+                              ? '#eab308'
+                              : goal.surveyRating === 'bad'
+                                ? '#ef4444'
+                                : '#6b7280',
+                      }}
+                    >
+                      <div className="mt-1 flex-shrink-0">
+                        {updatingGoal === goal._id ? (
+                          <div
+                            className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"
+                          />
+                        ) : goal.isCompleted ? (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <Circle className="h-4 w-4 text-muted-foreground hover:text-primary" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className={`text-sm ${goal.isCompleted ? 'line-through text-muted-foreground' : ''}`}
+                        >
+                          {goal.description}
+                        </p>
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">
+                              {goal.date
+                                ? new Intl.DateTimeFormat(locale, {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    timeZone: 'UTC',
+                                  }).format(new Date(goal.date))
+                                : ''}
                             </span>
-                          )}
-                          <span
-                            className="text-xs px-2 py-1 rounded-full"
-                            style={{
-                              backgroundColor: goal.isCompleted
-                                ? theme.palette.success.main
-                                : theme.palette.warning.main,
-                              color: goal.isCompleted
-                                ? theme.palette.success.contrastText
-                                : theme.palette.warning.contrastText,
-                            }}
-                          >
-                            {goal.isCompleted ? t('status.completed') : t('status.pending')}
-                          </span>
-                        </>
-                      )}
+                          </div>
+                        </div>
+                        {goal.surveyComment && (
+                          <div className="text-left text-xs text-muted-foreground border border-muted-foreground rounded-md p-2 mt-2">
+                            {goal.surveyComment}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Target className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      {t('noTasks')}
+                    </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              className="text-center py-8"
-              style={{ color: theme.palette.text.secondary }}
-            >
-              <p>{t('noTasks')}</p>
-            </div>
-          )}
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Resumen de tareas */}
           {tasksData?.goals && tasksData.goals.length > 0 && (
@@ -458,7 +459,7 @@ const ClientTasks: React.FC = () => {
       </div>
 
       {/* Fila inferior */}
-      <div className="flex flex-1">
+      <div className="flex flex-col lg:flex-row flex-1">
         {/* Sección Feedback (Inferior Izquierda) */}
         <div
           className="flex-1 rounded-lg p-6"
