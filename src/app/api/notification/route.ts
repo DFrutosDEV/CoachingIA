@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Notification from '@/models/Notification';
 import Profile from '@/models/Profile';
+import Role from '@/models/Role';
 
 // GET /api/notification - Obtener notificaciones del usuario
 export async function GET(request: NextRequest) {
@@ -128,6 +129,16 @@ export async function POST(request: NextRequest) {
     }
 
     let recipientIds: string[] = [];
+    const [coachRole, clientRole] = await Promise.all([
+      Role.findOne({
+        $or: [{ name: { $regex: /^coach$/i } }, { code: '2' }],
+        active: true,
+      }).select('_id'),
+      Role.findOne({
+        $or: [{ name: { $regex: /^client$/i } }, { code: '3' }],
+        active: true,
+      }).select('_id'),
+    ]);
 
     if (hasMassNotification && massNotification?.allClients) {
       // Obtener todos los clientes del coach
@@ -138,13 +149,35 @@ export async function POST(request: NextRequest) {
       }
     } else if (hasMassNotification && massNotification?.allCoaches) {
       // Obtener todos los coaches
-      const coaches = await Profile.find({ 'role.name': 'coach' }).select(
-        '_id'
-      );
+      if (!coachRole?._id) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Rol de coach no encontrado',
+          },
+          { status: 400 }
+        );
+      }
+      const coaches = await Profile.find({
+        role: coachRole._id,
+        isDeleted: { $ne: true },
+      }).select('_id');
       recipientIds = coaches.map(coach => coach._id);
     } else if (hasMassNotification && massNotification?.allUsers) {
       // Obtener todos los usuarios (clientes)
-      const users = await Profile.find({ 'role.name': 'client' }).select('_id');
+      if (!clientRole?._id) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Rol de client no encontrado',
+          },
+          { status: 400 }
+        );
+      }
+      const users = await Profile.find({
+        role: clientRole._id,
+        isDeleted: { $ne: true },
+      }).select('_id');
       recipientIds = users.map(user => user._id);
     } else if (recipients && recipients.length > 0) {
       // Usar los destinatarios seleccionados individualmente
