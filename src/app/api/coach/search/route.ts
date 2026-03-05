@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
 import Profile from '@/models/Profile';
 
 // GET /api/coach/search - Buscar usuarios por nombre, apellido o email
@@ -10,56 +9,81 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
-    const coachId = searchParams.get('coachId');
+    const profileId = searchParams.get('profileId');
+    const normalizedSearch = (search || '').trim().toLowerCase();
+    const hasSearch = normalizedSearch.length >= 3;
 
-    // Validar que se proporcione el coachId
-    if (!coachId) {
+    // Validar que se proporcione el profileId
+    if (!profileId) {
       return NextResponse.json(
-        { error: 'Se requiere coachId' },
+        { error: 'Se requiere profileId' },
         { status: 400 }
       );
     }
 
-    // Buscar el perfil del coach
-    const coach = await Profile.findOne({
-      _id: coachId,
+    // Buscar el perfil solicitante para determinar el rol
+    const profile = await Profile.findOne({
+      _id: profileId,
       isDeleted: { $ne: true },
     })
-      .select('clients')
+      .select('role clients')
       .populate({
+        path: 'role',
+        select: 'name',
+      });
+
+    if (!profile) {
+      return NextResponse.json(
+        { success: false, error: 'Perfil no encontrado' },
+        { status: 400 }
+      );
+    }
+
+    const roleName = (profile as any)?.role?.name?.toLowerCase();
+    let candidateProfiles: any[] = [];
+
+    if (roleName === 'admin') {
+      // Si el solicitante es admin, buscar en todos los perfiles activos
+      candidateProfiles = await Profile.find({
+        isDeleted: { $ne: true },
+      })
+        .select('_id user name lastName')
+        .populate({
+          path: 'user',
+          select: '_id email isDeleted',
+          match: { isDeleted: false },
+        });
+    } else {
+      // Para cualquier otro rol (coach), mantener búsqueda en sus clientes
+      await profile.populate({
         path: 'clients',
+        match: { isDeleted: { $ne: true } },
         select: '_id user name lastName',
         populate: {
           path: 'user',
-          select: '_id email',
-          match:
-            search && search.length >= 3
-              ? {
-                  $or: [
-                    { name: { $regex: search, $options: 'i' } },
-                    { lastName: { $regex: search, $options: 'i' } },
-                    { email: { $regex: search, $options: 'i' } },
-                  ],
-                }
-              : {},
+          select: '_id email isDeleted',
+          match: { isDeleted: false },
         },
       });
-
-    if (!coach) {
-      return NextResponse.json(
-        { success: false, error: 'Coach no encontrado' },
-        { status: 400 }
-      );
+      candidateProfiles = (profile as any).clients || [];
     }
 
-    // Filtrar clientes que tengan datos de usuario y que coincidan con la búsqueda
-    const users = coach.clients
-      .filter((client: any) => client.user) // Solo clientes que tengan datos de usuario
-      .map((client: any) => ({
-        _id: client.user._id,
-        name: client.name,
-        lastName: client.lastName,
-        email: client.user.email,
+    const users = candidateProfiles
+      .filter((candidate: any) => candidate.user) // Solo perfiles con usuario válido
+      .filter((candidate: any) => {
+        if (!hasSearch) return true;
+        const fullName = `${candidate.name || ''} ${candidate.lastName || ''}`.toLowerCase();
+        const email = (candidate.user?.email || '').toLowerCase();
+        return (
+          fullName.includes(normalizedSearch) || email.includes(normalizedSearch)
+        );
+      })
+      .map((candidate: any) => ({
+        profileId: candidate._id,
+        _id: candidate.user._id,
+        name: candidate.name,
+        lastName: candidate.lastName,
+        email: candidate.user.email,
       }));
 
     return NextResponse.json({

@@ -4,9 +4,9 @@ export interface INotification extends Document {
   title: string;
   description: string;
   createdAt: Date;
-  userIdRecipients: ObjectId[];
-  userIdSender: ObjectId;
-  userIdRead: ObjectId[];
+  profileIdRecipients: ObjectId[];
+  profileIdSender: ObjectId;
+  profileIdRead: ObjectId[];
 }
 
 const NotificationSchema: Schema = new Schema(
@@ -27,17 +27,17 @@ const NotificationSchema: Schema = new Schema(
       type: Date,
       default: Date.now,
     },
-    userIdRecipients: {
+    profileIdRecipients: {
       type: [Schema.Types.ObjectId],
       ref: 'Profile',
       required: true,
     },
-    userIdSender: {
+    profileIdSender: {
       type: Schema.Types.ObjectId,
       ref: 'Profile',
       required: true,
     },
-    userIdRead: {
+    profileIdRead: {
       type: [Schema.Types.ObjectId],
       ref: 'Profile',
       default: [],
@@ -49,9 +49,9 @@ const NotificationSchema: Schema = new Schema(
 );
 
 NotificationSchema.index({ title: 1 });
-NotificationSchema.index({ userIdRecipients: 1 });
-NotificationSchema.index({ userIdSender: 1 });
-NotificationSchema.index({ userIdRead: 1 });
+NotificationSchema.index({ profileIdRecipients: 1 });
+NotificationSchema.index({ profileIdSender: 1 });
+NotificationSchema.index({ profileIdRead: 1 });
 
 export default mongoose.models.Notification ||
   mongoose.model<INotification>('Notification', NotificationSchema);

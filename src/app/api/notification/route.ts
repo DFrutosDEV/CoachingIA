@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Notification from '@/models/Notification';
 import Profile from '@/models/Profile';
@@ -9,10 +10,10 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const profileId = searchParams.get('userId');
     const userType = searchParams.get('userType'); // 'client', 'coach', 'admin', 'enterprise'
 
-    if (!userId) {
+    if (!profileId) {
       return NextResponse.json(
         {
           success: false,
@@ -24,22 +25,22 @@ export async function GET(request: NextRequest) {
 
     // Buscar notificaciones donde el usuario es destinatario
     const notifications = await Notification.find({
-      userIdRecipients: userId,
+      profileIdRecipients: profileId,
     })
-      .populate('userIdSender', 'name email')
-      .populate('userIdRecipients', 'name email')
+      .populate('profileIdSender', 'name email')
+      .populate('profileIdRecipients', 'name email')
       .sort({ createdAt: -1 })
       .limit(50);
 
-    // Contar notificaciones no leídas (donde el usuario no está en userIdRead)
+    // Contar notificaciones no leídas (donde el usuario no está en profileIdRead)
     const unreadCount = await Notification.countDocuments({
-      userIdRecipients: userId,
-      userIdRead: { $ne: userId },
+      profileIdRecipients: profileId,
+      profileIdRead: { $ne: profileId },
     });
 
     // Procesar las notificaciones para agregar el campo "read" calculado
     const processedNotifications = notifications.map(notification => {
-      const isRead = notification.userIdRead.includes(userId);
+      const isRead = notification.profileIdRead.includes(profileId);
       return {
         ...notification.toObject(),
         read: isRead,
@@ -85,9 +86,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!mongoose.Types.ObjectId.isValid(profileId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'profileId inválido',
+        },
+        { status: 400 }
+      );
+    }
+
+    const senderProfile = await Profile.findOne({
+      _id: profileId,
+      isDeleted: { $ne: true },
+    }).select('_id');
+
+    if (!senderProfile) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Perfil remitente no válido',
+        },
+        { status: 400 }
+      );
+    }
+
     // Verificar que haya algún tipo de destinatario
-    const hasMassNotification =
-      massNotification && Object.values(massNotification).some(Boolean);
+    const hasMassNotification = Boolean(
+      massNotification && Object.values(massNotification).some(Boolean)
+    );
     const hasIndividualRecipients = recipients && recipients.length > 0;
 
     if (!hasMassNotification && !hasIndividualRecipients) {
@@ -102,26 +129,37 @@ export async function POST(request: NextRequest) {
 
     let recipientIds: string[] = [];
 
-    if (massNotification.allClients) {
+    if (hasMassNotification && massNotification?.allClients) {
       // Obtener todos los clientes del coach
       const coachProfile =
         await Profile.findById(profileId).populate('clients');
       if (coachProfile && coachProfile.clients) {
         recipientIds = coachProfile.clients.map((client: any) => client._id);
       }
-    } else if (massNotification.allCoaches) {
+    } else if (hasMassNotification && massNotification?.allCoaches) {
       // Obtener todos los coaches
       const coaches = await Profile.find({ 'role.name': 'coach' }).select(
         '_id'
       );
       recipientIds = coaches.map(coach => coach._id);
-    } else if (massNotification.allUsers) {
+    } else if (hasMassNotification && massNotification?.allUsers) {
       // Obtener todos los usuarios (clientes)
       const users = await Profile.find({ 'role.name': 'client' }).select('_id');
       recipientIds = users.map(user => user._id);
     } else if (recipients && recipients.length > 0) {
       // Usar los destinatarios seleccionados individualmente
-      recipientIds = recipients;
+      recipientIds = recipients.filter((recipientId: string) =>
+        mongoose.Types.ObjectId.isValid(recipientId)
+      );
+    }
+
+    // Validar que los destinatarios correspondan a perfiles válidos
+    if (recipientIds.length > 0) {
+      const validRecipients = await Profile.find({
+        _id: { $in: recipientIds },
+        isDeleted: { $ne: true },
+      }).select('_id');
+      recipientIds = validRecipients.map(profile => profile._id.toString());
     }
 
     if (recipientIds.length === 0) {
@@ -138,9 +176,9 @@ export async function POST(request: NextRequest) {
       title,
       description,
       createdAt: new Date(),
-      userIdRead: [],
-      userIdRecipients: recipientIds,
-      userIdSender: profileId,
+      profileIdRead: [],
+      profileIdRecipients: recipientIds,
+      profileIdSender: profileId,
     });
 
     await notification.save();
@@ -197,10 +235,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Agregar el userId a la lista de userIdRead
+    // Agregar el userId a la lista de profileIdRead
     const notification = await Notification.findByIdAndUpdate(
       notificationId,
-      { $addToSet: { userIdRead: userId } },
+      { $addToSet: { profileIdRead: userId } },
       { new: true }
     );
 
@@ -252,10 +290,10 @@ export async function PUT(request: NextRequest) {
     // Buscar todas las notificaciones donde el usuario es destinatario y no las ha leído
     const result = await Notification.updateMany(
       {
-        userIdRecipients: userId,
-        userIdRead: { $ne: userId },
+        profileIdRecipients: userId,
+        profileIdRead: { $ne: userId },
       },
-      { $addToSet: { userIdRead: userId } }
+      { $addToSet: { profileIdRead: userId } }
     );
 
     return NextResponse.json({

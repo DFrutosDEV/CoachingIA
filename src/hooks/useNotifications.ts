@@ -25,16 +25,17 @@ export const useNotifications = (
   const [error, setError] = useState<string | null>(null);
 
   const { user, token } = useSelector((state: RootState) => state.auth);
+  const profileId = user?.profile?._id;
 
   const fetchNotifications = useCallback(async () => {
-    if (!user?._id || !token) return;
+    if (!profileId || !token) return;
 
     try {
       setIsLoading(true);
       setError(null);
 
       const response = await fetch(
-        `/api/notification?userId=${user.profile?._id}&userType=${userType}`,
+        `/api/notification?userId=${profileId}&userType=${userType}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,11 +58,11 @@ export const useNotifications = (
     } finally {
       setIsLoading(false);
     }
-  }, [user?._id, token, userType]);
+  }, [profileId, token, userType]);
 
   const markAsRead = useCallback(
     async (notificationId: string) => {
-      if (!token || !user?._id) return;
+      if (!token || !profileId) return;
 
       try {
         const response = await fetch('/api/notification', {
@@ -70,7 +71,7 @@ export const useNotifications = (
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ notificationId, userId: user.profile?._id }),
+          body: JSON.stringify({ notificationId, userId: profileId }),
         });
 
         if (response.ok) {
@@ -89,11 +90,11 @@ export const useNotifications = (
         console.error('Error al marcar como leída:', error);
       }
     },
-    [token, user?._id]
+    [profileId, token]
   );
 
   const markAllAsRead = useCallback(async () => {
-    if (!user?._id || !token) return;
+    if (!profileId || !token) return;
 
     try {
       const response = await fetch('/api/notification', {
@@ -103,7 +104,7 @@ export const useNotifications = (
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user.profile?._id,
+          userId: profileId,
         }),
       });
 
@@ -118,7 +119,7 @@ export const useNotifications = (
     } catch (error) {
       console.error('Error al marcar todas como leídas:', error);
     }
-  }, [user?._id, token]);
+  }, [profileId, token]);
 
   const refreshNotifications = useCallback(() => {
     fetchNotifications();
@@ -126,10 +127,10 @@ export const useNotifications = (
 
   // Cargar notificaciones iniciales
   useEffect(() => {
-    if (user?._id && token) {
+    if (profileId && token) {
       fetchNotifications();
     }
-  }, [user?._id, token, fetchNotifications]);
+  }, [profileId, token, fetchNotifications]);
 
   return {
     notifications,

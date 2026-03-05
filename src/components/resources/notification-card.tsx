@@ -77,7 +77,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `/api/coach/search?search=${encodeURIComponent(query)}&coachId=${user?.profile?._id}`,
+        `/api/coach/search?search=${encodeURIComponent(query)}&profileId=${user?.profile?._id}`,
         {
           method: 'GET',
           headers: {
@@ -92,7 +92,9 @@ export function NotificationCard({ userType }: NotificationCardProps) {
           // Filtrar usuarios que ya están seleccionados
           const filteredUsers = (result.users || []).filter(
             (user: any) =>
-              !selectedRecipients.some(recipient => recipient.id === user._id)
+              !selectedRecipients.some(
+                recipient => recipient.id === (user.profileId || user._id)
+              )
           );
           setSearchResults(filteredUsers);
           setShowRecipientSuggestions(true);
@@ -131,8 +133,11 @@ export function NotificationCard({ userType }: NotificationCardProps) {
   };
 
   const handleRecipientSelect = (user: any) => {
+    const recipientId = user.profileId || user._id;
+    if (!recipientId) return;
+
     const newRecipient = {
-      id: user._id,
+      id: recipientId,
       name: `${user.name} ${user.lastName}`,
     };
     setSelectedRecipients(prev => [...prev, newRecipient]);
@@ -416,7 +421,7 @@ export function NotificationCard({ userType }: NotificationCardProps) {
                         <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                           {searchResults.map(searchUser => (
                             <div
-                              key={searchUser._id}
+                              key={searchUser.profileId || searchUser._id}
                               className="px-3 py-2 hover:bg-accent cursor-pointer border-b border-border last:border-b-0 transition-colors"
                               onClick={() => handleRecipientSelect(searchUser)}
                             >

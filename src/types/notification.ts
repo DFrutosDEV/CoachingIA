@@ -3,17 +3,17 @@ export interface Notification {
   title: string;
   description: string;
   createdAt: string;
-  userIdRecipients: {
+  profileIdRecipients: {
     _id: string;
     name: string;
     email: string;
   }[];
-  userIdSender: {
+  profileIdSender: {
     _id: string;
     name: string;
     email: string;
   };
-  userIdRead: string[];
+  profileIdRead: string[];
   read?: boolean; // Campo calculado que se agrega dinámicamente
 }
 
