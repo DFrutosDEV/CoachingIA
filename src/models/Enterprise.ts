@@ -33,7 +33,6 @@ const EnterpriseSchema: Schema = new Schema(
     phone: {
       type: String,
       trim: true,
-      maxlength: [10, 'The phone cannot exceed 10 characters'],
       default: '',
     },
     email: {
