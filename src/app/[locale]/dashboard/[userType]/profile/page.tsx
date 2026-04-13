@@ -30,6 +30,12 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
+const PROFILE_NAME_MAX_LENGTH = 50;
+const PROFILE_LAST_NAME_MAX_LENGTH = 50;
+const PROFILE_BIO_MAX_LENGTH = 1500;
+const PROFILE_AGE_MIN = 0;
+const PROFILE_AGE_MAX = 120;
+
 //! TODO: Optimizar el archivo de perfil de usuario.
 export default function ProfilePage() {
   const t = useTranslations('text.profile');
@@ -255,6 +261,15 @@ export default function ProfilePage() {
   ) => {
     const { name, value } = e.target;
 
+    if (name === 'age') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setFormData(prev => ({
+        ...prev,
+        age: numericValue,
+      }));
+      return;
+    }
+
     // Validar que solo se ingresen números en los campos de teléfono
     if (
       name === 'phoneCountryCode' ||
@@ -272,6 +287,61 @@ export default function ProfilePage() {
         [name]: value,
       }));
     }
+  };
+
+  const validateProfileForm = () => {
+    const trimmedName = formData.name.trim();
+    const trimmedLastName = formData.lastName.trim();
+    const trimmedBio = formData.bio.trim();
+    const ageValue =
+      formData.age === '' || formData.age === null || formData.age === undefined
+        ? null
+        : Number(formData.age);
+
+    if (!trimmedName || !trimmedLastName) {
+      toast.error(t('errors.allFieldsRequired'));
+      return null;
+    }
+
+    if (trimmedName.length > PROFILE_NAME_MAX_LENGTH) {
+      toast.error(
+        `El nombre no puede superar ${PROFILE_NAME_MAX_LENGTH} caracteres`
+      );
+      return null;
+    }
+
+    if (trimmedLastName.length > PROFILE_LAST_NAME_MAX_LENGTH) {
+      toast.error(
+        `El apellido no puede superar ${PROFILE_LAST_NAME_MAX_LENGTH} caracteres`
+      );
+      return null;
+    }
+
+    if (trimmedBio.length > PROFILE_BIO_MAX_LENGTH) {
+      toast.error(
+        `La biografia no puede superar ${PROFILE_BIO_MAX_LENGTH} caracteres`
+      );
+      return null;
+    }
+
+    if (
+      ageValue !== null &&
+      (!Number.isInteger(ageValue) ||
+        ageValue < PROFILE_AGE_MIN ||
+        ageValue > PROFILE_AGE_MAX)
+    ) {
+      toast.error(
+        `La edad debe estar entre ${PROFILE_AGE_MIN} y ${PROFILE_AGE_MAX}`
+      );
+      return null;
+    }
+
+    return {
+      trimmedName,
+      trimmedLastName,
+      trimmedBio,
+      ageValue,
+    };
   };
 
   const handleCancel = () => {
@@ -498,24 +568,16 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!user) return;
 
-    // Validar campos obligatorios del teléfono
-    const countryCode = formData.phoneCountryCode.replace(/\s/g, '');
-    // const area = formData.phoneArea.replace(/\s/g, '');
-    const number = formData.phoneNumber.replace(/\s/g, '');
-
-    if (
-      !countryCode ||
-      !number ||
-      !formData.name ||
-      !formData.lastName
-    ) {
-      toast.error(t('errors.allFieldsRequired'));
+    const validatedProfile = validateProfileForm();
+    if (!validatedProfile) {
       return;
     }
 
+    const countryCode = formData.phoneCountryCode.replace(/\s/g, '');
+    const number = formData.phoneNumber.replace(/\s/g, '');
+
     setIsLoading(true);
     try {
-      // Concatenar los campos del teléfono en formato E.164
       let fullPhone = '';
       if (countryCode && number) {
         fullPhone = `+${countryCode}${number}`;
@@ -523,11 +585,16 @@ export default function ProfilePage() {
 
       const formDataToSend = new FormData();
       formDataToSend.append('userId', user._id);
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('lastName', formData.lastName);
-      formDataToSend.append('age', formData.age.toString());
+      formDataToSend.append('name', validatedProfile.trimmedName);
+      formDataToSend.append('lastName', validatedProfile.trimmedLastName);
+      formDataToSend.append(
+        'age',
+        validatedProfile.ageValue !== null
+          ? validatedProfile.ageValue.toString()
+          : ''
+      );
       formDataToSend.append('phone', fullPhone);
-      formDataToSend.append('bio', formData.bio);
+      formDataToSend.append('bio', validatedProfile.trimmedBio);
       // formDataToSend.append('address', formData.address)
 
       if (selectedImage) {
@@ -548,11 +615,14 @@ export default function ProfilePage() {
             email: formData.email,
             profile: {
               ...user.profile,
-              name: formData.name,
-              lastName: formData.lastName,
-              age: formData.age ? parseInt(formData.age.toString()) : undefined,
+              name: validatedProfile.trimmedName,
+              lastName: validatedProfile.trimmedLastName,
+              age:
+                validatedProfile.ageValue !== null
+                  ? validatedProfile.ageValue
+                  : undefined,
               phone: fullPhone,
-              bio: formData.bio,
+              bio: validatedProfile.trimmedBio,
               // address: formData.address,
               profilePicture:
                 result.data.profilePicture || user.profile?.profilePicture,
@@ -774,6 +844,7 @@ export default function ProfilePage() {
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
+                          maxLength={PROFILE_NAME_MAX_LENGTH}
                           disabled={!isEditing}
                           className={!isEditing ? 'bg-muted' : ''}
                         />
@@ -787,6 +858,7 @@ export default function ProfilePage() {
                           name="lastName"
                           value={formData.lastName}
                           onChange={handleInputChange}
+                          maxLength={PROFILE_LAST_NAME_MAX_LENGTH}
                           disabled={!isEditing}
                           className={!isEditing ? 'bg-muted' : ''}
                         />
@@ -823,7 +895,7 @@ export default function ProfilePage() {
 
                     <div className="space-y-2">
                       <Label htmlFor="phone">
-                        {t('personalInfo.fields.phone')} <span className="text-red-500">*</span>
+                        {t('personalInfo.fields.phone')}
                       </Label>
                       <div className="grid gap-2 md:grid-cols-2">
                         <div className="flex flex-col gap-1">
@@ -836,10 +908,9 @@ export default function ProfilePage() {
                             className={!isEditing ? 'bg-muted' : ''}
                             placeholder="54"
                             maxLength={3}
-                            required
                           />
                           <p className="text-xs text-muted-foreground">
-                            {t('personalInfo.phoneComponents.country')} <span className="text-red-500">*</span>
+                            {t('personalInfo.phoneComponents.country')}
                           </p>
                         </div>
                         {/* <div className="flex flex-col gap-1">
@@ -868,10 +939,9 @@ export default function ProfilePage() {
                             className={!isEditing ? 'bg-muted' : ''}
                             placeholder="40317700"
                             maxLength={10}
-                            required
                           />
                           <p className="text-xs text-muted-foreground">
-                            {t('personalInfo.phoneComponents.number')} <span className="text-red-500">*</span>
+                            {t('personalInfo.phoneComponents.number')}
                           </p>
                         </div>
                       </div>
@@ -887,6 +957,7 @@ export default function ProfilePage() {
                         name="bio"
                         value={formData.bio}
                         onChange={handleInputChange}
+                        maxLength={PROFILE_BIO_MAX_LENGTH}
                         disabled={!isEditing}
                         className={!isEditing ? 'bg-muted' : ''}
                         placeholder={t('personalInfo.bioPlaceholder')}

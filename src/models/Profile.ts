@@ -53,7 +53,7 @@ const ProfileSchema: Schema = new Schema(
     bio: {
       type: String,
       trim: true,
-      maxlength: [500, 'The bio cannot exceed 500 characters'],
+      maxlength: [1500, 'The bio cannot exceed 1500 characters'],
       default: '',
     },
     phone: {
