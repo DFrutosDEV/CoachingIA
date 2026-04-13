@@ -173,7 +173,10 @@ export async function GET(request: NextRequest) {
       ? {
         date: nextSession.date,
         link: nextSession.link,
-        time: nextSession.time,
+        time: formatUtcTime(nextSession.date, {
+          locale,
+          format: 'time-24',
+        }),
         client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,
         topic: nextSession.objectiveId?.title || 'Sin objetivo definido',
       }
