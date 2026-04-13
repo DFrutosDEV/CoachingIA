@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { DEFAULT_LOCALE, useDateFormatter } from '@/utils/date-formatter';
 import {
   Dialog,
   DialogContent,
@@ -68,7 +69,8 @@ const ClientTasks: React.FC = () => {
   const { user } = useAuth();
   const t = useTranslations('common.dashboard.clientTasks');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || DEFAULT_LOCALE;
+  const { formatDate } = useDateFormatter();
   const [tasksData, setTasksData] = useState<TasksData | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingGoal, setUpdatingGoal] = useState<string | null>(null);
@@ -316,12 +318,12 @@ const ClientTasks: React.FC = () => {
                             <Clock className="h-3 w-3 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground">
                               {goal.date
-                                ? new Intl.DateTimeFormat(locale, {
+                                ? formatDate(goal.date, 'custom', {
                                     day: 'numeric',
                                     month: 'short',
                                     year: 'numeric',
                                     timeZone: 'UTC',
-                                  }).format(new Date(goal.date))
+                                  })
                                 : ''}
                             </span>
                           </div>
@@ -418,8 +420,7 @@ const ClientTasks: React.FC = () => {
                       className="text-sm font-semibold"
                       style={{ color: theme.palette.text.primary }}
                     >
-                      {/* //! TODO: Implementar una solucion mas general llevando esta logica a un hook/archivo de utilidades. */}
-                      {new Date(note.createdAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US')}
+                      {formatDate(note.createdAt, 'short')}
                     </h3>
                   </div>
                   <p
@@ -434,7 +435,9 @@ const ClientTasks: React.FC = () => {
                       style={{ color: theme.palette.text.secondary }}
                     >
                       <p>
-                        {t('session', { date: new Date(note.sessionInfo.date).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US') })}
+                        {t('session', {
+                          date: formatDate(note.sessionInfo.date, 'short'),
+                        })}
                       </p>
                     </div>
                   )}
@@ -493,9 +496,7 @@ const ClientTasks: React.FC = () => {
                     color: theme.palette.success.contrastText,
                   }}
                 >
-                  {new Date(tasksData.feedback.createdAt).toLocaleDateString(
-                    locale === 'es' ? 'es-ES' : 'en-US'
-                  )}
+                  {formatDate(tasksData.feedback.createdAt, 'short')}
                 </span>
               </div>
               <p

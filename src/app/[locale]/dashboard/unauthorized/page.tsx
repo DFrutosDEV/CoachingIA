@@ -12,11 +12,12 @@ import {
 import { AlertTriangle, ArrowLeft, Home } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 
 export default function UnauthorizedPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
   const t = useTranslations('text.unauthorized');
 
   return (

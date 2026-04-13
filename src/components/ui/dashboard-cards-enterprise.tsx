@@ -19,6 +19,7 @@ import {
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 
 // Interfaces para los tipos de datos
 interface RecentUser {
@@ -46,7 +47,7 @@ interface PlatformStats {
 export function TotalUsersCard({ totalUsers = 0, newUsersThisMonth = 0 }) {
   const t = useTranslations('common.dashboard.adminCards.totalUsers');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="total-users">
@@ -79,7 +80,7 @@ export function ActiveCoachesCard({
 }) {
   const t = useTranslations('common.dashboard.adminCards.activeCoaches');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="active-coaches">
@@ -112,7 +113,7 @@ export function CompletedSessionsCard({
 }) {
   const t = useTranslations('common.dashboard.adminCards.completedSessions');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="completed-sessions">
@@ -146,7 +147,7 @@ export function CompletedSessionsCard({
 export function EnterprisePointsCard({ enterprisePoints = 0 }) {
   const t = useTranslations('common.dashboard.enterprisePointsCard');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="enterprise-points" style={{ minHeight: '100%' }}>
@@ -175,7 +176,7 @@ export function EnterprisePointsCard({ enterprisePoints = 0 }) {
 export function ReportsCard({ pendingReports = 0 }) {
   const t = useTranslations('common.dashboard.adminCards.reports');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="reports">
@@ -207,7 +208,7 @@ export function NewUsersCard({
 }) {
   const t = useTranslations('common.dashboard.adminCards.newUsers');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="new-users">
@@ -262,7 +263,7 @@ export function PlatformPerformanceCard({
 }) {
   const t = useTranslations('common.dashboard.adminCards.platformPerformance');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   const stats = [
     { metric: t('metrics.conversionRate'), ...platformStats?.conversionRate },

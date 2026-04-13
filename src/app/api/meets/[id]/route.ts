@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Meet from '@/models/Meet';
 import { fromZonedTime } from 'date-fns-tz';
+import {
+  DEFAULT_LOCALE,
+  getTimeZoneForLocale,
+  normalizeLocale,
+} from '@/utils/date-formatter';
 
 // PATCH /api/meets/[id] - Actualizar una sesión específica
 export async function PATCH(
@@ -15,8 +20,9 @@ export async function PATCH(
     const updateData = await request.json();
 
     // Obtener la zona horaria del header
+    const locale = normalizeLocale(request.headers.get('x-locale'));
     const timezone =
-      request.headers.get('x-timezone') || 'America/Buenos_Aires';
+      request.headers.get('x-timezone') || getTimeZoneForLocale(locale || DEFAULT_LOCALE);
 
     if (!id) {
       return NextResponse.json(
@@ -51,14 +57,6 @@ export async function PATCH(
         }
 
         updateData.date = utcDate;
-
-        console.log('Debug timezone conversion:', {
-          originalDate: updateData.date,
-          originalTime: updateData.time,
-          timezone: timezone,
-          dateString: dateString,
-          utcDate: utcDate.toISOString(),
-        });
 
         // Remover el campo time ya que no existe en el modelo
         delete updateData.time;

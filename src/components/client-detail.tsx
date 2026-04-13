@@ -27,7 +27,7 @@ import { GoalsModal } from './ui/goals-modal';
 import { ObjectiveDetailModal } from './ui/objective-detail-modal';
 import { RescheduleSessionModal } from './ui/reschedule-session-modal';
 import { useAppSelector } from '@/lib/redux/hooks';
-import { formatDate } from '@/utils/validatesInputs';
+import { useDateFormatter } from '@/utils/date-formatter';
 import { toast } from 'sonner';
 import { Goal, ClientDetailProps, Objective } from '@/types';
 import { sendMessage } from '@/utils/wpp-methods';
@@ -42,6 +42,10 @@ export function ClientDetail({
   onUpdateClient
 }: ClientDetailProps) {
   const t = useTranslations('common.dashboard.clientDetail');
+  const {
+    formatDate: formatDateWithLocale,
+    formatTime: formatTimeWithLocale,
+  } = useDateFormatter();
 
   const [activeTab, setActiveTab] = useState('info');
   const [isGoalsModalOpen, setIsGoalsModalOpen] = useState(false);
@@ -258,7 +262,7 @@ export function ClientDetail({
                     <div className="rounded-lg border p-3">
                       <div className="flex justify-between">
                         <div className="font-medium">
-                          {`${formatDate(new Date(client.nextSession.date))} | ${new Date(client.nextSession.date).toLocaleTimeString().slice(0, 4)} - ${client.nextSession.objective.title}`}
+                          {`${formatDateWithLocale(client.nextSession.date)} | ${formatTimeWithLocale(client.nextSession.date, 'time-24')} - ${client.nextSession.objective.title}`}
                         </div>
                         <Badge variant="outline">{t('info.scheduled')}</Badge>
                       </div>
@@ -299,7 +303,7 @@ export function ClientDetail({
                     <div className="rounded-lg border p-3">
                       <div className="flex justify-between">
                         <div className="font-medium">
-                          {`${formatDate(new Date(client.lastSession.date))} - ${client.lastSession.objective.title}`}
+                          {`${formatDateWithLocale(client.lastSession.date)} - ${client.lastSession.objective.title}`}
                         </div>
                         <Badge variant="outline">{t('info.scheduled')}</Badge>
                       </div>
@@ -393,7 +397,9 @@ export function ClientDetail({
                             </div>
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span>
-                                {t('objectives.created', { date: formatDate(new Date(objective.createdAt)) })}
+                                {t('objectives.created', {
+                                  date: formatDateWithLocale(objective.createdAt),
+                                })}
                               </span>
                               <span>{t('objectives.coach', { coach: objective.coach })}</span>
                             </div>
@@ -425,7 +431,7 @@ export function ClientDetail({
                     client.notes.map(note => (
                       <div key={note._id} className="rounded-lg border p-3">
                         <div className="mb-1 text-xs text-muted-foreground">
-                          {formatDate(new Date(note.createdAt))}
+                          {formatDateWithLocale(note.createdAt)}
                         </div>
                         <p className="text-sm">{note.content}</p>
                       </div>

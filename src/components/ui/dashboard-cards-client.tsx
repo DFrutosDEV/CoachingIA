@@ -14,6 +14,7 @@ import { formatDate } from '@/utils/validatesInputs';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { ObjectId } from 'mongoose';
+import { routing } from '@/i18n/routing';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -159,7 +160,7 @@ export function GoalsCard({
   const completionPercentage =
     totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="goals">
@@ -304,7 +305,7 @@ export function ProgressCard({
 }) {
   const t = useTranslations('common.dashboard.clientCards.progress');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="progress">

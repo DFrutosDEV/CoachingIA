@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
@@ -6,8 +7,45 @@ import Objective from '@/models/Objective';
 import Meet from '@/models/Meet';
 import Role from '@/models/Role';
 import { generateJitsiLink } from '@/utils/generateJitsiLinks';
+import {
+  DEFAULT_LOCALE,
+  getTimeZoneForLocale,
+  normalizeLocale,
+} from '@/utils/date-formatter';
 import { fromZonedTime } from 'date-fns-tz';
 import { sendWelcomeEmail } from '@/lib/services/email-service';
+
+const MAX_TEXT_LENGTH = 50;
+
+function normalizeString(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function getUtcMeetDate(startDate: string, startTime: string, timezone?: string | null) {
+  const dateString = `${startDate}T${startTime}:00`;
+  const timezoneToUse = timezone || getTimeZoneForLocale(DEFAULT_LOCALE);
+
+  try {
+    const utcDate = fromZonedTime(dateString, timezoneToUse);
+
+    if (!Number.isNaN(utcDate.getTime())) {
+      return utcDate;
+    }
+  } catch (error) {
+    console.error('Zona horaria inválida, usando fallback:', timezoneToUse, error);
+  }
+
+  const fallbackDate = fromZonedTime(
+    dateString,
+    getTimeZoneForLocale(DEFAULT_LOCALE)
+  );
+
+  if (Number.isNaN(fallbackDate.getTime())) {
+    throw new Error('INVALID_MEET_DATE');
+  }
+
+  return fallbackDate;
+}
 
 // POST: Crear un nuevo objetivo
 export async function POST(request: NextRequest) {
@@ -27,12 +65,22 @@ export async function POST(request: NextRequest) {
       clientId, // Si se envía, es un usuario existente
     } = body;
 
-    // Obtener la zona horaria del header Accept-Language o usar una por defecto
+    const normalizedFirstName = normalizeString(firstName);
+    const normalizedLastName = normalizeString(lastName);
+    const normalizedEmail = normalizeString(email).toLowerCase();
+    const normalizedPhone = normalizeString(phone);
+    const normalizedFocus = normalizeString(focus);
+    const normalizedStartDate = normalizeString(startDate);
+    const normalizedStartTime = normalizeString(startTime);
+    const normalizedCoachId = normalizeString(coachId);
+    const normalizedClientId = normalizeString(clientId);
+
+    const locale = normalizeLocale(request.headers.get('x-locale'));
     const timezone =
-      request.headers.get('x-timezone') || 'America/Buenos_Aires'; // Fallback
+      request.headers.get('x-timezone') || getTimeZoneForLocale(locale);
 
     // Validaciones básicas
-    if (!focus || !startDate || !startTime || !coachId) {
+    if (!normalizedFocus || !normalizedStartDate || !normalizedStartTime || !normalizedCoachId) {
       return NextResponse.json(
         {
           success: false,
@@ -43,8 +91,68 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (
+      normalizedFirstName.length > MAX_TEXT_LENGTH ||
+      normalizedLastName.length > MAX_TEXT_LENGTH ||
+      normalizedFocus.length > MAX_TEXT_LENGTH
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Los campos nombre, apellido y objetivo no pueden superar ${MAX_TEXT_LENGTH} caracteres`,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(normalizedStartDate) ||
+      !/^\d{2}:\d{2}$/.test(normalizedStartTime)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'La fecha u hora de inicio no tienen un formato válido',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(normalizedCoachId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Coach inválido',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (normalizedClientId && !mongoose.Types.ObjectId.isValid(normalizedClientId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Cliente inválido',
+        },
+        { status: 400 }
+      );
+    }
+
+    let utcMeetDate: Date;
+    try {
+      utcMeetDate = getUtcMeetDate(normalizedStartDate, normalizedStartTime, timezone);
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'La fecha de la primera sesión no es válida',
+        },
+        { status: 400 }
+      );
+    }
+
     // Verificar que el coach existe
-    const coachProfile = await Profile.findOne({ _id: coachId });
+    const coachProfile = await Profile.findOne({ _id: normalizedCoachId });
     if (!coachProfile) {
       return NextResponse.json(
         {
@@ -80,8 +188,8 @@ export async function POST(request: NextRequest) {
 
     let clientIdToUse: string;
     // Si no se envía clientId, crear nuevo usuario
-    if (!clientId) {
-      if (!firstName || !lastName || !email) {
+    if (!normalizedClientId) {
+      if (!normalizedFirstName || !normalizedLastName || !normalizedEmail) {
         return NextResponse.json(
           {
             success: false,
@@ -92,7 +200,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Verificar si el email ya existe
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email: normalizedEmail });
       if (existingUser) {
         return NextResponse.json(
           {
@@ -108,7 +216,7 @@ export async function POST(request: NextRequest) {
 
       // Crear nuevo usuario
       const newUser = new User({
-        email,
+        email: normalizedEmail,
         password: defaultPassword,
         active: true,
         firstLogin: false,
@@ -119,9 +227,9 @@ export async function POST(request: NextRequest) {
 
       // Crear perfil para el nuevo usuario
       const newProfile = new Profile({
-        name: firstName,
-        lastName: lastName,
-        phone: phone,
+        name: normalizedFirstName,
+        lastName: normalizedLastName,
+        phone: normalizedPhone,
         user: savedUser._id,
         role: clientRole._id,
         isDeleted: false,
@@ -135,7 +243,7 @@ export async function POST(request: NextRequest) {
         const coachUser = await User.findById(coachProfile.user);
         const coachEmail = coachUser?.email || '';
 
-        await sendWelcomeEmail(email, firstName, defaultPassword, {
+        await sendWelcomeEmail(normalizedEmail, normalizedFirstName, defaultPassword, {
           name: coachProfile.name,
           lastName: coachProfile.lastName,
           email: coachEmail,
@@ -148,7 +256,7 @@ export async function POST(request: NextRequest) {
 
       clientIdToUse = newProfile._id.toString();
     } else {
-      clientIdToUse = clientId;
+      clientIdToUse = normalizedClientId;
     }
 
     // Obtener el perfil del cliente
@@ -182,11 +290,11 @@ export async function POST(request: NextRequest) {
 
     // Crear el objetivo
     const newObjective = new Objective({
-      title: focus,
-      startDate: startDate,
-      createdBy: coachId,
+      title: normalizedFocus,
+      startDate: normalizedStartDate,
+      createdBy: normalizedCoachId,
       clientId: clientIdToUse,
-      coachId,
+      coachId: normalizedCoachId,
       isCompleted: false,
       active: true,
     });
@@ -197,21 +305,16 @@ export async function POST(request: NextRequest) {
     coachProfile.points -= 1;
     await coachProfile.save();
 
-    // Crear la fecha combinando startDate y startTime
-    const dateString = `${startDate}T${startTime}:00`;
-    // Convertir la fecha/hora local y zona horaria a UTC
-    const utcMeetDate = fromZonedTime(dateString, timezone);
-
     // Crear el link de Jitsi Meet
-    const meetLink = generateJitsiLink(utcMeetDate, clientIdToUse, coachId);
+    const meetLink = generateJitsiLink(utcMeetDate, clientIdToUse, normalizedCoachId);
 
     // Crear la reunión
     const newMeet = new Meet({
       date: utcMeetDate,
       link: meetLink,
-      createdBy: coachId,
+      createdBy: normalizedCoachId,
       clientId: clientIdToUse,
-      coachId,
+      coachId: normalizedCoachId,
       objectiveId: savedObjective._id,
       isCancelled: false,
     });
@@ -233,6 +336,40 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Error en POST /api/objective:', error);
+
+    if (
+      error &&
+      typeof error === 'object' &&
+      'name' in error &&
+      error.name === 'ValidationError'
+    ) {
+      const validationError = error as mongoose.Error.ValidationError;
+      const firstMessage = Object.values(validationError.errors)[0]?.message;
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: firstMessage || 'Error de validación',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 11000
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Ya existe un usuario con este email',
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       {
         success: false,

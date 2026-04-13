@@ -57,7 +57,7 @@ export class AIService {
       // Si son muchos objetivos (más de 15), dividir en múltiples llamadas
       const GOALS_PER_BATCH = 12; // Número seguro de objetivos por llamada
 
-      const language = this.getLanguageName(metrics.locale || 'es');
+      const language = this.getLanguageName(metrics.locale || 'it');
 
       if (numberOfGoals > GOALS_PER_BATCH) {
         console.log(`🔵 Dividiendo generación en múltiples lotes: ${numberOfGoals} objetivos en lotes de ${GOALS_PER_BATCH}`);

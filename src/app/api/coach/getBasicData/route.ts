@@ -4,7 +4,7 @@ import User from '@/models/User';
 import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
-import { formatDate } from 'date-fns';
+import { formatUtcDate, formatUtcTime, normalizeLocale } from '@/utils/date-formatter';
 
 // GET /api/coach/getBasicData - Obtener datos básicos del dashboard del coach
 export async function GET(request: NextRequest) {
@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const coachId = searchParams.get('coachId');
+    const locale = normalizeLocale(searchParams.get('locale'));
 
     if (!coachId) {
       return NextResponse.json(
@@ -156,7 +157,13 @@ export async function GET(request: NextRequest) {
 
     // Transformar las sesiones de hoy al formato esperado
     const formattedTodaySessions = todaySessions.map(session => ({
-      time: `${formatDate(new Date(session.date), 'dd/MM/yyyy')} - ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+      time: `${formatUtcDate(session.date, {
+        locale,
+        format: 'short',
+      })} - ${formatUtcTime(session.date, {
+        locale,
+        format: 'time-24',
+      })}`,
       client: `${session.clientId.name} ${session.clientId.lastName}`,
       topic: session.objectiveId?.title || 'Sin objetivo definido',
     }));

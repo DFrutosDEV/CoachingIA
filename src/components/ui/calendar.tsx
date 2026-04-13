@@ -9,6 +9,8 @@ import {
 } from 'react-big-calendar';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import 'dayjs/locale/en';
+import 'dayjs/locale/it';
 import 'dayjs/locale/es';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import {
@@ -23,8 +25,8 @@ import { Button } from '@/components/ui/button';
 import { CalendarService, SessionEvent as ServiceSessionEvent } from '@/lib/services/calendar-service';
 import RescheduleModal from './reschedule-modal';
 import { useAppSelector } from '@/lib/redux/hooks';
-import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
+import { routing } from '@/i18n/routing';
 
 // Extiende dayjs con el plugin
 dayjs.extend(localizedFormat);
@@ -40,10 +42,7 @@ interface SessionEvent extends ServiceSessionEvent {
 // Toolbar simplificado que funciona correctamente
 const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
   const t = useTranslations('common.dashboard.calendar');
-  const pathname = usePathname();
-
-  // Extraer el locale del path
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = useLocale() || routing.defaultLocale;
 
   // Configurar dayjs con el locale del path
   dayjs.locale(locale);
@@ -78,10 +77,7 @@ const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
 
 export default function SessionsPage() {
   const t = useTranslations('common.dashboard.calendar');
-  const pathname = usePathname();
-
-  // Extraer el locale del path
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = useLocale() || routing.defaultLocale;
 
   // Configurar dayjs con el locale del path
   dayjs.locale(locale);
@@ -108,7 +104,6 @@ export default function SessionsPage() {
           ...event,
           _id: event.id, // Mapear id a _id para compatibilidad
         }));
-        console.log('Sesiones recibidas:', mappedEvents);
         setSessions(mappedEvents);
       } else {
         setError(result.error || 'Error al cargar las sesiones');
@@ -126,15 +121,7 @@ export default function SessionsPage() {
     loadSessions();
   }, []);
 
-  // Debug: Log cuando cambian las sesiones
-  useEffect(() => {
-    console.log('Renderizando calendario con sesiones:', sessions);
-    console.log('Fecha actual:', new Date());
-    console.log('Primera sesión:', sessions[0]);
-  }, [sessions]);
-
   const handleSelectEvent = (event: SessionEvent) => {
-    console.log('Sesión seleccionada:', event);
     setSelectedSession(event);
   };
 
@@ -142,13 +129,12 @@ export default function SessionsPage() {
     setSelectedSession(null);
   };
 
-  const handleSelectSlot = (slotInfo: {
+  const handleSelectSlot = (_slotInfo: {
     start: Date;
     end: Date;
     slots: Date[] | string[];
     action: 'select' | 'click' | 'doubleClick';
   }) => {
-    console.log('Slot seleccionado:', slotInfo);
     // Aquí podrías permitir crear una nueva sesión en el slot seleccionado
   };
 

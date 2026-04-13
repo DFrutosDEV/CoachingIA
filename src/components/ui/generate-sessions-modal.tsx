@@ -21,6 +21,7 @@ import {
 import { Calendar, Clock, Plus, Edit, X, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { Session } from '@/types';
+import { useDateFormatter } from '@/utils/date-formatter';
 
 interface GeneratedSession {
   _id: string;
@@ -46,6 +47,7 @@ export function GenerateSessionsModal({
   clientId,
   coachId,
 }: GenerateSessionsModalProps) {
+  const { formatDate: formatDateWithLocale } = useDateFormatter();
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [periodicity, setPeriodicity] = useState('weekly');
@@ -200,8 +202,7 @@ export function GenerateSessionsModal({
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
+    return formatDateWithLocale(dateString, 'custom', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { formatDate } from '@/utils/validatesInputs';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 
 // Interfaces para los datos
 interface NextSessionData {
@@ -112,7 +113,7 @@ export function NextSessionCard({ data }: { data?: NextSessionData | null }) {
 export function ActiveClientsCard({ count }: { count: number }) {
   const t = useTranslations('common.dashboard.coach.activeClients');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="active-clients">
@@ -140,7 +141,7 @@ export function ActiveClientsCard({ count }: { count: number }) {
 export function ScheduledSessionsCard({ count }: { count: number }) {
   const t = useTranslations('common.dashboard.coach.scheduledSessions');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   return (
     <Card data-swapy-item="scheduled-sessions">
@@ -230,7 +231,7 @@ export function TodaySessionsCard({ sessions }: { sessions: TodaySession[] }) {
 export function RecentClientsCard({ clients }: { clients: RecentClient[] }) {
   const t = useTranslations('common.dashboard.coach.recentClients');
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   if (clients.length === 0) {
     return (

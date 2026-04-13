@@ -5,7 +5,7 @@ import { DashboardSidebar } from '@/components/dashboard-sidebar';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useRef, useState } from 'react';
 import { createSwapy } from 'swapy';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   NextSessionCard,
   ActiveClientsCard,
@@ -44,6 +44,7 @@ interface CoachBasicData {
 export default function CoachDashboard() {
   const user = useAppSelector(state => state.auth.user);
   const t = useTranslations('text.dashboardCoach');
+  const locale = useLocale();
   const [basicData, setBasicData] = useState<CoachBasicData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +74,7 @@ export default function CoachDashboard() {
       setError(null);
 
       const response = await HttpClient.get(
-        `/api/coach/getBasicData?coachId=${user?._id}`
+        `/api/coach/getBasicData?coachId=${user?._id}&locale=${locale}`
       );
 
       if (!response.ok) {
@@ -99,7 +100,7 @@ export default function CoachDashboard() {
     if (user?._id) {
       fetchBasicData();
     }
-  }, [user?._id]);
+  }, [locale, user?._id]);
 
   useEffect(() => {
     // Marcar como listo después de que el componente se monte

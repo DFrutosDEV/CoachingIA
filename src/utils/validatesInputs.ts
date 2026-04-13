@@ -1,3 +1,11 @@
+import {
+  DEFAULT_LOCALE,
+  formatUtcDate,
+  formatUtcDateTime,
+  formatUtcTime,
+  getCurrentLocale,
+} from './date-formatter';
+
 export const validateDates = (
   clientForm: any,
   showError: (message: string) => void
@@ -35,12 +43,12 @@ export const validateDates = (
 // Función para obtener el locale del navegador
 export const getBrowserLocale = (): string => {
   if (typeof window === 'undefined') {
-    return 'es-ES'; // Fallback para SSR
+    return 'it-IT'; // Fallback para SSR
   }
 
   // Obtener el locale del navegador
   const browserLocale =
-    navigator.language || navigator.languages?.[0] || 'es-ES';
+    navigator.language || navigator.languages?.[0] || 'it-IT';
 
   // Mapear algunos locales comunes a formatos más específicos
   const localeMap: { [key: string]: string } = {
@@ -70,8 +78,14 @@ export const formatDate = (
   date: Date,
   options?: Intl.DateTimeFormatOptions
 ): string => {
-  const locale = getBrowserLocale();
-  return date.toLocaleDateString(locale, options);
+  const locale =
+    typeof window === 'undefined' ? DEFAULT_LOCALE : getCurrentLocale();
+
+  return formatUtcDate(date, {
+    locale,
+    format: 'custom',
+    customOptions: options,
+  });
 };
 
 // Función para formatear horas con el locale del navegador
@@ -80,8 +94,14 @@ export const formatTime = (
   date: Date,
   options?: Intl.DateTimeFormatOptions
 ): string => {
-  const locale = getBrowserLocale();
-  return date.toLocaleTimeString(locale, options);
+  const locale =
+    typeof window === 'undefined' ? DEFAULT_LOCALE : getCurrentLocale();
+
+  return formatUtcTime(date, {
+    locale,
+    format: 'custom',
+    customOptions: options,
+  });
 };
 
 // Función para formatear fecha y hora con el locale del navegador
@@ -90,8 +110,14 @@ export const formatDateTime = (
   date: Date,
   options?: Intl.DateTimeFormatOptions
 ): string => {
-  const locale = getBrowserLocale();
-  return date.toLocaleString(locale, options);
+  const locale =
+    typeof window === 'undefined' ? DEFAULT_LOCALE : getCurrentLocale();
+
+  return formatUtcDateTime(date, {
+    locale,
+    format: 'custom',
+    customOptions: options,
+  });
 };
 
 export const isValidEmail = (email: string): boolean => {

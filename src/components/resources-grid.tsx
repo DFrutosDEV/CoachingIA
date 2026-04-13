@@ -24,7 +24,7 @@ export function ResourcesGrid({
         <NotificationCard userType={userType} />
       )}
 
-      {/* Agregar Cliente */}
+      {/* Crear Objetivo */}
       {userType === 'coach' && <NewObjectiveCard userType={userType} />}
 
       {/* Agregar Usuario (solo Admin) */}

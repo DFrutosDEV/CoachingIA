@@ -5,7 +5,7 @@ import { DashboardSidebar } from '@/components/dashboard-sidebar';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useRef, useState } from 'react';
 import { createSwapy } from 'swapy';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   NextSessionCard,
   CompletedSessionsCard,
@@ -66,6 +66,7 @@ interface ClientBasicData {
 export default function ClientDashboard() {
   const user = useAppSelector(state => state.auth.user);
   const t = useTranslations('text.dashboardClient');
+  const locale = useLocale();
   const [basicData, setBasicData] = useState<ClientBasicData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +96,7 @@ export default function ClientDashboard() {
       setError(null);
 
       const response = await HttpClient.get(
-        `/api/client/getBasicData?clientId=${user?._id}`
+        `/api/client/getBasicData?clientId=${user?._id}&locale=${locale}`
       );
 
       if (!response.ok) {
@@ -121,7 +122,7 @@ export default function ClientDashboard() {
     if (user?._id) {
       fetchBasicData();
     }
-  }, [user?._id]);
+  }, [locale, user?._id]);
 
   useEffect(() => {
     // Marcar como listo después de que el componente se monte

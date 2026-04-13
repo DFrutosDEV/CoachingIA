@@ -13,6 +13,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar, Clock, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  getCurrentLocale,
+  getTimeZoneForLocale,
+  useDateFormatter,
+} from '@/utils/date-formatter';
 
 interface RescheduleSessionModalProps {
   isOpen: boolean;
@@ -31,6 +36,7 @@ export function RescheduleSessionModal({
   currentTime,
   onSessionRescheduled,
 }: RescheduleSessionModalProps) {
+  const { formatDateTime } = useDateFormatter();
   const [newDate, setNewDate] = useState(currentDate);
   const [newTime, setNewTime] = useState(currentTime);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -51,10 +57,15 @@ export function RescheduleSessionModal({
     setIsUpdating(true);
 
     try {
+      const locale = getCurrentLocale();
+      const timezone = getTimeZoneForLocale(locale);
+
       const response = await fetch(`/api/meets/${sessionId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'x-locale': locale,
+          'x-timezone': timezone,
         },
         body: JSON.stringify({
           date: newDate,
@@ -84,14 +95,7 @@ export function RescheduleSessionModal({
   };
 
   const formatCurrentDateTime = () => {
-    const date = new Date(currentDate);
-    const time = currentTime;
-    return `${date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })} a las ${time}`;
+    return `${formatDateTime(`${currentDate}T${currentTime}`)} `;
   };
 
   return (
@@ -148,16 +152,7 @@ export function RescheduleSessionModal({
                   Nueva sesión programada para:
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(`${newDate}T${newTime}`).toLocaleDateString(
-                    'es-ES',
-                    {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    }
-                  )}{' '}
-                  a las {newTime}
+                  {formatDateTime(`${newDate}T${newTime}`)}
                 </p>
               </div>
             )}

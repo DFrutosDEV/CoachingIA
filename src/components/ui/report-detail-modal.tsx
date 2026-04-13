@@ -25,6 +25,7 @@ import {
   Clock,
   AlertTriangle,
 } from 'lucide-react';
+import { useDateFormatter } from '@/utils/date-formatter';
 
 interface ReportDetailModalProps {
   report: Report | null;
@@ -79,16 +80,6 @@ const getCategoryIcon = (category: string) => {
   }
 };
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
 export function ReportDetailModal({
   report,
   isOpen,
@@ -98,6 +89,7 @@ export function ReportDetailModal({
   onResolve,
   currentUserId,
 }: ReportDetailModalProps) {
+  const { formatDateTime } = useDateFormatter();
   const [response, setResponse] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -211,7 +203,13 @@ export function ReportDetailModal({
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  Reportado el {formatDate(report.createdAt)}
+                  Reportado el {formatDateTime(report.createdAt, 'custom', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               </div>
             </CardContent>
@@ -244,7 +242,13 @@ export function ReportDetailModal({
                 {report.responseByName && report.responseDate && (
                   <div className="text-sm text-muted-foreground">
                     Respondido por {report.responseByName} el{' '}
-                    {formatDate(report.responseDate)}
+                    {formatDateTime(report.responseDate, 'custom', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -322,11 +326,23 @@ export function ReportDetailModal({
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="text-sm text-muted-foreground">
-                  Última actualización: {formatDate(report.updatedAt)}
+                  Última actualización: {formatDateTime(report.updatedAt, 'custom', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </div>
                 {report.closedAt && (
                   <div className="text-sm text-muted-foreground">
-                    Cerrado el: {formatDate(report.closedAt)}
+                    Cerrado el: {formatDateTime(report.closedAt, 'custom', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                     {report.closedByName && ` por ${report.closedByName}`}
                   </div>
                 )}

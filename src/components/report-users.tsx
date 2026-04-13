@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Report } from '@/types';
+import { formatUtcDate, getCurrentLocale } from '@/utils/date-formatter';
 
 // Props para el componente ReportUsers
 interface ReportUsersProps {
@@ -100,10 +101,14 @@ const formatDate = (dateString: string) => {
   if (diffDays < 30)
     return `Hace ${Math.ceil(diffDays / 7)} semana${Math.ceil(diffDays / 7) > 1 ? 's' : ''}`;
 
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  return formatUtcDate(date, {
+    locale: getCurrentLocale(),
+    format: 'custom',
+    customOptions: {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    },
   });
 };
 

@@ -16,12 +16,12 @@ import { Mail, Phone, Building2, Calendar, Coins, MoreVertical, Trash2, Unlink }
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
 import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { RootState } from '@/lib/redux/store';
 import { toast } from 'sonner';
 import { getStoredToken } from '@/lib/token-utils';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
+import { useDateFormatter } from '@/utils/date-formatter';
 
 interface CoachCardProps {
   id: string;
@@ -59,8 +59,7 @@ export function CoachCard({
   onCoachUpdated,
 }: CoachCardProps) {
   const t = useTranslations('common.dashboard.coachCard');
-  const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const { formatDate: formatDateWithLocale } = useDateFormatter();
   const user = useAppSelector((state: RootState) => state.auth.user);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUnlinking, setIsUnlinking] = useState(false);
@@ -69,21 +68,6 @@ export function CoachCard({
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
-  const formatDate = (dateString: string) => {
-    //! TODO: Implementar una solucion mas general llevando esta logica a un hook/archivo de utilidades.
-    const localeMap = {
-      'es': 'es-ES',
-      'en': 'en-US',
-      'it': 'it-IT'
-    };
-
-    return new Date(dateString).toLocaleDateString(localeMap[locale as keyof typeof localeMap] || 'es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   };
 
   const handleSendMessage = () => {
@@ -269,7 +253,15 @@ export function CoachCard({
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
-                <span>{t('registered', { date: formatDate(createdAt) })}</span>
+                <span>
+                  {t('registered', {
+                    date: formatDateWithLocale(createdAt, 'custom', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    }),
+                  })}
+                </span>
               </div>
               {
                 points && (

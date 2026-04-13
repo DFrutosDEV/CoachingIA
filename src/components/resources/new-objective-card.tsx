@@ -25,6 +25,10 @@ import { Target, ArrowRight, User, Mail, Phone, Calendar } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import {
+  getCurrentLocale,
+  getTimeZoneForLocale,
+} from '@/utils/date-formatter';
 import { isValidEmail } from '@/utils/validatesInputs';
 
 interface NewObjectiveCardProps {
@@ -41,6 +45,7 @@ interface ExistingClient {
   age?: number;
 }
 
+const MAX_TEXT_LENGTH = 50;
 export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
   const t = useTranslations('common.dashboard.newObjectiveCard');
 
@@ -68,6 +73,24 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
   // Obtener usuario autenticado y datos del estado global
   const user = useAppSelector(state => state.auth.user);
+  const emailRequestIdRef = useRef(0);
+
+  const resetClientForm = () => {
+    emailRequestIdRef.current += 1;
+    setIsCheckingEmail(false);
+    setFieldsEnabled(false);
+    setExistingClient(null);
+    setClientForm({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      focus: '',
+      startDate: '',
+      startTime: '',
+      coachId: '',
+    });
+  };
 
   const handleClientFormChange = (field: string, value: string) => {
     setClientForm(prev => ({
@@ -78,22 +101,30 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
   // Función para verificar si existe un usuario por email
   const checkEmailExists = async (email: string) => {
-    if (!email || email.length < 3) return;
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail || normalizedEmail.length < 3) return;
 
     // Si el email no es valido, mostrar un toast de error
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(normalizedEmail)) {
+      emailRequestIdRef.current += 1;
       toast.error(t('errors.validEmail'));
+      setIsCheckingEmail(false);
+      setExistingClient(null);
+      setFieldsEnabled(false);
       return;
     }
 
+    const requestId = ++emailRequestIdRef.current;
     setIsCheckingEmail(true);
-    // Agregar timeout de 1.5 segundos
-    await new Promise(resolve => setTimeout(resolve, 1500));
     try {
       const response = await fetch(
-        `/api/users/check-email?email=${encodeURIComponent(email)}`
+        `/api/users/check-email?email=${encodeURIComponent(normalizedEmail)}`
       );
       const result = await response.json();
+
+      if (requestId !== emailRequestIdRef.current) {
+        return;
+      }
 
       if (result.success && result.exists) {
         setExistingClient(result.user);
@@ -114,7 +145,9 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       console.error('Error verificando email:', error);
       toast.error(t('errors.checkEmail'));
     } finally {
-      setIsCheckingEmail(false);
+      if (requestId === emailRequestIdRef.current) {
+        setIsCheckingEmail(false);
+      }
     }
   };
 
@@ -150,13 +183,19 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
 
     // Si el email está vacío, deshabilitar campos
     if (!clientForm.email) {
+      emailRequestIdRef.current += 1;
       setFieldsEnabled(false);
       setExistingClient(null);
+      setIsCheckingEmail(false);
       return;
     }
 
     // Si el email tiene menos de 3 caracteres, no validar
     if (clientForm.email.length < 3) {
+      emailRequestIdRef.current += 1;
+      setIsCheckingEmail(false);
+      setFieldsEnabled(false);
+      setExistingClient(null);
       return;
     }
 
@@ -210,20 +249,40 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
   };
 
   const handleCreateClient = async () => {
+    const normalizedEmail = clientForm.email.trim().toLowerCase();
+    const normalizedFirstName = clientForm.firstName.trim();
+    const normalizedLastName = clientForm.lastName.trim();
+    const normalizedFocus = clientForm.focus.trim();
+    const normalizedPhone = clientForm.phone.trim();
+    const isExistingClient = Boolean(existingClient?.clientId);
+
     if (
-      !clientForm.firstName ||
-      !clientForm.lastName ||
-      !clientForm.email ||
-      !clientForm.focus ||
+      !normalizedEmail ||
+      !normalizedFocus ||
       !clientForm.startDate ||
-      !clientForm.startTime
+      !clientForm.startTime ||
+      (!isExistingClient && (!normalizedFirstName || !normalizedLastName))
     ) {
       toast.error(t('errors.completeFields'));
       return;
     }
 
+    if (!isValidEmail(normalizedEmail)) {
+      toast.error(t('errors.validEmail'));
+      return;
+    }
+
+    if (
+      normalizedFirstName.length > MAX_TEXT_LENGTH ||
+      normalizedLastName.length > MAX_TEXT_LENGTH ||
+      normalizedFocus.length > MAX_TEXT_LENGTH
+    ) {
+      toast.error(`Nombre, apellido y objetivo no pueden superar ${MAX_TEXT_LENGTH} caracteres`);
+      return;
+    }
+
     //! UNA VEZ QUE SE HAGA EL MIDDLEWARE DE AUTH, SE DEBE REMOVER ESTA VALIDACIÓN
-    if (!user?._id) {
+    if (!user?.profile?._id) {
       toast.error(t('errors.userNotIdentified'));
       return;
     }
@@ -250,18 +309,27 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
         coachIdToUse = clientForm.coachId;
       }
 
+      if (!coachIdToUse) {
+        toast.error(t('errors.userNotIdentified'));
+        return;
+      }
+
+      const locale = getCurrentLocale();
+      const timezone = getTimeZoneForLocale(locale);
+
       const response = await fetch('/api/objective', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-timezone': Intl.DateTimeFormat().resolvedOptions().timeZone, // Enviar zona horaria en header
+          'x-locale': locale,
+          'x-timezone': timezone,
         },
         body: JSON.stringify({
-          firstName: clientForm.firstName,
-          lastName: clientForm.lastName,
-          email: clientForm.email,
-          phone: clientForm.phone,
-          focus: clientForm.focus,
+          firstName: normalizedFirstName,
+          lastName: normalizedLastName,
+          email: normalizedEmail,
+          phone: normalizedPhone,
+          focus: normalizedFocus,
           startDate: clientForm.startDate,
           startTime: clientForm.startTime,
           coachId: coachIdToUse,
@@ -274,19 +342,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
       if (result.success) {
         toast.success(t('success.clientCreated'));
         setShowClientDialog(false);
-        // Resetear formulario
-        setClientForm({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          focus: '',
-          startDate: '',
-          startTime: '',
-          coachId: '',
-        });
-        setFieldsEnabled(false);
-        setExistingClient(null);
+        resetClientForm();
       } else {
         toast.error(`Error: ${result.error}`);
       }
@@ -350,6 +406,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                     placeholder={t('modal.emailPlaceholder')}
                     value={clientForm.email}
                     onChange={e => handleEmailChange(e.target.value)}
+                    maxLength={254}
                     className="pl-10"
                   />
                 </div>
@@ -377,6 +434,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                       onChange={e =>
                         handleClientFormChange('firstName', e.target.value)
                       }
+                      maxLength={MAX_TEXT_LENGTH}
                       disabled={!fieldsEnabled}
                       className="pl-10"
                     />
@@ -393,6 +451,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                       onChange={e =>
                         handleClientFormChange('lastName', e.target.value)
                       }
+                      maxLength={MAX_TEXT_LENGTH}
                       disabled={!fieldsEnabled}
                       className="pl-10"
                     />
@@ -424,6 +483,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                   onChange={e =>
                     handleClientFormChange('focus', e.target.value)
                   }
+                  maxLength={MAX_TEXT_LENGTH}
                 />
               </div>
 
@@ -481,18 +541,7 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
                 variant="outlined"
                 onClick={() => {
                   setShowClientDialog(false);
-                  setFieldsEnabled(false);
-                  setExistingClient(null);
-                  setClientForm({
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    phone: '',
-                    focus: '',
-                    startDate: '',
-                    startTime: '',
-                    coachId: '',
-                  });
+                  resetClientForm();
                 }}
                 disabled={isSubmitting}
               >
@@ -500,7 +549,11 @@ export function NewObjectiveCard({ userType }: NewObjectiveCardProps) {
               </Button>
               <Button
                 onClick={handleCreateClient}
-                disabled={isSubmitting || (!fieldsEnabled && !existingClient)}
+                disabled={
+                  isSubmitting ||
+                  isCheckingEmail ||
+                  (!fieldsEnabled && !existingClient)
+                }
               >
                 {isSubmitting ? t('modal.creating') : t('modal.create')}
               </Button>

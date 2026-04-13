@@ -6,6 +6,7 @@ import Role from '@/models/Role';
 import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Enterprise from '@/models/Enterprise';
+import { formatUtcDate } from '@/utils/date-formatter';
 
 // Tipo simplificado para la respuesta del admin
 interface EnterpriseClientResponse {
@@ -103,10 +104,13 @@ export async function GET(request: NextRequest) {
           name: `${profile.name} ${profile.lastName}`,
           email: profile.user.email,
           phone: profile.phone,
-          startDate: profile.createdAt.toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
+          startDate: formatUtcDate(profile.createdAt, {
+            format: 'custom',
+            customOptions: {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            },
           }),
           sessions: totalMeets,
           nextSession: nextSession,

@@ -1,5 +1,10 @@
 import mongoose, { Document, Schema, ObjectId } from 'mongoose';
-import { getBrowserLocale } from '../utils/validatesInputs';
+import { toZonedTime } from 'date-fns-tz';
+import {
+  DEFAULT_LOCALE,
+  DEFAULT_TIMEZONE,
+  formatUtcTime,
+} from '../utils/date-formatter';
 
 export interface IMeet extends Document {
   date: Date;
@@ -68,31 +73,31 @@ const MeetSchema: Schema = new Schema(
 );
 
 MeetSchema.methods.getLocalDate = function (
-  timezone: string = 'America/Mexico_City'
+  timezone: string = DEFAULT_TIMEZONE
 ): Date {
   const utcDate = new Date(this.date);
-  const localDate = new Date(
-    utcDate.toLocaleString('en-US', { timeZone: timezone })
-  );
-  return localDate;
+  return toZonedTime(utcDate, timezone);
 };
 
 MeetSchema.methods.getLocalTime = function (
-  timezone: string = 'America/Mexico_City'
+  timezone: string = DEFAULT_TIMEZONE
 ): string {
-  const localDate = this.getLocalDate(timezone);
-  return localDate.toLocaleTimeString(getBrowserLocale(), {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
+  return formatUtcTime(this.date, {
+    locale: DEFAULT_LOCALE,
+    timeZone: timezone,
+    format: 'time-24',
   });
 };
 
 MeetSchema.methods.getLocalDateString = function (
-  timezone: string = 'America/Mexico_City'
+  timezone: string = DEFAULT_TIMEZONE
 ): string {
-  const localDate = this.getLocalDate(timezone);
-  return localDate.toISOString().split('T')[0];
+  const zonedDate = this.getLocalDate(timezone);
+  const year = zonedDate.getFullYear();
+  const month = String(zonedDate.getMonth() + 1).padStart(2, '0');
+  const day = String(zonedDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 MeetSchema.index({ date: 1 });

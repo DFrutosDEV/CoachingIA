@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { routing } from '@/i18n/routing';
 
 interface HeaderProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -16,7 +17,7 @@ interface HeaderProps {
 
 export function DashboardHeader({ userType, onToggleSidebar }: HeaderProps) {
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
   const user = useAppSelector(state => state.auth.user);
 
   return (

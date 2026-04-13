@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { routing } from '@/i18n/routing';
 import {
   Dialog,
   DialogContent,
@@ -52,7 +53,7 @@ export function DashboardSidebar({
   const t = useTranslations('common.dashboard');
 
   // Obtener el locale actual de la ruta
-  const locale = pathname.split('/')[1] || 'es';
+  const locale = pathname.split('/')[1] || routing.defaultLocale;
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);

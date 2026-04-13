@@ -1,24 +1,27 @@
 /**
- * Utilidades para formatear fechas de forma centralizada
- * Soporta múltiples locales y formatos predefinidos
+ * Utilidades centralizadas para formatear fechas y horas.
+ * La fuente de verdad vive aqui y prioriza Italia (`it` / `Europe/Rome`).
  */
 
-export type Locale = 'es' | 'en' | 'it';
+import { routing } from '@/i18n/routing';
+import { getPreferredLocale } from './locale-storage';
+
+export type Locale = 'it' | 'es' | 'en';
 
 export type DateFormat =
-  | 'full'           // Lunes, 15 de enero de 2024
-  | 'long'           // 15 de enero de 2024
-  | 'medium'         // 15 ene 2024
-  | 'short'          // 15/1/2024
-  | 'weekday-long'   // Lunes
-  | 'weekday-short'  // Lun
-  | 'month-long'     // enero
-  | 'month-short'    // ene
-  | 'time-12'        // 2:30 PM
-  | 'time-24'        // 14:30
-  | 'datetime-full'  // Lunes, 15 de enero de 2024 a las 14:30
-  | 'datetime-short' // 15/1/2024 14:30
-  | 'relative'       // hace 2 horas, hace 3 días, etc.
+  | 'full'
+  | 'long'
+  | 'medium'
+  | 'short'
+  | 'weekday-long'
+  | 'weekday-short'
+  | 'month-long'
+  | 'month-short'
+  | 'time-12'
+  | 'time-24'
+  | 'datetime-full'
+  | 'datetime-short'
+  | 'relative'
   | 'custom';
 
 export interface CustomFormatOptions {
@@ -34,70 +37,77 @@ export interface CustomFormatOptions {
 }
 
 export interface DateFormatterOptions {
-  locale?: Locale;
+  locale?: Locale | string;
   format?: DateFormat;
   customOptions?: CustomFormatOptions;
+  timeZone?: string;
 }
 
-//! TODO: ARREGLAR ARCHIVO Y FUNCIONES PARA PODER ESTANDARIZAR LAS FECHAS
-// Mapeo de locales a códigos de idioma completos
-export const localeMap: Record<string, string> = {
-  'es': 'es-ES',
-  'en': 'en-US',
-  'it': 'it-IT'
+export interface DateConfig {
+  language: Locale;
+  localeCode: string;
+  timeZone: string;
+}
+
+export const APP_LOCALES: Locale[] = ['it', 'es', 'en'];
+export const DEFAULT_LOCALE: Locale = routing.defaultLocale as Locale;
+export const DEFAULT_TIMEZONE = 'Europe/Rome';
+
+export const localeMap: Record<Locale, string> = {
+  it: 'it-IT',
+  es: 'es-AR',
+  en: 'en-US',
 };
 
-// Mapeo de locales a zonas horarias
-const timezoneMap: Record<Locale, string> = {
-  'es': 'Europe/Madrid',
-  'en': 'America/New_York',
-  'it': 'Europe/Rome',
+export const timezoneMap: Record<Locale, string> = {
+  it: 'Europe/Rome',
+  es: 'America/Argentina/Buenos_Aires',
+  en: 'America/New_York',
 };
 
-// Configuraciones predefinidas para cada formato
 const formatConfigs: Record<DateFormat, Intl.DateTimeFormatOptions> = {
-  'full': {
+  full: {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   },
-  'long': {
+  long: {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   },
-  'medium': {
+  medium: {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   },
-  'short': {
+  short: {
     year: 'numeric',
     month: 'numeric',
-    day: 'numeric'
+    day: 'numeric',
   },
   'weekday-long': {
-    weekday: 'long'
+    weekday: 'long',
   },
   'weekday-short': {
-    weekday: 'short'
+    weekday: 'short',
   },
   'month-long': {
-    month: 'long'
+    month: 'long',
   },
   'month-short': {
-    month: 'short'
+    month: 'short',
   },
   'time-12': {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
   },
   'time-24': {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: false,
   },
   'datetime-full': {
     weekday: 'long',
@@ -106,7 +116,7 @@ const formatConfigs: Record<DateFormat, Intl.DateTimeFormatOptions> = {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: false,
   },
   'datetime-short': {
     year: 'numeric',
@@ -114,198 +124,254 @@ const formatConfigs: Record<DateFormat, Intl.DateTimeFormatOptions> = {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: false,
   },
-  'relative': {},
-  'custom': {}
+  relative: {},
+  custom: {},
 };
 
-/**
- * Formatea una fecha según el locale y formato especificados
- */
+function isValidLocale(locale?: string | null): locale is Locale {
+  return Boolean(locale && APP_LOCALES.includes(locale as Locale));
+}
+
+function isDateFormat(value?: string): value is DateFormat {
+  return Boolean(value && value in formatConfigs);
+}
+
+function parseDateInput(date: string | Date): Date | null {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return Number.isNaN(dateObj.getTime()) ? null : dateObj;
+}
+
+function getEffectiveFormatOptions(
+  fallbackFormat: DateFormat,
+  options: DateFormatterOptions
+) {
+  const format = isDateFormat(options.format) ? options.format : fallbackFormat;
+
+  if (format === 'relative') {
+    return { format, intlOptions: {} as Intl.DateTimeFormatOptions };
+  }
+
+  const intlOptions =
+    format === 'custom' && options.customOptions
+      ? options.customOptions
+      : formatConfigs[format];
+
+  return { format, intlOptions };
+}
+
+function buildFormatterOptions(
+  fallbackFormat: DateFormat,
+  options: DateFormatterOptions
+) {
+  const config = getDateConfig(options.locale);
+  const { format, intlOptions } = getEffectiveFormatOptions(fallbackFormat, options);
+  const effectiveTimeZone =
+    options.customOptions?.timeZone || options.timeZone || config.timeZone;
+
+  return {
+    config,
+    format,
+    intlOptions: {
+      ...intlOptions,
+      timeZone: effectiveTimeZone,
+    } satisfies Intl.DateTimeFormatOptions,
+  };
+}
+
+function formatRelativeDate(date: Date, localeCode: string): string {
+  const now = new Date();
+  const diffInSeconds = Math.round((date.getTime() - now.getTime()) / 1000);
+  const formatter = new Intl.RelativeTimeFormat(localeCode, { numeric: 'auto' });
+
+  const ranges: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+    ['year', 60 * 60 * 24 * 365],
+    ['month', 60 * 60 * 24 * 30],
+    ['week', 60 * 60 * 24 * 7],
+    ['day', 60 * 60 * 24],
+    ['hour', 60 * 60],
+    ['minute', 60],
+    ['second', 1],
+  ];
+
+  for (const [unit, secondsInUnit] of ranges) {
+    if (Math.abs(diffInSeconds) >= secondsInUnit || unit === 'second') {
+      return formatter.format(
+        Math.round(diffInSeconds / secondsInUnit),
+        unit
+      );
+    }
+  }
+
+  return formatter.format(0, 'second');
+}
+
+export function normalizeLocale(locale?: string | null): Locale {
+  if (isValidLocale(locale)) {
+    return locale;
+  }
+
+  return DEFAULT_LOCALE;
+}
+
+export function getDateConfig(locale?: string | null): DateConfig {
+  const normalizedLocale = normalizeLocale(locale);
+
+  return {
+    language: normalizedLocale,
+    localeCode: localeMap[normalizedLocale],
+    timeZone: timezoneMap[normalizedLocale] || DEFAULT_TIMEZONE,
+  };
+}
+
+export function getLocaleCode(locale?: string | null): string {
+  return getDateConfig(locale).localeCode;
+}
+
+export function getTimeZoneForLocale(locale?: string | null): string {
+  return getDateConfig(locale).timeZone;
+}
+
+export function getLocaleFromPathname(pathname?: string | null): Locale | null {
+  if (!pathname) {
+    return null;
+  }
+
+  const localeFromPath = pathname.split('/')[1];
+  return isValidLocale(localeFromPath) ? localeFromPath : null;
+}
+
+export function getCurrentLocale(): Locale {
+  if (typeof window === 'undefined') {
+    return DEFAULT_LOCALE;
+  }
+
+  const localeFromPath = getLocaleFromPathname(window.location.pathname);
+  if (localeFromPath) {
+    return localeFromPath;
+  }
+
+  const preferredLocale = getPreferredLocale();
+  if (isValidLocale(preferredLocale)) {
+    return preferredLocale;
+  }
+
+  return DEFAULT_LOCALE;
+}
+
 export function formatDate(
   date: string | Date,
   options: DateFormatterOptions = {}
 ): string {
-  const {
-    locale = 'es',
-    format = 'medium',
-    customOptions
-  } = options;
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  // Validar que la fecha sea válida
-  if (isNaN(dateObj.getTime())) {
+  const dateObj = parseDateInput(date);
+  if (!dateObj) {
     return 'Fecha inválida';
   }
 
-  const fullLocale = localeMap[locale] || localeMap['es'];
-
-  // Manejar formato relativo
+  const { config, format, intlOptions } = buildFormatterOptions('medium', options);
   if (format === 'relative') {
-    return formatRelativeDate(dateObj, fullLocale);
+    return formatRelativeDate(dateObj, config.localeCode);
   }
 
-  // Obtener opciones de formato
-  let formatOptions: Intl.DateTimeFormatOptions;
-
-  if (format === 'custom' && customOptions) {
-    formatOptions = customOptions;
-  } else {
-    formatOptions = formatConfigs[format];
-  }
-
-  // Usar el método correcto según si el formato incluye hora
-  // Convertir a la zona horaria del locale especificado
-  const localeTimeZone = timezoneMap[locale] || timezoneMap['es'];
-  if (format === 'time-12' || format === 'time-24') {
-    const timeOptions = { ...formatOptions, timeZone: localeTimeZone };
-    return dateObj.toLocaleTimeString(fullLocale, timeOptions);
-  } else if (formatOptions.hour !== undefined || formatOptions.minute !== undefined) {
-    const dateTimeOptions = { ...formatOptions, timeZone: localeTimeZone };
-    return dateObj.toLocaleString(fullLocale, dateTimeOptions);
-  } else {
-    return dateObj.toLocaleDateString(fullLocale, formatOptions);
-  }
+  return new Intl.DateTimeFormat(config.localeCode, intlOptions).format(dateObj);
 }
 
-/**
- * Formatea una hora según el locale y formato especificados
- */
 export function formatTime(
   date: string | Date,
   options: DateFormatterOptions = {}
 ): string {
-  const {
-    locale = 'es',
-    format = 'time-24',
-    customOptions
-  } = options;
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  // Validar que la fecha sea válida
-  if (isNaN(dateObj.getTime())) {
+  const dateObj = parseDateInput(date);
+  if (!dateObj) {
     return 'Hora inválida';
   }
 
-  const fullLocale = localeMap[locale];
-
-  // Obtener opciones de formato
-  let formatOptions: Intl.DateTimeFormatOptions;
-
-  if (format === 'custom' && customOptions) {
-    formatOptions = customOptions;
-  } else {
-    formatOptions = formatConfigs[format];
+  const { config, format, intlOptions } = buildFormatterOptions('time-24', options);
+  if (format === 'relative') {
+    return formatRelativeDate(dateObj, config.localeCode);
   }
 
-  // Formatear la hora
-  return dateObj.toLocaleTimeString(fullLocale, formatOptions);
+  return new Intl.DateTimeFormat(config.localeCode, intlOptions).format(dateObj);
 }
 
-/**
- * Formatea fecha y hora juntas
- */
 export function formatDateTime(
   date: string | Date,
   options: DateFormatterOptions = {}
 ): string {
-  const {
-    locale = 'es',
-    format = 'datetime-full'
-  } = options;
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  // Validar que la fecha sea válida
-  if (isNaN(dateObj.getTime())) {
+  const dateObj = parseDateInput(date);
+  if (!dateObj) {
     return 'Fecha y hora inválidas';
   }
 
-  const fullLocale = localeMap[locale];
-  const formatOptions = formatConfigs[format];
+  const { config, format, intlOptions } = buildFormatterOptions(
+    'datetime-full',
+    options
+  );
+  if (format === 'relative') {
+    return formatRelativeDate(dateObj, config.localeCode);
+  }
 
-  return dateObj.toLocaleString(fullLocale, formatOptions);
+  return new Intl.DateTimeFormat(config.localeCode, intlOptions).format(dateObj);
 }
 
-/**
- * Formatea una fecha en formato relativo (hace X tiempo)
- */
-function formatRelativeDate(date: Date, locale: string): string {
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime())) / 1000;
-
-  if (diffInSeconds < 60) {
-    return 'Hace un momento';
-  }
-
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return `Hace ${diffInMinutes} minuto${diffInMinutes !== 1 ? 's' : ''}`;
-  }
-
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return `Hace ${diffInHours} hora${diffInHours !== 1 ? 's' : ''}`;
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) {
-    return `Hace ${diffInDays} día${diffInDays !== 1 ? 's' : ''}`;
-  }
-
-  const diffInWeeks = Math.floor(diffInDays / 7);
-  if (diffInWeeks < 4) {
-    return `Hace ${diffInWeeks} semana${diffInWeeks !== 1 ? 's' : ''}`;
-  }
-
-  const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12) {
-    return `Hace ${diffInMonths} mes${diffInMonths !== 1 ? 'es' : ''}`;
-  }
-
-  const diffInYears = Math.floor(diffInDays / 365);
-  return `Hace ${diffInYears} año${diffInYears !== 1 ? 's' : ''}`;
+export function formatUtcDate(
+  date: string | Date,
+  options: DateFormatterOptions = {}
+): string {
+  return formatDate(date, options);
 }
 
-/**
- * Obtiene el locale actual desde la URL o localStorage
- */
-export function getCurrentLocale(): Locale {
-  if (typeof window === 'undefined') return 'es';
-
-  // Intentar obtener desde la URL
-  const pathname = window.location.pathname;
-  const localeFromPath = pathname.split('/')[1] as Locale;
-  if (['es', 'en', 'it'].includes(localeFromPath)) {
-    return localeFromPath;
-  }
-
-  // Intentar obtener desde localStorage
-  const storedLocale = localStorage.getItem('locale') as Locale;
-  if (['es', 'en', 'it'].includes(storedLocale)) {
-    return storedLocale;
-  }
-
-  // Default
-  return 'es';
+export function formatUtcTime(
+  date: string | Date,
+  options: DateFormatterOptions = {}
+): string {
+  return formatTime(date, options);
 }
 
-/**
- * Hook para usar el formateador de fechas con el locale actual
- */
+export function formatUtcDateTime(
+  date: string | Date,
+  options: DateFormatterOptions = {}
+): string {
+  return formatDateTime(date, options);
+}
+
 export function useDateFormatter() {
   const locale = getCurrentLocale();
+  const config = getDateConfig(locale);
 
   return {
-    formatDate: (date: string | Date, format?: DateFormat, customOptions?: CustomFormatOptions) =>
-      formatDate(date, { locale, format, customOptions }),
-    formatTime: (date: string | Date, format?: DateFormat, customOptions?: CustomFormatOptions) =>
-      formatTime(date, { locale, format, customOptions }),
-    formatDateTime: (date: string | Date, format?: DateFormat, customOptions?: CustomFormatOptions) =>
-      formatDateTime(date, { locale, format, customOptions }),
-    locale
+    locale,
+    localeCode: config.localeCode,
+    timeZone: config.timeZone,
+    formatDate: (
+      date: string | Date,
+      format?: DateFormat,
+      customOptions?: CustomFormatOptions
+    ) => formatDate(date, { locale, format, customOptions }),
+    formatTime: (
+      date: string | Date,
+      format?: DateFormat,
+      customOptions?: CustomFormatOptions
+    ) => formatTime(date, { locale, format, customOptions }),
+    formatDateTime: (
+      date: string | Date,
+      format?: DateFormat,
+      customOptions?: CustomFormatOptions
+    ) => formatDateTime(date, { locale, format, customOptions }),
+    formatUtcDate: (
+      date: string | Date,
+      format?: DateFormat,
+      customOptions?: CustomFormatOptions
+    ) => formatUtcDate(date, { locale, format, customOptions }),
+    formatUtcTime: (
+      date: string | Date,
+      format?: DateFormat,
+      customOptions?: CustomFormatOptions
+    ) => formatUtcTime(date, { locale, format, customOptions }),
+    formatUtcDateTime: (
+      date: string | Date,
+      format?: DateFormat,
+      customOptions?: CustomFormatOptions
+    ) => formatUtcDateTime(date, { locale, format, customOptions }),
   };
 }

@@ -7,7 +7,11 @@ import utc from 'dayjs/plugin/utc';
 import User from '@/models/User';
 import Objective from '@/models/Objective';
 import { toZonedTime } from 'date-fns-tz';
-import { getBrowserLocale } from '@/utils/validatesInputs';
+import {
+  formatUtcTime,
+  getDateConfig,
+  normalizeLocale,
+} from '@/utils/date-formatter';
 
 // Configurar dayjs con el plugin UTC
 dayjs.extend(utc);
@@ -22,7 +26,9 @@ export async function GET(request: NextRequest) {
     const userType = searchParams.get('userType'); // 'coach', 'client', 'admin'
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
-    const timezone = searchParams.get('timezone') || 'America/Buenos_Aires'; // Zona horaria del usuario
+    const locale = normalizeLocale(searchParams.get('locale'));
+    const { timeZone: defaultTimeZone } = getDateConfig(locale);
+    const timezone = searchParams.get('timezone') || defaultTimeZone;
 
     if (!userId) {
       return NextResponse.json(
@@ -103,7 +109,7 @@ export async function GET(request: NextRequest) {
       const startDate = new Date(zonedDate);
       const endDate = new Date(zonedDate.getTime() + 60 * 60 * 1000); // +1 hora
 
-      return {
+      const eventData = {
         id: meet._id.toString(),
         title: `${meet.objectiveId.title} - ${clientName}`,
         start: startDate.toISOString(),
@@ -112,13 +118,15 @@ export async function GET(request: NextRequest) {
         client: clientName,
         coach: coachName,
         link: meet.link,
-        time: zonedDate.toLocaleTimeString(getBrowserLocale(), {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        }), // TODO: GENERALIZAR LA FUNCION DE FORMATEO DE FECHAS
+        time: formatUtcTime(utcDate, {
+          locale,
+          timeZone: timezone,
+          format: 'time-24',
+        }),
         objectiveTitle: meet.objectiveId.title,
       };
+
+      return eventData;
     });
 
     return NextResponse.json({

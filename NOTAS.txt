@@ -122,3 +122,10 @@ REVISAR QUE EL MAIL DE LA ENCUESTA AL CLIENTE TRAMBIEN CONTEMPLE LOS CASOS DONDE
 
 
 MODIFICAR 'es' por routing.defaultLocale (i18n libreria)
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+POSIBILIDAD DE BORRAR UN CAMPO Y SACAR EL NRO TELEFONO
+
+- PARA EL DESARROLLO DE GRAFICOS USAR CHARTS.JS

@@ -5,7 +5,7 @@ import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
 import Goal from '@/models/Goal';
-import { formatDate } from '@/utils/validatesInputs';
+import { formatUtcDate, formatUtcTime, normalizeLocale } from '@/utils/date-formatter';
 
 // GET /api/client/getBasicData - Obtener datos básicos del dashboard del cliente
 export async function GET(request: NextRequest) {
@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('clientId');
+    const locale = normalizeLocale(searchParams.get('locale'));
 
     if (!clientId) {
       return NextResponse.json(
@@ -158,11 +159,18 @@ export async function GET(request: NextRequest) {
 
     // Transformar las próximas sesiones al formato esperado
     const formattedUpcomingSessions = upcomingSessions.map(session => ({
-      date: `${formatDate(new Date(session.date), {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      })}, ${new Date(session.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+      date: `${formatUtcDate(session.date, {
+        locale,
+        format: 'custom',
+        customOptions: {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        },
+      })}, ${formatUtcTime(session.date, {
+        locale,
+        format: 'time-24',
+      })}`,
       coach: `${session.coachId.name} ${session.coachId.lastName}`,
       topic: session.objectiveId?.title || 'Sin objetivo definido',
     }));
@@ -172,10 +180,9 @@ export async function GET(request: NextRequest) {
       ? {
         date: nextSession.date,
         link: nextSession.link,
-        time: new Date(nextSession.date).toLocaleTimeString('es-ES', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
+        time: formatUtcTime(nextSession.date, {
+          locale,
+          format: 'time-24',
         }),
         coach: `${nextSession.coachId.name} ${nextSession.coachId.lastName}`,
         topic: nextSession.objectiveId?.title || 'Sin objetivo definido',

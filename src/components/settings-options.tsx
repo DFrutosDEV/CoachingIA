@@ -18,6 +18,7 @@ import { setTheme as setReduxTheme } from '@/lib/redux/slices/sessionSlice';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { setPreferredLocale } from '@/utils/locale-storage';
+import { routing } from '@/i18n/routing';
 
 interface SettingsFormProps {
   userType: 'client' | 'coach' | 'admin' | 'enterprise';
@@ -32,7 +33,9 @@ export function SettingsForm({ userType }: SettingsFormProps) {
   const dispatch = useAppDispatch();
   const reduxTheme = useAppSelector(state => state.session.theme);
   const [selectedTheme, setSelectedTheme] = useState<string>('system');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('es');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(
+    routing.defaultLocale
+  );
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -47,7 +50,7 @@ export function SettingsForm({ userType }: SettingsFormProps) {
     }
 
     // Obtener el idioma actual de la URL
-    const currentLocale = pathname.split('/')[1] || 'es';
+    const currentLocale = pathname.split('/')[1] || routing.defaultLocale;
     setSelectedLanguage(currentLocale);
   }, [theme, reduxTheme, setTheme, pathname]);
 

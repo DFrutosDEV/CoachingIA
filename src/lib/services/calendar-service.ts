@@ -1,4 +1,5 @@
 import { AuthService } from './auth-service';
+import { getCurrentLocale, getTimeZoneForLocale } from '@/utils/date-formatter';
 
 export interface SessionEvent {
   id: string;
@@ -43,14 +44,15 @@ export class CalendarService {
             ? 'client'
             : 'enterprise';
 
-      // Obtener la zona horaria del navegador
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const locale = getCurrentLocale();
+      const timezone = getTimeZoneForLocale(locale);
 
       // Construir la URL con parámetros
       const searchParams = new URLSearchParams({
         userId: currentUser._id,
         userType: userType,
-        timezone: timezone, // Enviar zona horaria al backend
+        locale,
+        timezone, // Enviar zona horaria centralizada al backend
       });
 
       if (params?.startDate) {

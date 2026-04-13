@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { useDateFormatter } from '@/utils/date-formatter';
 
 interface PdaData {
   id: string;
@@ -40,6 +41,7 @@ interface PdaData {
 }
 
 export function PdaCard() {
+  const { formatDate: formatDateWithLocale } = useDateFormatter();
   const [pdaData, setPdaData] = useState<PdaData | null>(null);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -178,7 +180,7 @@ export function PdaCard() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    return formatDateWithLocale(dateString, 'custom', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

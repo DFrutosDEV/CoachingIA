@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { setPreferredLocale } from '@/utils/locale-storage';
 import { useTranslations } from 'next-intl';
+import { routing } from '@/i18n/routing';
 
 const languages = [
   { code: 'es', flag: '🇪🇸' },
@@ -24,7 +25,7 @@ export function LanguageSwitcher() {
   const router = useRouter();
 
   // Obtener el locale actual de la ruta
-  const currentLocale = pathname.split('/')[1] || 'es';
+  const currentLocale = pathname.split('/')[1] || routing.defaultLocale;
 
   const changeLanguage = (newLocale: string) => {
     // Guardar la preferencia en localStorage de manera segura
