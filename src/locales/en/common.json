@@ -485,7 +485,45 @@
         "commentLabel": "Is there anything in particular you'd like to tell me?",
         "commentPlaceholder": "Write your comment here...",
         "confirmButton": "Confirm",
-        "cancelButton": "Cancel"
+        "cancelButton": "Cancel",
+        "alreadyCompleted": "This survey was already completed earlier."
+      }
+    },
+    "surveyPage": {
+      "errors": {
+        "missingToken": "Missing or invalid token. Please check the email link.",
+        "invalidLink": "Invalid or expired link.",
+        "missingRating": "Please select a rating",
+        "submitFailed": "Error sending the response",
+        "unknown": "Unknown error"
+      },
+      "states": {
+        "checking": {
+          "title": "Checking link",
+          "description": "Checking whether the survey is available."
+        },
+        "invalid": {
+          "title": "Invalid link"
+        },
+        "alreadyAnswered": {
+          "title": "Survey already completed",
+          "message": "We already recorded a response for this challenge, so there is no need to send another one."
+        },
+        "submitted": {
+          "title": "Thank you",
+          "description": "Your response was sent successfully. Your feedback is very important to us.",
+          "toast": "Thank you. Your response was sent successfully."
+        },
+        "closePage": "You can close this page."
+      },
+      "form": {
+        "title": "How did your challenge go? 🎯",
+        "subtitle": "Share your experience with us",
+        "ratingLabel": "1. How did applying the challenge go today?",
+        "commentLabel": "2. Is there anything in particular you want to tell me?",
+        "characterCount": "{count}/{max} characters",
+        "submitButton": "Send response",
+        "submitting": "Sending..."
       }
     },
     "notifications": {
@@ -915,6 +953,34 @@
       "title": "Generate Goals with AI",
       "description": "Configure parameters to generate personalized goals with AI",
       "mainObjective": "Main Objective",
+      "status": {
+        "defaultProvider": "AI Service",
+        "unknownStatus": "Unknown status",
+        "unknownEnvironment": "unknown",
+        "environment": "Environment: {environment}",
+        "connected": "Connected",
+        "disconnected": "Disconnected"
+      },
+      "preview": {
+        "open": "Open preview",
+        "remove": "Remove file"
+      },
+      "goalFields": {
+        "descriptionPlaceholder": "Goal description",
+        "noDate": "No date",
+        "aforism": "Aphorism",
+        "aforismPlaceholder": "Motivational aphorism",
+        "estimatedTime": "Estimated time",
+        "estimatedTimePlaceholder": "Ex: 30 minutes",
+        "example": "Example",
+        "examplePlaceholder": "Practical example",
+        "successIndicator": "Success indicator",
+        "successIndicatorPlaceholder": "Measurable success criterion"
+      },
+      "details": {
+        "show": "Show details",
+        "hide": "Hide details"
+      },
       "form": {
         "aiConfig": {
           "voiceToneTooltip": "Voice tone that will be used to generate goals",
@@ -962,11 +1028,16 @@
         "generating": "Generating goals with AI...",
         "generate": "Generate 30 goals",
         "accept": "Accept Goals",
-        "regenerate": "Regenerate Goals"
+        "regenerate": "Regenerate Goals",
+        "cancel": "Cancel",
+        "save": "Save"
       },
       "errors": {
         "generateGoals": "Error generating goals",
-        "uploadPda": "Error uploading report"
+        "uploadPda": "Error uploading report",
+        "connection": "Connection error",
+        "authTokenRequired": "Authentication token required",
+        "unknown": "Unknown error"
       },
       "success": {
         "goalsGenerated": "Objectives generated successfully",

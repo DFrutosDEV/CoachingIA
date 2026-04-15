@@ -5,33 +5,86 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@mui/material';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
+import { GOAL_SURVEY_COMMENT_MAX_LENGTH } from '@/lib/constants/goal';
+
+type Rating = 'excellent' | 'so-so' | 'bad';
+type SurveyState =
+  | 'checking'
+  | 'ready'
+  | 'submitted'
+  | 'invalid'
+  | 'already_answered';
 
 export default function SurveyPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const pageT = useTranslations('common.surveyPage');
+  const surveyT = useTranslations('common.dashboard.clientTasks.survey');
 
-  const [rating, setRating] = useState<'excellent' | 'so-so' | 'bad' | null>(null);
+  const [rating, setRating] = useState<Rating | null>(null);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [surveyState, setSurveyState] = useState<SurveyState>('checking');
   const [error, setError] = useState<string | null>(null);
+  const [goalDescription, setGoalDescription] = useState('');
 
   useEffect(() => {
-    if (!token) {
-      setError('Token non valido o mancante. Controlla il link nell\'email.');
-    }
-  }, [token]);
+    const validateSurveyLink = async () => {
+      if (!token) {
+        setError(pageT('errors.missingToken'));
+        setSurveyState('invalid');
+        return;
+      }
+
+      try {
+        setError(null);
+        setSurveyState('checking');
+
+        const response = await fetch(
+          `/api/goals/survey?token=${encodeURIComponent(token)}`
+        );
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          setGoalDescription(data.goal?.description ?? '');
+          setSurveyState('ready');
+          return;
+        }
+
+        if (data.status === 'already_answered') {
+          setSurveyState('already_answered');
+          setError(data.error || pageT('states.alreadyAnswered.message'));
+          return;
+        }
+
+        setError(data.error || pageT('errors.invalidLink'));
+        setSurveyState('invalid');
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : pageT('errors.unknown');
+        setError(errorMessage);
+        setSurveyState('invalid');
+      }
+    };
+
+    validateSurveyLink();
+  }, [pageT, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!token) {
-      setError('Token non valido o mancante.');
+      setError(pageT('errors.missingToken'));
+      return;
+    }
+
+    if (surveyState !== 'ready') {
       return;
     }
 
     if (!rating) {
-      toast.error('Per favore, seleziona una valutazione');
+      toast.error(pageT('errors.missingRating'));
       return;
     }
 
@@ -54,13 +107,21 @@ export default function SurveyPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Errore durante l\'invio della risposta');
+        if (data.status === 'already_answered') {
+          setSurveyState('already_answered');
+          setError(data.error || pageT('states.alreadyAnswered.message'));
+          toast.error(data.error || pageT('states.alreadyAnswered.message'));
+          return;
+        }
+
+        throw new Error(data.error || pageT('errors.submitFailed'));
       }
 
-      setSubmitted(true);
-      toast.success('Grazie! La tua risposta è stata inviata con successo.');
+      setSurveyState('submitted');
+      toast.success(pageT('states.submitted.toast'));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Errore sconosciuto';
+      const errorMessage =
+        err instanceof Error ? err.message : pageT('errors.unknown');
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -68,33 +129,64 @@ export default function SurveyPage() {
     }
   };
 
-  if (error && !token) {
+  if (surveyState === 'checking') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="max-w-md w-full mx-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
-          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Link Non Valido
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] px-4">
+        <div className="max-w-md w-full rounded-lg border bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[hsl(var(--foreground))] mx-auto mb-4"></div>
+          <h1 className="text-2xl font-bold mb-2">{pageT('states.checking.title')}</h1>
+          <p className="text-[hsl(var(--muted-foreground))]">
+            {pageT('states.checking.description')}
+          </p>
         </div>
       </div>
     );
   }
 
-  if (submitted) {
+  if (surveyState === 'invalid') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="max-w-md w-full mx-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Grazie! 🙏
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] px-4">
+        <div className="max-w-md w-full rounded-lg border bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-lg p-8 text-center">
+          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-2">{pageT('states.invalid.title')}</h1>
+          <p className="text-[hsl(var(--muted-foreground))]">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (surveyState === 'already_answered') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] px-4">
+        <div className="max-w-md w-full rounded-lg border bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-lg p-8 text-center">
+          <AlertCircle className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-2">
+            {pageT('states.alreadyAnswered.title')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            La tua risposta è stata inviata con successo. Il tuo feedback è molto importante per noi!
+          <p className="text-[hsl(var(--muted-foreground))] mb-4">
+            {error || pageT('states.alreadyAnswered.message')}
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500">
-            Puoi chiudere questa pagina.
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
+            {pageT('states.closePage')}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (surveyState === 'submitted') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] px-4">
+        <div className="max-w-md w-full rounded-lg border bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-lg p-8 text-center">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-2">
+            {pageT('states.submitted.title')}
+          </h1>
+          <p className="text-[hsl(var(--muted-foreground))] mb-4">
+            {pageT('states.submitted.description')}
+          </p>
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
+            {pageT('states.closePage')}
           </p>
         </div>
       </div>
@@ -102,36 +194,41 @@ export default function SurveyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[hsl(var(--background))] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="rounded-lg border bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Come è andata la tua sfida? 🎯
+            <h1 className="text-3xl font-bold mb-2">
+              {pageT('form.title')}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Condividi la tua esperienza con noi
+            <p className="text-[hsl(var(--muted-foreground))]">
+              {pageT('form.subtitle')}
             </p>
+            {goalDescription && (
+              <p className="mt-4 text-sm rounded-lg border bg-[hsl(var(--background))] px-4 py-3 text-[hsl(var(--muted-foreground))]">
+                {goalDescription}
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Domanda 1: Rating */}
             <div>
-              <label className="block text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                1. Com'è andata l'applicazione della sfida oggi?
+              <label className="block text-lg font-semibold mb-4">
+                {pageT('form.ratingLabel')}
               </label>
               <div className="space-y-3">
                 <button
                   type="button"
                   onClick={() => setRating('excellent')}
                   className={`w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${rating === 'excellent'
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-green-400 bg-white dark:bg-gray-700'
+                      ? 'border-green-500 bg-green-500/10'
+                      : 'border-[hsl(var(--border))] bg-[hsl(var(--card))] hover:border-green-400 hover:bg-[hsl(var(--accent))]'
                     }`}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${rating === 'excellent'
                       ? 'border-green-500 bg-green-500'
-                      : 'border-gray-400'
+                      : 'border-[hsl(var(--muted-foreground))]'
                     }`}>
                     {rating === 'excellent' && (
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -139,13 +236,13 @@ export default function SurveyPage() {
                   </div>
                   <div className="flex-1 text-left">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">🟢</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        Benissimo!
+                      <span className="text-2xl">{surveyT('options.excellent.emoji')}</span>
+                      <span className="font-semibold">
+                        {surveyT('options.excellent.label')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      L'ho applicata con successo e mi sono sentito/a a mio agio.
+                    <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
+                      {surveyT('options.excellent.description')}
                     </p>
                   </div>
                 </button>
@@ -154,13 +251,13 @@ export default function SurveyPage() {
                   type="button"
                   onClick={() => setRating('so-so')}
                   className={`w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${rating === 'so-so'
-                      ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-yellow-400 bg-white dark:bg-gray-700'
+                      ? 'border-yellow-500 bg-yellow-500/10'
+                      : 'border-[hsl(var(--border))] bg-[hsl(var(--card))] hover:border-yellow-400 hover:bg-[hsl(var(--accent))]'
                     }`}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${rating === 'so-so'
                       ? 'border-yellow-500 bg-yellow-500'
-                      : 'border-gray-400'
+                      : 'border-[hsl(var(--muted-foreground))]'
                     }`}>
                     {rating === 'so-so' && (
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -168,13 +265,13 @@ export default function SurveyPage() {
                   </div>
                   <div className="flex-1 text-left">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">🟡</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        Così così...
+                      <span className="text-2xl">{surveyT('options.so-so.emoji')}</span>
+                      <span className="font-semibold">
+                        {surveyT('options.so-so.label')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Ci ho provato, ma ho incontrato qualche difficoltà o non sono del tutto soddisfatto/a.
+                    <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
+                      {surveyT('options.so-so.description')}
                     </p>
                   </div>
                 </button>
@@ -183,13 +280,13 @@ export default function SurveyPage() {
                   type="button"
                   onClick={() => setRating('bad')}
                   className={`w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${rating === 'bad'
-                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-red-400 bg-white dark:bg-gray-700'
+                      ? 'border-red-500 bg-red-500/10'
+                      : 'border-[hsl(var(--border))] bg-[hsl(var(--card))] hover:border-red-400 hover:bg-[hsl(var(--accent))]'
                     }`}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${rating === 'bad'
                       ? 'border-red-500 bg-red-500'
-                      : 'border-gray-400'
+                      : 'border-[hsl(var(--muted-foreground))]'
                     }`}>
                     {rating === 'bad' && (
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -197,13 +294,13 @@ export default function SurveyPage() {
                   </div>
                   <div className="flex-1 text-left">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">🔴</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        Male
+                      <span className="text-2xl">{surveyT('options.bad.emoji')}</span>
+                      <span className="font-semibold">
+                        {surveyT('options.bad.label')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Non sono riuscito/a ad applicarla o mi sono sentito/a molto a disagio.
+                    <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
+                      {surveyT('options.bad.description')}
                     </p>
                   </div>
                 </button>
@@ -214,28 +311,31 @@ export default function SurveyPage() {
             <div>
               <label
                 htmlFor="comment"
-                className="block text-lg font-semibold text-gray-900 dark:text-white mb-4"
+                className="block text-lg font-semibold mb-4"
               >
-                2. C'è qualcosa in particolare che vuoi raccontarmi?
+                {pageT('form.commentLabel')}
               </label>
               <textarea
                 id="comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={5}
-                maxLength={1000}
+                maxLength={GOAL_SURVEY_COMMENT_MAX_LENGTH}
                 className="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-[hsl(var(--background))] text-[hsl(var(--foreground))] border border-[hsl(var(--input))] placeholder:text-[hsl(var(--muted-foreground))]"
-                placeholder="Scrivi qui il tuo commento (opzionale)..."
+                placeholder={surveyT('commentPlaceholder')}
               />
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                {comment.length}/1000 caratteri
+              <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">
+                {pageT('form.characterCount', {
+                  count: comment.length,
+                  max: GOAL_SURVEY_COMMENT_MAX_LENGTH,
+                })}
               </p>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+                <p className="text-sm text-red-500">{error}</p>
               </div>
             )}
 
@@ -261,7 +361,7 @@ export default function SurveyPage() {
                   },
                 }}
               >
-                {loading ? 'Invio in corso...' : 'Invia Risposta'}
+                {loading ? pageT('form.submitting') : pageT('form.submitButton')}
               </Button>
             </div>
           </form>

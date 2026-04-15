@@ -2,6 +2,140 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
 import { verifyToken } from '@/lib/auth-jwt';
+import { GOAL_SURVEY_COMMENT_MAX_LENGTH } from '@/lib/constants/goal';
+
+type SurveyStatus =
+  | 'ready'
+  | 'missing_token'
+  | 'invalid_token'
+  | 'goal_not_found'
+  | 'goal_not_completed'
+  | 'already_answered';
+
+function normalizeComment(comment: unknown) {
+  if (typeof comment !== 'string') {
+    return '';
+  }
+
+  return comment.trim();
+}
+
+async function getSurveyGoal(token: string) {
+  const decoded = verifyToken(token) as { goalId: string } | null;
+
+  if (!decoded?.goalId) {
+    return {
+      status: 'invalid_token' as SurveyStatus,
+      httpStatus: 401,
+      error: 'Token non valido o scaduto',
+    };
+  }
+
+  const goal = await Goal.findById(decoded.goalId);
+
+  if (!goal) {
+    return {
+      status: 'goal_not_found' as SurveyStatus,
+      httpStatus: 404,
+      error: 'Goal non trovato',
+      goalId: decoded.goalId,
+    };
+  }
+
+  if (!goal.isCompleted) {
+    return {
+      status: 'goal_not_completed' as SurveyStatus,
+      httpStatus: 400,
+      error: 'Il Goal deve essere completato prima di inviare la risposta',
+      goalId: goal._id.toString(),
+      goal,
+    };
+  }
+
+  if (goal.surveyRating) {
+    return {
+      status: 'already_answered' as SurveyStatus,
+      httpStatus: 409,
+      error: 'Il semaforo e gia stato completato',
+      goalId: goal._id.toString(),
+      goal,
+    };
+  }
+
+  return {
+    status: 'ready' as SurveyStatus,
+    httpStatus: 200,
+    goalId: goal._id.toString(),
+    goal,
+  };
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    await connectDB();
+
+    const token = request.nextUrl.searchParams.get('token');
+
+    if (!token) {
+      console.info('[survey][email-link]', {
+        result: 'missing_token',
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          status: 'missing_token',
+          error: 'Token mancante',
+        },
+        { status: 400 }
+      );
+    }
+
+    const surveyGoal = await getSurveyGoal(token);
+
+    if (surveyGoal.status !== 'ready') {
+      console.info('[survey][email-link]', {
+        goalId: surveyGoal.goalId ?? null,
+        result: surveyGoal.status,
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          status: surveyGoal.status,
+          error: surveyGoal.error,
+        },
+        { status: surveyGoal.httpStatus }
+      );
+    }
+
+    console.info('[survey][email-link]', {
+      goalId: surveyGoal.goalId,
+      result: 'ready',
+    });
+
+    return NextResponse.json({
+      success: true,
+      status: 'ready',
+      goal: {
+        id: surveyGoal.goalId,
+        description: surveyGoal.goal.description,
+      },
+    });
+  } catch (error) {
+    console.error('[survey][email-link]', {
+      result: 'server_error',
+      error: error instanceof Error ? error.message : 'Errore sconosciuto',
+    });
+
+    return NextResponse.json(
+      {
+        success: false,
+        status: 'server_error',
+        error: 'Errore interno del server',
+      },
+      { status: 500 }
+    );
+  }
+}
 
 
 // POST /api/goals/survey - Guardar la encuesta de un cliente
@@ -14,9 +148,13 @@ export async function POST(request: NextRequest) {
 
     // Validar que el token esté presente
     if (!token) {
+      console.info('[survey][email-link]', {
+        result: 'missing_token',
+      });
       return NextResponse.json(
         {
           success: false,
+          status: 'missing_token',
           error: 'Token mancante',
         },
         { status: 400 }
@@ -25,74 +163,106 @@ export async function POST(request: NextRequest) {
 
     // Validar que el rating esté presente y sea válido
     if (!rating || !['excellent', 'so-so', 'bad'].includes(rating)) {
+      console.info('[survey][email-link]', {
+        result: 'invalid_rating',
+      });
       return NextResponse.json(
         {
           success: false,
+          status: 'invalid_rating',
           error: 'Rating non valido',
         },
         { status: 400 }
       );
     }
 
-    // Decodificar el token para obtener el goalId
-    const decoded = verifyToken(token) as { goalId: string };
-    if (!decoded || !decoded.goalId) {
+    const surveyGoal = await getSurveyGoal(token);
+
+    if (surveyGoal.status !== 'ready') {
+      console.info('[survey][email-link]', {
+        goalId: surveyGoal.goalId ?? null,
+        result: surveyGoal.status,
+      });
       return NextResponse.json(
         {
           success: false,
-          error: 'Token non valido o scaduto',
+          status: surveyGoal.status,
+          error: surveyGoal.error,
         },
-        { status: 401 }
-      );
-    }
-    const goalId = decoded?.goalId;
-
-    // Buscar el Goal
-    const goal = await Goal.findById(goalId);
-
-    if (!goal) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Goal non trovato',
-        },
-        { status: 404 }
+        { status: surveyGoal.httpStatus }
       );
     }
 
-    // Verificar que el Goal esté completado
-    if (!goal.isCompleted) {
+    const normalizedComment = normalizeComment(comment);
+    const goalId = surveyGoal.goalId;
+
+    if (normalizedComment.length > GOAL_SURVEY_COMMENT_MAX_LENGTH) {
+      console.info('[survey][email-link]', {
+        goalId,
+        result: 'comment_too_long',
+      });
       return NextResponse.json(
         {
           success: false,
-          error: 'Il Goal deve essere completato prima di inviare la risposta',
+          status: 'invalid_comment',
+          error: `Il commento non puo superare ${GOAL_SURVEY_COMMENT_MAX_LENGTH} caratteri`,
         },
         { status: 400 }
       );
     }
 
-    // Actualizar el Goal con los datos de la encuesta
-    goal.surveyRating = rating;
-    if (comment && comment.trim().length > 0) {
-      goal.surveyComment = comment.trim();
+    const updatedGoal = await Goal.findOneAndUpdate(
+      {
+        _id: goalId,
+        $or: [{ surveyRating: { $exists: false } }, { surveyRating: null }],
+      },
+      {
+        $set: {
+          surveyRating: rating,
+          surveyComment: normalizedComment,
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedGoal) {
+      console.info('[survey][email-link]', {
+        goalId,
+        result: 'already_answered',
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          status: 'already_answered',
+          error: 'Il semaforo e gia stato completato',
+        },
+        { status: 409 }
+      );
     }
 
-    await goal.save();
-
-    console.log(`✅ Encuesta guardada para Goal ${goalId}: ${rating}`);
+    console.info('[survey][email-link]', {
+      goalId,
+      result: 'saved',
+      rating,
+    });
 
     return NextResponse.json({
       success: true,
+      status: 'saved',
       message: 'Risposta salvata con successo',
     });
   } catch (error) {
-    console.error('Error procesando encuesta:', error);
+    console.error('[survey][email-link]', {
+      result: 'server_error',
+      error: error instanceof Error ? error.message : 'Errore sconosciuto',
+    });
     const errorMessage =
       error instanceof Error ? error.message : 'Errore sconosciuto';
 
     return NextResponse.json(
       {
         success: false,
+        status: 'server_error',
         error: 'Errore interno del server',
         details: errorMessage,
       },

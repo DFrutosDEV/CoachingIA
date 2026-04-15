@@ -485,7 +485,45 @@
         "commentLabel": "C'è qualcosa in particolare che vuoi raccontarmi?",
         "commentPlaceholder": "Scrivi il tuo commento qui...",
         "confirmButton": "Conferma",
-        "cancelButton": "Annulla"
+        "cancelButton": "Annulla",
+        "alreadyCompleted": "Questo semaforo e gia stato completato in precedenza."
+      }
+    },
+    "surveyPage": {
+      "errors": {
+        "missingToken": "Token non valido o mancante. Controlla il link nell'email.",
+        "invalidLink": "Link non valido o scaduto.",
+        "missingRating": "Per favore, seleziona una valutazione",
+        "submitFailed": "Errore durante l'invio della risposta",
+        "unknown": "Errore sconosciuto"
+      },
+      "states": {
+        "checking": {
+          "title": "Verifica del link",
+          "description": "Sto controllando se il semaforo e disponibile."
+        },
+        "invalid": {
+          "title": "Link non valido"
+        },
+        "alreadyAnswered": {
+          "title": "Semaforo gia completato",
+          "message": "Abbiamo gia registrato una risposta per questa sfida, quindi non e necessario inviarne un'altra."
+        },
+        "submitted": {
+          "title": "Grazie",
+          "description": "La tua risposta e stata inviata con successo. Il tuo feedback e molto importante per noi.",
+          "toast": "Grazie. La tua risposta e stata inviata con successo."
+        },
+        "closePage": "Puoi chiudere questa pagina."
+      },
+      "form": {
+        "title": "Come e andata la tua sfida? 🎯",
+        "subtitle": "Condividi la tua esperienza con noi",
+        "ratingLabel": "1. Com'e andata l'applicazione della sfida oggi?",
+        "commentLabel": "2. C'e qualcosa in particolare che vuoi raccontarmi?",
+        "characterCount": "{count}/{max} caratteri",
+        "submitButton": "Invia risposta",
+        "submitting": "Invio in corso..."
       }
     },
     "notifications": {
@@ -915,6 +953,34 @@
       "title": "Genera Obiettivi con IA",
       "description": "Configura i parametri per generare obiettivi personalizzati con l'IA",
       "mainObjective": "Obiettivo Principale",
+      "status": {
+        "defaultProvider": "Servizio IA",
+        "unknownStatus": "Stato sconosciuto",
+        "unknownEnvironment": "sconosciuto",
+        "environment": "Ambiente: {environment}",
+        "connected": "Connesso",
+        "disconnected": "Disconnesso"
+      },
+      "preview": {
+        "open": "Apri anteprima",
+        "remove": "Elimina file"
+      },
+      "goalFields": {
+        "descriptionPlaceholder": "Descrizione dell'obiettivo",
+        "noDate": "Nessuna data",
+        "aforism": "Aforisma",
+        "aforismPlaceholder": "Aforisma motivazionale",
+        "estimatedTime": "Tempo stimato",
+        "estimatedTimePlaceholder": "Es: 30 minuti",
+        "example": "Esempio",
+        "examplePlaceholder": "Esempio pratico",
+        "successIndicator": "Indicatore di successo",
+        "successIndicatorPlaceholder": "Criterio di successo misurabile"
+      },
+      "details": {
+        "show": "Vedi dettagli",
+        "hide": "Nascondi dettagli"
+      },
       "form": {
         "aiConfig": {
           "voiceToneTooltip": "Tono di voce che verrà utilizzato per generare i goal",
@@ -962,11 +1028,16 @@
         "generating": "Generazione obiettivi con IA...",
         "generate": "Genera 30 obiettivi",
         "accept": "Accetta Obiettivi",
-        "regenerate": "Rigenera Obiettivi"
+        "regenerate": "Rigenera Obiettivi",
+        "cancel": "Annulla",
+        "save": "Salva"
       },
       "errors": {
         "generateGoals": "Errore nella generazione degli obiettivi",
-        "uploadPda": "Errore nel caricamento del report"
+        "uploadPda": "Errore nel caricamento del report",
+        "connection": "Errore di connessione",
+        "authTokenRequired": "Token di autenticazione richiesto",
+        "unknown": "Errore sconosciuto"
       },
       "success": {
         "goalsGenerated": "Obiettivi generati con successo",

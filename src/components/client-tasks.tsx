@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { DEFAULT_LOCALE, useDateFormatter } from '@/utils/date-formatter';
+import { GOAL_SURVEY_COMMENT_MAX_LENGTH } from '@/lib/constants/goal';
 import {
   Dialog,
   DialogContent,
@@ -128,6 +129,11 @@ const ClientTasks: React.FC = () => {
 
   // Abrir modal de encuesta cuando se hace clic en un goal
   const handleGoalClick = (goal: Goal) => {
+    if (goal.surveyRating) {
+      toast.error(t('survey.alreadyCompleted'));
+      return;
+    }
+
     // Si ya está completado, no hacer nada
     if (goal.isCompleted) {
       return;
@@ -188,7 +194,31 @@ const ClientTasks: React.FC = () => {
         setSelectedRating(null);
         setSurveyComment('');
       } else {
-        toast.error(t('errors.updateTask'));
+        if (result.status === 'already_answered') {
+          setTasksData(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              goals: prev.goals.map(goal =>
+                goal._id === selectedGoal._id
+                  ? {
+                    ...goal,
+                    isCompleted: true,
+                    surveyRating:
+                      goal.surveyRating ?? selectedGoal.surveyRating ?? undefined,
+                    surveyComment:
+                      goal.surveyComment ?? selectedGoal.surveyComment ?? '',
+                  }
+                  : goal
+              ),
+            };
+          });
+          handleCloseSurvey();
+          toast.error(result.error || t('survey.alreadyCompleted'));
+          return;
+        }
+
+        toast.error(result.error || t('errors.updateTask'));
       }
     } catch (error) {
       console.error('Error al actualizar tarea:', error);
@@ -283,7 +313,7 @@ const ClientTasks: React.FC = () => {
                     <div
                       key={goal._id}
                       onClick={() => handleGoalClick(goal)}
-                      className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 ${goal.isCompleted ? '' : 'cursor-pointer hover:opacity-90'}`}
+                      className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 ${goal.isCompleted || goal.surveyRating ? '' : 'cursor-pointer hover:opacity-90'}`}
                       style={{
                         borderColor:
                           goal.surveyRating === 'excellent'
@@ -606,6 +636,7 @@ const ClientTasks: React.FC = () => {
                 onChange={(e) => setSurveyComment(e.target.value)}
                 placeholder={t('survey.commentPlaceholder')}
                 rows={4}
+                maxLength={GOAL_SURVEY_COMMENT_MAX_LENGTH}
                 className="w-full p-3 rounded-lg resize-none"
                 style={{
                   backgroundColor: theme.palette.background.default,
@@ -613,6 +644,12 @@ const ClientTasks: React.FC = () => {
                   color: theme.palette.text.primary,
                 }}
               />
+              <p
+                className="text-xs"
+                style={{ color: theme.palette.text.secondary }}
+              >
+                {surveyComment.length}/{GOAL_SURVEY_COMMENT_MAX_LENGTH}
+              </p>
             </div>
           </div>
 

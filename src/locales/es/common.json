@@ -485,7 +485,45 @@
         "commentLabel": "¿Hay algo en particular que quieras contarme?",
         "commentPlaceholder": "Escribe tu comentario aquí...",
         "confirmButton": "Confirmar",
-        "cancelButton": "Cancelar"
+        "cancelButton": "Cancelar",
+        "alreadyCompleted": "Este semáforo ya fue completado anteriormente."
+      }
+    },
+    "surveyPage": {
+      "errors": {
+        "missingToken": "Token no valido o faltante. Revisa el enlace del email.",
+        "invalidLink": "Enlace no valido o vencido.",
+        "missingRating": "Por favor, selecciona una valoración",
+        "submitFailed": "Error al enviar la respuesta",
+        "unknown": "Error desconocido"
+      },
+      "states": {
+        "checking": {
+          "title": "Verificando enlace",
+          "description": "Estoy comprobando si el semáforo está disponible."
+        },
+        "invalid": {
+          "title": "Enlace no válido"
+        },
+        "alreadyAnswered": {
+          "title": "Semáforo ya completado",
+          "message": "Ya registramos una respuesta para este desafío, así que no hace falta enviar otra."
+        },
+        "submitted": {
+          "title": "Gracias",
+          "description": "Tu respuesta fue enviada correctamente. Tu feedback es muy importante para nosotros.",
+          "toast": "Gracias. Tu respuesta fue enviada correctamente."
+        },
+        "closePage": "Puedes cerrar esta página."
+      },
+      "form": {
+        "title": "¿Cómo te fue con tu desafío? 🎯",
+        "subtitle": "Comparte tu experiencia con nosotros",
+        "ratingLabel": "1. ¿Cómo te fue con la aplicación del desafío hoy?",
+        "commentLabel": "2. ¿Hay algo en particular que quieras contarme?",
+        "characterCount": "{count}/{max} caracteres",
+        "submitButton": "Enviar respuesta",
+        "submitting": "Enviando..."
       }
     },
     "notifications": {
@@ -915,6 +953,34 @@
       "title": "Generar Objetivos con IA",
       "description": "Configura los parámetros para generar objetivos personalizados con IA",
       "mainObjective": "Objetivo Principal",
+      "status": {
+        "defaultProvider": "Servicio de IA",
+        "unknownStatus": "Estado desconocido",
+        "unknownEnvironment": "desconocido",
+        "environment": "Entorno: {environment}",
+        "connected": "Conectado",
+        "disconnected": "Desconectado"
+      },
+      "preview": {
+        "open": "Ver vista previa",
+        "remove": "Eliminar archivo"
+      },
+      "goalFields": {
+        "descriptionPlaceholder": "Descripción del objetivo",
+        "noDate": "Sin fecha",
+        "aforism": "Aforismo",
+        "aforismPlaceholder": "Aforismo motivacional",
+        "estimatedTime": "Tiempo estimado",
+        "estimatedTimePlaceholder": "Ej: 30 minutos",
+        "example": "Ejemplo",
+        "examplePlaceholder": "Ejemplo práctico",
+        "successIndicator": "Indicador de éxito",
+        "successIndicatorPlaceholder": "Criterio de éxito medible"
+      },
+      "details": {
+        "show": "Ver detalles",
+        "hide": "Ocultar detalles"
+      },
       "form": {
         "aiConfig": {
           "voiceToneTooltip": "Tono de voz que se usará para generar los objetivos",
@@ -962,11 +1028,16 @@
         "generating": "Generando objetivos con IA...",
         "generate": "Generar 30 objetivos",
         "accept": "Aceptar Objetivos",
-        "regenerate": "Regenerar Objetivos"
+        "regenerate": "Regenerar Objetivos",
+        "cancel": "Cancelar",
+        "save": "Guardar"
       },
       "errors": {
         "generateGoals": "Error al generar objetivos",
-        "uploadPda": "Error al cargar reporte"
+        "uploadPda": "Error al cargar reporte",
+        "connection": "Error de conexión",
+        "authTokenRequired": "Token de autenticación requerido",
+        "unknown": "Error desconocido"
       },
       "success": {
         "goalsGenerated": "Objetivos generados exitosamente",

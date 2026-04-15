@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, ObjectId } from 'mongoose';
+import { GOAL_SURVEY_COMMENT_MAX_LENGTH } from '@/lib/constants/goal';
 
 export interface IGoal extends Document {
   objectiveId: ObjectId;
@@ -23,14 +24,12 @@ const GoalSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Objective',
       required: [true, 'The objectiveId is required'],
-      trim: true,
-      maxlength: [50, 'The objectiveId cannot exceed 50 characters'],
     },
     description: {
       type: String,
       required: [true, 'The description is required'],
       trim: true,
-      maxlength: [500, 'The description cannot exceed 500 characters'],
+      maxlength: [1500, 'The description cannot exceed 1500 characters'],
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -70,13 +69,13 @@ const GoalSchema: Schema = new Schema(
       type: String,
       required: false,
       trim: true,
-      maxlength: [500, 'El ejemplo no puede exceder 500 caracteres'],
+      maxlength: [1000, 'El ejemplo no puede exceder 1000 caracteres'],
     },
     indicadorExito: {
       type: String,
       required: false,
       trim: true,
-      maxlength: [500, 'El indicador de éxito no puede exceder 500 caracteres'],
+      maxlength: [1000, 'El indicador de éxito no puede exceder 1000 caracteres'],
     },
     status: {
       type: String,
@@ -93,7 +92,10 @@ const GoalSchema: Schema = new Schema(
       type: String,
       required: false,
       trim: true,
-      maxlength: [1000, 'El comentario no puede exceder 1000 caracteres'],
+      maxlength: [
+        GOAL_SURVEY_COMMENT_MAX_LENGTH,
+        `El comentario no puede exceder ${GOAL_SURVEY_COMMENT_MAX_LENGTH} caracteres`,
+      ],
     },
   },
   {

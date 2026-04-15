@@ -27,6 +27,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { FilePreviewModal } from './file-preview-modal';
 import { Tooltip } from '@mui/material';
+import {
+  GOAL_AFORISM_MAX_LENGTH,
+  GOAL_DESCRIPTION_MAX_LENGTH,
+  GOAL_EJEMPLO_MAX_LENGTH,
+  GOAL_INDICADOR_EXITO_MAX_LENGTH,
+  GOAL_TIEMPO_ESTIMADO_MAX_LENGTH,
+} from '@/lib/constants/goal';
 
 interface AIGoalsGeneratorProps {
   isOpen: boolean;
@@ -79,24 +86,24 @@ export function AIGoalsGenerator({
       const data = await response.json();
 
       setAiStatus({
-        provider: data.provider || 'AI Service',
+        provider: data.provider || t('status.defaultProvider'),
         available: data.available || false,
-        message: data.message || 'Estado desconocido',
-        environment: data.environment || 'unknown',
+        message: data.message || t('status.unknownStatus'),
+        environment: data.environment || t('status.unknownEnvironment'),
       });
     } catch (error) {
       setAiStatus({
-        provider: 'AI Service',
+        provider: t('status.defaultProvider'),
         available: false,
-        message: 'Error de conexión',
-        environment: 'unknown',
+        message: t('errors.connection'),
+        environment: t('status.unknownEnvironment'),
       });
     }
   };
 
   const handlePdaFileUpload = async (file: File) => {
     if (!token) {
-      throw new Error('Token de autenticación requerido');
+      throw new Error(t('errors.authTokenRequired'));
     }
 
     setIsUploadingPda(true);
@@ -121,11 +128,11 @@ export function AIGoalsGenerator({
           setPdaFile(file);
           return data.pdaId;
         } else {
-          throw new Error(data.error || 'Error al cargar el archivo PDA');
+          throw new Error(data.error || t('errors.uploadPda'));
         }
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al cargar el archivo PDA');
+        throw new Error(errorData.error || t('errors.uploadPda'));
       }
     } catch (error) {
       console.error('Error al cargar archivo PDA:', error);
@@ -169,12 +176,12 @@ export function AIGoalsGenerator({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error generando objetivos');
+        throw new Error(data.error || t('errors.generateGoals'));
       }
 
       setGeneratedGoals(data.goals);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
+      setError(error instanceof Error ? error.message : t('errors.unknown'));
     } finally {
       setIsGenerating(false);
     }
@@ -234,7 +241,7 @@ export function AIGoalsGenerator({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Generar Objetivos con IA
+              {t('title')}
             </DialogTitle>
           </DialogHeader>
 
@@ -254,11 +261,13 @@ export function AIGoalsGenerator({
                       {aiStatus.message}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Entorno: {aiStatus.environment}
+                      {t('status.environment', { environment: aiStatus.environment })}
                     </p>
                   </div>
                   <Badge variant={aiStatus.available ? 'active' : 'inactive'}>
-                    {aiStatus.available ? 'Conectado' : 'Desconectado'}
+                    {aiStatus.available
+                      ? t('status.connected')
+                      : t('status.disconnected')}
                   </Badge>
                 </div>
               </div>
@@ -397,7 +406,7 @@ export function AIGoalsGenerator({
                         variant="outline"
                         size="sm"
                         onClick={() => setIsPreviewOpen(true)}
-                        title="Ver preview"
+                        title={t('preview.open')}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -406,7 +415,7 @@ export function AIGoalsGenerator({
                         variant="outline"
                         size="sm"
                         onClick={() => setPdaFile(null)}
-                        title="Eliminar archivo"
+                        title={t('preview.remove')}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -465,7 +474,8 @@ export function AIGoalsGenerator({
                                   value={goal.description || ''}
                                   onChange={(e) => handleEditGoal(goal._id, 'description', e.target.value)}
                                   className="min-h-[60px] text-sm"
-                                  placeholder="Descripción del objetivo"
+                                  placeholder={t('goalFields.descriptionPlaceholder')}
+                                  maxLength={GOAL_DESCRIPTION_MAX_LENGTH}
                                 />
                               ) : (
                                 <p className="text-sm font-medium flex-1">
@@ -490,7 +500,9 @@ export function AIGoalsGenerator({
                                 />
                               ) : (
                                 <span className="text-xs text-muted-foreground">
-                                  {goal.date ? formatDateWithLocale(new Date(goal.date), 'short') : 'Sin fecha'}
+                                  {goal.date
+                                    ? formatDateWithLocale(new Date(goal.date), 'short')
+                                    : t('goalFields.noDate')}
                                 </span>
                               )}
                             </div>
@@ -503,15 +515,17 @@ export function AIGoalsGenerator({
                                   <div className="space-y-1">
                                     <div className="flex items-center gap-1">
                                       <Lightbulb className="h-3 w-3 text-muted-foreground" />
-                                      <Label className="text-xs font-medium">Aforismo</Label>
+                                      <Label className="text-xs font-medium">
+                                        {t('goalFields.aforism')}
+                                      </Label>
                                     </div>
                                     {isEditing ? (
                                       <Input
                                         value={goal.aforism || ''}
                                         onChange={(e) => handleEditGoal(goal._id, 'aforism', e.target.value)}
-                                        placeholder="Aforismo motivacional"
+                                        placeholder={t('goalFields.aforismPlaceholder')}
                                         className="text-xs h-8"
-                                        maxLength={300}
+                                        maxLength={GOAL_AFORISM_MAX_LENGTH}
                                       />
                                     ) : (
                                       <p className="text-xs text-muted-foreground italic pl-4">
@@ -526,15 +540,17 @@ export function AIGoalsGenerator({
                                   <div className="space-y-1">
                                     <div className="flex items-center gap-1">
                                       <Clock className="h-3 w-3 text-muted-foreground" />
-                                      <Label className="text-xs font-medium">Tiempo Estimado</Label>
+                                      <Label className="text-xs font-medium">
+                                        {t('goalFields.estimatedTime')}
+                                      </Label>
                                     </div>
                                     {isEditing ? (
                                       <Input
                                         value={goal.tiempoEstimado || ''}
                                         onChange={(e) => handleEditGoal(goal._id, 'tiempoEstimado', e.target.value)}
-                                        placeholder="Ej: 30 minutos"
+                                        placeholder={t('goalFields.estimatedTimePlaceholder')}
                                         className="text-xs h-8"
-                                        maxLength={100}
+                                        maxLength={GOAL_TIEMPO_ESTIMADO_MAX_LENGTH}
                                       />
                                     ) : (
                                       <p className="text-xs text-muted-foreground pl-4">
@@ -547,14 +563,16 @@ export function AIGoalsGenerator({
                                 {/* Ejemplo */}
                                 {(goal.ejemplo || isEditing) && (
                                   <div className="space-y-1">
-                                    <Label className="text-xs font-medium">Ejemplo</Label>
+                                    <Label className="text-xs font-medium">
+                                      {t('goalFields.example')}
+                                    </Label>
                                     {isEditing ? (
                                       <Textarea
                                         value={goal.ejemplo || ''}
                                         onChange={(e) => handleEditGoal(goal._id, 'ejemplo', e.target.value)}
-                                        placeholder="Ejemplo práctico"
+                                        placeholder={t('goalFields.examplePlaceholder')}
                                         className="text-xs min-h-[60px]"
-                                        maxLength={500}
+                                        maxLength={GOAL_EJEMPLO_MAX_LENGTH}
                                       />
                                     ) : (
                                       <p className="text-xs text-muted-foreground pl-2">
@@ -569,15 +587,17 @@ export function AIGoalsGenerator({
                                   <div className="space-y-1">
                                     <div className="flex items-center gap-1">
                                       <CheckCircle2 className="h-3 w-3 text-muted-foreground" />
-                                      <Label className="text-xs font-medium">Indicador de Éxito</Label>
+                                      <Label className="text-xs font-medium">
+                                        {t('goalFields.successIndicator')}
+                                      </Label>
                                     </div>
                                     {isEditing ? (
                                       <Textarea
                                         value={goal.indicadorExito || ''}
                                         onChange={(e) => handleEditGoal(goal._id, 'indicadorExito', e.target.value)}
-                                        placeholder="Criterio de éxito medible"
+                                        placeholder={t('goalFields.successIndicatorPlaceholder')}
                                         className="text-xs min-h-[60px]"
-                                        maxLength={500}
+                                        maxLength={GOAL_INDICADOR_EXITO_MAX_LENGTH}
                                       />
                                     ) : (
                                       <p className="text-xs text-muted-foreground pl-4">
@@ -598,12 +618,12 @@ export function AIGoalsGenerator({
                                 {isExpanded ? (
                                   <>
                                     <ChevronUp className="h-3 w-3" />
-                                    Ocultar detalles
+                                    {t('details.hide')}
                                   </>
                                 ) : (
                                   <>
                                     <ChevronDown className="h-3 w-3" />
-                                    Ver detalles
+                                    {t('details.show')}
                                   </>
                                 )}
                               </button>
@@ -630,14 +650,14 @@ export function AIGoalsGenerator({
                               onClick={() => setEditingGoalId(null)}
                               className="flex-1"
                             >
-                              Cancelar
+                              {t('buttons.cancel')}
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => setEditingGoalId(null)}
                               className="flex-1"
                             >
-                              Guardar
+                              {t('buttons.save')}
                             </Button>
                           </div>
                         )}

@@ -141,6 +141,8 @@ export async function GET(request: NextRequest) {
       day: goal.day,
       date: goal.date, // Incluir la fecha completa para comparar con el día actual
       isCompleted: goal.isCompleted,
+      surveyRating: goal.surveyRating ?? null,
+      surveyComment: goal.surveyComment ?? '',
       createdAt: goal.createdAt,
     }));
 
