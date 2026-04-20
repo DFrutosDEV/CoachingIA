@@ -40,6 +40,7 @@ import { GenerateSessionsModal } from './generate-sessions-modal';
 import { Goal, Note, Objective, Session } from '@/types';
 import { useTranslations } from 'next-intl';
 import { useDateFormatter } from '@/utils/date-formatter';
+import { sortGoalsByDateAsc } from '@/utils/sort-goals';
 
 interface ObjectiveDetailData {
   objective: Objective;
@@ -123,8 +124,7 @@ export function ObjectiveDetailModal({
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setGoals(data.goals);
-          console.log('Metas cargadas:', JSON.stringify(data.goals, null, 2));
+          setGoals(sortGoalsByDateAsc(data.goals));
         }
       }
     } catch (error) {
@@ -203,8 +203,9 @@ export function ObjectiveDetailModal({
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          // Actualizar el estado local con las nuevas metas
-          setGoals(prevGoals => [...prevGoals, ...data.goals]);
+          setGoals(prevGoals =>
+            sortGoalsByDateAsc([...prevGoals, ...data.goals])
+          );
           setIsAIGeneratorOpen(false);
           toast.success(
             `${data.goals.length} metas generadas con IA exitosamente`
@@ -464,9 +465,10 @@ export function ObjectiveDetailModal({
                   {t('header.title')}
                 </CardTitle>
                 <div className="flex gap-2">
-                  <Badge variant={objective.active ? 'active' : 'inactive'}>
-                    {objective.active ? t('header.status.active') : t('header.status.inactive')}
-                  </Badge>
+                  {
+                    objective.active &&
+                    <Badge variant="active">{t('header.status.active')}</Badge>
+                  }
                   <Badge variant={objective.isCompleted ? 'active' : 'outline'}>
                     {objective.isCompleted ? t('header.status.completed') : t('header.status.inProgress')}
                   </Badge>
@@ -612,11 +614,11 @@ export function ObjectiveDetailModal({
                                   <span className="text-xs text-muted-foreground">
                                     {goal.date
                                       ? formatDateWithLocale(goal.date, 'custom', {
-                                          day: 'numeric',
-                                          month: 'short',
-                                          year: 'numeric',
-                                          timeZone: 'UTC',
-                                        })
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                        timeZone: 'UTC',
+                                      })
                                       : ''}
                                   </span>
                                 </div>

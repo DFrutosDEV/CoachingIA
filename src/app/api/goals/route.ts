@@ -309,7 +309,7 @@ export async function GET(request: NextRequest) {
       ...(showFullHistory ? {} : { isDeleted: false }),
     })
       .populate('objectiveId', 'title description')
-      .sort({ day: 1, createdAt: 1 });
+      .sort({ date: 1, createdAt: 1 });
 
     return NextResponse.json({
       success: true,

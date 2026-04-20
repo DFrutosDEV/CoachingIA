@@ -17,6 +17,7 @@ import { CheckCircle, Circle, Clock, FileText, User, Download } from 'lucide-rea
 import { useDateFormatter } from '@/utils/date-formatter';
 import { Goal, Note, Objective } from '@/types';
 import { useTranslations } from 'next-intl';
+import { sortGoalsByDateAsc } from '@/utils/sort-goals';
 
 interface ObjectiveDetails {
   objective: {
@@ -103,7 +104,11 @@ export default function ProgressPage() {
       const result = await response.json();
 
       if (result.success) {
-        setSelectedObjective(result.data);
+        const data = result.data;
+        setSelectedObjective({
+          ...data,
+          goals: sortGoalsByDateAsc(data.goals ?? []),
+        });
         setShowModal(true);
       } else {
         throw new Error(result.error || t('unknownError'));

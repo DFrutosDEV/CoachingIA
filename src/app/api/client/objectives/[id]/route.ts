@@ -35,7 +35,7 @@ export async function GET(
     const goals = await Goal.find({
       objectiveId: objective._id,
       ...(objective.isCompleted ? {} : { isDeleted: false }),
-    }).sort({ createdAt: -1 });
+    }).sort({ date: 1, createdAt: 1 });
 
     // Obtener las notas relacionadas con este objetivo
     const notes = await Note.find({
