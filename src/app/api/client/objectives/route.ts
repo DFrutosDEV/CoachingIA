@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         const objectiveGoals = await Goal.find({
           objectiveId: objective._id,
           clientId: clientProfile._id,
-          isDeleted: false,
+          ...(objective.isCompleted ? {} : { isDeleted: false }),
         });
 
         const totalGoals = objectiveGoals.length;

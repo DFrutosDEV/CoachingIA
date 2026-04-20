@@ -292,7 +292,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const objectiveId = searchParams.get('objectiveId');
 
-    const goals = await Goal.find({ objectiveId, isDeleted: false })
+    if (!objectiveId) {
+      return NextResponse.json(
+        { error: 'objectiveId es requerido' },
+        { status: 400 }
+      );
+    }
+
+    const objective = await Objective.findById(objectiveId).select(
+      'isCompleted'
+    );
+    const showFullHistory = objective?.isCompleted === true;
+
+    const goals = await Goal.find({
+      objectiveId,
+      ...(showFullHistory ? {} : { isDeleted: false }),
+    })
       .populate('objectiveId', 'title description')
       .sort({ day: 1, createdAt: 1 });
 

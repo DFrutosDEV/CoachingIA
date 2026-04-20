@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Objective from '@/models/Objective';
 import Feedback from '@/models/Feedback';
-import Goal from '@/models/Goal';
 import Meet from '@/models/Meet';
 
 // PUT: Finalizar un objetivo con feedback
@@ -64,12 +63,8 @@ export async function PUT(request: NextRequest) {
     objective.feedback = feedback.trim();
     await objective.save();
 
-    // Actualizar las metas del objetivo
-    const goals = await Goal.find({ objectiveId: objective._id });
-    goals.forEach(async goal => {
-      goal.isDeleted = true;
-      await goal.save();
-    });
+    // Las metas se conservan (isDeleted) para que coach y cliente sigan viendo
+    // el historial en el detalle del objetivo; los emails/cron ya filtran por objective.active.
 
     // Actualizar las videollamadas del objetivo
     const meets = await Meet.find({ objectiveId: objective._id });

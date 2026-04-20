@@ -31,10 +31,10 @@ export async function GET(
       );
     }
 
-    // Obtener los Goals del objetivo
+    // Metas: en objetivos finalizados incluir también soft-deleted (histórico tras finalize antiguo)
     const goals = await Goal.find({
       objectiveId: objective._id,
-      isDeleted: false,
+      ...(objective.isCompleted ? {} : { isDeleted: false }),
     }).sort({ createdAt: -1 });
 
     // Obtener las notas relacionadas con este objetivo

@@ -215,18 +215,14 @@ export function ClientsList({
                       <TableCell>
                         <Badge
                           variant={
-                            client.status === 'active'
+                            client.activeObjectiveId
                               ? 'active'
-                              : client.status === 'pending'
-                                ? 'pending'
-                                : 'inactive'
+                              : 'inactive'
                           }
                         >
-                          {client.status === 'active'
+                          {client.activeObjectiveId
                             ? t('status.active')
-                            : client.status === 'pending'
-                              ? t('status.pending')
-                              : t('status.inactive')}
+                            : t('status.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell>

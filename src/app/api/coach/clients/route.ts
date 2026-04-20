@@ -86,12 +86,6 @@ export async function GET(request: NextRequest) {
           }).select('description isCompleted day');
         }
 
-        // Buscar notas del cliente
-        const notes = await Note.find({
-          clientId: clientProfile._id,
-          isDeleted: false,
-        });
-
         // Buscar siguientes sesiones del cliente
         const upcomingSessions = await Meet.find({
           clientId: clientProfile._id,
@@ -161,15 +155,12 @@ export async function GET(request: NextRequest) {
                 goals.length) *
               100
               : 0,
-          status: clientProfile.isDeleted ? 'inactive' : 'active',
           focus: activeObjective?.title || 'Sin objetivo',
           avatar:
             clientProfile.profilePicture ||
             `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(clientProfile.name + ' ' + clientProfile.lastName)}`,
           bio: clientProfile.bio || 'Sin información',
-          goals: goals,
           upcomingSessions: upcomingSessions,
-          notes: notes,
           activeObjectiveId: activeObjective?._id?.toString() || null,
         } as ClientResponse;
       })

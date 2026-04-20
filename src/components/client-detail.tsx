@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -58,6 +58,7 @@ export function ClientDetail({
   const [selectedSession, setSelectedSession] = useState<any>(null);
 
   const user = useAppSelector((state: RootState) => state.auth.user);
+  const objectivesClientKeyRef = useRef<string | null>(null);
 
   const handleGoalsUpdate = (updatedGoals: Goal[]) => {
     if (client) {
@@ -66,13 +67,11 @@ export function ClientDetail({
     setIsGoalsModalOpen(false);
   };
 
-  const fetchObjectives = async () => {
-    if (!client?._id) return;
-
+  const fetchObjectives = async (profileId: string, requestKey: string) => {
     try {
       setLoadingObjectives(true);
       const response = await fetch(
-        `/api/client/objectives?clientId=${client.profileId}`
+        `/api/client/objectives?clientId=${profileId}`
       );
 
       if (!response.ok) {
@@ -81,16 +80,24 @@ export function ClientDetail({
 
       const data = await response.json();
 
+      if (objectivesClientKeyRef.current !== requestKey) {
+        return;
+      }
+
       if (data.success) {
         setObjectives(data.objectives);
       } else {
         throw new Error(data.error || 'Error desconocido');
       }
     } catch (err) {
-      console.error('Error al cargar objetivos:', err);
-      toast.error('Error al cargar los objetivos del cliente');
+      if (objectivesClientKeyRef.current === requestKey) {
+        console.error('Error al cargar objetivos:', err);
+        toast.error('Error al cargar los objetivos del cliente');
+      }
     } finally {
-      setLoadingObjectives(false);
+      if (objectivesClientKeyRef.current === requestKey) {
+        setLoadingObjectives(false);
+      }
     }
   };
 
@@ -145,11 +152,37 @@ export function ClientDetail({
     }
   };
 
+  const clientObjectivesKey =
+    client?._id && client?.profileId
+      ? `${client._id}:${client.profileId}`
+      : null;
+
   useEffect(() => {
-    if (activeTab === 'objectives' && client?._id && objectives.length === 0) {
-      fetchObjectives();
+    if (!clientObjectivesKey) {
+      objectivesClientKeyRef.current = null;
+      setObjectives([]);
+      setSelectedObjectiveData(null);
+      setIsObjectiveDetailModalOpen(false);
+      return;
     }
-  }, [activeTab, client?._id]);
+
+    setObjectives([]);
+    setSelectedObjectiveData(null);
+    setIsObjectiveDetailModalOpen(false);
+    objectivesClientKeyRef.current = clientObjectivesKey;
+  }, [clientObjectivesKey]);
+
+  useEffect(() => {
+    if (
+      activeTab !== 'objectives' ||
+      !client?.profileId ||
+      !clientObjectivesKey
+    ) {
+      return;
+    }
+
+    void fetchObjectives(client.profileId, clientObjectivesKey);
+  }, [activeTab, client?.profileId, clientObjectivesKey]);
 
   if (!isOpen && activeTab !== 'info') {
     setActiveTab('info');
@@ -184,18 +217,14 @@ export function ClientDetail({
               </div>
               <Badge
                 variant={
-                  client.status === 'active'
+                  client.activeObjectiveId
                     ? 'active'
-                    : client.status === 'pending'
-                      ? 'pending'
-                      : 'inactive'
+                    : 'inactive'
                 }
               >
-                {client.status === 'active'
+                {client.activeObjectiveId
                   ? t('status.active')
-                  : client.status === 'pending'
-                    ? t('status.pending')
-                    : t('status.inactive')}
+                  : t('status.inactive')}
               </Badge>
             </div>
 
@@ -341,13 +370,7 @@ export function ClientDetail({
                       </div>
                     </div>
                   ) : objectives.length > 0 ? (
-                    <div
-                      className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleObjectiveSelect(objectives[0]._id);
-                      }}
-                    >
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                       {objectives.map(objective => (
                         <div
                           key={objective._id}
