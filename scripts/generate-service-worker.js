@@ -12,7 +12,7 @@ const CACHE_NAME = '${CACHE_NAME}';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/logo.png',
+  '/favicon.ico',
 ];
 
 self.addEventListener('install', (event) => {

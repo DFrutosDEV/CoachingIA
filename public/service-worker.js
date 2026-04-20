@@ -3,7 +3,7 @@ const CACHE_NAME = 'kyt-coaching-v3.2.4';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/logo.png',
+  '/favicon.ico',
 ];
 
 self.addEventListener('install', (event) => {
