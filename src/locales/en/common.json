@@ -491,11 +491,17 @@
     },
     "surveyPage": {
       "errors": {
-        "missingToken": "Missing or invalid token. Please check the email link.",
-        "invalidLink": "Invalid or expired link.",
+        "missingToken": "The address is missing the secure part of the link. Open the survey using the button in the email from your coach.",
+        "invalidToken": "This link is no longer valid. It usually expires {days} days after the email was sent, or the link may have been cut off when copying. Ask your coach for a new survey email if you need one.",
+        "invalidLink": "We could not open the survey with this link. Try again from the email or contact your coach.",
+        "goalNotFound": "We could not find that challenge. The link may be outdated.",
+        "goalNotCompleted": "This challenge is not marked as completed yet, so the survey is not available.",
+        "invalidRating": "Choose one of the three options before submitting.",
+        "commentTooLong": "The comment cannot exceed {max} characters.",
+        "serverError": "Something went wrong on the server. Please wait a moment and try again.",
         "missingRating": "Please select a rating",
-        "submitFailed": "Error sending the response",
-        "unknown": "Unknown error"
+        "submitFailed": "We could not send your response. Please try again.",
+        "unknown": "An unexpected error occurred."
       },
       "states": {
         "checking": {
@@ -503,7 +509,7 @@
           "description": "Checking whether the survey is available."
         },
         "invalid": {
-          "title": "Invalid link"
+          "title": "We could not open the survey"
         },
         "alreadyAnswered": {
           "title": "Survey already completed",

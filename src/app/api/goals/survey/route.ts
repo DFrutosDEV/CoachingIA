@@ -27,7 +27,6 @@ async function getSurveyGoal(token: string) {
     return {
       status: 'invalid_token' as SurveyStatus,
       httpStatus: 401,
-      error: 'Token non valido o scaduto',
     };
   }
 
@@ -37,7 +36,6 @@ async function getSurveyGoal(token: string) {
     return {
       status: 'goal_not_found' as SurveyStatus,
       httpStatus: 404,
-      error: 'Goal non trovato',
       goalId: decoded.goalId,
     };
   }
@@ -46,7 +44,6 @@ async function getSurveyGoal(token: string) {
     return {
       status: 'goal_not_completed' as SurveyStatus,
       httpStatus: 400,
-      error: 'Il Goal deve essere completato prima di inviare la risposta',
       goalId: goal._id.toString(),
       goal,
     };
@@ -56,7 +53,6 @@ async function getSurveyGoal(token: string) {
     return {
       status: 'already_answered' as SurveyStatus,
       httpStatus: 409,
-      error: 'Il semaforo e gia stato completato',
       goalId: goal._id.toString(),
       goal,
     };
@@ -84,7 +80,6 @@ export async function GET(request: NextRequest) {
         {
           success: false,
           status: 'missing_token',
-          error: 'Token mancante',
         },
         { status: 400 }
       );
@@ -101,7 +96,6 @@ export async function GET(request: NextRequest) {
         {
           success: false,
           status: surveyGoal.status,
-          error: surveyGoal.error,
         },
         { status: surveyGoal.httpStatus }
       );
@@ -130,7 +124,6 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         status: 'server_error',
-        error: 'Errore interno del server',
       },
       { status: 500 }
     );
@@ -155,7 +148,6 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           status: 'missing_token',
-          error: 'Token mancante',
         },
         { status: 400 }
       );
@@ -170,7 +162,6 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           status: 'invalid_rating',
-          error: 'Rating non valido',
         },
         { status: 400 }
       );
@@ -187,7 +178,6 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           status: surveyGoal.status,
-          error: surveyGoal.error,
         },
         { status: surveyGoal.httpStatus }
       );
@@ -205,7 +195,6 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           status: 'invalid_comment',
-          error: `Il commento non puo superare ${GOAL_SURVEY_COMMENT_MAX_LENGTH} caratteri`,
         },
         { status: 400 }
       );
@@ -234,7 +223,6 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           status: 'already_answered',
-          error: 'Il semaforo e gia stato completato',
         },
         { status: 409 }
       );
@@ -249,22 +237,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       status: 'saved',
-      message: 'Risposta salvata con successo',
     });
   } catch (error) {
     console.error('[survey][email-link]', {
       result: 'server_error',
       error: error instanceof Error ? error.message : 'Errore sconosciuto',
     });
-    const errorMessage =
-      error instanceof Error ? error.message : 'Errore sconosciuto';
 
     return NextResponse.json(
       {
         success: false,
         status: 'server_error',
-        error: 'Errore interno del server',
-        details: errorMessage,
       },
       { status: 500 }
     );

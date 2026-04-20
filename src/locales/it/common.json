@@ -491,11 +491,17 @@
     },
     "surveyPage": {
       "errors": {
-        "missingToken": "Token non valido o mancante. Controlla il link nell'email.",
-        "invalidLink": "Link non valido o scaduto.",
+        "missingToken": "Manca la parte sicura del link nell'indirizzo. Apri il semaforo dal pulsante nell'email del tuo coach.",
+        "invalidToken": "Questo link non e piu valido: di solito scade dopo {days} giorni dall'email oppure il testo puo essersi tagliato copiandolo. Chiedi al coach una nuova email del semaforo se ti serve.",
+        "invalidLink": "Non siamo riusciti ad aprire il semaforo con questo link. Riprova dall'email o contatta il coach.",
+        "goalNotFound": "Non abbiamo trovato quella sfida. Il link potrebbe essere obsoleto.",
+        "goalNotCompleted": "Questa sfida non risulta ancora completata, quindi il semaforo non e disponibile.",
+        "invalidRating": "Scegli una delle tre opzioni prima di inviare.",
+        "commentTooLong": "Il commento non puo superare {max} caratteri.",
+        "serverError": "Si e verificato un errore sul server. Attendi un momento e riprova.",
         "missingRating": "Per favore, seleziona una valutazione",
-        "submitFailed": "Errore durante l'invio della risposta",
-        "unknown": "Errore sconosciuto"
+        "submitFailed": "Non siamo riusciti a inviare la risposta. Riprova.",
+        "unknown": "Si e verificato un errore imprevisto."
       },
       "states": {
         "checking": {
@@ -503,7 +509,7 @@
           "description": "Sto controllando se il semaforo e disponibile."
         },
         "invalid": {
-          "title": "Link non valido"
+          "title": "Non siamo riusciti ad aprire il semaforo"
         },
         "alreadyAnswered": {
           "title": "Semaforo gia completato",

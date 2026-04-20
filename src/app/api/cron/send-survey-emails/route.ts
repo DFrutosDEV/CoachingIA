@@ -5,6 +5,7 @@ import Profile from '@/models/Profile';
 import User from '@/models/User';
 import { sendEmailWithBrevo, renderTemplateFromData } from '@/lib/services/email-service';
 import { generateToken } from '@/lib/auth-jwt';
+import { GOAL_SURVEY_TOKEN_VALIDITY_DAYS } from '@/lib/constants/goal';
 
 // Función para procesar Goals a mandar encuesta y enviar emails de encuesta
 async function processCompletedGoalsAndSendSurveys() {
@@ -113,7 +114,10 @@ async function processCompletedGoalsAndSendSurveys() {
         console.log(`   📝 Descripción: ${goal.description?.substring(0, 50) || 'N/A'}...`);
 
         // Generar token JWT con el goalId (expira en 2 días)
-        const token = generateToken({ goalId: goal._id.toString() }, '2d');
+        const token = generateToken(
+          { goalId: goal._id.toString() },
+          `${GOAL_SURVEY_TOKEN_VALIDITY_DAYS}d`
+        );
         const surveyUrl = `${baseUrl}/it/survey?token=${encodeURIComponent(token)}`;
 
         console.log(`   🔐 Token generado (expira en 2 días)`);

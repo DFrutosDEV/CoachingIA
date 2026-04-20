@@ -6,7 +6,10 @@ import { Button } from '@mui/material';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { GOAL_SURVEY_COMMENT_MAX_LENGTH } from '@/lib/constants/goal';
+import {
+  GOAL_SURVEY_COMMENT_MAX_LENGTH,
+  GOAL_SURVEY_TOKEN_VALIDITY_DAYS,
+} from '@/lib/constants/goal';
 
 type Rating = 'excellent' | 'so-so' | 'bad';
 type SurveyState =
@@ -15,6 +18,34 @@ type SurveyState =
   | 'submitted'
   | 'invalid'
   | 'already_answered';
+
+function messageForSurveyStatus(
+  pageT: (key: string, values?: Record<string, number | string>) => string,
+  status: string | undefined
+) {
+  switch (status) {
+    case 'missing_token':
+      return pageT('errors.missingToken');
+    case 'invalid_token':
+      return pageT('errors.invalidToken', {
+        days: GOAL_SURVEY_TOKEN_VALIDITY_DAYS,
+      });
+    case 'goal_not_found':
+      return pageT('errors.goalNotFound');
+    case 'goal_not_completed':
+      return pageT('errors.goalNotCompleted');
+    case 'invalid_rating':
+      return pageT('errors.invalidRating');
+    case 'invalid_comment':
+      return pageT('errors.commentTooLong', {
+        max: GOAL_SURVEY_COMMENT_MAX_LENGTH,
+      });
+    case 'server_error':
+      return pageT('errors.serverError');
+    default:
+      return pageT('errors.invalidLink');
+  }
+}
 
 export default function SurveyPage() {
   const searchParams = useSearchParams();
@@ -54,11 +85,11 @@ export default function SurveyPage() {
 
         if (data.status === 'already_answered') {
           setSurveyState('already_answered');
-          setError(data.error || pageT('states.alreadyAnswered.message'));
+          setError(pageT('states.alreadyAnswered.message'));
           return;
         }
 
-        setError(data.error || pageT('errors.invalidLink'));
+        setError(messageForSurveyStatus(pageT, data.status));
         setSurveyState('invalid');
       } catch (err) {
         const errorMessage =
@@ -108,13 +139,14 @@ export default function SurveyPage() {
 
       if (!response.ok || !data.success) {
         if (data.status === 'already_answered') {
+          const msg = pageT('states.alreadyAnswered.message');
           setSurveyState('already_answered');
-          setError(data.error || pageT('states.alreadyAnswered.message'));
-          toast.error(data.error || pageT('states.alreadyAnswered.message'));
+          setError(msg);
+          toast.error(msg);
           return;
         }
 
-        throw new Error(data.error || pageT('errors.submitFailed'));
+        throw new Error(messageForSurveyStatus(pageT, data.status));
       }
 
       setSurveyState('submitted');
