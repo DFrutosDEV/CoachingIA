@@ -374,7 +374,16 @@ export function ClientDetail({
                       {objectives.map(objective => (
                         <div
                           key={objective._id}
-                          className="p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                          role="button"
+                          tabIndex={0}
+                          className="p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          onClick={() => handleObjectiveSelect(objective._id)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleObjectiveSelect(objective._id);
+                            }
+                          }}
                         >
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
@@ -394,18 +403,16 @@ export function ClientDetail({
                                   ? t('objectives.completed')
                                   : t('objectives.inProgress')}
                               </Badge>
-                              <div className="flex items-center gap-1">
-                                <Button size="sm" variant="outline">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </div>
+                              <span
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background text-muted-foreground"
+                                aria-hidden
+                              >
+                                <Eye className="h-4 w-4" />
+                              </span>
                             </div>
                           </div>
 
-                          <div
-                            className="space-y-2 cursor-pointer"
-                            onClick={() => handleObjectiveSelect(objective._id)}
-                          >
+                          <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                               <span>{t('objectives.progress', { progress: objective.progress })}</span>
                               <span>
