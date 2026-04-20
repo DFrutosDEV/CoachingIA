@@ -328,7 +328,7 @@
     },
     "settings": {
       "title": "Settings",
-      "description": "Adjust your account settings for the {userType} profile.",
+      "description": "Adjust your account settings for the profile.",
       "theme": {
         "title": "Theme",
         "description": "Select the visual theme of the application.",

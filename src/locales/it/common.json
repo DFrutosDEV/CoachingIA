@@ -214,7 +214,7 @@
       "createNotification": "Crea Notifica",
       "modal": {
         "title": "Crea Notifica",
-        "description": "Invia una notifica a {userType} utenti del sistema",
+        "description": "Invia una notifica a utenti del sistema",
         "massNotifications": "Notifiche di Massa",
         "notifyAllClients": "Notifica tutti i miei clienti",
         "notifyAllCoaches": "Notifica tutti i coach",
@@ -328,7 +328,7 @@
     },
     "settings": {
       "title": "Impostazioni",
-      "description": "Regola le impostazioni del tuo account per il profilo di {userType}.",
+      "description": "Regola le impostazioni del tuo account per il profilo.",
       "theme": {
         "title": "Tema",
         "description": "Seleziona il tema visivo dell'applicazione.",

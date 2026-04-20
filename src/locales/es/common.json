@@ -328,7 +328,7 @@
     },
     "settings": {
       "title": "Configuración",
-      "description": "Ajusta la configuración de tu cuenta para el perfil de {userType}.",
+      "description": "Ajusta la configuración de tu cuenta para el perfil.",
       "theme": {
         "title": "Tema",
         "description": "Selecciona el tema visual de la aplicación.",

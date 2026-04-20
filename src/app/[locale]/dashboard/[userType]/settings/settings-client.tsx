@@ -46,7 +46,7 @@ export function SettingsClient({ userType }: SettingsClientProps) {
             <div>
               <h1 className="text-3xl font-bold">{t('title')}</h1>
               <p className="text-muted-foreground">
-                {t('description', { userType })}
+                {t('description')}
               </p>
             </div>
             <SettingsForm userType={userType} />
