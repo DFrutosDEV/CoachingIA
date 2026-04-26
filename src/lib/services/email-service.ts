@@ -1,10 +1,18 @@
 import fs from 'fs';
+import { readFile, unlink } from 'fs/promises';
 import path from 'path';
 
+export interface EmailAttachment {
+  filePath: string;
+  fileName: string;
+  contentType?: string;
+}
+
 export interface EmailData {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
+  attachments?: EmailAttachment[];
 }
 
 // Función para procesar templates con variables
@@ -93,14 +101,51 @@ const postBrevoEmail = async (payload: any) => {
   }
 };
 
+const buildBrevoAttachments = async (attachments?: EmailAttachment[]) => {
+  if (!attachments?.length) {
+    return undefined;
+  }
+
+  return Promise.all(
+    attachments.map(async attachment => {
+      const fileBuffer = await readFile(attachment.filePath);
+
+      return {
+        name: attachment.fileName,
+        content: fileBuffer.toString('base64'),
+      };
+    })
+  );
+};
+
+const cleanupAttachments = async (attachments?: EmailAttachment[]) => {
+  if (!attachments?.length) {
+    return;
+  }
+
+  await Promise.all(
+    attachments.map(async attachment => {
+      try {
+        await unlink(attachment.filePath);
+      } catch (error) {
+        console.error(`Error eliminando adjunto temporal ${attachment.filePath}:`, error);
+      }
+    })
+  );
+};
+
 export const sendEmailWithBrevo = async (emailData: EmailData) => {
   try {
     const sender = parseEmailFrom(process.env.EMAIL_FROM);
+    const attachments = await buildBrevoAttachments(emailData.attachments);
     const payload = {
       sender: { name: sender.name, email: sender.email },
-      to: [{ email: emailData.to }],
+      to: (Array.isArray(emailData.to) ? emailData.to : [emailData.to]).map(email => ({
+        email,
+      })),
       subject: emailData.subject,
       htmlContent: emailData.html,
+      ...(attachments ? { attachment: attachments } : {}),
     };
 
     const result = await postBrevoEmail(payload);
@@ -114,9 +159,10 @@ export const sendEmailWithBrevo = async (emailData: EmailData) => {
 // Función genérica para enviar emails usando templates
 export const sendTemplateEmail = async (
   templateName: string,
-  to: string,
+  to: string | string[],
   subject: string,
-  variables: Record<string, string>
+  variables: Record<string, string>,
+  attachments?: EmailAttachment[]
 ) => {
   try {
     const template = readTemplate(templateName);
@@ -126,6 +172,7 @@ export const sendTemplateEmail = async (
       to,
       subject,
       html,
+      attachments,
     });
   } catch (error) {
     console.error(`Error enviando email con template ${templateName}:`, error);
@@ -200,31 +247,81 @@ export const sendWelcomeEmail = async (
   );
 };
 
-export const sendAppointmentConfirmationEmail = async (
-  email: string,
-  name: string,
-  appointmentDate: string,
-  appointmentTime: string,
-  coachName: string
-) => {
-  const variables = {
-    companyName: 'KytCoaching',
-    userName: name,
-    appointmentDate,
-    appointmentTime,
-    coachName,
-    dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
-    companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
-    companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
-  };
+export interface AppointmentConfirmationRecipient {
+  email: string;
+  name: string;
+}
 
-  return sendTemplateEmail(
-    'appointment-confirmation.html',
-    email,
-    'Confirmación de Cita - KytCoaching',
-    variables
-  );
+export interface AppointmentConfirmationEmailData {
+  recipients: AppointmentConfirmationRecipient[];
+  appointmentDate: string;
+  appointmentTime: string;
+  coachName: string;
+  appointmentDuration?: string;
+  appointmentType?: string;
+  meetingLink?: string;
+  objectiveTitle?: string;
+  icsAttachment?: EmailAttachment;
+}
+
+export const sendAppointmentConfirmationEmail = async ({
+  recipients,
+  appointmentDate,
+  appointmentTime,
+  coachName,
+  appointmentDuration = '60 minutos',
+  appointmentType = 'Videoconsulta',
+  meetingLink = '',
+  objectiveTitle = 'Sesión de coaching',
+  icsAttachment,
+}: AppointmentConfirmationEmailData) => {
+  const validRecipients = recipients.filter(recipient => recipient.email);
+  const attachments = icsAttachment ? [icsAttachment] : undefined;
+
+  if (validRecipients.length === 0) {
+    await cleanupAttachments(attachments);
+    return { success: false, error: 'No hay destinatarios válidos' };
+  }
+
+  try {
+    const results = await Promise.all(
+      validRecipients.map(recipient => {
+        const variables = {
+          companyName: 'KytCoaching',
+          userName: recipient.name,
+          objectiveTitle,
+          appointmentDate,
+          appointmentTime,
+          coachName,
+          appointmentDuration,
+          appointmentType,
+          meetingLink,
+          joinMeetingUrl: meetingLink || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+          rescheduleUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+          cancelUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+          dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+          companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
+          companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
+          companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
+          privacyUrl: process.env.NEXT_PUBLIC_APP_PRIVACY_URL || '',
+          unsubscribeUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings`,
+        };
+
+        return sendTemplateEmail(
+          'appointment-confirmation.html',
+          recipient.email,
+          'Confirmación de Cita - KytCoaching',
+          variables,
+          attachments
+        );
+      })
+    );
+
+    const failedResult = results.find(result => !result.success);
+    return failedResult || { success: true, data: results.map(result => result.data) };
+  } finally {
+    await cleanupAttachments(attachments);
+  }
 };
 
 export const sendPasswordResetEmail = async (

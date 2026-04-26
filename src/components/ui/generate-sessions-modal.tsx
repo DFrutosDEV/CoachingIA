@@ -47,7 +47,7 @@ export function GenerateSessionsModal({
   clientId,
   coachId,
 }: GenerateSessionsModalProps) {
-  const { formatDate: formatDateWithLocale } = useDateFormatter();
+  const { formatDate: formatDateWithLocale, locale, timeZone } = useDateFormatter();
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [periodicity, setPeriodicity] = useState('weekly');
@@ -156,11 +156,12 @@ export function GenerateSessionsModal({
     setIsCreating(true);
 
     try {
-      console.log('objectiveId', objectiveId);
       const response = await fetch('/api/meets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-locale': locale,
+          'x-timezone': timeZone,
         },
         body: JSON.stringify({
           objectiveId,
@@ -170,6 +171,7 @@ export function GenerateSessionsModal({
           })),
           clientId: clientId,
           coachId: coachId,
+          periodicity,
         }),
       });
 

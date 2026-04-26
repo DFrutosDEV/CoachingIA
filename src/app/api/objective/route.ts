@@ -9,11 +9,17 @@ import Role from '@/models/Role';
 import { generateJitsiLink } from '@/utils/generateJitsiLinks';
 import {
   DEFAULT_LOCALE,
+  formatUtcDate,
+  formatUtcTime,
   getTimeZoneForLocale,
   normalizeLocale,
 } from '@/utils/date-formatter';
 import { fromZonedTime } from 'date-fns-tz';
-import { sendWelcomeEmail } from '@/lib/services/email-service';
+import {
+  sendAppointmentConfirmationEmail,
+  sendWelcomeEmail,
+} from '@/lib/services/email-service';
+import { createIcsFile } from '@/utils/ics-service';
 
 const MAX_TEXT_LENGTH = 50;
 
@@ -320,6 +326,61 @@ export async function POST(request: NextRequest) {
     });
 
     const savedMeet = await newMeet.save();
+
+    try {
+      const [clientUser, coachUser] = await Promise.all([
+        User.findById(clientProfile.user).select('email'),
+        User.findById(coachProfile.user).select('email'),
+      ]);
+
+      const clientName = `${clientProfile.name} ${clientProfile.lastName}`.trim();
+      const coachName = `${coachProfile.name} ${coachProfile.lastName}`.trim();
+      const icsFile = await createIcsFile({
+        title: `Sesión de coaching - ${normalizedFocus}`,
+        startDate: utcMeetDate,
+        durationMinutes: 60,
+        description: `Objetivo: ${normalizedFocus}`,
+        location: 'Videoconsulta',
+        meetingUrl: meetLink,
+        organizer: coachUser?.email
+          ? { email: coachUser.email, name: coachName }
+          : undefined,
+        attendees: [
+          clientUser?.email ? { email: clientUser.email, name: clientName } : null,
+          coachUser?.email ? { email: coachUser.email, name: coachName } : null,
+        ].filter(
+          (attendee): attendee is { email: string; name: string } => Boolean(attendee)
+        ),
+        fileNamePrefix: 'sesion-coaching',
+      });
+
+      await sendAppointmentConfirmationEmail({
+        recipients: [
+          clientUser?.email ? { email: clientUser.email, name: clientName } : null,
+          coachUser?.email ? { email: coachUser.email, name: coachName } : null,
+        ].filter(
+          (recipient): recipient is { email: string; name: string } => Boolean(recipient)
+        ),
+        appointmentDate: formatUtcDate(utcMeetDate, {
+          locale,
+          timeZone: timezone,
+          format: 'long',
+        }),
+        appointmentTime: formatUtcTime(utcMeetDate, {
+          locale,
+          timeZone: timezone,
+          format: 'time-24',
+        }),
+        coachName,
+        appointmentDuration: '60 minutos',
+        appointmentType: 'Videoconsulta',
+        meetingLink: meetLink,
+        objectiveTitle: normalizedFocus,
+        icsAttachment: icsFile,
+      });
+    } catch (emailError) {
+      console.error('Error enviando confirmación de cita:', emailError);
+    }
 
     return NextResponse.json(
       {

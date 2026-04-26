@@ -207,6 +207,10 @@
                 <div class="appointment-details">
                   <h3>📅 Detalles de la Sesión</h3>
                   <div class="detail-row">
+                    <span class="detail-label">Objetivo:</span>
+                    <span class="detail-value">{{objectiveTitle}}</span>
+                  </div>
+                  <div class="detail-row">
                     <span class="detail-label">Fecha:</span>
                     <span class="detail-value">{{appointmentDate}}</span>
                   </div>
@@ -226,12 +230,10 @@
                     <span class="detail-label">Modalidad:</span>
                     <span class="detail-value">{{appointmentType}}</span>
                   </div>
-                  {{#if meetingLink}}
                   <div class="detail-row">
                     <span class="detail-label">Enlace de reunión:</span>
                     <span class="detail-value">{{meetingLink}}</span>
                   </div>
-                  {{/if}}
                 </div>
 
                 <div style="text-align: center">

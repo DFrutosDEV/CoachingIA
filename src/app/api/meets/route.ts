@@ -1,21 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Meet from '@/models/Meet';
+import Objective from '@/models/Objective';
+import Profile from '@/models/Profile';
+import User from '@/models/User';
+import {
+  DEFAULT_LOCALE,
+  formatUtcDate,
+  formatUtcTime,
+  getTimeZoneForLocale,
+  normalizeLocale,
+} from '@/utils/date-formatter';
+import { fromZonedTime } from 'date-fns-tz';
+import { sendAppointmentConfirmationEmail } from '@/lib/services/email-service';
+import { createIcsFile, IcsRecurrence } from '@/utils/ics-service';
 import { generateJitsiLink } from '@/utils/generateJitsiLinks';
+
+function getUtcMeetDate(date: string, time?: string, timezone?: string | null) {
+  if (time && /^\d{4}-\d{2}-\d{2}$/.test(date) && /^\d{2}:\d{2}$/.test(time)) {
+    const utcDate = fromZonedTime(
+      `${date}T${time}:00`,
+      timezone || getTimeZoneForLocale(DEFAULT_LOCALE)
+    );
+
+    if (!Number.isNaN(utcDate.getTime())) {
+      return utcDate;
+    }
+  }
+
+  const fallbackDate = new Date(date);
+  if (Number.isNaN(fallbackDate.getTime())) {
+    throw new Error('INVALID_MEET_DATE');
+  }
+
+  return fallbackDate;
+}
+
+function getRecurrenceFromPeriodicity(
+  periodicity: unknown,
+  count: number
+): IcsRecurrence | undefined {
+  if (count <= 1 || typeof periodicity !== 'string') {
+    return undefined;
+  }
+
+  switch (periodicity) {
+    case 'daily':
+      return { frequency: 'DAILY', count };
+    case 'weekly':
+      return { frequency: 'WEEKLY', count };
+    case 'biweekly':
+      return { frequency: 'WEEKLY', interval: 2, count };
+    case 'monthly':
+      return { frequency: 'MONTHLY', count };
+    default:
+      return undefined;
+  }
+}
 
 // POST /api/meets - Crear múltiples meets para un cliente
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
-    const { clientId, coachId, objectiveId, meets } = await request.json();
+    const { clientId, coachId, objectiveId, meets, periodicity } =
+      await request.json();
+    const locale = normalizeLocale(request.headers.get('x-locale'));
+    const timezone =
+      request.headers.get('x-timezone') || getTimeZoneForLocale(locale);
 
     if (
       !clientId ||
       !coachId ||
       !objectiveId ||
       !meets ||
-      !Array.isArray(meets)
+      !Array.isArray(meets) ||
+      meets.length === 0
     ) {
       return NextResponse.json(
         { error: 'clientId, coachId, objectiveId y meets son requeridos' },
@@ -23,19 +83,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear los meets en la base de datos
-    const meetsToCreate = meets.map((meet: any) => {
-      // Combinar fecha y hora en un solo objeto Date
-      const meetDate = new Date(meet.date);
-      if (meet.time) {
-        const [hours, minutes] = meet.time.split(':');
-        meetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      }
+    const recurrence = getRecurrenceFromPeriodicity(periodicity, meets.length);
+    let preparedMeets: Array<{ date: Date }>;
+    try {
+      preparedMeets = meets.map((meet: any) => ({
+        date: getUtcMeetDate(meet.date, meet.time, timezone),
+      }));
+    } catch {
+      return NextResponse.json(
+        { error: 'Una o más sesiones tienen fecha u hora inválida' },
+        { status: 400 }
+      );
+    }
+    const seriesLink = recurrence
+      ? generateJitsiLink(preparedMeets[0].date, clientId, coachId)
+      : null;
 
-      const link = generateJitsiLink(meetDate, clientId, coachId);
+    // Crear los meets en la base de datos
+    const meetsToCreate = preparedMeets.map(meet => {
+      const link = seriesLink || generateJitsiLink(meet.date, clientId, coachId);
 
       return {
-        date: meetDate,
+        date: meet.date,
         link,
         createdBy: coachId,
         clientId,
@@ -46,6 +115,73 @@ export async function POST(request: NextRequest) {
     });
 
     const createdMeets = await Meet.insertMany(meetsToCreate);
+
+    try {
+      const [clientProfile, coachProfile, objective] = await Promise.all([
+        Profile.findById(clientId),
+        Profile.findById(coachId),
+        Objective.findById(objectiveId).select('title'),
+      ]);
+
+      if (clientProfile && coachProfile && createdMeets.length > 0) {
+        const [clientUser, coachUser] = await Promise.all([
+          User.findById(clientProfile.user).select('email'),
+          User.findById(coachProfile.user).select('email'),
+        ]);
+        const firstMeet = createdMeets[0];
+        const clientName = `${clientProfile.name} ${clientProfile.lastName}`.trim();
+        const coachName = `${coachProfile.name} ${coachProfile.lastName}`.trim();
+        const objectiveTitle = objective?.title || 'Sesión de coaching';
+        const icsFile = await createIcsFile({
+          title: `Sesión de coaching - ${objectiveTitle}`,
+          startDate: firstMeet.date,
+          durationMinutes: 60,
+          description: `Objetivo: ${objectiveTitle}`,
+          location: 'Videoconsulta',
+          meetingUrl: firstMeet.link,
+          organizer: coachUser?.email
+            ? { email: coachUser.email, name: coachName }
+            : undefined,
+          attendees: [
+            clientUser?.email ? { email: clientUser.email, name: clientName } : null,
+            coachUser?.email ? { email: coachUser.email, name: coachName } : null,
+          ].filter(
+            (attendee): attendee is { email: string; name: string } => Boolean(attendee)
+          ),
+          recurrence,
+          fileNamePrefix: recurrence ? 'sesiones-coaching' : 'sesion-coaching',
+        });
+
+        await sendAppointmentConfirmationEmail({
+          recipients: [
+            clientUser?.email ? { email: clientUser.email, name: clientName } : null,
+            coachUser?.email ? { email: coachUser.email, name: coachName } : null,
+          ].filter(
+            (recipient): recipient is { email: string; name: string } => Boolean(recipient)
+          ),
+          appointmentDate: formatUtcDate(firstMeet.date, {
+            locale,
+            timeZone: timezone,
+            format: 'long',
+          }),
+          appointmentTime: formatUtcTime(firstMeet.date, {
+            locale,
+            timeZone: timezone,
+            format: 'time-24',
+          }),
+          coachName,
+          appointmentDuration: '60 minutos',
+          appointmentType: recurrence
+            ? `Videoconsulta recurrente (${createdMeets.length} sesiones)`
+            : 'Videoconsulta',
+          meetingLink: firstMeet.link,
+          objectiveTitle,
+          icsAttachment: icsFile,
+        });
+      }
+    } catch (emailError) {
+      console.error('Error enviando confirmación de sesiones:', emailError);
+    }
 
     return NextResponse.json({
       success: true,
