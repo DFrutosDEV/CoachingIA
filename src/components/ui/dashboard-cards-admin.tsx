@@ -60,12 +60,12 @@ export function TotalUsersCard({ totalUsers = 0, newUsersThisMonth = 0 }) {
           {t('thisMonth', { count: newUsersThisMonth })}
         </p>
         <div className="mt-4">
-          <Link href={`/${locale}/dashboard/admin/users`}>
+          {/* <Link href={`/${locale}/dashboard/admin/users`}>
             <Button size="sm" variant="outline" className="w-full">
               {t('viewUsers')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </CardContent>
     </Card>
