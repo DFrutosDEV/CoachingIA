@@ -170,8 +170,8 @@ export async function GET(request: NextRequest) {
     });
 
     const enterpriseBasicData = {
-      totalUsers,
-      newUsersThisMonth,
+      totalUsers: totalUsers - 1,
+      newUsersThisMonth: newUsersThisMonth - 1,
       activeCoaches,
       newCoachesThisMonth,
       completedSessions,

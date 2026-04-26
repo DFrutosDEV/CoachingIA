@@ -94,7 +94,7 @@ export function ActiveCoachesCard({
           {t('thisMonth', { count: newCoachesThisMonth })}
         </p>
         <div className="mt-4">
-          <Link href={`/${locale}/dashboard/admin/coaches`}>
+          <Link href={`/${locale}/dashboard/enterprise/coaches`}>
             <Button size="sm" variant="outline" className="w-full">
               {t('viewCoaches')}
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -131,12 +131,12 @@ export function CompletedSessionsCard({
           {t('thisMonth', { count: completedSessionsThisMonth })}
         </p>
         <div className="mt-4">
-          <Link href={`/${locale}/dashboard/admin/analytics`}>
+          {/* <Link href={`/${locale}/dashboard/enterprise/analytics`}>
             <Button size="sm" variant="outline" className="w-full">
               {t('viewAnalytics')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </CardContent>
     </Card>
@@ -188,7 +188,7 @@ export function ReportsCard({ pendingReports = 0 }) {
         <div className="text-2xl font-bold">{pendingReports}</div>
         <p className="text-xs text-muted-foreground">{t('pendingReview')}</p>
         <div className="mt-4">
-          <Link href={`/${locale}/dashboard/admin/reports`}>
+          <Link href={`/${locale}/dashboard/enterprise/reports`}>
             <Button size="sm" variant="outline" className="w-full">
               {t('viewReports')}
               <ArrowRight className="ml-2 h-4 w-4" />
