@@ -108,6 +108,7 @@ export function ServicesGrid({ isEnterprise, isClient }: { isEnterprise?: boolea
             profilePicture={coach.profilePicture}
             active={coach.active}
             enterprise={coach.enterprise}
+            clientsCount={coach.clientsCount}
             createdAt={coach.createdAt}
             onCoachUpdated={fetchCoaches}
           />

@@ -408,6 +408,7 @@
       "singular": ""
     },
     "coachCard": {
+      "clientsCount": "Coachees: {clientsCount}",
       "status": {
         "active": "Attivo",
         "inactive": "Inattivo"

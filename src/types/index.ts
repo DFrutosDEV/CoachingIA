@@ -120,6 +120,7 @@ export interface CoachResponse {
     logo?: string;
   } | null;
   createdAt: string;
+  clientsCount: number;
 }
 
 // Tipo para datos básicos del cliente

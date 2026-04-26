@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Mail, Phone, Building2, Calendar, Coins, MoreVertical, Trash2, Unlink } from 'lucide-react';
+import { Mail, Phone, Building2, Calendar, Coins, MoreVertical, Trash2, Unlink, Users } from 'lucide-react';
 import { sendMessage } from '@/utils/wpp-methods';
 import { sendEmail } from '@/utils/sendEmail';
 import { useTranslations } from 'next-intl';
@@ -39,6 +39,7 @@ interface CoachCardProps {
     name: string;
     logo?: string;
   } | null;
+  clientsCount: number;
   createdAt: string;
   onCoachUpdated?: () => void;
 }
@@ -55,6 +56,7 @@ export function CoachCard({
   profilePicture,
   active,
   enterprise,
+  clientsCount,
   createdAt,
   onCoachUpdated,
 }: CoachCardProps) {
@@ -203,7 +205,7 @@ export function CoachCard({
                     <span className="sr-only">{t('openMenu')}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent className="bg-background" align="end">
                   <DropdownMenuItem
                     className="bg-background-hover"
                     onClick={() => setUnlinkModalOpen(true)}
@@ -251,6 +253,11 @@ export function CoachCard({
                 </div>
               )}
 
+              <div className="flex items-center gap-2 text-sm">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span>{t('clientsCount', { clientsCount: clientsCount })}</span>
+              </div>
+
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span>
@@ -272,16 +279,16 @@ export function CoachCard({
                 )
               }
             </div>
-            <div className="flex gap-2 ">
-              <MuiButton
-                variant="outlined"
-                size="small"
-                className="flex-1"
-                onClick={handleSendMessage}
-              >
-                {t('sendMessage')}
-              </MuiButton>
-            </div>
+          </div>
+          <div className="flex gap-2 ">
+            <MuiButton
+              variant="outlined"
+              size="small"
+              className="flex-1"
+              onClick={handleSendMessage}
+            >
+              {t('sendMessage')}
+            </MuiButton>
           </div>
         </CardContent>
       </Card>
