@@ -58,7 +58,7 @@ function getRecurrenceFromPeriodicity(
   }
 }
 
-// POST /api/meets - Crear múltiples meets para un cliente
+// POST /api/meets - Crear multiples meets para un cliente
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       }));
     } catch {
       return NextResponse.json(
-        { error: 'Una o más sesiones tienen fecha u hora inválida' },
+        { error: 'One or more sessions have an invalid date or time' },
         { status: 400 }
       );
     }
@@ -131,9 +131,9 @@ export async function POST(request: NextRequest) {
         const firstMeet = createdMeets[0];
         const clientName = `${clientProfile.name} ${clientProfile.lastName}`.trim();
         const coachName = `${coachProfile.name} ${coachProfile.lastName}`.trim();
-        const objectiveTitle = objective?.title || 'Sesión de coaching';
+        const objectiveTitle = objective?.title || '';
         const icsFile = await createIcsFile({
-          title: `Sesión de coaching - ${objectiveTitle}`,
+          title: `${objectiveTitle} - ${coachName}`,
           startDate: firstMeet.date,
           durationMinutes: 60,
           description: `Objetivo: ${objectiveTitle}`,
@@ -170,17 +170,13 @@ export async function POST(request: NextRequest) {
             format: 'time-24',
           }),
           coachName,
-          appointmentDuration: '60 minutos',
-          appointmentType: recurrence
-            ? `Videoconsulta recurrente (${createdMeets.length} sesiones)`
-            : 'Videoconsulta',
+          appointmentDuration: '60',
           meetingLink: firstMeet.link,
-          objectiveTitle,
           icsAttachment: icsFile,
         });
       }
     } catch (emailError) {
-      console.error('Error enviando confirmación de sesiones:', emailError);
+      console.error('Error sending session confirmation:', emailError);
     }
 
     return NextResponse.json({
@@ -249,7 +245,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/meets/:id - Actualizar una sesión
+// PATCH /api/meets/:id - Actualizar una sesion
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
@@ -259,12 +255,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const meet = await Meet.findById(id);
     if (!meet) {
-      return NextResponse.json({ error: 'Sesión no encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Sesion not found' }, { status: 404 });
     }
 
-    // Validar que la fecha y hora sean válidas
+    // Validar que la fecha y hora sean validas
     if (!date || !time) {
-      return NextResponse.json({ error: 'Fecha y hora son requeridos' }, { status: 400 });
+      return NextResponse.json({ error: 'Date and time are required' }, { status: 400 });
     }
 
     // Combinar fecha y hora en un solo objeto Date
@@ -274,15 +270,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       meetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     }
 
-    // Actualizar la sesión
+    // Actualizar la sesion
     const updatedMeet = await Meet.findByIdAndUpdate(id, { date: meetDate }, { new: true });
     if (!updatedMeet) {
-      return NextResponse.json({ error: 'Error al actualizar la sesión' }, { status: 500 });
+      return NextResponse.json({ error: 'Error updating the session' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: 'Sesión actualizada correctamente', meet: updatedMeet });
+    return NextResponse.json({ success: true, message: 'Session updated successfully', meet: updatedMeet });
   } catch (error) {
-    console.error('Error al actualizar sesión:', error);
+    console.error('Error updating session:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

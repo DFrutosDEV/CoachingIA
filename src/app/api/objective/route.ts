@@ -372,10 +372,8 @@ export async function POST(request: NextRequest) {
           format: 'time-24',
         }),
         coachName,
-        appointmentDuration: '60 minutos',
-        appointmentType: 'Videoconsulta',
+        appointmentDuration: '60',
         meetingLink: meetLink,
-        objectiveTitle: normalizedFocus,
         icsAttachment: icsFile,
       });
     } catch (emailError) {

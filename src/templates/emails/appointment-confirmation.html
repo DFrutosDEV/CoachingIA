@@ -1,302 +1,147 @@
 <!doctype html>
-<html lang="es">
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Confirmación de Cita - {{companyName}}</title>
+    <title>Conferma Sessione Kyt Coaching</title>
     <style>
-      /* Reset styles */
-      body,
-      table,
-      td,
-      p,
-      a,
-      li,
-      blockquote {
-        -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%;
-      }
-      table,
-      td {
-        mso-table-lspace: 0pt;
-        mso-table-rspace: 0pt;
-      }
-      img {
-        -ms-interpolation-mode: bicubic;
-        border: 0;
-        height: auto;
-        line-height: 100%;
-        outline: none;
-        text-decoration: none;
-      }
-
-      /* Base styles */
+      /* Fallback per Gotham */
       body {
+        font-family: 'Gotham', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+        color: #0e0d13;
         margin: 0;
         padding: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 16px;
-        line-height: 1.6;
-        color: #333333;
-        background-color: #f4f4f4;
-      }
-
-      .email-container {
-        max-width: 600px;
-        margin: 0 auto;
         background-color: #ffffff;
       }
-
-      .header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 30px 20px;
-        text-align: center;
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
       }
-
-      .header h1 {
-        color: #ffffff;
-        margin: 0;
-        font-size: 28px;
-        font-weight: 600;
-      }
-
-      .content {
-        padding: 40px 30px;
-      }
-
-      .confirmation-message {
-        text-align: center;
+      .logo {
         margin-bottom: 30px;
       }
-
-      .confirmation-message h2 {
-        color: #28a745;
-        margin-bottom: 15px;
+      .title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 5px;
+        line-height: 1.2;
       }
-
-      .appointment-details {
-        background-color: #f8f9fa;
-        padding: 25px;
-        border-radius: 8px;
+      .subtitle {
+        font-size: 16px;
+        font-weight: bold;
+        color: #0e0d13;
+        margin-bottom: 25px;
+      }
+      .session-box {
+        background-color: #f8fafc;
+        border-left: 4px solid #d4af37;
+        padding: 20px;
         margin: 25px 0;
-        border-left: 4px solid #28a745;
       }
-
-      .appointment-details h3 {
-        color: #495057;
-        margin-top: 0;
-        margin-bottom: 15px;
+      .button-container {
+        margin: 30px 0;
       }
-
-      .detail-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        padding: 8px 0;
-        border-bottom: 1px solid #e9ecef;
-      }
-
-      .detail-row:last-child {
-        border-bottom: none;
-      }
-
-      .detail-label {
-        font-weight: 600;
-        color: #495057;
-      }
-
-      .detail-value {
-        color: #6c757d;
-      }
-
-      .button {
-        display: inline-block;
+      .btn {
+        background-color: #0f172a;
+        color: #ffffff !important;
         padding: 12px 24px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #ffffff;
         text-decoration: none;
-        border-radius: 6px;
-        font-weight: 600;
-        margin: 20px 0;
+        font-weight: bold;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 13px;
+        text-transform: uppercase;
       }
-
-      .button:hover {
-        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+      .tip-box {
+        background-color: #f1f5f9;
+        padding: 15px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin-top: 25px;
       }
-
-      .button.secondary {
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-      }
-
-      .button.secondary:hover {
-        background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
-      }
-
       .footer {
-        background-color: #f8f9fa;
-        padding: 30px 20px;
-        text-align: center;
-        border-top: 1px solid #e9ecef;
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
       }
-
-      .footer p {
-        margin: 5px 0;
-        color: #6c757d;
-        font-size: 14px;
+      .legal {
+        font-size: 10px;
+        color: #94a3b8;
+        text-align: justify;
+        line-height: 1.4;
       }
-
-      /* Responsive */
-      @media only screen and (max-width: 600px) {
-        .email-container {
-          width: 100% !important;
-        }
-        .content {
-          padding: 20px 15px !important;
-        }
-        .header {
-          padding: 20px 15px !important;
-        }
-        .header h1 {
-          font-size: 24px !important;
-        }
-        .detail-row {
-          flex-direction: column;
-        }
-        .detail-value {
-          margin-top: 5px;
-        }
+      .link {
+        color: #2ec4b6;
+        text-decoration: none;
       }
     </style>
   </head>
   <body>
-    <table
-      role="presentation"
-      cellspacing="0"
-      cellpadding="0"
-      border="0"
-      width="100%"
-    >
-      <tr>
-        <td align="center" style="background-color: #f4f4f4; padding: 20px 0">
-          <table
-            role="presentation"
-            cellspacing="0"
-            cellpadding="0"
-            border="0"
-            width="600"
-            class="email-container"
-          >
-            <!-- Header -->
-            <tr>
-              <td class="header">
-                <h1>{{companyName}}</h1>
-              </td>
-            </tr>
+    <div class="container">
+      <div class="logo">
+        <img src="{{companyLogo}}" alt="Kyt Coaching" width="100" />
+      </div>
 
-            <!-- Content -->
-            <tr>
-              <td class="content">
-                <div class="confirmation-message">
-                  <h2>✅ Cita Confirmada</h2>
-                  <p>
-                    Hola {{userName}}, tu sesión de coaching ha sido confirmada
-                    exitosamente.
-                  </p>
-                </div>
+      <div class="title">
+        La tua prossima sessione è programmata, {{coachName}}.
+      </div>
+      <div class="subtitle">
+        Ogni incontro è un passo misurabile verso l'obiettivo.
+      </div>
 
-                <div class="appointment-details">
-                  <h3>📅 Detalles de la Sesión</h3>
-                  <div class="detail-row">
-                    <span class="detail-label">Objetivo:</span>
-                    <span class="detail-value">{{objectiveTitle}}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Fecha:</span>
-                    <span class="detail-value">{{appointmentDate}}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Hora:</span>
-                    <span class="detail-value">{{appointmentTime}}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Duración:</span>
-                    <span class="detail-value">{{appointmentDuration}}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Coach:</span>
-                    <span class="detail-value">{{coachName}}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Modalidad:</span>
-                    <span class="detail-value">{{appointmentType}}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Enlace de reunión:</span>
-                    <span class="detail-value">{{meetingLink}}</span>
-                  </div>
-                </div>
+      <p>
+        La tua sessione di coaching è stata confermata con successo. Di seguito
+        trovi tutti i dettagli necessari per gestire l'incontro e l'integrazione
+        con il tuo calendario professionale.
+      </p>
 
-                <div style="text-align: center">
-                  <a href="{{joinMeetingUrl}}" class="button"
-                    >Unirse a la Sesión</a
-                  >
-                  <br />
-                  <a href="{{rescheduleUrl}}" class="button secondary"
-                    >Reprogramar</a
-                  >
-                  <a href="{{cancelUrl}}" class="button secondary">Cancelar</a>
-                </div>
+      <div class="session-box">
+        <p style="margin-top: 0; font-weight: bold; color: #0f172a">
+          Dettagli della Sessione:
+        </p>
+        <ul style="list-style: none; padding: 0; margin: 0">
+          <li><strong>Coachee:</strong> {{userName}}</li>
+          <li><strong>Data:</strong> {{appointmentDate}}</li>
+          <li><strong>Ora:</strong> {{appointmentTime}}</li>
+          <li><strong>Durata:</strong> {{appointmentDuration}} min</li>
+          <li>
+            <strong>Link:</strong>
+            <a href="{{meetingLink}}" class="link">{{meetingLink}}</a>
+          </li>
+        </ul>
+      </div>
 
-                <div
-                  style="
-                    margin-top: 30px;
-                    padding: 20px;
-                    background-color: #e7f3ff;
-                    border-radius: 8px;
-                  "
-                >
-                  <h4 style="margin-top: 0; color: #0056b3">
-                    💡 Preparación para tu sesión
-                  </h4>
-                  <ul style="margin: 10px 0; padding-left: 20px">
-                    <li>Asegúrate de tener un espacio tranquilo y privado</li>
-                    <li>Ten listos tus objetivos y preguntas</li>
-                    <li>Prueba tu conexión de internet y audio</li>
-                    <li>Llega 5 minutos antes de la hora programada</li>
-                  </ul>
-                </div>
+      <div class="tip-box">
+        <strong>Preparazione alla sessione:</strong> Prima di iniziare, ti
+        consigliamo di consultare la <strong>Dashboard Kyt coaching</strong> per
+        verificare lo stato di avanzamento delle sfide quotidiane di
+        {{userName}}. Arrivare all'incontro con dati oggettivi sui progressi
+        dell'ultima settimana ti permetterà di intervenire in modo chirurgico e
+        strategico.
+      </div>
 
-                <p style="margin-top: 30px; color: #6c757d; font-size: 14px">
-                  Si necesitas hacer algún cambio o tienes alguna pregunta, no
-                  dudes en contactarnos.
-                </p>
-              </td>
-            </tr>
+      <p style="margin-top: 30px"><strong>Kyt coaching</strong></p>
 
-            <!-- Footer -->
-            <tr>
-              <td class="footer">
-                <p><strong>{{companyName}}</strong></p>
-                <p>{{companyAddress}}</p>
-                <p>Email: {{companyEmail}} | Tel: {{companyPhone}}</p>
-                <p>
-                  <a
-                    href="{{unsubscribeUrl}}"
-                    style="color: #6c757d; text-decoration: none"
-                    >Cancelar suscripción</a
-                  >
-                  |
-                  <a
-                    href="{{privacyUrl}}"
-                    style="color: #6c757d; text-decoration: none"
-                    >Política de privacidad</a
-                  >
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+      <div class="footer">
+        <div class="legal">
+          <strong>AVVISO DI RISERVATEZZA</strong><br />
+          Le informazioni contenute in questo messaggio sono RISERVATE e
+          destinate esclusivamente al destinatario indicato. Qualsiasi uso non
+          autorizzato, diffusione o copia del presente messaggio sono
+          espressamente vietati. Se non sei il destinatario previsto, ti
+          preghiamo di informarci rispondendo a questa email e di procedere alla
+          cancellazione del messaggio. Eventuali opinioni espresse sono
+          dell'autore e non rappresentano necessariamente quelle di Kyt
+          coaching, salvo quando diversamente specificato e laddove il mittente
+          sia autorizzato a dichiarare che tali opinioni provengono da Kyt
+          coaching o dalle sue entità affiliate.
+          <br /><br />
+          <a href="{{privacyUrl}}" class="link">Politica sulla privacy</a>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

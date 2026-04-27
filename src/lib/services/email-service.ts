@@ -258,9 +258,7 @@ export interface AppointmentConfirmationEmailData {
   appointmentTime: string;
   coachName: string;
   appointmentDuration?: string;
-  appointmentType?: string;
   meetingLink?: string;
-  objectiveTitle?: string;
   icsAttachment?: EmailAttachment;
 }
 
@@ -269,14 +267,14 @@ export const sendAppointmentConfirmationEmail = async ({
   appointmentDate,
   appointmentTime,
   coachName,
-  appointmentDuration = '60 minutos',
-  appointmentType = 'Videoconsulta',
+  appointmentDuration = '60',
   meetingLink = '',
-  objectiveTitle = 'Sesión de coaching',
   icsAttachment,
 }: AppointmentConfirmationEmailData) => {
   const validRecipients = recipients.filter(recipient => recipient.email);
   const attachments = icsAttachment ? [icsAttachment] : undefined;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const companyLogo = `${appUrl.replace(/\/$/, '')}/logo.png`;
 
   if (validRecipients.length === 0) {
     await cleanupAttachments(attachments);
@@ -288,29 +286,23 @@ export const sendAppointmentConfirmationEmail = async ({
       validRecipients.map(recipient => {
         const variables = {
           companyName: 'KytCoaching',
+          companyLogo,
           userName: recipient.name,
-          objectiveTitle,
           appointmentDate,
           appointmentTime,
           coachName,
           appointmentDuration,
-          appointmentType,
           meetingLink,
-          joinMeetingUrl: meetingLink || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-          rescheduleUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-          cancelUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-          dashboardUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
           companyAddress: process.env.NEXT_PUBLIC_APP_ADDRESS || '',
           companyEmail: process.env.NEXT_PUBLIC_APP_EMAIL_FROM || '',
           companyPhone: process.env.NEXT_PUBLIC_APP_PHONE || '',
           privacyUrl: process.env.NEXT_PUBLIC_APP_PRIVACY_URL || '',
-          unsubscribeUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings`,
         };
 
         return sendTemplateEmail(
           'appointment-confirmation.html',
           recipient.email,
-          'Confirmación de Cita - KytCoaching',
+          'Conferma Sessione - KytCoaching',
           variables,
           attachments
         );
