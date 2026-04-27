@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -48,9 +49,10 @@ function messageForSurveyStatus(
 }
 
 export default function SurveyPage() {
+  const theme = useTheme();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const pageT = useTranslations('common.surveyPage');
+  const pageT = useTranslations('common.dashboard.surveyPage');
   const surveyT = useTranslations('common.dashboard.clientTasks.survey');
 
   const [rating, setRating] = useState<Rating | null>(null);
@@ -161,6 +163,36 @@ export default function SurveyPage() {
     }
   };
 
+  const ratingColors: Record<Rating, { border: string; background: string }> = {
+    excellent: {
+      border: '#22c55e',
+      background:
+        theme.palette.mode === 'dark' ? 'rgba(34, 197, 94, 0.16)' : '#dcfce7',
+    },
+    'so-so': {
+      border: '#eab308',
+      background:
+        theme.palette.mode === 'dark' ? 'rgba(234, 179, 8, 0.16)' : '#fef9c3',
+    },
+    bad: {
+      border: '#ef4444',
+      background:
+        theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.16)' : '#fee2e2',
+    },
+  };
+
+  const getRatingButtonStyle = (option: Rating) => {
+    const isSelected = rating === option;
+
+    return {
+      borderColor: isSelected ? ratingColors[option].border : theme.palette.divider,
+      backgroundColor: isSelected
+        ? ratingColors[option].background
+        : theme.palette.background.default,
+      color: theme.palette.text.primary,
+    };
+  };
+
   if (surveyState === 'checking') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] px-4">
@@ -253,14 +285,12 @@ export default function SurveyPage() {
                 <button
                   type="button"
                   onClick={() => setRating('excellent')}
-                  className={`w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${rating === 'excellent'
-                      ? 'border-green-500 bg-green-500/10'
-                      : 'border-[hsl(var(--border))] bg-[hsl(var(--card))] hover:border-green-400 hover:bg-[hsl(var(--accent))]'
-                    }`}
+                  className="w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 hover:opacity-90"
+                  style={getRatingButtonStyle('excellent')}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${rating === 'excellent'
-                      ? 'border-green-500 bg-green-500'
-                      : 'border-[hsl(var(--muted-foreground))]'
+                    ? 'border-green-500 bg-green-500'
+                    : 'border-[hsl(var(--muted-foreground))]'
                     }`}>
                     {rating === 'excellent' && (
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -282,14 +312,12 @@ export default function SurveyPage() {
                 <button
                   type="button"
                   onClick={() => setRating('so-so')}
-                  className={`w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${rating === 'so-so'
-                      ? 'border-yellow-500 bg-yellow-500/10'
-                      : 'border-[hsl(var(--border))] bg-[hsl(var(--card))] hover:border-yellow-400 hover:bg-[hsl(var(--accent))]'
-                    }`}
+                  className="w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 hover:opacity-90"
+                  style={getRatingButtonStyle('so-so')}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${rating === 'so-so'
-                      ? 'border-yellow-500 bg-yellow-500'
-                      : 'border-[hsl(var(--muted-foreground))]'
+                    ? 'border-yellow-500 bg-yellow-500'
+                    : 'border-[hsl(var(--muted-foreground))]'
                     }`}>
                     {rating === 'so-so' && (
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -311,14 +339,12 @@ export default function SurveyPage() {
                 <button
                   type="button"
                   onClick={() => setRating('bad')}
-                  className={`w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${rating === 'bad'
-                      ? 'border-red-500 bg-red-500/10'
-                      : 'border-[hsl(var(--border))] bg-[hsl(var(--card))] hover:border-red-400 hover:bg-[hsl(var(--accent))]'
-                    }`}
+                  className="w-full p-4 rounded-lg border-2 transition-all flex items-center gap-3 hover:opacity-90"
+                  style={getRatingButtonStyle('bad')}
                 >
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${rating === 'bad'
-                      ? 'border-red-500 bg-red-500'
-                      : 'border-[hsl(var(--muted-foreground))]'
+                    ? 'border-red-500 bg-red-500'
+                    : 'border-[hsl(var(--muted-foreground))]'
                     }`}>
                     {rating === 'bad' && (
                       <CheckCircle className="h-4 w-4 text-white" />
@@ -384,12 +410,14 @@ export default function SurveyPage() {
                   fontWeight: 600,
                   textTransform: 'none',
                   borderRadius: 2,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundColor: theme.palette.primary.main,
+                  color: "default",
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                    backgroundColor: theme.palette.primary.dark,
                   },
-                  '&:disabled': {
-                    background: '#ccc',
+                  '&.Mui-disabled': {
+                    backgroundColor: theme.palette.action.disabledBackground,
+                    color: theme.palette.text.disabled,
                   },
                 }}
               >
