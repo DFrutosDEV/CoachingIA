@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Types } from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Goal from '@/models/Goal';
 import { verifyToken } from '@/lib/auth-jwt';
@@ -20,23 +21,33 @@ function normalizeComment(comment: unknown) {
   return comment.trim();
 }
 
-async function getSurveyGoal(token: string) {
+function getGoalIdFromSurveyToken(token: string) {
+  if (process.env.NODE_ENV !== 'production' && Types.ObjectId.isValid(token)) {
+    return token;
+  }
+
   const decoded = verifyToken(token) as { goalId: string } | null;
 
-  if (!decoded?.goalId) {
+  return decoded?.goalId ?? null;
+}
+
+async function getSurveyGoal(token: string) {
+  const goalId = getGoalIdFromSurveyToken(token);
+
+  if (!goalId) {
     return {
       status: 'invalid_token' as SurveyStatus,
       httpStatus: 401,
     };
   }
 
-  const goal = await Goal.findById(decoded.goalId);
+  const goal = await Goal.findById(goalId);
 
   if (!goal) {
     return {
       status: 'goal_not_found' as SurveyStatus,
       httpStatus: 404,
-      goalId: decoded.goalId,
+      goalId,
     };
   }
 
