@@ -1,6 +1,6 @@
 {
-  "name": "coach",
-  "version": "3.3.8",
+  "name": "kyt-coaching",
+  "version": "3.3.9",
   "private": true,
   "scripts": {
     "dev": "next dev",
