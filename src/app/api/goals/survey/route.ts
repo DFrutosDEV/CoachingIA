@@ -10,7 +10,6 @@ type SurveyStatus =
   | 'missing_token'
   | 'invalid_token'
   | 'goal_not_found'
-  | 'goal_not_completed'
   | 'already_answered';
 
 function normalizeComment(comment: unknown) {
@@ -52,12 +51,8 @@ async function getSurveyGoal(token: string) {
   }
 
   if (!goal.isCompleted) {
-    return {
-      status: 'goal_not_completed' as SurveyStatus,
-      httpStatus: 400,
-      goalId: goal._id.toString(),
-      goal,
-    };
+    goal.isCompleted = true;
+    await goal.save();
   }
 
   if (goal.surveyRating) {

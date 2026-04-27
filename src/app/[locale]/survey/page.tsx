@@ -33,8 +33,6 @@ function messageForSurveyStatus(
       });
     case 'goal_not_found':
       return pageT('errors.goalNotFound');
-    case 'goal_not_completed':
-      return pageT('errors.goalNotCompleted');
     case 'invalid_rating':
       return pageT('errors.invalidRating');
     case 'invalid_comment':
