@@ -5,6 +5,7 @@ import { DashboardSidebar } from '@/components/dashboard-sidebar';
 import SessionsPage from '@/components/ui/calendar';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { DEFAULT_TIMEZONE } from '@/utils/date-formatter';
 
 export default function CalendarPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function CalendarPage() {
             <div className="flex flex-col">
               <h1 className="text-3xl font-bold">{t('title')}</h1>
             </div>
-            <SessionsPage />
+            <SessionsPage timezone={DEFAULT_TIMEZONE} />
           </div>
         </main>
       </div>

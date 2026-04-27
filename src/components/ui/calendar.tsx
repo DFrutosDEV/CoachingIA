@@ -1,6 +1,6 @@
 'use client'; // Necesario ya que usaremos hooks como useState y event handlers
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Calendar,
   dayjsLocalizer,
@@ -39,6 +39,10 @@ interface SessionEvent extends ServiceSessionEvent {
   _id: string;
 }
 
+interface SessionsPageProps {
+  timezone?: string;
+}
+
 // Toolbar simplificado que funciona correctamente
 const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
   const t = useTranslations('common.dashboard.calendar');
@@ -75,7 +79,7 @@ const CustomToolbar = (toolbar: ToolbarProps<SessionEvent, object>) => {
 };
 
 
-export default function SessionsPage() {
+export default function SessionsPage({ timezone }: SessionsPageProps) {
   const t = useTranslations('common.dashboard.calendar');
   const locale = useLocale() || routing.defaultLocale;
 
@@ -91,12 +95,12 @@ export default function SessionsPage() {
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const user = useAppSelector(state => state.auth.user);
   // Función para cargar las sesiones desde el API
-  const loadSessions = async () => {
+  const loadSessions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const result = await CalendarService.getSessions();
+      const result = await CalendarService.getSessions({ timezone });
 
       if (result.success) {
         // Mapear los eventos del servicio para incluir _id desde id
@@ -114,12 +118,12 @@ export default function SessionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [timezone]);
 
   // Cargar sesiones al montar el componente
   useEffect(() => {
     loadSessions();
-  }, []);
+  }, [loadSessions]);
 
   const handleSelectEvent = (event: SessionEvent) => {
     setSelectedSession(event);

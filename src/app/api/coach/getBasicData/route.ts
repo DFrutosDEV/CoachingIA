@@ -4,7 +4,43 @@ import User from '@/models/User';
 import Meet from '@/models/Meet';
 import Objective from '@/models/Objective';
 import Profile from '@/models/Profile';
-import { formatUtcDate, formatUtcTime, normalizeLocale } from '@/utils/date-formatter';
+import { fromZonedTime } from 'date-fns-tz';
+import {
+  formatUtcDate,
+  formatUtcTime,
+  getDateConfig,
+  normalizeLocale,
+} from '@/utils/date-formatter';
+
+function getDateKeyInTimezone(date: Date, timezone: string) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts
+      .filter(part => part.type !== 'literal')
+      .map(part => [part.type, part.value])
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getUtcDayRange(date: Date, timezone: string) {
+  const localDateKey = getDateKeyInTimezone(date, timezone);
+  const nextLocalDate = new Date(`${localDateKey}T00:00:00.000Z`);
+  nextLocalDate.setUTCDate(nextLocalDate.getUTCDate() + 1);
+
+  const nextLocalDateKey = nextLocalDate.toISOString().slice(0, 10);
+
+  return {
+    start: fromZonedTime(`${localDateKey}T00:00:00`, timezone),
+    end: fromZonedTime(`${nextLocalDateKey}T00:00:00`, timezone),
+  };
+}
 
 // GET /api/coach/getBasicData - Obtener datos básicos del dashboard del coach
 export async function GET(request: NextRequest) {
@@ -14,6 +50,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const coachId = searchParams.get('coachId');
     const locale = normalizeLocale(searchParams.get('locale'));
+    const { timeZone: defaultTimeZone } = getDateConfig(locale);
+    const timezone =
+      request.headers.get('x-timezone') ||
+      searchParams.get('timezone') ||
+      defaultTimeZone;
 
     if (!coachId) {
       return NextResponse.json(
@@ -96,16 +137,13 @@ export async function GET(request: NextRequest) {
       date: { $gte: startOfWeek, $lt: endOfWeek },
     });
 
-    // Obtener sesiones de hoy
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Obtener sesiones de hoy en la zona horaria del usuario.
+    const todayRange = getUtcDayRange(new Date(), timezone);
 
     const todaySessions = await Meet.find({
       coachId: coachProfile._id, // Usar profileId del coach
       isCancelled: false,
-      date: { $gte: today, $lt: tomorrow },
+      date: { $gte: todayRange.start, $lt: todayRange.end },
     })
       .populate({
         path: 'clientId',
@@ -159,9 +197,11 @@ export async function GET(request: NextRequest) {
     const formattedTodaySessions = todaySessions.map(session => ({
       time: `${formatUtcDate(session.date, {
         locale,
+        timeZone: timezone,
         format: 'short',
       })} - ${formatUtcTime(session.date, {
         locale,
+        timeZone: timezone,
         format: 'time-24',
       })}`,
       client: `${session.clientId.name} ${session.clientId.lastName}`,
@@ -175,6 +215,7 @@ export async function GET(request: NextRequest) {
         link: nextSession.link,
         time: formatUtcTime(nextSession.date, {
           locale,
+          timeZone: timezone,
           format: 'time-24',
         }),
         client: `${nextSession.clientId.name} ${nextSession.clientId.lastName}`,

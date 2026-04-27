@@ -27,6 +27,7 @@ export class CalendarService {
   static async getSessions(params?: {
     startDate?: string;
     endDate?: string;
+    timezone?: string;
   }): Promise<CalendarResponse> {
     try {
       const currentUser = AuthService.getCurrentUser();
@@ -45,7 +46,7 @@ export class CalendarService {
             : 'enterprise';
 
       const locale = getCurrentLocale();
-      const timezone = getTimeZoneForLocale(locale);
+      const timezone = params?.timezone || getTimeZoneForLocale(locale);
 
       // Construir la URL con parámetros
       const searchParams = new URLSearchParams({
